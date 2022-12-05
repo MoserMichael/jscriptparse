@@ -242,6 +242,16 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser") {
                 makeError("Parsing error in " + name + " at term " + i, state.pos, er);
             }
         }
+
+        // Achtung! if last element is an empty array then chop it off
+        // that's for cases when we have an optional repetition of clausese
+        if (result.length != 0) {
+            let last = result[result.length-1];
+            if (last instanceof Array && last.length == 0) {
+               result.pop();
+            }
+        }
+
         state.result = result;
         return state;
     }, name);

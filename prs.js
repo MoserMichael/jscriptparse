@@ -1,6 +1,10 @@
 
 let trace_on = false;
 
+/**
+ * Enable tracing of the parser
+ * @param on - boolean true - enable tracing.
+ */
 const setTrace = function(on) {
     trace_on = on;
 }
@@ -121,7 +125,12 @@ function skipWhitespace(state) {
     return state;
 }
 
-// returns parser that consumes argument token string or regex
+/**
+ * Returns a parser that can matches/consumes a given regular expression
+ * @param regex - the regex to match
+ * @param name - optional name of the parser (for tracing purposes)
+ * @returns {*|(function(*): *)}
+ */
 const makeRegexParser = function (regex, name = null) {
 
     let type = -1;
@@ -151,7 +160,11 @@ const makeRegexParser = function (regex, name = null) {
     }, name=name);
 }
 
-// returns parser that consumes argument token string or regex
+/**
+ * returns parser that consumes argument token string
+ * @param token
+ * @returns {*|(function(*): *)}
+ */
 const makeTokenParser = function (token) {
 
     if (typeof(token) != 'string') {
@@ -190,7 +203,14 @@ function requireArrayOfFunctions(a) {
         }
     }
 }
-// returns parser that applies argument parser repeatedly
+
+/**
+ * returns parser that applies argument parser repeatedly
+ * @param parser - argument parsing function
+ * @param minMatching - number of minimal matches (default 1)
+ * @param name
+ * @returns {*|(function(*): *)}
+ */
 const makeRepetitionParser = function(parser, minMatching = 1, name = "RepetitionParser") {
 
     requireFunction(parser);
@@ -222,8 +242,13 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
     }, name);
 }
 
-
-// returns parser that applies all argument parsers sequentialy
+/**
+ * returns parser that applies all argument parsers sequentially
+ * @param arrayOfParsers - array of argument parsers, each one applied after the previous one.
+ * @param name
+ * @param simplifyResult
+ * @returns {*|(function(*): *)}
+ */
 const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simplifyResult = true) {
 
     requireArrayOfFunctions(arrayOfParsers);
@@ -263,7 +288,14 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simpl
     }, name);
 }
 
-// returns parser that must requires one of the argument parsers to math the input
+
+/**
+ * returns parser that must requires one of the argument parsers to math the input
+ * @param arrayOfParsers - array of argument parsers, tries to apply each of them, consecutively.
+ * @param name
+ * @param forwardWithIndex
+ * @returns {*|(function(*): *)}
+ */
 const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser", forwardWithIndex = false) {
 
     requireArrayOfFunctions(arrayOfParsers);
@@ -287,7 +319,11 @@ const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser
     }, name);
 }
 
-// returns parser that must consume all of the input
+/**
+ * returns parser that must consume all of the input
+ * @param nestedParser
+ * @returns {function(*): *}
+ */
 const makeConsumeAll = function(nestedParser) {
 
     requireFunction(nestedParser);
@@ -302,8 +338,13 @@ const makeConsumeAll = function(nestedParser) {
     }
 }
 
-
-// returns parser that transforms the result of the argument parser/transforms parser error exception
+/**
+ * returns parser that transforms the result of the argument parser/transforms parser error exception
+ * @param nestedParser
+ * @param transformResult
+ * @param nameOfEntityOrErrorFunc
+ * @returns {function(*): null}
+ */
 const makeTransformer = function(nestedParser, transformResult, nameOfEntityOrErrorFunc) {
 
     requireFunction(nestedParser);
@@ -329,6 +370,11 @@ const makeTransformer = function(nestedParser, transformResult, nameOfEntityOrEr
 }
 
 // new makeForwarder - creates an instance of a forwarder!
+/**
+ * returns a forwarding parser, the inner parser can be set later on. This is used to express recursive grammars.
+ * @param nestedParser
+ * @returns {function(*): *}
+ */
 function makeForwarder(innerFunc = null) {
 
     if (innerFunc != null) {

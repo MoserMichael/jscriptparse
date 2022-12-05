@@ -30,7 +30,7 @@ function makeParser() {
             multOperator,
             primaryExpr,
             ], "multExpressionSeq"),
-            0, "multExpressionRep"),
+            0, -1, "multExpressionRep"),
         ],
         "multExpression"
     );
@@ -46,7 +46,7 @@ function makeParser() {
             prs.makeSequenceParser([
             addOperator,
             multExpression,
-        ], "addExpressionSeq"), 0, "addExpressionRep"),
+        ], "addExpressionSeq"), 0,  -1,"addExpressionRep"),
     ], "addExpression");
 
     forwardExpr.setInner(expression);
@@ -64,7 +64,7 @@ function makeParser() {
                 prs.makeTokenParser(","),
                 statement
             ], "statementListRep"),
-            0, "statementListCont"
+            0, -1,"statementListCont"
         )
     ], "statementList");
 

@@ -212,10 +212,11 @@ function requireArrayOfFunctions(a) {
  * returns parser that applies argument parser repeatedly
  * @param parser - argument parsing function
  * @param minMatching - number of minimal matches (default 1)
+ * @param maxMatching - number of maximum allowed matches, -1 - no limit
  * @param name
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-const makeRepetitionParser = function(parser, minMatching = 1, name = "RepetitionParser") {
+const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1, name = "RepetitionParser") {
 
     requireFunction(parser);
 
@@ -223,7 +224,7 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
         let result = [];
         let matching = 0;
 
-        for (; state.pos < state.data.length; ++matching) {
+        for (; state.pos < state.data.length && (maxMatching == -1 || matching < maxMatching); ++matching) {
             try {
                 let nextState = parser(state);
                 result.push(nextState.result);
@@ -244,6 +245,16 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
         state.result = result;
         return state;
     }, name);
+}
+
+/**
+ * returns parser that applies the argument parser at least once
+ * @param parser
+ * @param name
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.*
+ */
+const makeOptParser = function(parser, name = "OptParser") {
+    return makeRepetitionParser(parser, 0, 1, name);
 }
 
 /**
@@ -399,6 +410,7 @@ module.exports = {
     State,
     makeTokenParser,
     makeRegexParser,
+    makeOptParser,
     makeRepetitionParser,
     makeSequenceParser,
     makeAlternativeParser,

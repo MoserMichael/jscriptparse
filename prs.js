@@ -28,7 +28,11 @@ function showRec(arg) {
     return ret;
 }
 
-// my short parser library
+/**
+ * class that encapsulates the parsers input and output of a parser.
+ * The input is the current position of the parser and the text that is being parsed
+ * The returned output is an object that represents the parsed value:
+ */
 class State {
     constructor(pos, data, result = null) {
         this.pos = pos;
@@ -129,7 +133,7 @@ function skipWhitespace(state) {
  * Returns a parser that can matches/consumes a given regular expression
  * @param regex - the regex to match
  * @param name - optional name of the parser (for tracing purposes)
- * @returns {*|(function(*): *)}
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 const makeRegexParser = function (regex, name = null) {
 
@@ -163,7 +167,7 @@ const makeRegexParser = function (regex, name = null) {
 /**
  * returns parser that consumes argument token string
  * @param token
- * @returns {*|(function(*): *)}
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 const makeTokenParser = function (token) {
 
@@ -209,7 +213,7 @@ function requireArrayOfFunctions(a) {
  * @param parser - argument parsing function
  * @param minMatching - number of minimal matches (default 1)
  * @param name
- * @returns {*|(function(*): *)}
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 const makeRepetitionParser = function(parser, minMatching = 1, name = "RepetitionParser") {
 
@@ -247,7 +251,7 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
  * @param arrayOfParsers - array of argument parsers, each one applied after the previous one.
  * @param name
  * @param simplifyResult
- * @returns {*|(function(*): *)}
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simplifyResult = true) {
 
@@ -294,7 +298,7 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simpl
  * @param arrayOfParsers - array of argument parsers, tries to apply each of them, consecutively.
  * @param name
  * @param forwardWithIndex
- * @returns {*|(function(*): *)}
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser", forwardWithIndex = false) {
 
@@ -322,7 +326,7 @@ const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser
 /**
  * returns parser that must consume all of the input
  * @param nestedParser
- * @returns {function(*): *}
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 const makeConsumeAll = function(nestedParser) {
 
@@ -343,7 +347,7 @@ const makeConsumeAll = function(nestedParser) {
  * @param nestedParser
  * @param transformResult
  * @param nameOfEntityOrErrorFunc
- * @returns {function(*): null}
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 const makeTransformer = function(nestedParser, transformResult, nameOfEntityOrErrorFunc) {
 
@@ -369,11 +373,10 @@ const makeTransformer = function(nestedParser, transformResult, nameOfEntityOrEr
     }
 }
 
-// new makeForwarder - creates an instance of a forwarder!
 /**
  * returns a forwarding parser, the inner parser can be set later on. This is used to express recursive grammars.
  * @param nestedParser
- * @returns {function(*): *}
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 function makeForwarder(innerFunc = null) {
 

@@ -1,4 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: prs.js</title>
 
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: prs.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
 let trace_on = false;
 
 /**
@@ -14,7 +42,7 @@ function showRec(arg) {
     if (arg instanceof Array) {
         ret += "[";
         let i = 0;
-        for (; i < arg.length; ++i) {
+        for (; i &lt; arg.length; ++i) {
             if (i > 0) {
                 ret += ",";
             }
@@ -55,10 +83,10 @@ class ParserError extends Error {
 
 function getLineAt(data, pos) {
     let start = pos;
-    for(;start>=0 && data.charAt(start) != '\n'; --start);
+    for(;start>=0 &amp;&amp; data.charAt(start) != '\n'; --start);
     start += 1;
     let end = pos;
-    for(;end < data.length && data.charAt(end) != '\n'; ++end);
+    for(;end &lt; data.length &amp;&amp; data.charAt(end) != '\n'; ++end);
     return [ data.substring(start, end), pos-start];
 }
 
@@ -119,7 +147,7 @@ function isSpace(ch) {
 }
 
 function skipWhitespace(state) {
-    while(state.pos < state.data.length) {
+    while(state.pos &lt; state.data.length) {
         let ch = state.data.charAt(state.pos);
         if (!isSpace(ch)) {
             break
@@ -201,7 +229,7 @@ function requireArrayOfFunctions(a) {
         throw new Error("argument is not a array");
     }
     let i = 0;
-    for(;i<a.length;++i) {
+    for(;i&lt;a.length;++i) {
         if (!a[i] instanceof Function) {
             throw new Error("Array element " + i + " is not a function. Requires array of functions");
         }
@@ -223,7 +251,7 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
         let result = [];
         let matching = 0;
 
-        for (; state.pos < state.data.length; ++matching) {
+        for (; state.pos &lt; state.data.length; ++matching) {
             try {
                 let nextState = parser(state);
                 result.push(nextState.result);
@@ -233,7 +261,7 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
             }
         }
 
-        if (matching < minMatching) {
+        if (matching &lt; minMatching) {
             if (matching == 0) {
                 makeError("didn't match even one in " + name, state.pos);
             } else {
@@ -260,7 +288,7 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simpl
     return makeTracer( function(state) {
         let result = [];
         let i = 0;
-        for(;i < arrayOfParsers.length;++i) {
+        for(;i &lt; arrayOfParsers.length;++i) {
             let parser = arrayOfParsers[i];
             try {
                 state = parser(state);
@@ -275,7 +303,7 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simpl
         // that's for cases when we have an optional repetition of clausese
         if (result.length != 0) {
             let last = result[result.length-1];
-            if (last instanceof Array && last.length == 0) {
+            if (last instanceof Array &amp;&amp; last.length == 0) {
                result.pop();
             }
         }
@@ -306,7 +334,7 @@ const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser
 
     return makeTracer(function (state) {
         let i = 0;
-        for(;i < arrayOfParsers.length;++i) {
+        for(;i &lt; arrayOfParsers.length;++i) {
             let parser = arrayOfParsers[i];
             try {
                 let res = parser(state);
@@ -335,7 +363,7 @@ const makeConsumeAll = function(nestedParser) {
     return function consumeAll(state) {
         let res = nestedParser(state);
         res=skipWhitespace(res);
-        if (res.pos < state.data.length) {
+        if (res.pos &lt; state.data.length) {
             makeError(res, "did not parse all the string. Trailing data",res.pos);
         }
         return res;
@@ -408,3 +436,26 @@ module.exports = {
     formatParserError,
     setTrace,
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="State.html">State</a></li></ul><h3>Global</h3><ul><li><a href="global.html#makeAlternativeParser">makeAlternativeParser</a></li><li><a href="global.html#makeConsumeAll">makeConsumeAll</a></li><li><a href="global.html#makeForwarder">makeForwarder</a></li><li><a href="global.html#makeRegexParser">makeRegexParser</a></li><li><a href="global.html#makeRepetitionParser">makeRepetitionParser</a></li><li><a href="global.html#makeSequenceParser">makeSequenceParser</a></li><li><a href="global.html#makeTokenParser">makeTokenParser</a></li><li><a href="global.html#makeTransformer">makeTransformer</a></li><li><a href="global.html#setTrace">setTrace</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Mon Dec 05 2022 16:27:18 GMT+0200 (Israel Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

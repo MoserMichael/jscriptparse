@@ -2,7 +2,7 @@
 let trace_on = false;
 
 /**
- * Enable tracing of the parser
+ * Enable tracing of the parser. This function must be called before calling any of the parser generating functions (like makeSequenceParser, etc.)
  * @param on - boolean true - enable tracing.
  */
 const setTrace = function(on) {
@@ -378,7 +378,7 @@ const makeTransformer = function(nestedParser, transformResult, nameOfEntityOrEr
  * @param nestedParser
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-function makeForwarder(innerFunc = null) {
+const makeForwarder = function (innerFunc = null) {
 
     if (innerFunc != null) {
         requireFunction(innerFunc);

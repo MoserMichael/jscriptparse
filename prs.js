@@ -48,9 +48,7 @@ class ParserError extends Error {
 function getLineAt(data, pos) {
     let start = pos;
     for(;start>=0 && data.charAt(start) != '\n'; --start);
-    if (start <= 0) {
-        start = 0;
-    }
+    start += 1;
     let end = pos;
     for(;end < data.length && data.charAt(end) != '\n'; ++end);
     return [ data.substring(start, end), pos-start];
@@ -87,7 +85,7 @@ const makeTracer = function(parser, title) {
         console.log("enter parser: " + title);
 
         let entry = getLineAt(state.data,state.pos);
-        let msg = "\n" + entry[0] + "\n" + " ".repeat(entry[1]) + "^\n";
+        let msg = entry[0] + "\n" + " ".repeat(entry[1]) + "^";
         console.log(msg);
 
         let ret = null;
@@ -99,7 +97,7 @@ const makeTracer = function(parser, title) {
         }
 
         entry = getLineAt(ret.data,ret.pos);
-        msg = "\n" + entry[0] + "\n" + " ".repeat(entry[1]) + "^\n";
+        msg = entry[0] + "\n" + " ".repeat(entry[1]) + "^";
         console.log(msg);
 
         console.log("exit parser: " + title);

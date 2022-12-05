@@ -226,7 +226,7 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
 
 
 // returns parser that applies all argument parsers sequentialy
-const makeSequenceParser = function(arrayOfParsers, name="SequenceParser") {
+const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simplifyResult = true) {
 
     requireArrayOfFunctions(arrayOfParsers);
 
@@ -243,6 +243,7 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser") {
             }
         }
 
+
         // Achtung! if last element is an empty array then chop it off
         // that's for cases when we have an optional repetition of clausese
         if (result.length != 0) {
@@ -251,8 +252,15 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser") {
                result.pop();
             }
         }
-
         state.result = result;
+
+        // Achtung! simplify result option for single terms that call down to a deeper clause
+        if (simplifyResult) {
+            if (state.result.length == 1) {
+                state.result = state.result[0];
+            }
+        }
+
         return state;
     }, name);
 }

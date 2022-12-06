@@ -357,28 +357,15 @@ const makeConsumeAll = function(nestedParser) {
  * returns parser that transforms the result of the argument parser/transforms parser error exception
  * @param nestedParser
  * @param transformResult
- * @param nameOfEntityOrErrorFunc
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-const makeTransformer = function(nestedParser, transformResult, nameOfEntityOrErrorFunc) {
+const makeTransformer = function(nestedParser, transformResult) {
 
     requireFunction(nestedParser);
+    requireFunction(transformResult);
 
-    return function consumeAll(state) {
-        let pos = state.pos;
-        let res = null;
-        try {
-            res = nestedParser(state);
-        } catch(e) {
-            let errorMsg = null;
-            if (typeof(nameOfEntityOrErrorFunc) == 'string' ) {
-                errorMsg = nameOfEntityOrErrorFunc(e);
-            }
-            if (errorMsg == null) {
-                errorMsg = "Error while parsing " + nameOfEntityOrErrorFunc + "\nError: " + e;
-            }
-            makeError(state, errorMsg, pos);
-        }
+    return function(state) {
+        res = nestedParser(state);
         res.result = transformResult(res.result);
         return res;
     }

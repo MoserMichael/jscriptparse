@@ -393,17 +393,19 @@ const makeForwarder = function (innerFunc = null) {
     }
 }
 
-module.exports = {
-    State,
-    makeTokenParser,
-    makeRegexParser,
-    makeOptParser,
-    makeRepetitionParser,
-    makeSequenceParser,
-    makeAlternativeParser,
-    makeConsumeAll,
-    makeTransformer,
-    makeForwarder,
-    formatParserError,
-    setTrace,
+if (typeof(module) == 'object') {
+    module.exports = {
+        State,
+        makeTokenParser,
+        makeRegexParser,
+        makeOptParser,
+        makeRepetitionParser,
+        makeSequenceParser,
+        makeAlternativeParser,
+        makeConsumeAll,
+        makeTransformer,
+        makeForwarder,
+        formatParserError,
+        setTrace,
+    }
 }

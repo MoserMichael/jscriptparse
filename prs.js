@@ -53,6 +53,12 @@ class ParserError extends Error {
     }
 }
 
+function makeError(message, pos, nested) {
+    //console.log("message:" + message + " pos: " + pos + " nested: " + nested);
+    let ex = new ParserError(message, pos, nested);
+    throw ex;
+}
+
 function getLineAt(data, pos) {
     let start = pos;
     for(;start>=0 && data.charAt(start) != '\n'; --start);
@@ -68,8 +74,7 @@ function formatParserError(er, data) {
         let msg = er.message;
 
         let entry = getLineAt(data,er.pos);
-        msg += "\nat: " + entry[0] + "\n" + "   " + (" " * entry[1])
-
+        msg += "\n" + entry[0] + "\n" +  Array(entry[1]).join(".") + "^";
         if (er.nextException != null) {
             msg += "\n";
             msg += formatParserError(er.nextException, data);
@@ -79,11 +84,6 @@ function formatParserError(er, data) {
     return er;
 }
 
-
-function makeError(message, pos, nested) {
-    //console.trace("parser error at:" + pos);
-    throw new ParserError(message, pos, nested);
-}
 
 const makeTracer = function(parser, title) {
     if (!trace_on) {
@@ -216,7 +216,7 @@ function requireArrayOfFunctions(a) {
  * @param name
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1, name = "RepetitionParser") {
+const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1, name = "RepetitionParser", concat = false) {
 
     requireFunction(parser);
 
@@ -227,7 +227,12 @@ const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1,
         for (; state.pos < state.data.length && (maxMatching == -1 || matching < maxMatching); ++matching) {
             try {
                 let nextState = parser(state);
-                result.push(nextState.result);
+
+                if (concat) {
+                    result = result.concat(nextState.result);
+                } else {
+                    result.push(nextState.result);
+                }
                 state.pos = nextState.pos;
             } catch(er) {
                 break;
@@ -264,7 +269,7 @@ const makeOptParser = function(parser, name = "OptParser") {
  * @param simplifyResult
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simplifyResult = true) {
+const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", concat = false) {
 
     requireArrayOfFunctions(arrayOfParsers);
 
@@ -275,7 +280,11 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simpl
             let parser = arrayOfParsers[i];
             try {
                 state = parser(state);
-                result.push(state.result);
+                if (concat) {
+                    result = result.concat(state.result);
+                } else {
+                    result.push(state.result);
+                }
             } catch(er) {
                 makeError("Parsing error in " + name + " at term " + i, state.pos, er);
             }
@@ -293,10 +302,8 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simpl
         state.result = result;
 
         // Achtung! simplify result option for single terms that call down to a deeper clause
-        if (simplifyResult) {
-            if (state.result.length == 1) {
-                state.result = state.result[0];
-            }
+        if (state.result.length == 1) {
+            state.result = state.result[0];
         }
 
         return state;
@@ -347,7 +354,7 @@ const makeConsumeAll = function(nestedParser) {
         let res = nestedParser(state);
         res=skipWhitespace(res);
         if (res.pos < state.data.length) {
-            makeError(res, "did not parse all the string. Trailing data",res.pos);
+            makeError("did not parse all the string. Trailing data",res.pos);
         }
         return res;
     }

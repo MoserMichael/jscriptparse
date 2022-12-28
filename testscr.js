@@ -121,7 +121,7 @@ function makeParser() {
                 multOperator,
                 primaryExpr
             ], "multExpressionSeq"),
-            "multExpression"
+            "multExpression", true
         ), simplifyArray);
 
     let addOperator = prs.makeAlternativeParser([
@@ -138,7 +138,7 @@ function makeParser() {
                 addOperator,
                 multExpression,
             ], "addExpressionSeq"),
-        "addExpression"),
+        "addExpression", true),
         simplifyArray);
 
     let relationOperator = prs.makeAlternativeParser([

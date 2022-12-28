@@ -30,7 +30,7 @@
 let trace_on = false;
 
 /**
- * Enable tracing of the parser
+ * Enable tracing of the parser. This function must be called before calling any of the parser generating functions (like makeSequenceParser, etc.)
  * @param on - boolean true - enable tracing.
  */
 const setTrace = function(on) {
@@ -81,12 +81,21 @@ class ParserError extends Error {
     }
 }
 
+function makeError(message, pos, nested) {
+    //console.log("message:" + message + " pos: " + pos + " nested: " + nested);
+    let ex = new ParserError(message, pos, nested);
+    throw ex;
+}
+
 function getLineAt(data, pos) {
     let start = pos;
     for(;start>=0 &amp;&amp; data.charAt(start) != '\n'; --start);
     start += 1;
     let end = pos;
     for(;end &lt; data.length &amp;&amp; data.charAt(end) != '\n'; ++end);
+    if (start > pos) {
+        start = pos;
+    }
     return [ data.substring(start, end), pos-start];
 }
 
@@ -96,8 +105,7 @@ function formatParserError(er, data) {
         let msg = er.message;
 
         let entry = getLineAt(data,er.pos);
-        msg += "\nat: " + entry[0] + "\n" + "   " + (" " * entry[1])
-
+        msg += "\n" + entry[0] + "\n" +  Array(entry[1]).join(".") + "^";
         if (er.nextException != null) {
             msg += "\n";
             msg += formatParserError(er.nextException, data);
@@ -107,11 +115,6 @@ function formatParserError(er, data) {
     return er;
 }
 
-
-function makeError(message, pos, nested) {
-    //console.trace("parser error at:" + pos);
-    throw new ParserError(message, pos, nested);
-}
 
 const makeTracer = function(parser, title) {
     if (!trace_on) {
@@ -240,10 +243,11 @@ function requireArrayOfFunctions(a) {
  * returns parser that applies argument parser repeatedly
  * @param parser - argument parsing function
  * @param minMatching - number of minimal matches (default 1)
+ * @param maxMatching - number of maximum allowed matches, -1 - no limit
  * @param name
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-const makeRepetitionParser = function(parser, minMatching = 1, name = "RepetitionParser") {
+const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1, name = "RepetitionParser", concat = false) {
 
     requireFunction(parser);
 
@@ -251,10 +255,15 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
         let result = [];
         let matching = 0;
 
-        for (; state.pos &lt; state.data.length; ++matching) {
+        for (; state.pos &lt; state.data.length &amp;&amp; (maxMatching == -1 || matching &lt; maxMatching); ++matching) {
             try {
                 let nextState = parser(state);
-                result.push(nextState.result);
+
+                if (concat) {
+                    result = result.concat(nextState.result);
+                } else {
+                    result.push(nextState.result);
+                }
                 state.pos = nextState.pos;
             } catch(er) {
                 break;
@@ -274,6 +283,49 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
     }, name);
 }
 
+const makeRepetitionRecClause = function(parserMandatory, parserRepetition, title = "RecursiveClause", concat = false) {
+
+    requireFunction(parserMandatory);
+    requireFunction(parserRepetition);
+
+    return makeTracer( function (state) {
+        let result = [];
+
+        state = parserMandatory(state);
+        if (concat) {
+            result = result.concat(state.result);
+        } else {
+            result.push( state.result );
+        }
+
+        while(true) {
+            try {
+                state = parserRepetition(state);
+                if (concat) {
+                    result = result.concat(state.result);
+                } else {
+                    result.push( state.result );
+                }
+            } catch(er) {
+                break;
+            }
+        }
+
+        state.result = result;
+        return state;
+    }, title);
+}
+
+/**
+ * returns parser that applies the argument parser at least once
+ * @param parser
+ * @param name
+ * @returns parsing function that receives a State object for the current position within the input and returns the next state.*
+ */
+const makeOptParser = function(parser, name = "OptParser") {
+    return makeRepetitionParser(parser, 0, 1, name);
+}
+
 /**
  * returns parser that applies all argument parsers sequentially
  * @param arrayOfParsers - array of argument parsers, each one applied after the previous one.
@@ -281,7 +333,7 @@ const makeRepetitionParser = function(parser, minMatching = 1, name = "Repetitio
  * @param simplifyResult
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simplifyResult = true) {
+const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", concat = false) {
 
     requireArrayOfFunctions(arrayOfParsers);
 
@@ -292,7 +344,11 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simpl
             let parser = arrayOfParsers[i];
             try {
                 state = parser(state);
-                result.push(state.result);
+                if (concat) {
+                    result = result.concat(state.result);
+                } else {
+                    result.push(state.result);
+                }
             } catch(er) {
                 makeError("Parsing error in " + name + " at term " + i, state.pos, er);
             }
@@ -310,14 +366,12 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", simpl
         state.result = result;
 
         // Achtung! simplify result option for single terms that call down to a deeper clause
-        if (simplifyResult) {
-            if (state.result.length == 1) {
-                state.result = state.result[0];
-            }
+        if (state.result.length == 1) {
+            state.result = state.result[0];
         }
 
         return state;
-    }, name);
+    }, title);
 }
 
 
@@ -364,7 +418,7 @@ const makeConsumeAll = function(nestedParser) {
         let res = nestedParser(state);
         res=skipWhitespace(res);
         if (res.pos &lt; state.data.length) {
-            makeError(res, "did not parse all the string. Trailing data",res.pos);
+            makeError("did not parse all the string. Trailing data",res.pos);
         }
         return res;
     }
@@ -374,28 +428,15 @@ const makeConsumeAll = function(nestedParser) {
  * returns parser that transforms the result of the argument parser/transforms parser error exception
  * @param nestedParser
  * @param transformResult
- * @param nameOfEntityOrErrorFunc
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-const makeTransformer = function(nestedParser, transformResult, nameOfEntityOrErrorFunc) {
+const makeTransformer = function(nestedParser, transformResult) {
 
     requireFunction(nestedParser);
+    requireFunction(transformResult);
 
-    return function consumeAll(state) {
-        let pos = state.pos;
-        let res = null;
-        try {
-            res = nestedParser(state);
-        } catch(e) {
-            let errorMsg = null;
-            if (typeof(nameOfEntityOrErrorFunc) == 'string' ) {
-                errorMsg = nameOfEntityOrErrorFunc(e);
-            }
-            if (errorMsg == null) {
-                errorMsg = "Error while parsing " + nameOfEntityOrErrorFunc + "\nError: " + e;
-            }
-            makeError(state, errorMsg, pos);
-        }
+    return function(state) {
+        res = nestedParser(state);
         res.result = transformResult(res.result);
         return res;
     }
@@ -406,7 +447,7 @@ const makeTransformer = function(nestedParser, transformResult, nameOfEntityOrEr
  * @param nestedParser
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-function makeForwarder(innerFunc = null) {
+const makeForwarder = function (innerFunc = null) {
 
     if (innerFunc != null) {
         requireFunction(innerFunc);
@@ -423,18 +464,22 @@ function makeForwarder(innerFunc = null) {
     }
 }
 
-module.exports = {
-    State,
-    makeTokenParser,
-    makeRegexParser,
-    makeRepetitionParser,
-    makeSequenceParser,
-    makeAlternativeParser,
-    makeConsumeAll,
-    makeTransformer,
-    makeForwarder,
-    formatParserError,
-    setTrace,
+if (typeof(module) == 'object') {
+    module.exports = {
+        State,
+        makeTokenParser,
+        makeRegexParser,
+        makeOptParser,
+        makeRepetitionParser,
+        makeRepetitionRecClause,
+        makeSequenceParser,
+        makeAlternativeParser,
+        makeConsumeAll,
+        makeTransformer,
+        makeForwarder,
+        formatParserError,
+        setTrace,
+    }
 }
 </code></pre>
         </article>
@@ -446,13 +491,13 @@ module.exports = {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="State.html">State</a></li></ul><h3>Global</h3><ul><li><a href="global.html#makeAlternativeParser">makeAlternativeParser</a></li><li><a href="global.html#makeConsumeAll">makeConsumeAll</a></li><li><a href="global.html#makeForwarder">makeForwarder</a></li><li><a href="global.html#makeRegexParser">makeRegexParser</a></li><li><a href="global.html#makeRepetitionParser">makeRepetitionParser</a></li><li><a href="global.html#makeSequenceParser">makeSequenceParser</a></li><li><a href="global.html#makeTokenParser">makeTokenParser</a></li><li><a href="global.html#makeTransformer">makeTransformer</a></li><li><a href="global.html#setTrace">setTrace</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="State.html">State</a></li></ul><h3>Global</h3><ul><li><a href="global.html#makeAlternativeParser">makeAlternativeParser</a></li><li><a href="global.html#makeConsumeAll">makeConsumeAll</a></li><li><a href="global.html#makeForwarder">makeForwarder</a></li><li><a href="global.html#makeOptParser">makeOptParser</a></li><li><a href="global.html#makeRegexParser">makeRegexParser</a></li><li><a href="global.html#makeRepetitionParser">makeRepetitionParser</a></li><li><a href="global.html#makeSequenceParser">makeSequenceParser</a></li><li><a href="global.html#makeTokenParser">makeTokenParser</a></li><li><a href="global.html#makeTransformer">makeTransformer</a></li><li><a href="global.html#setTrace">setTrace</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Mon Dec 05 2022 16:27:18 GMT+0200 (Israel Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Dec 28 2022 09:04:45 GMT+0200 (Israel Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

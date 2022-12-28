@@ -15,10 +15,17 @@
 //  named parameters - NO
 //  parameters with default values - yes
 //  multiple return values, multiple assignment - as list (similar to python) - yes
-// generators - NO
-// with statements - NO
+// yield / generators / with statement - maybe later....
+
 
 const prs=require("./prs.js");
+
+function simplifyArray(arg) {
+    if (arg.length == 1) {
+        return arg[0];
+    }
+    return arg;
+}
 
 function makeParser() {
     let identifier = prs.makeRegexParser( /^[a-zA-Z][a-zA-Z0-9\_]*/, "identifier" );
@@ -32,11 +39,15 @@ function makeParser() {
 
     let forwardExpr = new prs.makeForwarder();
 
-    let nestedExpr = prs.makeSequenceParser( [
-        prs.makeTokenParser("("),
-        forwardExpr.forward(),
-        prs.makeTokenParser(")"),
-    ], "nestedExpression");
+    let nestedExpr = prs.makeTransformer(
+        prs.makeSequenceParser( [
+            prs.makeTokenParser("("),
+            forwardExpr.forward(),
+            prs.makeTokenParser(")"),
+        ], "nestedExpression"),
+        function(arg) {
+            return arg[1];
+        });
 
     let expressionList = prs.makeRepetitionRecClause(
         forwardExpr.forward(),
@@ -88,10 +99,10 @@ function makeParser() {
         formatStringEndConst
     ]);
 
-    let formatExpr = prs.makeRepetitionRecClause([
+    let formatExpr = prs.makeRepetitionRecClause(
         formatStringStartConst,
         formatStringContinuation
-    ]);
+    );
 
     let primaryExpr = prs.makeAlternativeParser(
         [ functionCall, identifier, number, stringConst, formatStringConst, nestedExpr, listExpr, dictExpr, formatExpr ],
@@ -103,14 +114,15 @@ function makeParser() {
         prs.makeTokenParser("%"),
     ], "multOperation");
 
-    let multExpression = prs.makeRepetitionRecClause(
-        primaryExpr,
-        prs.makeSequenceParser([
-            multOperator,
-            primaryExpr
-        ], "multExpressionSeq"),
-        "multExpression"
-    );
+    let multExpression = prs.makeTransformer(
+        prs.makeRepetitionRecClause(
+            primaryExpr,
+            prs.makeSequenceParser([
+                multOperator,
+                primaryExpr
+            ], "multExpressionSeq"),
+            "multExpression"
+        ), simplifyArray);
 
     let addOperator = prs.makeAlternativeParser([
         prs.makeTokenParser("+"),
@@ -119,13 +131,15 @@ function makeParser() {
 
     let forwardLambdaFunctionDef = new prs.makeForwarder();
 
-    let addExpression = prs.makeRepetitionRecClause(
-        multExpression,
-        prs.makeSequenceParser([
-            addOperator,
+    let addExpression = prs.makeTransformer(
+        prs.makeRepetitionRecClause(
             multExpression,
-        ], "addExpressionSeq"),
-    "addExpression");
+            prs.makeSequenceParser([
+                addOperator,
+                multExpression,
+            ], "addExpressionSeq"),
+        "addExpression"),
+        simplifyArray);
 
     let relationOperator = prs.makeAlternativeParser([
         prs.makeTokenParser(">="),
@@ -134,27 +148,29 @@ function makeParser() {
         prs.makeTokenParser(">")
     ])
 
-    let relationalExpression = prs.makeRepetitionRecClause(
-        addExpression,
-        prs.makeSequenceParser([
-            relationOperator,
-            addExpression
-        ])
-    )
+    let relationalExpression = prs.makeTransformer(
+        prs.makeRepetitionRecClause(
+            addExpression,
+            prs.makeSequenceParser([
+                relationOperator,
+                addExpression
+            ])
+        ), simplifyArray);
 
     let equalityOperator = prs.makeAlternativeParser([
         prs.makeTokenParser("=="),
         prs.makeTokenParser("!=")
     ])
 
-    let equalityExpression = prs.makeRepetitionRecClause(
-        relationalExpression,
-        prs.makeSequenceParser([
-            equalityOperator,
-            relationalExpression
-        ]),
-        "equalityExpression"
-    )
+    let equalityExpression = prs.makeTransformer(
+        prs.makeRepetitionRecClause(
+            relationalExpression,
+            prs.makeSequenceParser([
+                equalityOperator,
+                relationalExpression
+            ]),
+            "equalityExpression"
+        ), simplifyArray);
 
     let expression = prs.makeAlternativeParser([
         equalityExpression,
@@ -315,7 +331,10 @@ function fact(n) {
    }
    return n * fact(n-1)
 }
-fib(10)`
+fib(10)`,
+        `this=3
+         that=4
+         print("show this: {this} product: {this * that}")`
     ];
 
 

@@ -21,7 +21,6 @@ function makeParser() {
     let stringConst = prs.makeRegexParser( /^'(\\\\.|[^'])*'/, "string-const" );
 
     let forwardExpr = new prs.makeForwarder();
-    let forwardExpressionList = new prs.makeForwarder();
 
     let nestedExpr = prs.makeSequenceParser( [
         prs.makeTokenParser("("),
@@ -37,7 +36,6 @@ function makeParser() {
         ])
     );
 
-    forwardExpressionList.setInner(expressionList);
 
     let functionCall = prs.makeSequenceParser( [
         identifier,
@@ -48,7 +46,7 @@ function makeParser() {
 
     let listExpr = prs.makeSequenceParser([
         prs.makeTokenParser("["),
-        forwardExpressionList,
+        expressionList,
         prs.makeTokenParser( "]"),
     ])
 

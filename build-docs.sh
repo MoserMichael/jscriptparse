@@ -6,6 +6,6 @@ jsdoc prs.js README.md
 tmp=$(mktemp -d)
 mv out ${tmp}/
 
-git check gh-pages 
+git checkout gh-pages 
 
 cp -rf ${tmp}/out out 

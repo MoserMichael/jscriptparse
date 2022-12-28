@@ -285,11 +285,15 @@ function makeParser() {
 
     let statementOrStatementList = prs.makeAlternativeParser([
         statement,
-        prs.makeSequenceParser([
-            prs.makeTokenParser("{"),
-            statementList,
-            prs.makeTokenParser( "}")
-        ])
+        prs.makeTransformer(
+            prs.makeSequenceParser([
+                prs.makeTokenParser("{"),
+                statementList,
+                prs.makeTokenParser( "}")
+            ]), function(arg) {
+                return arg[1];
+            }
+        )
     ],"statementOrStatementList");
 
     statementOrStatementListFwd.setInner(statementOrStatementList);

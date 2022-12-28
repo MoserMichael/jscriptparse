@@ -8,4 +8,4 @@ mv out ${tmp}/
 
 git checkout gh-pages 
 
-cp -rf ${tmp}/out out 
+cp -rf ${tmp}/out .

@@ -9,3 +9,9 @@ mv out ${tmp}/
 git checkout gh-pages 
 
 cp -rf ${tmp}/out .
+
+git add out/* || true
+
+today=$(date)
+
+git commit -am "documentation changes ${today}"

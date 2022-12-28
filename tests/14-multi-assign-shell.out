@@ -1,0 +1,2 @@
+status: 0 output: hello world
+status: 0 output: !hello world!

@@ -1,17 +1,22 @@
 
-// ? c-like syntax
-// types?
+
+// features of the scripting language:
+//
+// go - like syntax (in the sense of: less frequent braces, but without strong typing)
+// types
+//   strings, floating point numbers - yes
 //   lists - yes
 //   maps - yes
-//   objects - as syntax sugar for maps
+//   objects - as syntax sugar for maps - NO
 //   type hints - NO
+//   f-strings - yes
 // functions
-//  ? closures
-//  ? named parameters
-//  ? parameters with default values
-// ? multiple return values, multiple assignment
-// ? generators - no
-// ? with statements - no
+//  closures - YES
+//  named parameters - NO
+//  parameters with default values - yes
+//  multiple return values, multiple assignment - as list (similar to python) - yes
+// generators - NO
+// with statements - NO
 
 const prs=require("./prs.js");
 
@@ -19,6 +24,11 @@ function makeParser() {
     let identifier = prs.makeRegexParser( /^[a-zA-Z][a-zA-Z0-9\_]*/, "identifier" );
     let number = prs.makeRegexParser( /^[\+\-]?[0-9]+([\.][0-9]+)?([eE][\+\-]?[0-9]+)?/, "number" );
     let stringConst = prs.makeRegexParser( /^'(\\\\.|[^'])*'/, "string-const" );
+    let formatStringConst = prs.makeRegexParser( /^"(\\\\.|[^"{])*"/, "string-const" );
+    let formatStringStartConst = prs.makeRegexParser( /^"(\\\\.|[^"{])*{/, "string-const" );
+    let formatStringMidConst = prs.makeRegexParser( /^}(\\\\.|[^"{])*{/, "string-const" );
+    let formatStringEndConst = prs.makeRegexParser( /^}(\\\\.|[^"{])*"/, "string-const" );
+
 
     let forwardExpr = new prs.makeForwarder();
 
@@ -66,8 +76,25 @@ function makeParser() {
         prs.makeTokenParser( "}")
     ])
 
+    let formatStringContinuation = prs.makeSequenceParser([
+        forwardExpr.forward(),
+        prs.makeRepetitionParser(
+            prs.makeSequenceParser([
+                formatStringMidConst,
+                forwardExpr.forward()
+            ]),
+            0
+        ),
+        formatStringEndConst
+    ]);
+
+    let formatExpr = prs.makeRepetitionRecClause([
+        formatStringStartConst,
+        formatStringContinuation
+    ]);
+
     let primaryExpr = prs.makeAlternativeParser(
-        [ functionCall, identifier, number, stringConst, nestedExpr, listExpr, dictExpr ],
+        [ functionCall, identifier, number, stringConst, formatStringConst, nestedExpr, listExpr, dictExpr, formatExpr ],
         "primaryExpression");
 
     let multOperator = prs.makeAlternativeParser([
@@ -136,8 +163,17 @@ function makeParser() {
 
     forwardExpr.setInner(expression);
 
-    let assignment = prs.makeSequenceParser([
+    let assignLhs = prs.makeRepetitionRecClause(
         identifier,
+        prs.makeSequenceParser([
+            prs.makeTokenParser(","),
+            identifier
+        ]),
+        "assignmentLhs",
+    )
+
+    let assignment = prs.makeSequenceParser([
+        assignLhs,
         prs.makeTokenParser("="),
         expression
     ],"assignment");
@@ -176,7 +212,15 @@ function makeParser() {
         expression
     ]);
 
-    let paramDef = identifier;
+    let paramDef = prs.makeSequenceParser([
+        identifier,
+        prs.makeOptParser(
+            prs.makeSequenceParser([
+                prs.makeTokenParser("="),
+                expression
+            ])
+        )
+    ]);
 
     let paramList = prs.makeRepetitionRecClause(
         paramDef,

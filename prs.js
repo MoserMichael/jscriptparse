@@ -65,6 +65,9 @@ function getLineAt(data, pos) {
     start += 1;
     let end = pos;
     for(;end < data.length && data.charAt(end) != '\n'; ++end);
+    if (start > pos) {
+        start = pos;
+    }
     return [ data.substring(start, end), pos-start];
 }
 
@@ -252,6 +255,39 @@ const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1,
     }, name);
 }
 
+const makeRepetitionRecClause = function(parserMandatory, parserRepetition, title = "RecursiveClause", concat = false) {
+
+    requireFunction(parserMandatory);
+    requireFunction(parserRepetition);
+
+    return makeTracer( function (state) {
+        let result = [];
+
+        state = parserMandatory(state);
+        if (concat) {
+            result = result.concat(state.result);
+        } else {
+            result.push( state.result );
+        }
+
+        while(true) {
+            try {
+                state = parserRepetition(state);
+                if (concat) {
+                    result = result.concat(state.result);
+                } else {
+                    result.push( state.result );
+                }
+            } catch(er) {
+                break;
+            }
+        }
+
+        state.result = result;
+        return state;
+    }, title);
+}
+
 /**
  * returns parser that applies the argument parser at least once
  * @param parser
@@ -269,7 +305,7 @@ const makeOptParser = function(parser, name = "OptParser") {
  * @param simplifyResult
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
-const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", concat = false) {
+const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", concat = false) {
 
     requireArrayOfFunctions(arrayOfParsers);
 
@@ -307,7 +343,7 @@ const makeSequenceParser = function(arrayOfParsers, name="SequenceParser", conca
         }
 
         return state;
-    }, name);
+    }, title);
 }
 
 
@@ -407,6 +443,7 @@ if (typeof(module) == 'object') {
         makeRegexParser,
         makeOptParser,
         makeRepetitionParser,
+        makeRepetitionRecClause,
         makeSequenceParser,
         makeAlternativeParser,
         makeConsumeAll,

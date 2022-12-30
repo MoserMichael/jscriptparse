@@ -38,6 +38,21 @@ class State {
         this.pos = pos;
         this.data = data;
         this.result = result;
+        this.errorPos = -1;
+    }
+
+    setErrorPos(parseError) {
+        if (parseError instanceof ParserError) {
+            if (parseError.pos > this.errorPos) {
+
+                //console.log("setErrorPos: errorPos: " + parseError.pos + " message: " + parseError.message);
+                this.errorPos = parseError.pos;
+                this.msg = parseError.message;
+            }
+            if (parseError.nextException != null) {
+                this.setErrorPos(parseError.nextException);
+            }
+        }
     }
 
     show() {
@@ -49,12 +64,13 @@ class ParserError extends Error {
     constructor(message, pos, nextException = null) {
         super(message);
         this.pos = pos;
+        this.errorPos = -1;
         this.nextException = nextException;
     }
 }
 
 function makeError(message, pos, nested) {
-    //console.log("message:" + message + " pos: " + pos + " nested: " + nested);
+    //console.log("message: " + message + " pos: " + pos + " nested: " + nested);
     let ex = new ParserError(message, pos, nested);
     throw ex;
 }
@@ -76,7 +92,13 @@ function formatParserError(er, data) {
     if (er instanceof ParserError) {
         let msg = er.message;
 
-        let entry = getLineAt(data,er.pos);
+        let pos = er.errorPos;
+        if (pos == -1) {
+            pos = er.pos;
+        }
+
+        //console.log("errorPos: " + pos + " data.length: " + data.length );
+        let entry = getLineAt(data,pos);
         msg += "\n" + entry[0] + "\n" +  Array(entry[1]).join(".") + "^";
         if (er.nextException != null) {
             msg += "\n";
@@ -143,7 +165,6 @@ const makeRegexParser = function (regex, name = null) {
     let type = -1;
     if (!(regex instanceof RegExp)) {
         let msg = "Illegal parser definition, expected string or regexp: " + regex + " :" + typeof(regex);
-        console.log(msg);
         throw new Error(msg);
     }
 
@@ -186,6 +207,9 @@ const makeTokenParser = function (token) {
             makeError("end of input. missing: " + token, state.pos);
         }
         if (state.data.substring(state.pos, state.pos + token.length) == token) {
+            //state.pos += token.lengthף
+            //state.result = token
+            //return state;
             return new State(state.pos + token.length, state.data, token)
         }
         makeError("expected token: " + token, state.pos);
@@ -238,11 +262,12 @@ const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1,
                 }
                 state.pos = nextState.pos;
             } catch(er) {
+                state.setErrorPos(er);
                 break;
             }
         }
 
-        if (matching < minMatching) {
+        if (matching < minMatching && minMatching != 0) {
             if (matching == 0) {
                 makeError("didn't match even one in " + name, state.pos);
             } else {
@@ -279,6 +304,7 @@ const makeRepetitionRecClause = function(parserMandatory, parserRepetition, titl
                     result.push( state.result );
                 }
             } catch(er) {
+                state.setErrorPos(er);
                 break;
             }
         }
@@ -370,6 +396,7 @@ const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser
                 return res;
             } catch(er) {
                 // ignore error
+                state.setErrorPos(er);
             }
         }
         makeError("none of the argument parser matches in " + name, state.pos);
@@ -390,7 +417,7 @@ const makeConsumeAll = function(nestedParser) {
         let res = nestedParser(state);
         res=skipWhitespace(res);
         if (res.pos < state.data.length) {
-            makeError("did not parse all the string. Trailing data",res.pos);
+            makeError("error at:",res.pos);
         }
         return res;
     }

@@ -1,0 +1,76 @@
+
+Boolean types
+
+    python3
+    >>> a=1
+    >>> b=a==1
+    >>> print(b)
+    True
+    >>> b=b+1
+    >>> print(b)
+    2
+
+
+    php -a
+    Interactive shell
+
+    php > $a=1;
+    php > $b=$a==1;
+    php > echo "{$b}";
+    1
+    php > $b=$b+1;
+    php > echo "{$b}";
+    2
+
+None type
+
+    python3
+    >>> def fun():
+    ...     pass
+    ...
+    >>> a=fun()
+    >>> print(a)
+    None
+    >>> a=a+1
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'
+
+
+    php -a
+    Interactive shell
+
+    php > function foo() {
+    php { }
+    php > $a=foo();
+    php > echo "{$a}";
+    php > $a=$a+1;
+    php > echo "{$a}";
+    1
+
+
+Multiple assignment
+
+    python3
+    >>> def foo():
+    ...     return 42
+    ...
+    >>> a,b = foo()
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: cannot unpack non-iterable int object
+
+
+    php -a
+    php > function foo2() {
+    php { return [ 42 ];
+    php { }
+    php > list($a, $b)=foo2();
+    PHP Notice:  Undefined offset: 1 in php shell code on line 1
+    PHP Stack trace:
+    PHP   1. {main}() php shell code:0
+
+    Notice: Undefined offset: 1 in php shell code on line 1
+
+    Call Stack:
+      135.6439     503232   1. {main}() php shell code:0

@@ -111,7 +111,7 @@ function makeParser() {
             expressionList,
             prs.makeTokenParser( ")")
         ]), function(arg) {
-            return makeFunctionCall(arg[0], arg[2]);
+            return rt.makeFunctionCall(arg[0], arg[2]);
         }
     );
 
@@ -121,7 +121,7 @@ function makeParser() {
             expressionList,
             prs.makeTokenParser( "]"),
         ]), function(arg) {
-            return arg[1]
+            return rt.newListCtorExpression(arg[1]);
         });
 
     let nameValuePair = prs.makeSequenceParser([
@@ -130,20 +130,24 @@ function makeParser() {
         forwardExpr.forward()
     ])
 
-    let dictExpr = prs.makeSequenceParser([
-        prs.makeTokenParser("{"),
-        prs.makeRepetitionRecClause(nameValuePair,
-            prs.makeTransformer(
-                prs.makeSequenceParser([
-                    prs.makeTokenParser(","),
-                    nameValuePair
-                ]), function (arg) {
-                    return arg[1];
-                }
-            )
-        ),
-        prs.makeTokenParser( "}")
-    ])
+    let dictExpr = prs.makeTransformer(
+        prs.makeSequenceParser([
+            prs.makeTokenParser("{"),
+            prs.makeRepetitionRecClause(nameValuePair,
+                prs.makeTransformer(
+                    prs.makeSequenceParser([
+                        prs.makeTokenParser(","),
+                        nameValuePair
+                    ]), function (arg) {
+                        return arg[1];
+                    }
+                )
+            ),
+            prs.makeTokenParser( "}")
+        ]), function(arg) {
+            return rt.newDictListCtorExpression(arg[1]);
+        }
+    );
 
     let formatStringContinuation = prs.makeSequenceParser([
         forwardExpr.forward(),

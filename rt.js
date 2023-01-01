@@ -54,6 +54,16 @@ function value2Num(val) {
     throw new Error("can't convert " + mapTypeToName[val.type] + " to מוצנקר");
 }
 
+function value2Str(val) {
+    if (val.type == TYPE_STR) {
+        return val.val;
+    } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+        return toString(val.val);
+    } else {
+        throw new Error("can't convert " + mapTypeToName[val.type] + " to string");
+    }
+}
+
 VALUE_NONE=new Value(TYPE_NONE,null);
 
 class RuntimeException  extends Error {
@@ -231,6 +241,50 @@ class AstUnaryExpression {
         let exprVal = this.expr.eval(frame);
         return this.fun(exprVal);
     }
+}
+
+class AstDictCtorExpression {
+    constructor(exprList) {
+        this.exprList = exprList;
+    }
+
+    eval(frame) {
+        let ret = {}
+
+        for(let i = 0; i < this.exprList.length; ++i) {
+            let nameValueDef = this.exprList[i];
+
+            let nameVal = nameValueDef[0].eval(frame);
+            let name = value2Str( nameVal );
+            let value = nameValueDef[2].eval(frame);
+
+            ret[ name ] = value;
+        }
+        return new Value(TYPE_MAP, ret);
+    }
+}
+
+function newDictListCtorExpression(exprList) {
+    return new AstDictCtorExpression(exprList);
+}
+
+class AstListCtorExpression {
+    constructor(exprList) {
+        this.exprList = exprList;
+    }
+
+    eval(frame) {
+        let vals = [];
+        for(let i=0; i < this.exprList.length; ++i) {
+            let val = this.exprList[i].eval(frame);
+            vals.push(val)
+        }
+        return new Value(TYPE_LIST, vals);
+    }
+}
+
+function newListCtorExpression(exprList) {
+    return new AstListCtorExpression(exprList);
 }
 
 function makeUnaryExpression(expr, op) {
@@ -503,6 +557,8 @@ if (typeof(module) == 'object') {
         makeUnaryExpression,
         makeLambdaExpression,
         makeIdentifierRef,
+        newListCtorExpression,
+        newDictListCtorExpression,
         makeStatementList,
         makeAstAssignment,
         makeIfStmt,

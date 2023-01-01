@@ -29,12 +29,8 @@ const {makeIfStmt, makeIdentifierRef} = require("./rt");
 
 function makeParser() {
     let identifier = prs.makeRegexParser( /^[a-zA-Z][a-zA-Z0-9\_]*/, "identifier" );
-    let number = prs.makeTransformer(
-        prs.makeRegexParser( /^[\+\-]?[0-9]+([\.][0-9]+)?([eE][\+\-]?[0-9]+)?/, "number" ),
-        function(arg) {
-            return rt.makeConstValue(rt.TYPE_NUM, Number(arg));
-        }
-    );
+    let number = prs.makeRegexParser( /^[\+\-]?[0-9]+([\.][0-9]+)?([eE][\+\-]?[0-9]+)?/, "number" )
+
     let stringConst = prs.makeTransformer(
         prs.makeRegexParser( /^'(\\\\.|[^'])*'/, "string-const" ),
         function(arg) {
@@ -108,12 +104,16 @@ function makeParser() {
             })
     );
 
-    let functionCall = prs.makeSequenceParser( [
-        identifier,
-        prs.makeTokenParser("("),
-        expressionList,
-        prs.makeTokenParser( ")")
-    ])
+    let functionCall = prs.makeTransformer(
+            prs.makeSequenceParser( [
+            identifier,
+            prs.makeTokenParser("("),
+            expressionList,
+            prs.makeTokenParser( ")")
+        ]), function(arg) {
+            return makeFunctionCall(arg[0], arg[2]);
+        }
+    );
 
     let listExpr = prs.makeTransformer(
         prs.makeSequenceParser([
@@ -185,11 +185,24 @@ function makeParser() {
         }
     );
 
+    let signedNumber = prs.makeAlternativeParser([
+        prs.makeTransformer( prs.makeSequenceParser([
+            prs.makeTokenParser("-"),
+            number
+        ]),function(arg) {
+            return rt.makeConstValue(rt.TYPE_NUM, -1 * Number(arg[1]));
+        }),
+        prs.makeTransformer(number, function(arg) {
+            return rt.makeConstValue(rt.TYPE_NUM, Number(arg));
+        })
+    ]);
+
+
     let primaryExpr = prs.makeAlternativeParser(
         [
             functionCall,
             identifierWithOptIndex,
-            number,
+            signedNumber,
             stringConst,
             formatStringConst,
             trueConst,
@@ -267,10 +280,15 @@ function makeParser() {
         ), rt.makeExpression);
 
     let logicInversion = prs.makeAlternativeParser([
-        prs.makeSequenceParser([
-            prs.makeTokenParser("not"),
-            equalityExpression
-        ]),
+        prs.makeTransformer(
+            prs.makeSequenceParser([
+                prs.makeTokenParser("not"),
+                equalityExpression
+            ]),
+            function(arg) {
+                return rt.makeUnaryExpression(arg[1], "not");
+            }
+        ),
         equalityExpression
     ]);
 
@@ -385,14 +403,14 @@ function makeParser() {
     );
 
     let paramDef = prs.makeSequenceParser([
-        identifier,
-        prs.makeOptParser(
-            prs.makeSequenceParser([
-                prs.makeTokenParser("="),
-                expression
-            ])
-        )
-    ]);
+            identifier,
+            prs.makeOptParser(
+                prs.makeSequenceParser([
+                    prs.makeTokenParser("="),
+                    expression
+                ])
+            )
+        ]);
 
     let paramList = prs.makeRepetitionRecClause(
         paramDef,

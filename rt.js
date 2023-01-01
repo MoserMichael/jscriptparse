@@ -8,10 +8,22 @@ TYPE_NONE=5
 TYPE_CLOSURE=6
 TYPE_FORCE_RETURN=7
 
+mapTypeToName = {
+    TYPE_BOOL : "Boolean",
+    TYPE_NUM : "Number",
+    TYPE_STR : "String",
+    TYPE_LIST : "List",
+    TYPE_MAP : "Map",
+    TYPE_NONE : "None",
+    TYPE_CLOSURE : "Closure",
+    TYPE_FORCE_RETURN : "ForceReturn"
+}
+
 class ClosureValueImp {
     // needs the function definition and the frame of the current function (for lookup of captured vars)
-    constructor(functionDef, frame) {
+    constructor(functionDef, defaultParamValues, frame) {
         this.functionDef = functionDef;
+        this.defaultParamValues = defaultParamValues;
         this.frame = frame;
     }
 }
@@ -22,6 +34,26 @@ class Value {
     }
 }
 
+function value2Bool(val) {
+    if (val.type == TYPE_BOOL) {
+        return val.val;
+    } else if (val.type == TYPE_NUM) {
+        return val.val != 0;
+    } else if (val.type == TYPE_STR) {
+        return val.val == "true";
+    }
+    throw new Error("can't convert " + mapTypeToName[val.type] + " to boolean");
+}
+
+function value2Num(val) {
+    if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+        return val.val;
+    } else if (val.type == TYPE_STR) {
+        return parseFloat(val.val);
+    }
+    throw new Error("can't convert " + mapTypeToName[val.type] + " to מוצנקר");
+}
+
 VALUE_NONE=new Value(TYPE_NONE,null);
 
 class RuntimeException  extends Error {
@@ -29,6 +61,13 @@ class RuntimeException  extends Error {
         super(message);
         this.nextException = nextException;
     }
+}
+
+function copyPrimitiveVal(val) {
+    if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
+        return new Value(val.type, val.val);
+    }
+    return val;
 }
 
 class Frame {
@@ -57,23 +96,19 @@ class Frame {
                 this.vars[name] = value;
             } else {
                 let val = this.vars[name];
-                val[indexExpr] = value;
+                val[indexExpr] = copyPrimitiveVal(value);
             }
             return;
         }
         if (this.parentFrame != null) {
-            this.parentFrame.assign(name, value);
+            this.parentFrame.assign(name, copyPrimitiveVal(value));
             return;
         }
         throw new RuntimeException("undefined variable: " + name );
     }
-}
 
-class AstFunctionDef {
-    constructor(args, statements, frame) {
-        this.args = args;
-        this.statements = statements;
-        this.frame = frame;
+    defineVar(name, value) {
+       this.vars[name] = copyPrimitiveVal(value);
     }
 }
 
@@ -110,8 +145,36 @@ function makeConstValue(type, value) {
 }
 
 MAP_OP_TO_FUNC={
+    "and" : function(lhs,rhs) {
+        return new Value(TYPE_BOOL, value2Bool(lhs) && value2Bool(rhs));
+    },
+    "or" : function(lhs,rhs) {
+        return new Value(TYPE_BOOL, value2Bool(lhs) || value2Bool(rhs));
+    },
     "<" : function(lhs,rhs) {
-    }
+        return new Value(TYPE_BOOL, value2Num(lhs) < value2Num(rhs));
+    },
+    ">" : function(lhs,rhs) {
+        return new Value(TYPE_BOOL, value2Num(lhs) > value2Num(rhs));
+    },
+    "<=" : function(lhs,rhs) {
+        return new Value(TYPE_BOOL, value2Num(lhs) <= value2Num(rhs));
+    },
+    ">=" : function(lhs,rhs) {
+        return new Value(TYPE_BOOL, value2Num(lhs) >= value2Num(rhs));
+    },
+    "+" : function(lhs,rhs) {
+        return new Value(TYPE_NUM, value2Num(lhs) + value2Num(rhs));
+    },
+    "-" : function(lhs,rhs) {
+        return new Value(TYPE_NUM, value2Num(lhs) - value2Num(rhs));
+    },
+    "*" : function(lhs,rhs) {
+        return new Value(TYPE_NUM, value2Num(lhs) * value2Num(rhs));
+    },
+    "/" : function(lhs,rhs) {
+        return new Value(TYPE_NUM,value2Num(lhs) / value2Num(rhs));
+    },
 }
 
 class AstBinaryExpression {
@@ -147,11 +210,44 @@ function makeExpression(exprList) {
     return prevExpression;
 }
 
+MAP_UNARY_OP_TO_FUNC={
+    "not": function(value) {
+        return new Value(TYPE_BOOL, !value2Bool(value));
+
+    },
+    "-": function(value) {
+        return new Value(TYPE_NUM, -1 * value2Num(value));
+    }
+}
+
+class AstUnaryExpression {
+    constructor(expr, op) {
+        this.expr = expr;
+        this.op = op;
+        this.fun = MAP_UNARY_OP_TO_FUNC[op];
+    }
+
+    eval(frame) {
+        let exprVal = this.expr.eval(frame);
+        return this.fun(exprVal);
+    }
+}
+
+function makeUnaryExpression(expr, op) {
+    return new AstUnaryExpression(expr, op);
+}
+
 class AstLambdaExpression {
-    constructor(functionDef)
-    {
+
+    constructor(functionDef) {
         this.functionDef = functionDef;
         this.parentFrame = null;
+    }
+
+    eval(frame) {
+        let defaultParams = _evalDefaultParams(this.parentFrame, this.functionDef.params);
+        let cval = new ClosureValueImp(this.functionDef, defaultParams, this.parentFrame);
+        return new Value(TYPE_CLOSURE, cval);
     }
 }
 
@@ -247,11 +343,14 @@ class AstWhileStmt {
     }
     eval(frame) {
         while(true) {
-            let whileExpr = this.expr.eval(frame);
-            // convert to boolean
-            if (whileExpr.type == TYPE_BOOL && whileExpr.val == false) {
+            let condVal = this.expr.eval(frame);
+
+            let cond =  value2Bool(condVal);
+
+             if (cond.type == TYPE_BOOL && cond.val == false) {
                 break;
             }
+
             let rt = this.stmtList.eval(frame);
             if (rt.type == TYPE_FORCE_RETURN) {
                 return rt;
@@ -280,6 +379,19 @@ function makeReturnStmt(expr) {
     return new AstReturnStmt(expr);
 }
 
+function _evalDefaultParams(frame, params) {
+    let ret = [];
+    for(let i = 0;i < params.length; ++i) {
+        let param = params[i];
+        if (param.length > 1) {
+            let defValue = param[2].eval(frame);
+            ret.push(defValue);
+        } else {
+            ret.push(null);
+        }
+    }
+    return ret;
+}
 
 class AstFunctionDef {
     constructor(name, params, body) {
@@ -287,10 +399,91 @@ class AstFunctionDef {
         this.params = params;
         this.body = body;
     }
+
+    eval(frame) {
+        let defaultParamValues = _evalDefaultParams(frame, this.params);
+        let closureImp = new ClosureValueImp(this, defaultParamValues, frame);
+        let closureValue = new Value(TYPE_CLOSURE, closureImp);
+        if (this.name != null) {
+            frame.assign(this.name, closureValue);
+        }
+        return closureValue;
+    }
+
+    _evalDefaultParams(frame) {
+        let ret = [];
+        for(let i = 0;i < this.params.length; ++i) {
+            let param = this.params[i];
+            if (param.length > 1) {
+                let defValue = param[2].eval(frame);
+                ret.push(defValue);
+            } else {
+                ret.push(null);
+            }
+        }
+        return ret;
+    }
 }
 
 function makeFunctionDef(name, params, body) {
     return new AstFunctionDef(name, params, body)
+}
+
+class AstFunctionCall {
+    constructor(name, expressionList) {
+        this.name = name;
+        this.expressionList = expressionList;
+    }
+
+    eval(frame) {
+        let funcVal = frame.lookup(this.name);
+        if (funcVal == null) {
+            throw new Error("Can't call undefined function " + this.name);
+        }
+        if (funcVal.type != TYPE_CLOSURE) {
+            throw new Error("variable " + this.name + " is not a function, it is a " + mapTypeToName[funcVal.type]);
+        }
+
+        let closureVal = funcVal.val;
+        let functionDef = closureVal.functionDef;
+        let funcFrame = new Frame(frame);
+
+        if (this.expressionList.length > functionDef.params.length) {
+            throw new Error(this.name + " takes " + functionDef.params.length + " params, but " + this.expressionList.length + " were given");
+        }
+
+        // define all provided parameters in the new function frmae
+        let i=0;
+        for(; i<this.expressionList.length;++i) {
+            let argExpression = this.expressionList[i]; // parameter expression
+            let argValue = argExpression.eval(frame); // evaluate parameter expression
+            let paramDef = functionDef.params[i]; // name of parameter
+
+            funcFrame.defineVar(paramDef[0], argValue);
+        }
+
+        // provide values for arguments with default values
+        for(;i < functionDef.params.length; ++i) {
+            let paramDef = functionDef.params[i]; // name of parameter
+
+            let defaultParamValue = closureVal.defaultParamValues[i];
+            if (defaultParamValue == null) {
+                throw new Error("function " + this.name + " no value for parameter " + paramDef[0] );
+            }
+            funcFrame.defineVar(paramDef[0], defaultParamValue);
+        }
+
+        // frame is ready, evaluate the statement list
+        let rval = functionDef.body.eval(funcFrame);
+        if (rval.type == TYPE_FORCE_RETURN) {
+            return rval.val;
+        }
+        return VALUE_NONE
+    }
+}
+
+function makeFunctionCall(name, expressionList) {
+    return new AstFunctionCall(name, expressionList);
 }
 
 if (typeof(module) == 'object') {
@@ -307,6 +500,7 @@ if (typeof(module) == 'object') {
         Frame,
         makeConstValue,
         makeExpression,
+        makeUnaryExpression,
         makeLambdaExpression,
         makeIdentifierRef,
         makeStatementList,
@@ -314,6 +508,7 @@ if (typeof(module) == 'object') {
         makeIfStmt,
         makeWhileStmt,
         makeReturnStmt,
-        makeFunctionDef
+        makeFunctionDef,
+        makeFunctionCall
     }
 }

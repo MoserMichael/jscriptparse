@@ -1,6 +1,8 @@
 
 
-// features of the scripting language:
+// features of the scripting language (supposed to be used in a shell)
+//
+// runtime: ast interpreter
 //
 // go - like syntax (in the sense of: less frequent braces, but without strong typing)
 // types
@@ -16,23 +18,54 @@
 //  parameters with default values - yes
 //  multiple return values, multiple assignment - as list (similar to python) - yes
 // yield / generators / with statement - maybe later....
+//
+// modules/packages - no
+// try/catch - maybe later
 
 
 const prs=require("./prs.js");
-
-function simplifyArray(arg) {
-    if (arg.length == 1) {
-        return arg[0];
-    }
-    return arg;
-}
+const rt=require("./rt.js");
+const {makeIfStmt, makeIdentifierRef} = require("./rt");
 
 function makeParser() {
     let identifier = prs.makeRegexParser( /^[a-zA-Z][a-zA-Z0-9\_]*/, "identifier" );
-    let number = prs.makeRegexParser( /^[\+\-]?[0-9]+([\.][0-9]+)?([eE][\+\-]?[0-9]+)?/, "number" );
-    let stringConst = prs.makeRegexParser( /^'(\\\\.|[^'])*'/, "string-const" );
-    let formatStringConst = prs.makeRegexParser( /^"(\\\\.|[^"{])*"/, "string-const" );
+    let number = prs.makeTransformer(
+        prs.makeRegexParser( /^[\+\-]?[0-9]+([\.][0-9]+)?([eE][\+\-]?[0-9]+)?/, "number" ),
+        function(arg) {
+            return rt.makeConstValue(rt.TYPE_NUM, Number(arg));
+        }
+    );
+    let stringConst = prs.makeTransformer(
+        prs.makeRegexParser( /^'(\\\\.|[^'])*'/, "string-const" ),
+        function(arg) {
+            return rt.makeConstValue(rt.TYPE_STR, arg);
+        }
+    );
 
+    let formatStringConst = prs.makeTransformer(
+            prs.makeRegexParser( /^"(\\\\.|[^"{])*"/, "string-const" ),
+            function(arg) {
+            return rt.makeConstValue(rt.TYPE_STR, arg);
+        }
+    );
+
+    let trueConst = prs.makeTransformer(
+        prs.makeTokenParser("true"),
+        function(arg) {
+            return rt.makeConstValue(rt.TYPE_BOOL,true);
+        });
+
+    let falseConst = prs.makeTransformer(
+        prs.makeTokenParser("false"),
+        function(arg) {
+            return rt.makeConstValue(rt.TYPE_BOOL,true);
+        });
+
+    let noneConst = prs.makeTransformer(
+        prs.makeTokenParser("none"),
+        function(arg) {
+            return rt.makeConstValue(rt.TYPE_NONE, null);
+        });
 
     let formatStringStartConst = prs.makeTransformer(
         prs.makeRegexParser( /^"(\\\\.|[^"{])*{/, "string-const" ),
@@ -129,20 +162,28 @@ function makeParser() {
         formatStringContinuation
     );
 
-    let identifierWithOptIndex = prs.makeSequenceParser([
-        identifier,
-        prs.makeOptParser(
-            prs.makeTransformer(
-                prs.makeSequenceParser([
-                    prs.makeTokenParser("["),
-                    forwardExpr.forward(),
-                    prs.makeTokenParser("]")
-                ]), function(arg) {
-                    return arg[1];
-                }
+    let identifierWithOptIndex = prs.makeTransformer(
+            prs.makeSequenceParser([
+            identifier,
+            prs.makeOptParser(
+                prs.makeTransformer(
+                    prs.makeSequenceParser([
+                        prs.makeTokenParser("["),
+                        forwardExpr.forward(),
+                        prs.makeTokenParser("]")
+                    ]), function(arg) {
+                        return arg[1];
+                    }
+                )
             )
-        )
-    ]);
+        ]), function(arg) {
+            if (arg.length >= 1) {
+                return rt.makeIdentifierRef(arg[0], arg[1]);
+            } else {
+                return rt.makeIdentifierRef(arg[0], null);
+            }
+        }
+    );
 
     let primaryExpr = prs.makeAlternativeParser(
         [
@@ -151,9 +192,9 @@ function makeParser() {
             number,
             stringConst,
             formatStringConst,
-            prs.makeTokenParser("true"),
-            prs.makeTokenParser("false"),
-            prs.makeTokenParser("none"),
+            trueConst,
+            falseConst,
+            noneConst,
             nestedExpr,
             listExpr,
             dictExpr,
@@ -175,7 +216,7 @@ function makeParser() {
                 primaryExpr
             ], "multExpressionSeq"),
             "multExpression", true
-        ), simplifyArray);
+        ), rt.makeExpression);
 
     let addOperator = prs.makeAlternativeParser([
         prs.makeTokenParser("+"),
@@ -192,7 +233,7 @@ function makeParser() {
                 multExpression,
             ], "addExpressionSeq"),
         "addExpression", true),
-        simplifyArray);
+        rt.makeExpression);
 
     let relationOperator = prs.makeAlternativeParser([
         prs.makeTokenParser(">="),
@@ -208,7 +249,7 @@ function makeParser() {
                 relationOperator,
                 addExpression
             ])
-        ), simplifyArray);
+        ), rt.makeExpression);
 
     let equalityOperator = prs.makeAlternativeParser([
         prs.makeTokenParser("=="),
@@ -223,7 +264,7 @@ function makeParser() {
                 relationalExpression
             ]),
             "equalityExpression"
-        ), simplifyArray);
+        ), rt.makeExpression);
 
     let logicInversion = prs.makeAlternativeParser([
         prs.makeSequenceParser([
@@ -239,7 +280,7 @@ function makeParser() {
             prs.makeSequenceParser([
                 prs.makeTokenParser("and"),
                 logicInversion
-            ])), simplifyArray);
+            ])), rt.makeExpression);
 
     let logicalDisjunction = prs.makeTransformer(
         prs.makeRepetitionRecClause(
@@ -247,7 +288,7 @@ function makeParser() {
             prs.makeSequenceParser([
                 prs.makeTokenParser("or"),
                 logicalConjunction
-            ])), simplifyArray);
+            ])), rt.makeExpression);
 
     let expression = prs.makeAlternativeParser([
         logicalDisjunction,
@@ -258,8 +299,13 @@ function makeParser() {
 
     let assignLhsSingle = prs.makeAlternativeParser([
         identifierWithOptIndex,
-        prs.makeTokenParser("_")
-    ])
+        prs.makeTransformer(
+            prs.makeTokenParser("_"),
+            function(arg) {
+                return makeIdentifierRef("_", null);
+            }
+        )
+    ]);
 
     let assignLhs = prs.makeRepetitionRecClause(
         assignLhsSingle,
@@ -268,49 +314,75 @@ function makeParser() {
             assignLhsSingle
         ]),
         "assignmentLhs",
-    )
+    );
 
-
-    let assignment = prs.makeSequenceParser([
-        assignLhs,
-        prs.makeTokenParser("="),
-        expression
-    ],"assignment");
+    let assignment = prs.makeTransformer(
+        prs.makeSequenceParser([
+            assignLhs,
+            prs.makeTokenParser("="),
+            expression
+        ],"assignment"),
+        function(arg) {
+            return rt.makeAstAssignment(arg[0], arg[2]);
+        }
+    );
 
 
     let statementOrStatementListFwd = new prs.makeForwarder();
 
-    let ifStmt = prs.makeSequenceParser([
-        prs.makeTokenParser("if"),
-        expression,
-        statementOrStatementListFwd.forward(),
+    let ifStmt = prs.makeTransformer(
+        prs.makeSequenceParser([
+            prs.makeTokenParser("if"),
+            expression,
+            statementOrStatementListFwd.forward(),
 
-        prs.makeRepetitionParser(
+            prs.makeRepetitionParser(
+                prs.makeSequenceParser([
+                   prs.makeTokenParser("elif"),
+                   expression,
+                   statementOrStatementListFwd.forward(),
+                ] ,"elif"),
+                0,
+            ),
+            prs.makeOptParser(
+                prs.makeSequenceParser([
+                    prs.makeTokenParser("else"),
+                    statementOrStatementListFwd.forward()
+                ], "else")
+            )
+        ], "if-stmt"),
+        function(arg) {
+            let ret = makeIfStmt(arg[1], arg[2], arg[4]);
+            let elsIfClauses = arg[3];
+            if (elsIfClauses != null) {
+                for(let i=0; elsIfClauses.length; ++i) {
+                    ret.addIfClause(elsIfClauses[i][1], elsIfClauses[2]);
+                }
+            }
+            return ret;
+        }
+    );
+
+    let whileStmt = prs.makeTransformer(
+        prs.makeSequenceParser([
+            prs.makeTokenParser("while"),
+            expression,
+            statementOrStatementListFwd.forward(),
+        ]),
+        function(arg) {
+            return rt.makeWhileStmt(arg[1], arg[2]);
+        }
+    );
+
+    let returnStmt = prs.makeTransformer(
             prs.makeSequenceParser([
-               prs.makeTokenParser("elif"),
-               expression,
-               statementOrStatementListFwd.forward(),
-            ] ,"elif"),
-            0,
-        ),
-        prs.makeOptParser(
-            prs.makeSequenceParser([
-                prs.makeTokenParser("else"),
-                statementOrStatementListFwd.forward()
-            ], "else")
-        )
-    ], "if-stmt");
-
-    let whileStmt = prs.makeSequenceParser([
-        prs.makeTokenParser("while"),
-        expression,
-        statementOrStatementListFwd.forward(),
-    ]);
-
-    let returnStmt = prs.makeSequenceParser([
-        prs.makeTokenParser("return"),
-        expression
-    ]);
+            prs.makeTokenParser("return"),
+            expression
+        ]),
+        function(arg) {
+                return rt.makeReturnStmt(arg[1]);
+        }
+    );
 
     let paramDef = prs.makeSequenceParser([
         identifier,
@@ -330,25 +402,33 @@ function makeParser() {
         ])
     );
 
-    let lambdaFunctionDef = prs.makeSequenceParser([
-        prs.makeTokenParser("function"),
-        prs.makeTokenParser("("),
-        prs.makeOptParser(paramList),
-        prs.makeTokenParser(")"),
-        statementOrStatementListFwd.forward(),
-    ]);
+    let lambdaFunctionDef = prs.makeTransformer(
+        prs.makeSequenceParser([
+            prs.makeTokenParser("function"),
+            prs.makeTokenParser("("),
+            prs.makeOptParser(paramList),
+            prs.makeTokenParser(")"),
+            statementOrStatementListFwd.forward(),
+        ]), function(arg) {
+            let functionDef = rt.makeFunctionDef(null, arg[2], arg[4]);
+            return rt.makeLambdaExpression( functionDef );
+        }
+    );
 
     forwardLambdaFunctionDef.setInner(lambdaFunctionDef);
 
-
-    let functionDef = prs.makeSequenceParser([
-        prs.makeTokenParser("function"),
-        identifier,
-        prs.makeTokenParser("("),
-        paramList,
-        prs.makeTokenParser(")"),
-        statementOrStatementListFwd.forward(),
-    ]);
+    let functionDef = prs.makeTransformer(
+            prs.makeSequenceParser([
+            prs.makeTokenParser("function"),
+            identifier,
+            prs.makeTokenParser("("),
+            paramList,
+            prs.makeTokenParser(")"),
+            statementOrStatementListFwd.forward(),
+        ]), function(arg) {
+            return rt.makeFunctionDef(arg[1], arg[3], arg[5]);
+        }
+    );
 
     let statement = prs.makeAlternativeParser([
         ifStmt,
@@ -368,14 +448,19 @@ function makeParser() {
     );
 
     let statementOrStatementList = prs.makeAlternativeParser([
-        statement,
+        prs.makeTransformer(
+            statement,
+            function(arg) {
+                return rt.makeStatementList([ arg ] );
+            }
+        ),
         prs.makeTransformer(
             prs.makeSequenceParser([
                 prs.makeTokenParser("{"),
                 statementList,
                 prs.makeTokenParser( "}")
             ]), function(arg) {
-                return arg[1];
+                return rt.makeStatementList(arg[1]);
             }
         )
     ],"statementOrStatementList");

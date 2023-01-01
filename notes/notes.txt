@@ -74,3 +74,86 @@ Multiple assignment
 
     Call Stack:
       135.6439     503232   1. {main}() php shell code:0
+
+Is last evaluated statement the return value? It is in Ruby and Perl5, not in Python, php, javascript. (in shell you need to echo the value back...)
+
+
+    irb
+    irb(main):001:0> def foo()
+    irb(main):002:1> 42
+    irb(main):003:1> end
+    => :foo
+    irb(main):004:0> a=foo()
+    => 42
+
+    but not in python, js and php!
+
+    python
+    >>> def foo():
+    ...     42
+    ...
+    >>> a=foo()
+    >>> print(a)
+    None
+
+    >>> def foo():
+    ...     return 42
+    ...
+    >>> a=foo()
+    >>> print(a)
+    42
+
+    node
+    > function foo() {
+    ... 42;
+    ... }
+    undefined
+    > a=foo()
+    undefined
+    > function foo() {
+    ... return 42;
+    ... }
+    undefined
+    > a=foo()
+    42
+
+When is default function parameter evaluated?
+Python - upon function declaration! That makes sense!
+
+    python
+    >>> def get_val():
+    ...     print("get_val called")
+    ...     return 42
+    ...
+    >>> def foo(a=get_val()):
+    ...     print(f"foo called: a: {a}")
+    ...
+    get_val called
+
+    >>> foo(12)
+    foo called: a: 12
+
+    >>> foo(0)
+    foo called: a: 0
+    >>>
+
+It is also evaluated each time that a closure is created!!! When the function declaration is being evaluated !!!
+
+    >>> def getf():
+    ...     def foo(a=get_val()):
+    ...             return a+1
+    ...     return foo
+    ...
+    >>> a=getf()
+    get_val
+    >>> b=getf()
+    get_val
+    >>> c=getf()
+    get_val
+    >>> print(c(42))
+    43
+    >>> print(b(42))
+    43
+    >>> print(a(42))
+    43
+        

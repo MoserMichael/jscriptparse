@@ -1,9 +1,18 @@
 
 let trace_on = false;
+let location_with_token = false;
+
+/**
+ * Keep location with ast. This function must be called before calling any of the parser generating functions (like makeSequenceParser, etc.)
+ * @param on - boolean true - enable tracing. (default: off)
+ */
+const setKeepLocationWithToken = function(on) {
+    location_with_token = on;
+}
 
 /**
  * Enable tracing of the parser. This function must be called before calling any of the parser generating functions (like makeSequenceParser, etc.)
- * @param on - boolean true - enable tracing.
+ * @param on - boolean true - enable tracing. (default: off)
  */
 const setTrace = function(on) {
     trace_on = on;
@@ -181,7 +190,13 @@ const makeRegexParser = function (regex, name = null) {
         let remainder = state.data.substring(state.pos);
         let tres = regex.exec( remainder );
         if (tres != null) {
-            return new State(state.pos + tres[0].length, state.data, tres[0]);
+            let data = null;
+            if (location_with_token) {
+                data = [ tres[0], state.pos ];
+            } else {
+                data = tres[0];
+            }
+            return new State(state.pos + tres[0].length, state.data, data);
         }
         makeError("expected regex: " + regex.source, state.pos);
         return null;
@@ -210,6 +225,12 @@ const makeTokenParser = function (token) {
             //state.pos += token.lengthף
             //state.result = token
             //return state;
+            let data = null;
+            if (location_with_token) {
+                data = [ token, state.pos ];
+            } else {
+                data = token;
+            }
             return new State(state.pos + token.length, state.data, token)
         }
         makeError("expected token: " + token, state.pos);
@@ -478,5 +499,6 @@ if (typeof(module) == 'object') {
         makeForwarder,
         formatParserError,
         setTrace,
+        setKeepLocationWithToken,
     }
 }

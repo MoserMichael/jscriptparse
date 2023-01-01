@@ -86,32 +86,23 @@ class Frame {
         this.parentFrame = parentFrame;
     }
 
-    lookup(name, indexExpr =  null) {
+    lookup(name) {
         if (name in this.vars) {
             return this.vars[name];
         }
         if (this.parentFrame != null) {
-            let retVal =  this.parentFrame.lookup(name);
-            if (indexExpr != null) {
-                retVal = retVal[indexExpr];
-            }
-            return retVal;
+            return this.parentFrame.lookup(name);
         }
         throw new RuntimeException("undefined variable: " + name );
     }
 
-    assign(name, value, indexExpr =  null) {
+    assign(name, value) {
         if (name in this.vars) {
-            if (indexExpr == null) {
-                this.vars[name] = value;
-            } else {
-                let val = this.vars[name];
-                val[indexExpr] = copyPrimitiveVal(value);
-            }
+            this.vars[name] = copyPrimitiveVal(value);
             return;
         }
         if (this.parentFrame != null) {
-            this.parentFrame.assign(name, copyPrimitiveVal(value));
+            this.parentFrame.assign(name, value);
             return;
         }
         throw new RuntimeException("undefined variable: " + name );
@@ -309,8 +300,19 @@ function makeLambdaExpression(functionDef) {
     return new AstLambdaExpression(functionDef);
 }
 
+function lookupIndex(frame, value, refExpr) {
+    for(let i=0; i<refExpr.length; ++i) {
+        if (value.type != TYPE_LIST && value.type != TYPE_MAP) {
+            throw new Error("Can't index expression of variable " + this.identifierName);
+        }
+        let expr = refExpr[i];
+        let indexValue = expr.eval(frame);
+        value = value.val[ indexValue.val ];
+    }
+    return value;
+}
 
-class AstIndentifierRef {
+class AstIdentifierRef {
     constructor(identifierName, refExpr) {
         this.identifierName = identifierName;
         this.refExpr = refExpr;
@@ -318,13 +320,18 @@ class AstIndentifierRef {
 
     // evaluate, if as part of expression (for assignment there is AstAssignment)
     eval(frame) {
-        return frame.lookup(this.identifierName, this.refExpr);
+        let value = frame.lookup(this.identifierName);
+        if (this.refExpr != null) {
+            value = lookupIndex(frame, value, this.refExpr)
+        }
+        return value;
     }
 }
 
 function makeIdentifierRef(identifierName, refExpr) {
-    return new AstIndentifierRef(identifierName, refExpr);
+    return new AstIdentifierRef(identifierName, refExpr);
 }
+
 
 class AstAssign {
     constructor(lhs, rhs) {
@@ -356,16 +363,34 @@ class AstAssign {
         return VALUE_NONE;
     }
 
-    _assign(frame, singleLhs, value ) {
+    _assign(frame, singleLhs, value) {
         let varName = singleLhs.identifierName;
         let indexExpr = singleLhs.refExpr;
 
         if (varName != "_") {
-            let indexVal = null;
             if (indexExpr != null) {
-                indexVal = indexExpr.eval(frame);
+                let lhsValue = frame.lookup(singleLhs.identifierName);
+                this._indexAssign(frame, lhsValue, indexExpr, value)
+            } else {
+                frame.assign(varName, value);
             }
-            frame.assign(varName, value, indexVal);
+        }
+    }
+
+    _indexAssign(frame, value, refExpr, newValue) {
+        let i=0;
+        for(; i<refExpr.length; ++i) {
+            if (value.type != TYPE_LIST && value.type != TYPE_MAP) {
+                throw new Error("Can't index expression of variable " + this.identifierName);
+            }
+            let expr = refExpr[i];
+            let indexValue = expr.eval(frame);
+
+            if (i != (refExpr.length-1)) {
+                value = value.val[indexValue.val];
+            } else {
+                value.val[indexValue.val] = newValue;
+            }
         }
     }
 }

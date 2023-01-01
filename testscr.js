@@ -169,7 +169,7 @@ function makeParser() {
     let identifierWithOptIndex = prs.makeTransformer(
             prs.makeSequenceParser([
             identifier,
-            prs.makeOptParser(
+            prs.makeRepetitionParser(
                 prs.makeTransformer(
                     prs.makeSequenceParser([
                         prs.makeTokenParser("["),
@@ -178,7 +178,7 @@ function makeParser() {
                     ]), function(arg) {
                         return arg[1];
                     }
-                )
+                ), 0
             )
         ]), function(arg) {
             if (arg.length >= 1) {

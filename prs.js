@@ -31,8 +31,10 @@ function showRec(arg) {
             ret += showRec(obj);
         }
         ret += "]";
-    } else {
-        ret += arg;
+    } else if ("show" in arg) {
+        ret += arg.show();
+    } else  {
+        ret += arg.constructor.name;
     }
     return ret;
 }
@@ -170,17 +172,13 @@ function skipWhitespace(state) {
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 const makeRegexParser = function (regex, name = null) {
-
-    let type = -1;
     if (!(regex instanceof RegExp)) {
         let msg = "Illegal parser definition, expected string or regexp: " + regex + " :" + typeof(regex);
         throw new Error(msg);
     }
-
     if (name == null) {
         name = regex.source;
     }
-
     return makeTracer(function (state) {
         state = skipWhitespace(state);
         if (state.pos >= state.data.length) {
@@ -191,6 +189,7 @@ const makeRegexParser = function (regex, name = null) {
         let tres = regex.exec( remainder );
         if (tres != null) {
             let data = null;
+
             if (location_with_token) {
                 data = [ tres[0], state.pos ];
             } else {
@@ -198,7 +197,7 @@ const makeRegexParser = function (regex, name = null) {
             }
             return new State(state.pos + tres[0].length, state.data, data);
         }
-        makeError("expected regex: " + regex.source, state.pos);
+        makeError( name + " expected", state.pos);
         return null;
     }, name=name);
 }
@@ -231,7 +230,7 @@ const makeTokenParser = function (token) {
             } else {
                 data = token;
             }
-            return new State(state.pos + token.length, state.data, token)
+            return new State(state.pos + token.length, state.data, data)
         }
         makeError("expected token: " + token, state.pos);
         return null;
@@ -358,8 +357,8 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
 
     return makeTracer( function(state) {
         let result = [];
-        let i = 0;
-        for(;i < arrayOfParsers.length;++i) {
+
+        for(let i = 0;i < arrayOfParsers.length;++i) {
             let parser = arrayOfParsers[i];
             try {
                 state = parser(state);
@@ -373,9 +372,8 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
             }
         }
 
-
         // Achtung! if last element is an empty array then chop it off
-        // that's for cases when we have an optional repetition of clausese
+        // that's for cases when we have an optional repetition of clauses
         if (result.length != 0) {
             let last = result[result.length-1];
             if (last instanceof Array && last.length == 0) {
@@ -383,12 +381,6 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
             }
         }
         state.result = result;
-
-        // Achtung! simplify result option for single terms that call down to a deeper clause
-        if (state.result.length == 1) {
-            state.result = state.result[0];
-        }
-
         return state;
     }, title);
 }

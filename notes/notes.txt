@@ -157,3 +157,19 @@ It is also evaluated each time that a closure is created!!! When the function de
     >>> print(a(42))
     43
         
+You can redefined standard library functions in python3
+
+    python
+    >>> print("aaa")
+    aaa
+
+    >>> import logging
+    >>> logging.error("aaa")
+    ERROR:root:aaa
+
+    >>> def print(arg):
+    ...     logging.error(arg)
+    ...
+    >>> print("hello world")
+    ERROR:root:hello world
+

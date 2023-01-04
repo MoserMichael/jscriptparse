@@ -106,7 +106,8 @@ function makeParser() {
             ]),
             function (arg) {
                 return arg[1];
-            })
+            }),
+        "expressionList", true
     );
 
     let functionCall = prs.makeTransformer(
@@ -138,7 +139,8 @@ function makeParser() {
     let dictExpr = prs.makeTransformer(
         prs.makeSequenceParser([
             prs.makeTokenParser("{"),
-            prs.makeRepetitionRecClause(nameValuePair,
+            prs.makeRepetitionRecClause(
+                nameValuePair,
                 prs.makeTransformer(
                     prs.makeSequenceParser([
                         prs.makeTokenParser(","),
@@ -274,7 +276,9 @@ function makeParser() {
             prs.makeSequenceParser([
                 relationOperator,
                 addExpression
-            ])
+            ]),
+            "relationExpr",
+            true
         ), rt.makeExpression);
 
     let equalityOperator = prs.makeAlternativeParser([
@@ -289,7 +293,9 @@ function makeParser() {
                 equalityOperator,
                 relationalExpression
             ]),
-            "equalityExpression"
+            "equalityExpression",
+            true
+
         ), rt.makeExpression);
 
     let logicInversion = prs.makeAlternativeParser([
@@ -311,7 +317,7 @@ function makeParser() {
             prs.makeSequenceParser([
                 prs.makeTokenParser("and"),
                 logicInversion
-            ])), rt.makeExpression);
+            ], "andExpr", true)), rt.makeExpression);
 
     let logicalDisjunction = prs.makeTransformer(
         prs.makeRepetitionRecClause(
@@ -319,7 +325,7 @@ function makeParser() {
             prs.makeSequenceParser([
                 prs.makeTokenParser("or"),
                 logicalConjunction
-            ])), rt.makeExpression);
+            ]), "orExpression", true), rt.makeExpression);
 
     let expression = prs.makeAlternativeParser([
         logicalDisjunction,
@@ -383,13 +389,23 @@ function makeParser() {
             )
         ], "if-stmt"),
         function(arg) {
-            let ret = rt.makeIfStmt(arg[1], arg[2], arg[4], arg[0][1]);
+
+            //console.log("elsiff: " + JSON.stringify(arg));
+
+            let ret = rt.makeIfStmt(arg[1], arg[2][0], arg[4], arg[0][1]);
             let elsIfClauses = arg[3];
-            if (elsIfClauses != null) {
-                for(let i=0; elsIfClauses.length; ++i) {
-                    ret.addIfClause(elsIfClauses[i][1], elsIfClauses[2]);
+
+            for(let i=0; i<elsIfClauses.length; i++) {
+                let  oneElIf = elsIfClauses[i];
+                if (oneElIf != undefined) {
+                    //console.log("OneElIf: " + JSON.stringify(oneElIf));
+
+                    let elseCond = oneElIf[1];
+                    let elseStmt = oneElIf[2];
+                    ret.addIfClause(elseCond, elseStmt);
                 }
             }
+
             return ret;
         }
     );
@@ -457,6 +473,7 @@ function makeParser() {
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
         ]), function(arg) {
+            //console.log("function-def stmt: " + JSON.stringify((arg[5])));
             return rt.makeFunctionDef(arg[1], arg[3], arg[5], arg[0][1]);
         }
     );
@@ -472,12 +489,11 @@ function makeParser() {
 
 
     let statementList = prs.makeTransformer(
-
         prs.makeRepetitionParser(
             statement,
             0
-        )
-        , function(arg) {
+        ),
+        function(arg) {
             return rt.makeStatementList(arg);
         }
     );
@@ -486,6 +502,9 @@ function makeParser() {
         prs.makeTransformer(
             statement,
             function(arg) {
+                //let stmts = []
+                //stmts[0] = rt.makeStatementList([ arg ], arg.offset );
+                //return stmts;
                 return rt.makeStatementList([ arg ], arg.offset );
             }
         ),
@@ -495,7 +514,7 @@ function makeParser() {
                 statementList,
                 prs.makeTokenParser( "}")
             ]), function(arg) {
-                return rt.makeStatementList(arg[1], arg[0][1]);
+                return arg[1];
             }
         )
     ],"statementOrStatementList");
@@ -505,26 +524,35 @@ function makeParser() {
     return prs.makeConsumeAll(statementList);
 }
 
-function runParser(parser, data) {
+function runParser(parser, data, showAst = false) {
 
     console.log("test case: " + data);
     let s = new prs.State(0, data);
 
     try {
-        let result = parser(s);
-        console.log("parsing succeeded!");
-        console.log("parse result: " + result.show());
+        let state = parser(s);
 
-        rt.eval(result.result);
+        let result = state.result;
+
+        if (showAst) {
+            console.log("parsing succeeded!");
+            console.log("parse result name: " + result.constructor.name );
+            console.log("parse result1: ");
+            console.log("parse result2: " + result.show());
+            console.log("parse result3");
+        }
+
+        rt.eval(result);
 
     } catch(er) {
+        console.info(er.stack);
         console.log(prs.formatParserError(er, data));
     }
 }
 
 function testParser() {
 
-    prs.setTrace(true);
+    //prs.setTrace(true);
 
     let parser = makeParser();
 
@@ -586,9 +614,9 @@ fib(10)`,
             if val < 12
                 print("less than 10")
             elif val <= 30
-                print("youth age: {val}")                
+                print("youth age")                
             else {
-                print("after youth age: {val}")
+                print("after youth age")
             }
         }
         foo(6)
@@ -600,7 +628,7 @@ fib(10)`,
 
     let i = 0;
     for(i=0;i<data.length;++i) {
-        runParser(parser, data[i]);
+        runParser(parser, data[i], true);
     }
 
 }

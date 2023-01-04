@@ -160,20 +160,20 @@ class Frame {
 
 function showList(lst, dsp = null) {
     if (lst == null) {
-        return "";
+        return "(null-list)";
     }
-    let rval = "";
+    let retVal = "";
     for (let i = 0; i < lst.length; ++i) {
         if (i > 0) {
-            rval += ", ";
+            retVal += ", ";
         }
         if (dsp != null) {
-            rval += dsp(lst[i]);
+            retVal += dsp(lst[i]);
         } else {
-            rval += lst[i].show();
+            retVal += lst[i].show();
         }
     }
-    return rval;
+    return retVal;
 }
 
 class AstBase {
@@ -201,7 +201,7 @@ class AstStmtList extends AstBase {
         return VALUE_NONE;
     }
 
-    show(arg) {
+    show() {
         return showList(this.statements);
     }
 }
@@ -296,11 +296,15 @@ function makeExpression(exprList) {
     }
     let prevExpression = null;
     let pos = exprList.length -1;
+
+    //console.log("@@" + JSON.stringify(exprList));
     while(pos > 0) {
         if (prevExpression == null) {
+            //console.log("## " + JSON.stringify(exprList[pos-2]) + " # " +   JSON.stringify(exprList[pos-1]) + " # " + JSON.stringify(exprList[pos]));
             prevExpression = new AstBinaryExpression(exprList[pos-2], exprList[pos-1], exprList[pos]);
             pos -= 3;
         } else {
+            //console.log("!! " + JSON.stringify(exprList[pos-1]) + " # " +   JSON.stringify(exprList[pos]) + " # " + prevExpression);
             prevExpression = new AstBinaryExpression(exprList[pos-1], exprList[pos], prevExpression);
             pos -= 2;
         }

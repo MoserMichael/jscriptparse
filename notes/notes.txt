@@ -1,6 +1,31 @@
 
-Boolean types
+object ids
 
+    python
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> a="foo"
+    >>> b=a
+    >>> id(a)==id(b)
+    True
+    >>> a=1
+    >>> b=a
+    >>> id(a)==id(b)
+    True
+
+    >>> class Foo():
+        ...     def __init__(self,a):
+    ...             self.a=a
+    ...
+    >>> a=Foo("aaa")
+    >>> id(a.a)
+    4376913200
+    >>> b=a
+    >>> id(b.a)
+    4376913200
+    >>> id(b.a) == id(a.a)
+    True
+
+booleans
     python3
     >>> a=1
     >>> b=a==1
@@ -23,6 +48,16 @@ Boolean types
     2
 
 None type
+
+    javascript has several aliases for them?
+        undefined - variable has been defined, but not assigned value
+        null - has been assigned something! 
+        - but they are equal!!!
+
+    node
+    > undefined == null
+    true
+
 
     python3
     >>> def fun():

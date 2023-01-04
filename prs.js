@@ -45,11 +45,11 @@ function showRec(arg) {
  * The returned output is an object that represents the parsed value:
  */
 class State {
-    constructor(pos, data, result = null) {
+    constructor(pos, data, result = null, errorPos = -1) {
         this.pos = pos;
         this.data = data;
         this.result = result;
-        this.errorPos = -1;
+        this.errorPos = errorPos;
     }
 
     setErrorPos(parseError) {
@@ -72,17 +72,17 @@ class State {
 }
 
 class ParserError extends Error {
-    constructor(message, pos, nextException = null) {
+    constructor(message, state, nextException = null) {
         super(message);
-        this.pos = pos;
-        this.errorPos = -1;
+        this.pos = state.pos;
+        this.errorPos = state.errorPos;
         this.nextException = nextException;
     }
 }
 
-function makeError(message, pos, nested) {
+function makeError(message, state, nested) {
     //console.log("message: " + message + " pos: " + pos + " nested: " + nested);
-    let ex = new ParserError(message, pos, nested);
+    let ex = new ParserError(message, state, nested);
     throw ex;
 }
 
@@ -126,7 +126,7 @@ const makeTracer = function(parser, title) {
         return parser;
     }
     return function(state) {
-        console.log("enter parser: " + title);
+        console.log(state.errorPos + " enter parser: " + title);
 
         let entry = getLineAt(state.data,state.pos);
         let msg = entry[0] + "\n" + " ".repeat(entry[1]) + "^";
@@ -144,7 +144,7 @@ const makeTracer = function(parser, title) {
         msg = entry[0] + "\n" + " ".repeat(entry[1]) + "^";
         console.log(msg);
 
-        console.log("exit parser: " + title);
+        console.log(state.errorPos + " exit parser: " + title);
         return ret;
     }
 }
@@ -182,7 +182,7 @@ const makeRegexParser = function (regex, name = null) {
     return makeTracer(function (state) {
         state = skipWhitespace(state);
         if (state.pos >= state.data.length) {
-            makeError("end of input. missing: " + regex.source, state.pos);
+            makeError("end of input. missing: " + regex.source, state);
         }
 
         let remainder = state.data.substring(state.pos);
@@ -195,9 +195,9 @@ const makeRegexParser = function (regex, name = null) {
             } else {
                 data = tres[0];
             }
-            return new State(state.pos + tres[0].length, state.data, data);
+            return new State(state.pos + tres[0].length, state.data, data, state.errorPos);
         }
-        makeError( name + " expected", state.pos);
+        makeError( name + " expected", state);
         return null;
     }, name=name);
 }
@@ -218,7 +218,7 @@ const makeTokenParser = function (token) {
     return makeTracer(function (state) {
         state = skipWhitespace(state);
         if (state.pos >= state.data.length) {
-            makeError("end of input. missing: " + token, state.pos);
+            makeError("end of input. missing: " + token, state);
         }
         if (state.data.substring(state.pos, state.pos + token.length) == token) {
             //state.pos += token.lengthף
@@ -230,9 +230,9 @@ const makeTokenParser = function (token) {
             } else {
                 data = token;
             }
-            return new State(state.pos + token.length, state.data, data)
+            return new State(state.pos + token.length, state.data, data, state.errorPos)
         }
-        makeError("expected token: " + token, state.pos);
+        makeError("expected token: " + token, state);
         return null;
     }, name=token);
 }
@@ -289,9 +289,9 @@ const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1,
 
         if (matching < minMatching && minMatching != 0) {
             if (matching == 0) {
-                makeError("didn't match even one in " + name, state.pos);
+                makeError("didn't match even one in " + name, state);
             } else {
-                makeError("didn't match enough in " + name, state.pos);
+                makeError("didn't match enough in " + name, state);
             }
         }
 
@@ -368,7 +368,7 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
                     result.push(state.result);
                 }
             } catch(er) {
-                makeError("Parsing error in " + name + " at term " + i, state.pos, er);
+                makeError("Parsing error in " + name + " at term " + i, state, er);
             }
         }
 
@@ -412,7 +412,7 @@ const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser
                 state.setErrorPos(er);
             }
         }
-        makeError("none of the argument parser matches in " + name, state.pos);
+        makeError("none of the argument parser matches in " + name, state);
         return null;
     }, name);
 }
@@ -430,7 +430,7 @@ const makeConsumeAll = function(nestedParser) {
         let res = nestedParser(state);
         res=skipWhitespace(res);
         if (res.pos < state.data.length) {
-            makeError("error at:",res.pos);
+            makeError("error at:",res);
         }
         return res;
     }

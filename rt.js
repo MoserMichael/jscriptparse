@@ -110,7 +110,14 @@ RTLIB={
             return new Value(TYPE_LIST, Object.keys(arg[0].val));
         }
         throw new Error("map argument required");
-     }),
+    }),
+    "join": new BuiltinFunctionValue(1, function(arg) {
+        if (arg[0].type == TYPE_LIST) {
+            console.info("joinArg:" + JSON.stringify(arg[0].val));
+            return new Value(TYPE_STR, arg[0].val.map(value2Str).join(""));
+        }
+        throw new Error("list argument required. is: " + mapTypeToName[ arg[0].type ]);
+    }),
 }
 
 class Frame {
@@ -285,7 +292,7 @@ class AstBinaryExpression extends AstBase {
     }
 
     show() {
-        return "(" + this.op + " " + this.lhs.show() + " " + this.rhs.show() + ")";
+        return "(" + this.op + ": " + this.lhs.show() + " ," + this.rhs.show() + ")";
     }
 
 }
@@ -700,9 +707,9 @@ class AstFunctionDef extends AstBase {
         let ret = "(funcDef " + this.name + "("
 
         ret += showList(this.params, function(arg) {
-            let ret = arg[0];
+            let ret = arg[0][0];
             if (arg.length > 1) {
-                ret += arg[2];
+                ret += " = " + arg[2];
             }
             return ret;
         })

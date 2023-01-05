@@ -69,19 +69,19 @@ function makeParser() {
         prs.makeRegexParser( /^"(\\\\.|[^"{])*{/, "string-const" ),
         function(arg) {
             arg[0] = arg[0].slice(0,-1);
-            return arg;
+            return rt.makeConstValue(rt.TYPE_STR, arg);
         });
     let formatStringMidConst = prs.makeTransformer(
         prs.makeRegexParser( /^}(\\\\.|[^"{])*{/, "string-const" ),
         function(arg) {
             arg[0] = arg[0].slice(1,-1);
-            return arg;
+            return rt.makeConstValue(rt.TYPE_STR, arg);
         });
     let formatStringEndConst = prs.makeTransformer(
         prs.makeRegexParser( /^}(\\\\.|[^"{])*"/, "string-const" ),
         function(arg) {
             arg[0] = arg[0].slice(1);
-            return arg;
+            return rt.makeConstValue(rt.TYPE_STR, arg);
         })
 
 
@@ -156,21 +156,64 @@ function makeParser() {
         }
     );
 
-    let formatStringContinuation = prs.makeSequenceParser([
-        forwardExpr.forward(),
-        prs.makeRepetitionParser(
-            prs.makeSequenceParser([
-                formatStringMidConst,
-                forwardExpr.forward()
-            ]),
-            0
-        ),
-        formatStringEndConst
-    ]);
+    let formatStringContinuation = prs.makeTransformer(
+        prs.makeSequenceParser([
+            forwardExpr.forward(),
+            prs.makeRepetitionParser(
+                prs.makeSequenceParser([
+                    formatStringMidConst,
+                    forwardExpr.forward()
+                ]),
+                0
+            ),
+            formatStringEndConst
+        ]), function(arg) {
+            let rVal = [];
 
-    let formatExpr = prs.makeRepetitionRecClause(
-        formatStringStartConst,
-        formatStringContinuation
+            rVal.push(arg[0]);
+            let mid = arg[1];
+            for(let i=0; i< mid.length;++i) {
+                let seqMid = mid[i];
+                rVal.push( rt.makeConstValue(rt.TYPE_STR, seqMid[0]) );
+                rVal.push( seqMid[1] );
+            }
+            rVal.push(arg[2]);
+
+            console.info("cont: " + JSON.stringify(rVal));
+            return rVal;
+        }
+    );
+
+    let formatExpr = prs.makeTransformer(
+        prs.makeSequenceParser([
+            formatStringStartConst,
+            formatStringContinuation
+        ]), function(arg) {
+
+            console.info("arg: " + JSON.stringify(arg));
+
+
+            let argExpr = [ arg[0] ];
+
+            if (arg[1].length != 0) {
+                argExpr = argExpr.concat(arg[1][0]);
+            }
+
+            console.info("argExpr: " + JSON.stringify(arg));
+
+            //let argVal = [ argExpr, arg[0][1] ];
+
+            // make format expr
+            let funcTok = [ "join", arg[0].startOffset ];
+
+
+            //console.info("funcallArgExpr: " + JSON.stringify(argExpr));
+            let argVal = [ rt.newListCtorExpression(argExpr, arg[0].offset) ];
+
+            //console.info("argVal: " + JSON.stringify(argVal) );
+
+            return rt.makeFunctionCall(funcTok, argVal);
+        }
     );
 
     let identifierWithOptIndex = prs.makeTransformer(
@@ -443,10 +486,14 @@ function makeParser() {
 
     let paramList = prs.makeRepetitionRecClause(
         paramDef,
-        prs.makeSequenceParser([
-            prs.makeTokenParser(","),
-            paramDef
-        ])
+        prs.makeTransformer(
+            prs.makeSequenceParser([
+                prs.makeTokenParser(","),
+                paramDef
+            ]), function(arg) {
+                return arg[1];
+            }
+        )
     );
 
     let lambdaFunctionDef = prs.makeTransformer(
@@ -594,6 +641,14 @@ print(fact(2))
 print(fact(7))
 `,
 
+        `
+        function tri(a,b) {
+            return a * a + b * b
+         }    
+         
+         print( tri(3, 4) )
+        `
+/*
         `this=3
          that=4
          print("show this: {this} product: {this * that}")`,
@@ -608,6 +663,7 @@ print(fact(7))
         `num = { 1: "one", 2: "two", 3: [1, 2, 3] }
          print(num)
         `
+ */
     ];
 
     let i = 0;

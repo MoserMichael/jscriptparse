@@ -3,26 +3,29 @@ object ids
 
     python
     Type "help", "copyright", "credits" or "license" for more information.
-    >>> a="foo"
+    >>> a="a"
     >>> b=a
     >>> id(a)==id(b)
     True
-    >>> a=1
-    >>> b=a
+    >>> a+="a"
+    >>> a
+    'aa'
     >>> id(a)==id(b)
-    True
+    False
+
 
     >>> class Foo():
         ...     def __init__(self,a):
     ...             self.a=a
     ...
     >>> a=Foo("aaa")
-    >>> id(a.a)
-    4376913200
     >>> b=a
-    >>> id(b.a)
-    4376913200
     >>> id(b.a) == id(a.a)
+    True
+
+    >>> a=1
+    >>> b=a
+    >>> id(a)==id(b)
     True
 
 booleans

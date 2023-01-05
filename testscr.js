@@ -392,7 +392,7 @@ function makeParser() {
 
             //console.log("elsiff: " + JSON.stringify(arg));
 
-            let ret = rt.makeIfStmt(arg[1], arg[2][0], arg[4], arg[0][1]);
+            let ret = rt.makeIfStmt(arg[1], arg[2], arg[4], arg[0][1]);
             let elsIfClauses = arg[3];
 
             for(let i=0; i<elsIfClauses.length; i++) {
@@ -536,17 +536,14 @@ function runParser(parser, data, showAst = false) {
 
         if (showAst) {
             console.log("parsing succeeded!");
-            console.log("parse result name: " + result.constructor.name );
-            console.log("parse result1: ");
-            console.log("parse result2: " + result.show());
-            console.log("parse result3");
+            console.log("parse result: " + result.show());
         }
 
         rt.eval(result);
 
     } catch(er) {
-        console.info(er.stack);
         console.log(prs.formatParserError(er, data));
+
     }
 }
 
@@ -575,14 +572,14 @@ function testParser() {
             if val < 12
                 print("less than 10")
             elif val <= 30
-                print("youth age: {val}")                
+                print("youth age")                
             else {
-                print("after youth age: {val}")
+                print("after youth age")
             }
         }
         foo(6)
         foo(20)
-        foo(42)        
+        foo(42)
         `,
 
         `
@@ -592,11 +589,15 @@ function fact(n) {
    }
    return n * fact(n-1)
 }
-fib(10)`,
+print(fact(1))
+print(fact(2))
+print(fact(7))
+`,
 
         `this=3
          that=4
          print("show this: {this} product: {this * that}")`,
+
         `a=[1, 2, 3]
          tmp = a[0]
          a[0]=a[1]
@@ -608,23 +609,6 @@ fib(10)`,
          print(num)
         `
     ];
-
-    data = [        `
-        function foo(val) {
-            if val < 12
-                print("less than 10")
-            elif val <= 30
-                print("youth age")                
-            else {
-                print("after youth age")
-            }
-        }
-        foo(6)
-        foo(20)
-        foo(42)
-        `
-    ];
-
 
     let i = 0;
     for(i=0;i<data.length;++i) {

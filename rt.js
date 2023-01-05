@@ -453,7 +453,11 @@ class AstIdentifierRef extends AstBase {
     }
 
     show() {
-        return this.identifierName + showList(this.refExpr,function (arg) {return "["+arg.show()+"]"});
+        let ret = this.identifierName;
+        if (this.refExpr != null) {
+            ret += showList(this.refExpr,function (arg) {return "["+arg.show()+"]"});
+        }
+        return ret;
     }
 }
 
@@ -538,19 +542,25 @@ class AstIfStmt extends AstBase {
         super(offset);
         this.ifClauses = [];
         this.addIfClause(expr, stmtList);
-        this.elseStmtList = elseStmtList;
+
+        //console.log("else: " + JSON.stringify(elseStmtList));
+        this.elseStmtList = null;
+        if (elseStmtList != null && elseStmtList.length != 0) {
+            this.elseStmtList = elseStmtList[0][1];
+        }
     }
 
     addIfClause(expr,stmtList) {
+        //console.log("expr: " + JSON.stringify(expr) + " stmtList: " + stmtList);
         this.ifClauses.push([ expr, stmtList ]);
     }
 
     eval(frame) {
         for(let i=0; i< this.ifClauses.length; ++i) {
             let clause = this.ifClauses[i];
-            let val = clause.eval(frame[0]);
+            let val = clause[0].eval(frame);
             if (value2Bool(val)) {
-                return clause[1].eval();
+                return clause[1].eval(frame);
             }
         }
         if (this.elseStmtList != null) {
@@ -651,14 +661,21 @@ function _evalDefaultParams(frame, params) {
 class AstFunctionDef extends AstBase {
     constructor(name, params, body, offset) {
         super(offset);
-        this.name = name[0];
+        this.name = null;
+        if (name != null) {
+            this.name = name[0];
+        }
         this.params = params;
         this.body = body;
     }
 
     eval(frame) {
         let defaultParamValues = _evalDefaultParams(frame, this.params);
-        let closureValue = new ClosureValue(this, defaultParamValues, frame);
+        let argFrame = frame;
+        if (this.name != null) {
+            argFrame = null;
+        }
+        let closureValue = new ClosureValue(this, defaultParamValues, argFrame);
         if (this.name != null) {
             frame.assign(this.name, closureValue);
         }
@@ -740,6 +757,7 @@ class AstFunctionCall extends AstBase {
     _evalClosure(funcVal, frame) {
 
         if (funcVal.frame != null) { // for closures: for evaluation we use the frame of the enclosing function
+            console.log("_use_funcVal_");
             frame = funcVal.frame;
         }
         let functionDef = funcVal.functionDef;
@@ -754,9 +772,9 @@ class AstFunctionCall extends AstBase {
         for (; i < this.expressionList.length; ++i) {
             let argExpression = this.expressionList[i]; // parameter expression
             let argValue = argExpression.eval(frame); // evaluate parameter expression
-            let paramDef = functionDef.params[i]; // name of parameter
 
-            funcFrame.defineVar(paramDef[0], argValue);
+            let paramDef = functionDef.params[i]; // name of parameter
+            funcFrame.defineVar(paramDef[0][0], argValue);
         }
 
         // provide values for arguments with default values
@@ -767,11 +785,14 @@ class AstFunctionCall extends AstBase {
             if (defaultParamValue == null) {
                 throw new Error("function " + this.name + " no value for parameter " + paramDef[0]);
             }
-            funcFrame.defineVar(paramDef[0], defaultParamValue);
+            funcFrame.defineVar(paramDef[0][0], defaultParamValue);
         }
+
+        //console.log("funcFrame: " + JSON.stringify(funcFrame.vars));
 
         // frame is ready, evaluate the statement list
         let rval = functionDef.body.eval(funcFrame);
+
         if (rval.type == TYPE_FORCE_RETURN) {
             return rval.val;
         }
@@ -785,7 +806,7 @@ class AstFunctionCall extends AstBase {
 }
 
 function makeFunctionCall(name, expressionList) {
-    return new AstFunctionCall(name[0], expressionList, name[1], name[1]);
+    return new AstFunctionCall(name[0], expressionList, name[1]);
 }
 
 function eval(stmt) {

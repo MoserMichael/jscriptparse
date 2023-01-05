@@ -135,7 +135,7 @@ function formatParserError(er, data) {
         }
         return msg;
     }
-    return JSON.stringify(er);
+    return er.stack;
 }
 
 

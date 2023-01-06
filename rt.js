@@ -796,8 +796,12 @@ class AstFunctionCall extends AstBase {
         if (funcVal == undefined) {
             throw new Error("Can't call undefined function " + this.name);
         }
+        return this.evalClosure(funcVal, frame);
+    }
+
+    evalClosure(funcVal, frame) {
         if (funcVal.type != TYPE_CLOSURE && funcVal.type != TYPE_BUILTIN_FUNCTION) {
-            throw new Error("variable " + this.name + " is not a function, it is a " + mapTypeToName[funcVal.type.toString()]);
+            throw new Error("variable is not a function/closure, it is a " + mapTypeToName[funcVal.type.toString()]);
         }
 
         if (funcVal.type == TYPE_CLOSURE) {
@@ -811,7 +815,7 @@ class AstFunctionCall extends AstBase {
 
     _evalBuiltinFunc(funcVal, frame) {
         if (funcVal.numParams != this.expressionList.length) {
-            throw new Error(this.name + " takes " + funcVal.numParams + " parameters, whereas " + this.expressionList.length +
+            throw new Error("function takes " + funcVal.numParams + " parameters, whereas " + this.expressionList.length +
                 "  parameters are passed in call");
         }
         let args = [];

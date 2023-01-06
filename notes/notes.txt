@@ -1,5 +1,38 @@
+Passing more arguments then defined in function
 
-object ids
+    node
+    Welcome to Node.js v19.2.0.
+    Type ".help" for more information.
+    > function foo(x) {
+    ... console.log("arg: " + x);
+    ... }
+    undefined
+    > foo("123")
+    arg: 123
+    undefined
+    > foo()
+    arg: undefined
+    undefined
+    > foo("123",1,2)
+    arg: 123
+    undefined
+
+    python
+    >>>
+    >>> def foo(x):
+    ...     print(x)
+    ...
+    >>> foo("123")
+    123
+    >>> foo("123",1)
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: foo() takes 1 positional argument but 2 were given
+    object ids
+    >>> foo()
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    TypeError: foo() missing 1 required positional argument: 'x'
 
     python
     Type "help", "copyright", "credits" or "license" for more information.
@@ -7,7 +40,8 @@ object ids
     >>> b=a
     >>> id(a)==id(b)
     True
-    >>> a+="a"
+
+    >>> a+="a"              # copy on write
     >>> a
     'aa'
     >>> id(a)==id(b)
@@ -28,7 +62,9 @@ object ids
     >>> id(a)==id(b)
     True
 
-booleans
+
+Conversion of booleans to numbers
+
     python3
     >>> a=1
     >>> b=a==1

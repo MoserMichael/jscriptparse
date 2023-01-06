@@ -113,7 +113,6 @@ RTLIB={
     }),
     "join": new BuiltinFunctionValue(1, function(arg) {
         if (arg[0].type == TYPE_LIST) {
-            console.info("joinArg:" + JSON.stringify(arg[0].val));
             return new Value(TYPE_STR, arg[0].val.map(value2Str).join(""));
         }
         throw new Error("list argument required. is: " + mapTypeToName[ arg[0].type ]);
@@ -177,7 +176,11 @@ function showList(lst, dsp = null) {
         if (dsp != null) {
             retVal += dsp(lst[i]);
         } else {
-            retVal += lst[i].show();
+            if ('show' in lst[i]) {
+                retVal += lst[i].show();
+            } else {
+                retVal += "<error: " + lst[i].constructor.name + ">";
+            }
         }
     }
     return retVal;
@@ -361,7 +364,7 @@ class AstDictCtorExpression extends AstBase {
 
             let nameVal = nameValueDef[0].eval(frame);
             let name = value2Str( nameVal );
-            let value = nameValueDef[2].eval(frame);
+            let value = nameValueDef[1].eval(frame);
 
             ret[ name ] = value;
         }
@@ -370,7 +373,7 @@ class AstDictCtorExpression extends AstBase {
 
     show() {
         let rval = "{";
-        rval += showList(this.exprList, function(arg) { return arg[0].show() + ": " + arg[2].show()})
+        rval += showList(this.exprList, function(arg) { return arg[0].show() + ": " + arg[1].show()})
         return rval + "}";
     }
 }
@@ -401,7 +404,11 @@ class AstListCtorExpression extends AstBase {
 }
 
 function newListCtorExpression(exprList, offset) {
-    return new AstListCtorExpression(exprList[0], offset);
+    let arg = [];
+    if (exprList.length > 0) {
+        arg = exprList[0];
+    }
+    return new AstListCtorExpression(arg, offset);
 }
 
 function makeUnaryExpression(expr, op) {
@@ -437,7 +444,11 @@ function lookupIndex(frame, value, refExpr) {
         }
         let expr = refExpr[i];
         let indexValue = expr.eval(frame);
+
         value = value.val[ indexValue.val ];
+        if (value == null) {
+            throw new Error("Can't lookup value " + indexValue.val)
+        }
     }
     return value;
 }
@@ -813,7 +824,11 @@ class AstFunctionCall extends AstBase {
 }
 
 function makeFunctionCall(name, expressionList) {
-    return new AstFunctionCall(name[0], expressionList, name[1]);
+    let expr =  expressionList;
+    if (expressionList.length != 0) {
+        expr = expressionList[0];
+    }
+    return new AstFunctionCall(name[0], expr, name[1]);
 }
 
 function eval(stmt) {
@@ -848,6 +863,7 @@ if (typeof(module) == 'object') {
         makeReturnStmt,
         makeFunctionDef,
         makeFunctionCall,
-        eval
+        eval,
+        showList
     }
 }

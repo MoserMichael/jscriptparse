@@ -36,6 +36,7 @@ function makeParser() {
     let stringConst = prs.makeTransformer(
         prs.makeRegexParser( /^'(\\\\.|[^'])*'/, "string-const" ),
         function(arg) {
+            arg[0] = arg[0].slice(1,-1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         }
     );
@@ -43,6 +44,7 @@ function makeParser() {
     let formatStringConst = prs.makeTransformer(
             prs.makeRegexParser( /^"(\\\\.|[^"{])*"/, "string-const" ),
             function(arg) {
+            arg[0] = arg[0].slice(1,-1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         }
     );
@@ -68,7 +70,7 @@ function makeParser() {
     let formatStringStartConst = prs.makeTransformer(
         prs.makeRegexParser( /^"(\\\\.|[^"{])*{/, "string-const" ),
         function(arg) {
-            arg[0] = arg[0].slice(0,-1);
+            arg[0] = arg[0].slice(1,-1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
     let formatStringMidConst = prs.makeTransformer(
@@ -80,7 +82,7 @@ function makeParser() {
     let formatStringEndConst = prs.makeTransformer(
         prs.makeRegexParser( /^}(\\\\.|[^"{])*"/, "string-const" ),
         function(arg) {
-            arg[0] = arg[0].slice(1);
+            arg[0] = arg[0].slice(1,-1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         })
 
@@ -114,7 +116,7 @@ function makeParser() {
             prs.makeSequenceParser( [
             identifier,
             prs.makeTokenParser("("),
-            expressionList,
+            prs.makeOptParser(expressionList),
             prs.makeTokenParser( ")")
         ]), function(arg) {
             return rt.makeFunctionCall(arg[0], arg[2]);
@@ -124,35 +126,51 @@ function makeParser() {
     let listExpr = prs.makeTransformer(
         prs.makeSequenceParser([
             prs.makeTokenParser("["),
-            expressionList,
+            prs.makeOptParser(expressionList),
             prs.makeTokenParser( "]"),
         ]), function(arg) {
             return rt.newListCtorExpression(arg[1]);
         });
 
-    let nameValuePair = prs.makeSequenceParser([
-        forwardExpr.forward(),
-        prs.makeTokenParser(":"),
-        forwardExpr.forward()
-    ])
+    let nameValuePair = prs.makeTransformer(
+        prs.makeSequenceParser([
+            forwardExpr.forward(),
+            prs.makeTokenParser(":"),
+            forwardExpr.forward()
+        ]), function(arg) {
+            return [arg[0], arg[2]];
+        }
+    );
+
+    let dictClause = prs.makeRepetitionRecClause(
+        nameValuePair,
+        prs.makeTransformer(
+            prs.makeSequenceParser([
+                prs.makeTokenParser(","),
+                nameValuePair
+            ]), function (arg) {
+                return arg[1];
+            }
+        ), 0
+    );
 
     let dictExpr = prs.makeTransformer(
         prs.makeSequenceParser([
             prs.makeTokenParser("{"),
-            prs.makeRepetitionRecClause(
-                nameValuePair,
-                prs.makeTransformer(
-                    prs.makeSequenceParser([
-                        prs.makeTokenParser(","),
-                        nameValuePair
-                    ]), function (arg) {
-                        return arg[1];
-                    }
-                )
-            ),
+            prs.makeOptParser(dictClause),
             prs.makeTokenParser( "}")
         ]), function(arg) {
-            return rt.newDictListCtorExpression(arg[1],arg[0][1]);
+
+            arg = arg[1];
+
+            let cl = [];
+            if (arg.length != 0) {
+                cl = arg[0]
+            }
+
+            console.log("arg: " + JSON.stringify(cl));
+
+            return rt.newDictListCtorExpression(cl, arg[0][1]);
         }
     );
 
@@ -174,12 +192,10 @@ function makeParser() {
             let mid = arg[1];
             for(let i=0; i< mid.length;++i) {
                 let seqMid = mid[i];
-                rVal.push( rt.makeConstValue(rt.TYPE_STR, seqMid[0]) );
+                rVal.push( seqMid[0] );
                 rVal.push( seqMid[1] );
             }
             rVal.push(arg[2]);
-
-            console.info("cont: " + JSON.stringify(rVal));
             return rVal;
         }
     );
@@ -190,29 +206,19 @@ function makeParser() {
             formatStringContinuation
         ]), function(arg) {
 
-            console.info("arg: " + JSON.stringify(arg));
-
-
             let argExpr = [ arg[0] ];
 
             if (arg[1].length != 0) {
-                argExpr = argExpr.concat(arg[1][0]);
+                argExpr = argExpr.concat(arg[1]);
             }
 
-            console.info("argExpr: " + JSON.stringify(arg));
-
-            //let argVal = [ argExpr, arg[0][1] ];
-
-            // make format expr
             let funcTok = [ "join", arg[0].startOffset ];
 
+            let a = [];
+            a[0] = argExpr;
+            let argVal = [ rt.newListCtorExpression(a, arg[0].offset) ];
 
-            //console.info("funcallArgExpr: " + JSON.stringify(argExpr));
-            let argVal = [ rt.newListCtorExpression(argExpr, arg[0].offset) ];
-
-            //console.info("argVal: " + JSON.stringify(argVal) );
-
-            return rt.makeFunctionCall(funcTok, argVal);
+            return rt.makeFunctionCall(funcTok, [ argVal ]);
         }
     );
 
@@ -601,35 +607,35 @@ function testParser() {
     let parser = makeParser();
 
     let data = [
-        "aaa=1 print(aaa)",
+"aaa=1 print(aaa)",
 
-        "a=3+12/4 print(a)",
+"a=3+12/4 print(a)",
 
-        "b=2 a=3 e=4 d=b*(4-a*e) print(d)",
+"b=2 a=3 e=4 d=b*(4-a*e) print(d)",
 
-        `
-        function inc(x) {
-            return x + 1
-        }
-        print(21)
-        `,
+`
+function inc(x) {
+    return x + 1
+}
+print(21)
+`,
 
-        `
-        function foo(val) {
-            if val < 12
-                print("less than 10")
-            elif val <= 30
-                print("youth age")                
-            else {
-                print("after youth age")
-            }
-        }
-        foo(6)
-        foo(20)
-        foo(42)
-        `,
+`
+function foo(val) {
+    if val < 12
+        print("less than 10")
+    elif val <= 30
+        print("youth age")                
+    else {
+        print("after youth age")
+    }
+}
+foo(6)
+foo(20)
+foo(42)
+`,
 
-        `
+`
 function fact(n) {
    if n<=1 {
       return 1
@@ -641,29 +647,41 @@ print(fact(2))
 print(fact(7))
 `,
 
-        `
-        function tri(a,b) {
-            return a * a + b * b
-         }    
-         
-         print( tri(3, 4) )
-        `
-/*
-        `this=3
-         that=4
-         print("show this: {this} product: {this * that}")`,
+`
+function tri(a,b) {
+    return a * a + b * b
+ }    
+ 
+ print( tri(3, 4) )
+`,
 
-        `a=[1, 2, 3]
-         tmp = a[0]
-         a[0]=a[1]
-         a[1]=a[2]
-         a[2]=tmp
-        `,
+`
+    a = 2
+    b = 3
 
-        `num = { 1: "one", 2: "two", 3: [1, 2, 3] }
-         print(num)
-        `
- */
+    c = [ "product: ", a * b , " sum product of squares: ", (a *a) + (b * b) ]
+    print(join(c))
+    print(join([ "product: ", a * b , " sum product of squares: ", (a *a) + (b * b) ]))
+`,
+
+`
+    this=3
+    that=4
+    print("sum: {this + that} product: {this * that} diff: {3 - 4}.")
+`,
+
+`
+    a=[1, 2, 3]
+    tmp = a[0]
+    a[0]=a[1]
+    a[1]=a[2]
+    a[2]=tmp
+    print("first: {a[0]} second: {a[1]} third: {a[2]}")
+`,
+`
+    num = { 1: "one", 2: "two", 3: "three" }
+    print("first: {num['1']} second: {num['2']} third: {num['3']}")
+`
     ];
 
     let i = 0;
@@ -674,4 +692,3 @@ print(fact(7))
 }
 
 testParser();
-

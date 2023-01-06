@@ -8,7 +8,7 @@ To run the tests: ```node test.js```
 
 The tests are a small scripting language and interpreter for the scripting language. The parser/syntax tree is built [here](https://github.com/MoserMichael/jscriptparse/blob/main/scripty.js) the runtime for the interpeter is [here](https://github.com/MoserMichael/jscriptparse/blob/main/rt.js) 
 
-(don't judge the scripting language too sharply, it is my new tinker toy, very much a work in progress)
+(don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress)
  
 ## Documentation of the module
 

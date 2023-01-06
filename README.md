@@ -4,7 +4,9 @@ Had to build a parser and wrote this instead.
 
 The module is in ```prs.js```
 
-To run the tests: ```node testscr.js```
+To run the tests: ```node test.js```
+
+The tests are a small scripting language and interpreter for the scripting language. The parser/syntax tree is built [here](https://github.com/MoserMichael/jscriptparse/blob/main/scripty.js) the runtime for the interpeter is [here](https://github.com/MoserMichael/jscriptparse/blob/main/rt.js) 
 
 ## Documentation of the module
 

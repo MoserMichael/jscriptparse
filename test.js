@@ -3,7 +3,6 @@ const scr=require("./scripty.js");
 
 function testParser() {
 
-    //prs.setTrace(true);
 
     let parser = scr.makeParser();
 
@@ -16,14 +15,14 @@ function testParser() {
         "b=2 a=3 e=4 d=b*(4-a*e) print(d)",
 
         `
-function inc(x) {
+def inc(x) {
     return x + 1
 }
-print(21)
+print(inc(21))
 `,
 
 `
-function foo(val) {
+def foo(val) {
     if val < 12
         print("should be happy years")
     elif val <= 30
@@ -38,7 +37,7 @@ foo(42)
 `,
 
 `
-function fact(n) {
+def fact(n) {
    if n<=1 {
       return 1
    }
@@ -50,8 +49,8 @@ print(fact(7))
 `,
 
 `
-function tri(a,b) {
-    return a * a + b * b
+def tri(a,b) {
+    return sqrt(a * a + b * b)
  }    
  
  print( tri(3, 4) )
@@ -85,8 +84,8 @@ function tri(a,b) {
     print("first: {num['1']} second: {num['2']} third: {num['3']}")
 `,
 `
-    function makeAdder(num) {
-        return function(arg) {
+    def makeAdder(num) {
+        return def(arg) {
             return num + arg
        }
     }
@@ -96,10 +95,26 @@ function tri(a,b) {
 `
     ];
 
+    let showAst = false;
+
     let i = 0;
+    let failures = 0;
+
     for(i=0;i<data.length;++i) {
         console.log("-------------------");
-        scr.runParser(parser, data[i], true);
+        console.log("Source:")
+        console.log(data[i]);
+        console.log("\nEvaluation:");
+
+        if (!scr.runParser(parser, data[i], showAst)) {
+            failures += 1;
+        }
+    }
+    console.log("+++++++++++");
+    if (failures == 0) {
+        console.log("All tests passed")
+    } else {
+        console.log("SOME_TESTS_FAILED: Number of failed tests: " + failures);
     }
 }
 

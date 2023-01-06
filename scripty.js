@@ -27,7 +27,7 @@ const prs=require("./prs.js");
 const rt=require("./rt.js");
 
 KEYWORDS = {
-    'function': 1,
+    'def': 1,
     'return': 1,
     'if':   1,
     'else': 1,
@@ -530,7 +530,7 @@ function makeParser() {
 
     let lambdaFunctionDef = prs.makeTransformer(
         prs.makeSequenceParser([
-            prs.makeTokenParser("function"),
+            prs.makeTokenParser("def"),
             prs.makeTokenParser("("),
             prs.makeOptParser(paramList),
             prs.makeTokenParser(")"),
@@ -550,7 +550,7 @@ function makeParser() {
 
     let functionDef = prs.makeTransformer(
             prs.makeSequenceParser([
-            prs.makeTokenParser("function"),
+            prs.makeTokenParser("def"),
             identifier,
             prs.makeTokenParser("("),
             prs.makeOptParser(paramList),
@@ -611,7 +611,6 @@ function makeParser() {
 
 function runParser(parser, data, showAst = false) {
 
-    console.log("test case: " + data);
     let s = new prs.State(0, data);
 
     try {
@@ -625,11 +624,12 @@ function runParser(parser, data, showAst = false) {
         }
 
         rt.eval(result);
+        return true;
 
     } catch(er) {
         console.log(prs.formatParserError(er, data));
-
     }
+    return false;
 }
 
 if (typeof(module) == 'object') {

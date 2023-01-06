@@ -18,7 +18,7 @@ See the [generated documentation](https://mosermichael.github.io/jscriptparse/ou
 ## what I learned while writing this project
 
 i am learning about interpreted languages (such as python, php, javascript, perl, etc...) 
-I keep noticing quite a lot of details, while writing my little interpreter, I keep them [here](https://github.com/MoserMichael/jscriptparse/blob/main/notes/notes.txt)
+Now I keep noticing quite a lot of details, while writing my little interpreter. I am keeping some notes [here](https://github.com/MoserMichael/jscriptparse/blob/main/notes/notes.txt)
 
-The moral: any kind of project can teach you quite a lot of unexpected thinks! (i think the important part is to keep notes, otherwise you tend to forget this stuff...)
+The moral: you can learn a lot with this type of project! (i think the important part is to keep notes, otherwise you tend to forget the details...)
 

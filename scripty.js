@@ -26,11 +26,38 @@
 const prs=require("./prs.js");
 const rt=require("./rt.js");
 
+KEYWORDS = {
+    'function': 1,
+    'if':   1,
+    'else': 1,
+    'elif': 1,
+    'while': 1,
+    'not': 1,
+    'or': 1,
+    'and': 1,
+    'true': 1,
+    'false': 1,
+    'none': 1,
+}
+
+function isKeyword(arg) {
+    return arg in KEYWORDS;
+}
+
 function makeParser() {
 
     prs.setKeepLocationWithToken(true);
+    //prs.setTrace(true);
 
-    let identifier = prs.makeRegexParser( /^[a-zA-Z][a-zA-Z0-9\_]*/, "identifier" );
+    let identifier = prs.makeTransformer(
+        prs.makeRegexParser( /^[a-zA-Z][a-zA-Z0-9\_]*/, "identifier" ),
+        function(arg) {
+            if (isKeyword(arg[0])) {
+                throw new prs.ParserError("identifier expected", arg[1]);
+            }
+            return arg;
+        }
+    );
     let number = prs.makeRegexParser( /^[\+\-]?[0-9]+([\.][0-9]+)?([eE][\+\-]?[0-9]+)?/, "number" )
 
     let stringConst = prs.makeTransformer(
@@ -238,6 +265,7 @@ function makeParser() {
             )
         ]), function(arg) {
             if (arg.length >= 1) {
+                //console.log(JSON.stringify(arg));
                 return rt.makeIdentifierRef(arg[0], arg[1]);
             } else {
                 return rt.makeIdentifierRef(arg[0], null);
@@ -474,7 +502,7 @@ function makeParser() {
             prs.makeSequenceParser([
             prs.makeTokenParser("return"),
             expression
-        ]),
+        ], "returnStatement"),
         function(arg) {
                 return rt.makeReturnStmt(arg[1], arg[0][1]);
         }
@@ -486,9 +514,9 @@ function makeParser() {
                 prs.makeSequenceParser([
                     prs.makeTokenParser("="),
                     expression
-                ])
+                ], "functionParameter")
             )
-        ]);
+        ], "functionParameterList");
 
     let paramList = prs.makeRepetitionRecClause(
         paramDef,
@@ -509,7 +537,7 @@ function makeParser() {
             prs.makeOptParser(paramList),
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
-        ]), function(arg) {
+        ], "lambdaDef"), function(arg) {
             let functionDef = rt.makeFunctionDef(null, arg[2], arg[4], arg[0][1]);
             return rt.makeLambdaExpression( functionDef );
         }

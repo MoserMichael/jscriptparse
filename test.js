@@ -21,7 +21,7 @@ function inc(x) {
 print(21)
 `,
 
-        `
+`
 function foo(val) {
     if val < 12
         print("should be happy years")
@@ -36,7 +36,7 @@ foo(20)
 foo(42)
 `,
 
-        `
+`
 function fact(n) {
    if n<=1 {
       return 1
@@ -48,7 +48,7 @@ print(fact(2))
 print(fact(7))
 `,
 
-        `
+`
 function tri(a,b) {
     return a * a + b * b
  }    
@@ -56,7 +56,7 @@ function tri(a,b) {
  print( tri(3, 4) )
 `,
 
-        `
+`
     a = 2
     b = 3
 
@@ -71,7 +71,7 @@ function tri(a,b) {
     print("sum: {this + that} product: {this * that} diff: {this - that}.")
 `,
 
-        `
+`
     a=[1, 2, 3]
     tmp = a[0]
     a[0]=a[1]
@@ -79,9 +79,19 @@ function tri(a,b) {
     a[2]=tmp
     print("first: {a[0]} second: {a[1]} third: {a[2]}")
 `,
-        `
+`
     num = { 1: "one", 2: "two", 3: "three" }
     print("first: {num['1']} second: {num['2']} third: {num['3']}")
+`,
+`
+    function makeAdder(num) {
+        return function(arg) {
+            return num + arg
+       }
+    }
+    
+    ad = makeAdder(10);
+    print( ad(42) )
 `
     ];
 

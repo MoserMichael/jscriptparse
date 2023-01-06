@@ -95,6 +95,59 @@ function copyPrimitiveVal(val) {
 }
 
 RTLIB={
+    "max" : new BuiltinFunctionValue(2, function(arg) {
+        let num = value2Num(arg[0]);
+        let num2 = value2Num(arg[1]);
+        let res = num;
+        if (num2 > num) {
+            res = num2;
+        }
+        return new Value(TYPE_NUM, res);
+    }),
+    "min" : new BuiltinFunctionValue(2, function(arg) {
+        let num = value2Num(arg[0]);
+        let num2 = value2Num(arg[1]);
+        let res = num;
+        if (num2 < num) {
+            res = num2;
+        }
+        return new Value(TYPE_NUM, res);
+    }),
+    "abs" : new BuiltinFunctionValue(1, function(arg) {
+        let num = value2Num(arg[0]);
+        if (num < 0) {
+            num = -num;
+        }
+        return new Value(TYPE_NUM, num);
+    }),
+    "sqrt" : new BuiltinFunctionValue(1, function(arg) {
+        let num = value2Num(arg[0]);
+        return new Value(TYPE_NUM, Math.sqrt(num));
+    }),
+    "sin" : new BuiltinFunctionValue(1, function(arg) {
+        let num = value2Num(arg[0]);
+        return new Value(TYPE_NUM, Math.sin(num));
+    }),
+    "cos" : new BuiltinFunctionValue(1, function(arg) {
+        let num = value2Num(arg[0]);
+        return new Value(TYPE_NUM, Math.cos(num));
+    }),
+    "tan" : new BuiltinFunctionValue(1, function(arg) {
+        let num = value2Num(arg[0]);
+        return new Value(TYPE_NUM, Math.tan(num));
+    }),
+    "atan" : new BuiltinFunctionValue(1, function(arg) {
+        let num = value2Num(arg[0]);
+        return new Value(TYPE_NUM, Math.atan(num));
+    }),
+    "pow" : new BuiltinFunctionValue(2, function(arg) {
+        let pow = value2Num(arg[0]);
+        let exp = value2Num(arg[0]);
+        return new Value(TYPE_NUM, Math.pow(pow,exp));
+    }),
+    "random" : new BuiltinFunctionValue(0, function(arg) {
+        return new Value(TYPE_NUM, Math.random());
+    }),
     "print" : new BuiltinFunctionValue(1, function(arg) {
         let msg = value2Str(arg[0]);
         console.log( "print> : " +  msg );
@@ -105,17 +158,17 @@ RTLIB={
         }
         throw new Error("string or list argument required");
     }),
-    "keys": new BuiltinFunctionValue(1, function(arg) {
-        if (arg[0].type == TYPE_MAP) {
-            return new Value(TYPE_LIST, Object.keys(arg[0].val));
-        }
-        throw new Error("map argument required");
-    }),
     "join": new BuiltinFunctionValue(1, function(arg) {
         if (arg[0].type == TYPE_LIST) {
             return new Value(TYPE_STR, arg[0].val.map(value2Str).join(""));
         }
         throw new Error("list argument required. is: " + mapTypeToName[ arg[0].type ]);
+    }),
+    "keys": new BuiltinFunctionValue(1, function(arg) {
+        if (arg[0].type == TYPE_MAP) {
+            return new Value(TYPE_LIST, Object.keys(arg[0].val));
+        }
+        throw new Error("map argument required");
     }),
 }
 

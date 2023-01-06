@@ -59,9 +59,9 @@ class State {
 }
 
 class ParserError extends Error {
-    constructor(message, state, nextException = null) {
+    constructor(message, pos, nextException = null) {
         super(message);
-        this.pos = state.pos;
+        this.pos = pos;
 
         if (nextException != null && !(nextException instanceof ParserError) ) {
             console.trace("nextException is not a ParserError " + nextException.constructor.name);
@@ -104,7 +104,7 @@ function makeError(message, state, nested = null) {
     if (nested == null) {
         nested = state.lastError;
     }
-    throw new ParserError(message, state, nested);
+    throw new ParserError(message, state.pos, nested);
 }
 
 function getLineAt(data, pos) {
@@ -472,7 +472,7 @@ const makeConsumeAll = function(nestedParser) {
         let res = nestedParser(state);
         skipWhitespace(res);
         if (res.pos < state.data.length) {
-            makeError("error at:",res.nextException);
+            makeError("error at:",res);
         }
         return res;
     }
@@ -535,5 +535,6 @@ if (typeof(module) == 'object') {
         formatParserError,
         setTrace,
         setKeepLocationWithToken,
+        ParserError,
     }
 }

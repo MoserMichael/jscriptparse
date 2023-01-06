@@ -1,9 +1,19 @@
+const assert = require('assert');
 
 let trace_on = false;
+let location_with_token = false;
+
+/**
+ * Keep location with ast. This function must be called before calling any of the parser generating functions (like makeSequenceParser, etc.)
+ * @param on - boolean true - enable tracing. (default: off)
+ */
+const setKeepLocationWithToken = function(on) {
+    location_with_token = on;
+}
 
 /**
  * Enable tracing of the parser. This function must be called before calling any of the parser generating functions (like makeSequenceParser, etc.)
- * @param on - boolean true - enable tracing.
+ * @param on - boolean true - enable tracing. (default: off)
  */
 const setTrace = function(on) {
     trace_on = on;
@@ -22,8 +32,10 @@ function showRec(arg) {
             ret += showRec(obj);
         }
         ret += "]";
-    } else {
-        ret += arg;
+    } else if ("show" in arg) {
+        ret += arg.show();
+    } else  {
+        ret += arg.constructor.name;
     }
     return ret;
 }
@@ -38,21 +50,7 @@ class State {
         this.pos = pos;
         this.data = data;
         this.result = result;
-        this.errorPos = -1;
-    }
-
-    setErrorPos(parseError) {
-        if (parseError instanceof ParserError) {
-            if (parseError.pos > this.errorPos) {
-
-                //console.log("setErrorPos: errorPos: " + parseError.pos + " message: " + parseError.message);
-                this.errorPos = parseError.pos;
-                this.msg = parseError.message;
-            }
-            if (parseError.nextException != null) {
-                this.setErrorPos(parseError.nextException);
-            }
-        }
+        this.lastError = null
     }
 
     show() {
@@ -61,18 +59,52 @@ class State {
 }
 
 class ParserError extends Error {
-    constructor(message, pos, nextException = null) {
+    constructor(message, state, nextException = null) {
         super(message);
-        this.pos = pos;
-        this.errorPos = -1;
+        this.pos = state.pos;
+
+        if (nextException != null && !(nextException instanceof ParserError) ) {
+            console.trace("nextException is not a ParserError " + nextException.constructor.name);
+            console.trace("nextException " + nextException.stack);
+        }
         this.nextException = nextException;
+    }
+
+    getDeepest() {
+        if (this.nextException != null) {
+            let deepest = this.nextException.getDeepest();
+            if (deepest.pos >= this.pos) {
+                return deepest;
+            }
+        }
+        return this;
+    }
+    getErrorPos() {
+        return this.getDeepest().pos;
     }
 }
 
-function makeError(message, pos, nested) {
-    //console.log("message: " + message + " pos: " + pos + " nested: " + nested);
-    let ex = new ParserError(message, pos, nested);
-    throw ex;
+
+function getMostMatchingError(errors) {
+    let mostMatching = null;
+    let longestMatch = -1;
+
+    for(let i=0; i< errors.length; ++i) {
+        let matchLen = errors[i].getErrorPos();
+        if (matchLen > longestMatch) {
+            longestMatch = matchLen;
+            mostMatching = errors[i];
+        }
+    }
+    return mostMatching;
+}
+
+
+function makeError(message, state, nested = null) {
+    if (nested == null) {
+        nested = state.lastError;
+    }
+    throw new ParserError(message, state, nested);
 }
 
 function getLineAt(data, pos) {
@@ -90,14 +122,11 @@ function getLineAt(data, pos) {
 
 function formatParserError(er, data) {
     if (er instanceof ParserError) {
+        er = er.getDeepest();
+
         let msg = er.message;
+        let pos = er.pos;
 
-        let pos = er.errorPos;
-        if (pos == -1) {
-            pos = er.pos;
-        }
-
-        //console.log("errorPos: " + pos + " data.length: " + data.length );
         let entry = getLineAt(data,pos);
         msg += "\n" + entry[0] + "\n" +  Array(entry[1]).join(".") + "^";
         if (er.nextException != null) {
@@ -106,7 +135,7 @@ function formatParserError(er, data) {
         }
         return msg;
     }
-    return er;
+    return er.stack;
 }
 
 
@@ -151,7 +180,6 @@ function skipWhitespace(state) {
         }
         state.pos+=1;
     }
-    return state;
 }
 
 /**
@@ -161,29 +189,33 @@ function skipWhitespace(state) {
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
 const makeRegexParser = function (regex, name = null) {
-
-    let type = -1;
     if (!(regex instanceof RegExp)) {
-        let msg = "Illegal parser definition, expected string or regexp: " + regex + " :" + typeof(regex);
+        let msg = "Illegal parser definition, expected RegRxp, got: " + typeof(regex);
         throw new Error(msg);
     }
-
     if (name == null) {
         name = regex.source;
     }
-
     return makeTracer(function (state) {
-        state = skipWhitespace(state);
+        skipWhitespace(state);
+
         if (state.pos >= state.data.length) {
-            makeError("end of input. missing: " + regex.source, state.pos);
+            makeError("end of input. missing: " + regex.source, state);
         }
 
         let remainder = state.data.substring(state.pos);
         let tres = regex.exec( remainder );
         if (tres != null) {
-            return new State(state.pos + tres[0].length, state.data, tres[0]);
+            let data = null;
+
+            if (location_with_token) {
+                data = [ tres[0], state.pos ];
+            } else {
+                data = tres[0];
+            }
+            return new State(state.pos + tres[0].length, state.data, data);
         }
-        makeError("expected regex: " + regex.source, state.pos);
+        makeError( name + " expected", state);
         return null;
     }, name=name);
 }
@@ -196,41 +228,50 @@ const makeRegexParser = function (regex, name = null) {
 const makeTokenParser = function (token) {
 
     if (typeof(token) != 'string') {
-        let msg = "Illegal parser definition, expected string: " + typeof(token);
+        let msg = "Illegal parser definition, expected string, got " + typeof(token);
         console.log(msg);
         throw new Error(msg);
     }
 
     return makeTracer(function (state) {
-        state = skipWhitespace(state);
+        skipWhitespace(state);
         if (state.pos >= state.data.length) {
-            makeError("end of input. missing: " + token, state.pos);
+            makeError("end of input. missing: " + token, state);
         }
         if (state.data.substring(state.pos, state.pos + token.length) == token) {
-            //state.pos += token.lengthף
-            //state.result = token
-            //return state;
-            return new State(state.pos + token.length, state.data, token)
+            let data = null;
+            if (location_with_token) {
+                data = [ token, state.pos ];
+            } else {
+                data = token;
+            }
+            return new State(state.pos + token.length, state.data, data)
         }
-        makeError("expected token: " + token, state.pos);
+        makeError("expected token: " + token, state);
         return null;
     }, name=token);
 }
 
 function requireFunction(f) {
     if (!(f instanceof Function)) {
-        throw new Error("argument is not a function");
+        let msg="argument is not a function";
+        console.trace(msg);
+        throw new Error(msg);
     }
 }
 
 function requireArrayOfFunctions(a) {
     if (!(a instanceof Array)) {
-        throw new Error("argument is not a array");
+        let msg = "argument is not a array";
+        console.trace(msg);
+        throw new Error(msg);
     }
-    let i = 0;
-    for(;i<a.length;++i) {
+
+    for(let i=0; i < a.length; ++i) {
         if (!a[i] instanceof Function) {
-            throw new Error("Array element " + i + " is not a function. Requires array of functions");
+            let msg = "Array element " + i + " is not a function. Requires array of functions";
+            console.trace(msg);
+            throw new Error(msg);
         }
     }
 }
@@ -253,25 +294,24 @@ const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1,
 
         for (; state.pos < state.data.length && (maxMatching == -1 || matching < maxMatching); ++matching) {
             try {
-                let nextState = parser(state);
+                state = parser(state);
 
                 if (concat) {
-                    result = result.concat(nextState.result);
+                    result = result.concat(state.result);
                 } else {
-                    result.push(nextState.result);
+                    result.push(state.result);
                 }
-                state.pos = nextState.pos;
             } catch(er) {
-                state.setErrorPos(er);
+                state.lastError = er;
                 break;
             }
         }
 
         if (matching < minMatching && minMatching != 0) {
             if (matching == 0) {
-                makeError("didn't match even one in " + name, state.pos);
+                makeError("didn't match even one in " + name, state);
             } else {
-                makeError("didn't match enough in " + name, state.pos);
+                makeError("didn't match enough in " + name, state);
             }
         }
 
@@ -304,7 +344,7 @@ const makeRepetitionRecClause = function(parserMandatory, parserRepetition, titl
                     result.push( state.result );
                 }
             } catch(er) {
-                state.setErrorPos(er);
+                state.lastError = er;
                 break;
             }
         }
@@ -337,8 +377,10 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
 
     return makeTracer( function(state) {
         let result = [];
-        let i = 0;
-        for(;i < arrayOfParsers.length;++i) {
+
+        skipWhitespace(state);
+
+        for(let i = 0;i < arrayOfParsers.length;++i) {
             let parser = arrayOfParsers[i];
             try {
                 state = parser(state);
@@ -348,13 +390,15 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
                     result.push(state.result);
                 }
             } catch(er) {
-                makeError("Parsing error in " + name + " at term " + i, state.pos, er);
+                if (er.pos == state.pos) {
+                    er = null; // do not propagate inner error if no input has been consumed.
+                }
+                makeError("Parsing error in " + name + " at term " + i, state, er);
             }
         }
 
-
         // Achtung! if last element is an empty array then chop it off
-        // that's for cases when we have an optional repetition of clausese
+        // that's for cases when we have an optional repetition of clauses
         if (result.length != 0) {
             let last = result[result.length-1];
             if (last instanceof Array && last.length == 0) {
@@ -362,12 +406,6 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
             }
         }
         state.result = result;
-
-        // Achtung! simplify result option for single terms that call down to a deeper clause
-        if (state.result.length == 1) {
-            state.result = state.result[0];
-        }
-
         return state;
     }, title);
 }
@@ -386,6 +424,14 @@ const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser
 
     return makeTracer(function (state) {
         let i = 0;
+
+        // required for error handling
+        skipWhitespace(state);
+
+        let initialPos = state.pos;
+
+        let errors = [];
+
         for(;i < arrayOfParsers.length;++i) {
             let parser = arrayOfParsers[i];
             try {
@@ -395,11 +441,20 @@ const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser
                 }
                 return res;
             } catch(er) {
-                // ignore error
-                state.setErrorPos(er);
+                if (er instanceof ParserError) {
+                    errors.push(er);
+                } else {
+                    console.trace("unknown exception: " + er.stack);
+                }
             }
         }
-        makeError("none of the argument parser matches in " + name, state.pos);
+        // pick the most advanced error
+        let nested = getMostMatchingError(errors);
+        if (nested != null && nested.pos == initialPos) {
+            nested = null; // disregard error of nested clause that did not consume input
+        }
+
+        makeError("none of the argument parser matches in " + name, state, nested);
         return null;
     }, name);
 }
@@ -415,9 +470,9 @@ const makeConsumeAll = function(nestedParser) {
 
     return function consumeAll(state) {
         let res = nestedParser(state);
-        res=skipWhitespace(res);
+        skipWhitespace(res);
         if (res.pos < state.data.length) {
-            makeError("error at:",res.pos);
+            makeError("error at:",res.nextException);
         }
         return res;
     }
@@ -459,6 +514,7 @@ const makeForwarder = function (innerFunc = null) {
     };
 
     this.setInner = function(newVal) {
+        requireFunction(newVal);
         innerFunc = newVal;
     }
 }
@@ -478,5 +534,6 @@ if (typeof(module) == 'object') {
         makeForwarder,
         formatParserError,
         setTrace,
+        setKeepLocationWithToken,
     }
 }

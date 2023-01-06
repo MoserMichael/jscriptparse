@@ -1,12 +1,7 @@
 
 const scr=require("./scripty.js");
 
-function testParser() {
-
-
-    let parser = scr.makeParser();
-
-    let data = [
+let test_programs = [
 
 //-----------
         "aaa=1 print(aaa)",
@@ -108,20 +103,24 @@ def tri(a,b) {
 `,
 
 
-    ];
+];
 
+
+function testParser() {
+
+    let parser = scr.makeParser();
     let showAst = false;
 
     let i = 0;
     let failures = 0;
 
-    for(i=0;i<data.length;++i) {
+    for(i=0;i<test_programs.length;++i) {
         console.log("-------------------");
         console.log("Source:")
-        console.log(data[i]);
+        console.log(test_programs[i]);
         console.log("\nEvaluation:");
 
-        if (!scr.runParser(parser, data[i], showAst)) {
+        if (!scr.runParser(parser, test_programs[i], showAst)) {
             failures += 1;
         }
     }
@@ -129,7 +128,7 @@ def tri(a,b) {
     if (failures == 0) {
         console.log("All tests passed")
     } else {
-        console.log("SOME_TESTS_FAILED: Number of failed tests: " + failures + " out of " + data.length);
+        console.log("SOME_TESTS_FAILED: Number of failed tests: " + failures + " out of " + test_programs.length);
     }
 }
 

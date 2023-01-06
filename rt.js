@@ -94,6 +94,64 @@ function copyPrimitiveVal(val) {
     return val;
 }
 
+function evalClosure(funcVal, args, frame) {
+    if (funcVal.type == TYPE_CLOSURE) {
+        if (funcVal.frame != null) {
+            return _evalClosure(funcVal, funcVal.frame, args);
+        }
+        return _evalClosure(funcVal, frame, args);
+    }
+    return _evalBuiltinFunc(funcVal, frame, args);
+}
+
+function _evalBuiltinFunc(funcVal, frame, args) {
+    if (funcVal.numParams != args.length) {
+        throw new Error("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
+            "  parameters are passed in call");
+    }
+    let retVal = funcVal.funcImpl(args);
+    if (retVal == undefined) {
+        return VALUE_NONE;
+    }
+    return retVal;
+}
+
+function _evalClosure(funcVal, frame, args) {
+    let functionDef = funcVal.functionDef;
+    let funcFrame = new Frame(frame);
+
+    if (args.length > functionDef.params.length) {
+        throw new Error("function takes " + functionDef.params.length + " params, but " + args.length + " were given");
+    }
+
+    // define all provided parameters in the new function frmae
+    let i = 0;
+    for (; i < args.length; ++i) {
+        let argValue = args[i];
+        let paramDef = functionDef.params[i]; // name of parameter
+        funcFrame.defineVar(paramDef[0][0], argValue);
+    }
+
+    // provide values for arguments with default values
+    for (; i < functionDef.params.length; ++i) {
+        let paramDef = functionDef.params[i]; // name of parameter
+
+        let defaultParamValue = funcVal.defaultParamValues[i];
+        if (defaultParamValue == null) {
+            throw new Error(" no value for parameter " + paramDef[0]);
+        }
+        funcFrame.defineVar(paramDef[0][0], defaultParamValue);
+    }
+
+    // frame is ready, evaluate the statement list
+    let rVal = functionDef.body.eval(funcFrame);
+
+    if (rVal.type == TYPE_FORCE_RETURN) {
+        return rVal.val;
+    }
+    return VALUE_NONE
+}
+
 RTLIB={
     "max" : new BuiltinFunctionValue(2, function(arg) {
         let num = value2Num(arg[0]);
@@ -170,27 +228,47 @@ RTLIB={
         }
         throw new Error("map argument required");
     }),
+
     "map": new BuiltinFunctionValue(2, function(arg, frame) {
-        if (arg[0].type != TYPE_CLOSURE) {
+        if (arg[0].type != TYPE_LIST) {
             throw new Error("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
         }
-        if (arg[1].type != TYPE_MAP) {
+        if (arg[1].type != TYPE_CLOSURE) {
             throw new Error("second argument: function argument required. is: " + mapTypeToName[arg[0].type]);
         }
 
         let ret = [];
-        let argMap = arg.val;
+        let argList = arg[0];
+        let funVal = arg[1];
 
-        for(let i=0; i<argMap.length;++i) {
-            let arg = [ argMap[i] ];
-
-
-
-
-
+        for(let i=0; i<argList.val.length;++i) {
+            let arg = [ argList.val[i] ];
+            let mapVal = evalClosure(funVal, arg, frame);
+            ret.push(mapVal);
         }
+
         return new Value(TYPE_LIST, ret);
     }),
+
+    "reduce": new BuiltinFunctionValue(3, function(arg, frame) {
+        if (arg[0].type != TYPE_LIST) {
+            throw new Error("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+        if (arg[1].type != TYPE_CLOSURE) {
+            throw new Error("second argument: function argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+
+        let argList = arg[0];
+        let funVal = arg[1];
+        let rVal = arg[2];
+
+        for(let i=0; i<argList.val.length;++i) {
+            let arg = [rVal, argList.val[i]];
+            rVal = evalClosure(funVal, arg, frame);
+        }
+
+        return rVal;
+    })
 }
 
 class Frame {
@@ -817,86 +895,21 @@ class AstFunctionCall extends AstBase {
         if (funcVal == undefined) {
             throw new Error("Can't call undefined function " + this.name);
         }
-        return this.evalClosure(funcVal, frame);
+        return this._evalFunc(funcVal, frame);
     }
 
-    evalClosure(funcVal, frame) {
+    _evalFunc(funcVal, frame) {
         if (funcVal.type != TYPE_CLOSURE && funcVal.type != TYPE_BUILTIN_FUNCTION) {
             throw new Error("variable is not a function/closure, it is a " + mapTypeToName[funcVal.type.toString()]);
         }
 
-        if (funcVal.type == TYPE_CLOSURE) {
-            if (funcVal.frame != null) {
-                return this._evalClosure(funcVal, funcVal.frame);
-            }
-            return this._evalClosure(funcVal, frame);
-        }
-        return this._evalBuiltinFunc(funcVal, frame);
-    }
-
-    _evalBuiltinFunc(funcVal, frame) {
-        if (funcVal.numParams != this.expressionList.length) {
-            throw new Error("function takes " + funcVal.numParams + " parameters, whereas " + this.expressionList.length +
-                "  parameters are passed in call");
-        }
         let args = [];
         for (let i = 0; i < this.expressionList.length; ++i) {
             let argExpression = this.expressionList[i]; // parameter expression
             let argValue = argExpression.eval(frame); // evaluate parameter expression
             args.push(argValue);
         }
-        let retVal = funcVal.funcImpl(args);
-        if (retVal == undefined) {
-            return VALUE_NONE;
-        }
-        return retVal;
-    }
-
-    _evalClosure(funcVal, frame) {
-
-        /*
-        if (funcVal.frame != null) { // for closures: for evaluation we use the frame of the enclosing function
-            console.log("_use_funcVal_");
-            frame = funcVal.frame;
-        }
-         */
-        let functionDef = funcVal.functionDef;
-        let funcFrame = new Frame(frame);
-
-        if (this.expressionList.length > functionDef.params.length) {
-            throw new Error(this.name + " takes " + functionDef.params.length + " params, but " + this.expressionList.length + " were given");
-        }
-
-        // define all provided parameters in the new function frmae
-        let i = 0;
-        for (; i < this.expressionList.length; ++i) {
-            let argExpression = this.expressionList[i]; // parameter expression
-            let argValue = argExpression.eval(frame); // evaluate parameter expression
-
-            let paramDef = functionDef.params[i]; // name of parameter
-            funcFrame.defineVar(paramDef[0][0], argValue);
-        }
-
-        // provide values for arguments with default values
-        for (; i < functionDef.params.length; ++i) {
-            let paramDef = functionDef.params[i]; // name of parameter
-
-            let defaultParamValue = funcVal.defaultParamValues[i];
-            if (defaultParamValue == null) {
-                throw new Error("function " + this.name + " no value for parameter " + paramDef[0]);
-            }
-            funcFrame.defineVar(paramDef[0][0], defaultParamValue);
-        }
-
-        //console.log("funcFrame: " + JSON.stringify(funcFrame.vars));
-
-        // frame is ready, evaluate the statement list
-        let rval = functionDef.body.eval(funcFrame);
-
-        if (rval.type == TYPE_FORCE_RETURN) {
-            return rval.val;
-        }
-        return VALUE_NONE
+        return evalClosure(funcVal, args, frame);
     }
 
     show() {

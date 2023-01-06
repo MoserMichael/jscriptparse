@@ -8,6 +8,7 @@ function testParser() {
     let parser = scr.makeParser();
 
     let data = [
+
         "aaa=1 print(aaa)",
 
         "a=3+12/4 print(a)",
@@ -89,14 +90,15 @@ function tri(a,b) {
             return num + arg
        }
     }
-    
-    ad = makeAdder(10);
+    ad = makeAdder(10)
+    print("calling closure")    
     print( ad(42) )
 `
     ];
 
     let i = 0;
     for(i=0;i<data.length;++i) {
+        console.log("-------------------");
         scr.runParser(parser, data[i], true);
     }
 }

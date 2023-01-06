@@ -28,6 +28,7 @@ const rt=require("./rt.js");
 
 KEYWORDS = {
     'function': 1,
+    'return': 1,
     'if':   1,
     'else': 1,
     'elif': 1,
@@ -194,9 +195,6 @@ function makeParser() {
             if (arg.length != 0) {
                 cl = arg[0]
             }
-
-            console.log("arg: " + JSON.stringify(cl));
-
             return rt.newDictListCtorExpression(cl, arg[0][1]);
         }
     );
@@ -538,7 +536,12 @@ function makeParser() {
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
         ], "lambdaDef"), function(arg) {
-            let functionDef = rt.makeFunctionDef(null, arg[2], arg[4], arg[0][1]);
+
+            let param = [];
+            if (arg[2].length != 0) {
+                param = arg[2][0];
+            }
+            let functionDef = rt.makeFunctionDef(null, param, arg[4], arg[0][1]);
             return rt.makeLambdaExpression( functionDef );
         }
     );
@@ -550,12 +553,16 @@ function makeParser() {
             prs.makeTokenParser("function"),
             identifier,
             prs.makeTokenParser("("),
-            paramList,
+            prs.makeOptParser(paramList),
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
         ]), function(arg) {
             //console.log("function-def stmt: " + JSON.stringify((arg[5])));
-            return rt.makeFunctionDef(arg[1], arg[3], arg[5], arg[0][1]);
+            let param = [];
+            if (arg[3].length != 0) {
+                param = arg[3][0];
+            }
+            return rt.makeFunctionDef(arg[1], param, arg[5], arg[0][1]);
         }
     );
 
@@ -581,21 +588,18 @@ function makeParser() {
 
     let statementOrStatementList = prs.makeAlternativeParser([
         prs.makeTransformer(
-            statement,
-            function(arg) {
-                //let stmts = []
-                //stmts[0] = rt.makeStatementList([ arg ], arg.offset );
-                //return stmts;
-                return rt.makeStatementList([ arg ], arg.offset );
-            }
-        ),
-        prs.makeTransformer(
             prs.makeSequenceParser([
                 prs.makeTokenParser("{"),
                 statementList,
                 prs.makeTokenParser( "}")
             ]), function(arg) {
                 return arg[1];
+            }
+        ),
+        prs.makeTransformer(
+            statement,
+            function(arg) {
+                return rt.makeStatementList([ arg ], arg.offset );
             }
         )
     ],"statementOrStatementList");

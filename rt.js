@@ -23,7 +23,7 @@ mapTypeToName = {
 
 class ClosureValue {
     // needs the function definition and the frame of the current function (for lookup of captured vars)
-    constructor(functionDef, defaultParamValues, frame) {
+        constructor(functionDef, defaultParamValues, frame) {
         this.type = TYPE_CLOSURE;
         this.functionDef = functionDef;
         this.defaultParamValues = defaultParamValues; // default params are set when function/closure is evaluated.
@@ -473,12 +473,11 @@ class AstLambdaExpression extends AstBase {
     constructor(functionDef) {
         super(functionDef.offset);
         this.functionDef = functionDef;
-        this.parentFrame = null;
     }
 
     eval(frame) {
-        let defaultParams = _evalDefaultParams(this.parentFrame, this.functionDef.params);
-        return new ClosureValue(this.functionDef, defaultParams, this.parentFrame);
+        let defaultParams = _evalDefaultParams(frame, this.functionDef.params);
+        return new ClosureValue(this.functionDef, defaultParams, frame);
     }
 
     show() {
@@ -802,6 +801,9 @@ class AstFunctionCall extends AstBase {
         }
 
         if (funcVal.type == TYPE_CLOSURE) {
+            if (funcVal.frame != null) {
+                return this._evalClosure(funcVal, funcVal.frame);
+            }
             return this._evalClosure(funcVal, frame);
         }
         return this._evalBuiltinFunc(funcVal, frame);
@@ -827,10 +829,12 @@ class AstFunctionCall extends AstBase {
 
     _evalClosure(funcVal, frame) {
 
+        /*
         if (funcVal.frame != null) { // for closures: for evaluation we use the frame of the enclosing function
             console.log("_use_funcVal_");
             frame = funcVal.frame;
         }
+         */
         let functionDef = funcVal.functionDef;
         let funcFrame = new Frame(frame);
 

@@ -24,7 +24,7 @@ print(21)
         `
 function foo(val) {
     if val < 12
-        print("less than 10")
+        print("should be happy years")
     elif val <= 30
         print("youth age")                
     else {
@@ -68,7 +68,7 @@ function tri(a,b) {
         `
     this=3
     that=4
-    print("sum: {this + that} product: {this * that} diff: {3 - 4}.")
+    print("sum: {this + that} product: {this * that} diff: {this - that}.")
 `,
 
         `

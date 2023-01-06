@@ -13,3 +13,12 @@ The tests are a small scripting language and interpreter for the scripting langu
 ## Documentation of the module
 
 See the [generated documentation](https://mosermichael.github.io/jscriptparse/out/index.html)
+
+
+## what I learned while writing this project
+
+i am learning about interpreted languages (such as python, php, javascript, perl, etc...) 
+I keep noticing quite a lot of details, while writing my little interpreter, I keep them [here](https://github.com/MoserMichael/jscriptparse/blob/main/notes/notes.txt)
+
+The moral: any kind of project can teach you quite a lot of unexpected thinks! (i think the important part is to keep notes, otherwise you tend to forget this stuff...)
+

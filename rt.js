@@ -170,6 +170,27 @@ RTLIB={
         }
         throw new Error("map argument required");
     }),
+    "map": new BuiltinFunctionValue(2, function(arg, frame) {
+        if (arg[0].type != TYPE_CLOSURE) {
+            throw new Error("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+        if (arg[1].type != TYPE_MAP) {
+            throw new Error("second argument: function argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+
+        let ret = [];
+        let argMap = arg.val;
+
+        for(let i=0; i<argMap.length;++i) {
+            let arg = [ argMap[i] ];
+
+
+
+
+
+        }
+        return new Value(TYPE_LIST, ret);
+    }),
 }
 
 class Frame {

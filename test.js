@@ -8,19 +8,20 @@ function testParser() {
 
     let data = [
 
+//-----------
         "aaa=1 print(aaa)",
-
+//-----------
         "a=3+12/4 print(a)",
-
+//-----------
         "b=2 a=3 e=4 d=b*(4-a*e) print(d)",
-
+//-----------
         `
 def inc(x) {
     return x + 1
 }
 print(inc(21))
 `,
-
+//-----------
 `
 def foo(val) {
     if val < 12
@@ -35,7 +36,7 @@ foo(6)
 foo(20)
 foo(42)
 `,
-
+//-----------
 `
 def fact(n) {
    if n<=1 {
@@ -47,7 +48,7 @@ print(fact(1))
 print(fact(2))
 print(fact(7))
 `,
-
+//-----------
 `
 def tri(a,b) {
     return sqrt(a * a + b * b)
@@ -55,7 +56,7 @@ def tri(a,b) {
  
  print( tri(3, 4) )
 `,
-
+//-----------
 `
     a = 2
     b = 3
@@ -64,13 +65,13 @@ def tri(a,b) {
     print(join(c))
     print(join([ "product: ", a * b , " sum product of squares: ", (a *a) + (b * b) ]))
 `,
-
+//-----------
         `
     this=3
     that=4
     print("sum: {this + that} product: {this * that} diff: {this - that}.")
 `,
-
+//-----------
 `
     a=[1, 2, 3]
     tmp = a[0]
@@ -79,10 +80,12 @@ def tri(a,b) {
     a[2]=tmp
     print("first: {a[0]} second: {a[1]} third: {a[2]}")
 `,
+//-----------
 `
     num = { 1: "one", 2: "two", 3: "three" }
     print("first: {num['1']} second: {num['2']} third: {num['3']}")
 `,
+//-----------
 `
     def makeAdder(num) {
         return def(arg) {

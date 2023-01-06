@@ -1,92 +1,133 @@
+two passes or one? (can you call an unidentified function?)
+
+    node works with this!
+        foo();
+
+        function foo() {
+            console.log("hi");
+        }
+
+    php is ok with this!
+
+        <?php
+        foo();
+
+        function foo() {
+         echo "hi";
+        }
+
+    python gives an error!
+
+        foo()
+
+        def foo():
+            print("hi")
+
+        python t.py
+        Traceback (most recent call last):
+          File "t.py", line 3, in <module>
+            foo()
+        NameError: name 'foo' is not defined
+
+
 Passing more arguments then defined in function
 
+    javascript does not enforce it
+
     node
-    Welcome to Node.js v19.2.0.
-    Type ".help" for more information.
-    > function foo(x) {
-    ... console.log("arg: " + x);
-    ... }
-    undefined
-    > foo("123")
-    arg: 123
-    undefined
-    > foo()
-    arg: undefined
-    undefined
-    > foo("123",1,2)
-    arg: 123
-    undefined
+        Welcome to Node.js v19.2.0.
+        Type ".help" for more information.
+        > function foo(x) {
+        ... console.log("arg: " + x);
+        ... }
+        undefined
+        > foo("123")
+        arg: 123
+        undefined
+        > foo()
+        arg: undefined
+        undefined
+        > foo("123",1,2)
+        arg: 123
+        undefined
+
+    python requires to pass the exact number of arguments
+
+        python
+        >>>
+        >>> def foo(x):
+        ...     print(x)
+        ...
+        >>> foo("123")
+        123
+        >>> foo("123",1)
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        TypeError: foo() takes 1 positional argument but 2 were given
+        object ids
+        >>> foo()
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        TypeError: foo() missing 1 required positional argument: 'x'
+
+Object identity  / when is a value copied by value or referenced?
+
+    numbers/booleans are copied by value, strings (and everything else) by reference
+    but strings duplicate upon modificatio!
 
     python
-    >>>
-    >>> def foo(x):
-    ...     print(x)
-    ...
-    >>> foo("123")
-    123
-    >>> foo("123",1)
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-    TypeError: foo() takes 1 positional argument but 2 were given
-    object ids
-    >>> foo()
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-    TypeError: foo() missing 1 required positional argument: 'x'
+        Type "help", "copyright", "credits" or "license" for more information.
+        >>> a="a"
+        >>> b=a
+        >>> id(a)==id(b)
+        True
 
-    python
-    Type "help", "copyright", "credits" or "license" for more information.
-    >>> a="a"
-    >>> b=a
-    >>> id(a)==id(b)
-    True
-
-    >>> a+="a"              # copy on write
-    >>> a
-    'aa'
-    >>> id(a)==id(b)
-    False
+        >>> a+="a"              # copy on write
+        >>> a
+        'aa'
+        >>> id(a)==id(b)
+        False
 
 
-    >>> class Foo():
-        ...     def __init__(self,a):
-    ...             self.a=a
-    ...
-    >>> a=Foo("aaa")
-    >>> b=a
-    >>> id(b.a) == id(a.a)
-    True
+        >>> class Foo():
+            ...     def __init__(self,a):
+        ...             self.a=a
+        ...
+        >>> a=Foo("aaa")
+        >>> b=a
+        >>> id(b.a) == id(a.a)
+        True
 
-    >>> a=1
-    >>> b=a
-    >>> id(a)==id(b)
-    True
+        >>> a=1
+        >>> b=a
+        >>> id(a)==id(b)
+        True
 
 
 Conversion of booleans to numbers
 
     python3
-    >>> a=1
-    >>> b=a==1
-    >>> print(b)
-    True
-    >>> b=b+1
-    >>> print(b)
-    2
+        >>> a=1
+        >>> b=a==1
+        >>> print(b)
+        True
+        >>> b=b+1
+        >>> print(b)
+        2
 
 
     php -a
-    Interactive shell
+        Interactive shell
 
-    php > $a=1;
-    php > $b=$a==1;
-    php > echo "{$b}";
-    1
-    php > $b=$b+1;
-    php > echo "{$b}";
-    2
+        php > $a=1;
+        php > $b=$a==1;
+        php > echo "{$b}";
+        1
+        php > $b=$b+1;
+        php > echo "{$b}";
+        2
 
-None type
+None type / implicit conversions
 
     javascript has several aliases for them?
         undefined - variable has been defined, but not assigned value
@@ -94,62 +135,63 @@ None type
         - but they are equal!!!
 
     node
-    > undefined == null
-    true
+        > undefined == null
+        true
 
 
     python3
-    >>> def fun():
-    ...     pass
-    ...
-    >>> a=fun()
-    >>> print(a)
-    None
-    >>> a=a+1
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-    TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'
+        >>> def fun():
+        ...     pass
+        ...
+        >>> a=fun()
+        >>> print(a)
+        None
+        >>> a=a+1
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        TypeError: unsupported operand type(s) for +: 'NoneType' and 'int'
 
 
     php -a
-    Interactive shell
+        Interactive shell
 
-    php > function foo() {
-    php { }
-    php > $a=foo();
-    php > echo "{$a}";
-    php > $a=$a+1;
-    php > echo "{$a}";
-    1
+        php > function foo() {
+        php { }
+        php > $a=foo();
+        php > echo "{$a}";
+        php > $a=$a+1;
+        php > echo "{$a}";
+        1
 
 
 Multiple assignment
 
     python3
-    >>> def foo():
-    ...     return 42
-    ...
-    >>> a,b = foo()
-    Traceback (most recent call last):
-      File "<stdin>", line 1, in <module>
-    TypeError: cannot unpack non-iterable int object
+        >>> def foo():
+        ...     return 42
+        ...
+        >>> a,b = foo()
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        TypeError: cannot unpack non-iterable int object
 
 
     php -a
-    php > function foo2() {
-    php { return [ 42 ];
-    php { }
-    php > list($a, $b)=foo2();
-    PHP Notice:  Undefined offset: 1 in php shell code on line 1
-    PHP Stack trace:
-    PHP   1. {main}() php shell code:0
+        php > function foo2() {
+        php { return [ 42 ];
+        php { }
+        php > list($a, $b)=foo2();
+        PHP Notice:  Undefined offset: 1 in php shell code on line 1
+        PHP Stack trace:
+        PHP   1. {main}() php shell code:0
 
-    Notice: Undefined offset: 1 in php shell code on line 1
+        Notice: Undefined offset: 1 in php shell code on line 1
 
-    Call Stack:
-      135.6439     503232   1. {main}() php shell code:0
+        Call Stack:
+          135.6439     503232   1. {main}() php shell code:0
 
-Is last evaluated statement the return value? It is in Ruby and Perl5, not in Python, php, javascript. (in shell you need to echo the value back...)
+Is last evaluated statement the return value? 
+It is in Ruby and Perl5, not in Python, php, javascript. (in shell you need to echo the value back...)
 
 
     irb

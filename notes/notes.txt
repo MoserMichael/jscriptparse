@@ -1,9 +1,50 @@
+
+Divide by zero
+
+    javascript allows to do that!
+        node
+        > 1/0
+        Infinity
+        >
+
+    The others don't
+
+        python
+        >>> 1/0
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        ZeroDivisionError: division by zero
+        >>>
+
+
+        php -a
+
+        php > $a=1;
+        php > $a=1/0;
+        PHP Warning:  Division by zero in php shell code on line 1
+        PHP Stack trace:
+        PHP   1. {main}() php shell code:0
+
+        Warning: Division by zero in php shell code on line 1
+
+        Call Stack:
+           18.9835     393456   1. {main}() php shell code:0
+
+
 two passes or one? (can you call a functions that is defined later on in the same source file?)
 
     node does this!
         foo();
 
         function foo() {
+            console.log("hi");
+        }
+
+    but node doesn't do this - it's an error.
+
+        foo();
+
+        foo = function() {
             console.log("hi");
         }
 

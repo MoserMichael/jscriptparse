@@ -536,5 +536,6 @@ if (typeof(module) == 'object') {
         setTrace,
         setKeepLocationWithToken,
         ParserError,
+        getLineAt
     }
 }

@@ -1,3 +1,4 @@
+const prs=require("./prs.js");
 
 TYPE_BOOL=0
 TYPE_NUM=1
@@ -56,7 +57,7 @@ function value2Bool(val) {
     } else if (val.type == TYPE_STR) {
         return val.val == "true";
     }
-    throw new Error("can't convert " + mapTypeToName[val.type.toString()] + " to boolean");
+    throw new RuntimeException("can't convert " + mapTypeToName[val.type.toString()] + " to boolean");
 }
 
 function value2Num(val) {
@@ -65,7 +66,7 @@ function value2Num(val) {
     } else if (val.type == TYPE_STR) {
         return parseFloat(val.val);
     }
-    throw new Error("can't convert " + mapTypeToName[val.type.toString()] + " to מוצנקר");
+    throw new RuntimeException("can't convert " + mapTypeToName[val.type.toString]);
 }
 
 function value2Str(val) {
@@ -74,16 +75,37 @@ function value2Str(val) {
     } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
         return val.val.toString();
     } else {
-        throw new Error("can't convert " + mapTypeToName[val.type.toString] + " to string");
+        throw new RuntimeException("can't convert " + mapTypeToName[val.type.toString] + " to string");
     }
 }
 
 VALUE_NONE=new Value(TYPE_NONE,null);
 
 class RuntimeException  extends Error {
-    constructor(message, nextException = null) {
+    constructor(message, frameOffset = null) {
         super(message);
-        this.nextException = nextException;
+        this.stackTrace = [];
+        if (frameOffset != null) {
+            this.addToStack(frameOffset);
+        }
+    }
+    addToStack(frameOffset) {
+        this.stackTrace.push(frameOffset);
+    }
+
+    showStackTrace(data) {
+        let ret = "Error: " + this.message + "\n";
+
+        for(let i=0; i<this.stackTrace.length; ++i) {
+            let pos = this.stackTrace[i];
+
+            let entry = prs.getLineAt(data, pos);
+            let nFrame = this.stackTrace.length - i;
+            let prefix = "#(" + nFrame + ") ";
+            ret += prefix + entry[0] + "\n";
+            ret += (Array(prefix.length+2).join(' ')) +  Array(entry[1]).join(".") + "^\n";
+        }
+        return ret;
     }
 }
 
@@ -106,7 +128,7 @@ function evalClosure(funcVal, args, frame) {
 
 function _evalBuiltinFunc(funcVal, frame, args) {
     if (funcVal.numParams != args.length) {
-        throw new Error("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
+        throw new RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
             "  parameters are passed in call");
     }
     let retVal = funcVal.funcImpl(args);
@@ -121,7 +143,7 @@ function _evalClosure(funcVal, frame, args) {
     let funcFrame = new Frame(frame);
 
     if (args.length > functionDef.params.length) {
-        throw new Error("function takes " + functionDef.params.length + " params, but " + args.length + " were given");
+        throw new RuntimeException("function takes " + functionDef.params.length + " params, but " + args.length + " were given", funcVal.startOffset);
     }
 
     // define all provided parameters in the new function frmae
@@ -138,18 +160,31 @@ function _evalClosure(funcVal, frame, args) {
 
         let defaultParamValue = funcVal.defaultParamValues[i];
         if (defaultParamValue == null) {
-            throw new Error(" no value for parameter " + paramDef[0]);
+            throw new RuntimeException(" no value for parameter " + paramDef[0], funcVal.startOffset);
         }
         funcFrame.defineVar(paramDef[0][0], defaultParamValue);
     }
 
-    // frame is ready, evaluate the statement list
-    let rVal = functionDef.body.eval(funcFrame);
+    try {
+        // frame is ready, evaluate the statement list
+        let rVal = functionDef.body.eval(funcFrame);
 
-    if (rVal.type == TYPE_FORCE_RETURN) {
-        return rVal.val;
+        if (rVal.type == TYPE_FORCE_RETURN) {
+            return rVal.val;
+        }
+        return VALUE_NONE
+    } catch(er) {
+        if (er instanceof RuntimeException) {
+            er.addToStack(functionDef.startOffset);
+        }
+        throw er;
     }
-    return VALUE_NONE
+}
+
+let doLogHook = function(msg) { process.stdout.write(msg); }
+
+function setLogHook(hook) {
+    doLogHook = hook;
 }
 
 RTLIB={
@@ -208,35 +243,39 @@ RTLIB={
     }),
     "print" : new BuiltinFunctionValue(1, function(arg) {
         let msg = value2Str(arg[0]);
-        console.log( "print> : " +  msg );
+        doLogHook(msg)
     }),
+    "println" : new BuiltinFunctionValue(1, function(arg) {
+        let msg = value2Str(arg[0]);
+        doLogHook(msg + "\n")
+    }),
+
     "len" : new BuiltinFunctionValue(1, function(arg) {
         if (arg[0].type == TYPE_STR && arg[0].type == TYPE_LIST) {
             return new Value(TYPE_NUM, arg[0].val.length);
         }
-        throw new Error("string or list argument required");
+        throw new RuntimeException("string or list argument required");
     }),
     "join": new BuiltinFunctionValue(1, function(arg) {
         if (arg[0].type == TYPE_LIST) {
             return new Value(TYPE_STR, arg[0].val.map(value2Str).join(""));
         }
-        throw new Error("list argument required. is: " + mapTypeToName[ arg[0].type ]);
+        throw new RuntimeException("list argument required. is: " + mapTypeToName[ arg[0].type ]);
     }),
     "keys": new BuiltinFunctionValue(1, function(arg) {
         if (arg[0].type == TYPE_MAP) {
             return new Value(TYPE_LIST, Object.keys(arg[0].val));
         }
-        throw new Error("map argument required");
+        throw new RuntimeException("map argument required");
     }),
 
     "map": new BuiltinFunctionValue(2, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
-            throw new Error("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
         }
         if (arg[1].type != TYPE_CLOSURE) {
-            throw new Error("second argument: function argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("second argument: function argument required. is: " + mapTypeToName[arg[0].type]);
         }
-
         let ret = [];
         let argList = arg[0];
         let funVal = arg[1];
@@ -246,18 +285,15 @@ RTLIB={
             let mapVal = evalClosure(funVal, arg, frame);
             ret.push(mapVal);
         }
-
         return new Value(TYPE_LIST, ret);
     }),
-
     "reduce": new BuiltinFunctionValue(3, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
-            throw new Error("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
         }
         if (arg[1].type != TYPE_CLOSURE) {
-            throw new Error("second argument: function argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("second argument: function argument required. is: " + mapTypeToName[arg[0].type]);
         }
-
         let argList = arg[0];
         let funVal = arg[1];
         let rVal = arg[2];
@@ -266,9 +302,35 @@ RTLIB={
             let arg = [rVal, argList.val[i]];
             rVal = evalClosure(funVal, arg, frame);
         }
-
         return rVal;
-    })
+    }),
+
+    "push": new BuiltinFunctionValue(2, function(arg, frame) {
+        if (arg[0].type != TYPE_LIST) {
+            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+        arg[0].val.push(arg[1]);
+        return arg[0];
+    }),
+    "pop": new BuiltinFunctionValue(1,function(arg, frame) {
+        if (arg[0].type != TYPE_LIST) {
+            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+        if (arg[0].val.length == 0) {
+            throw new RuntimeException("Can't pop from an empty list");
+        }
+        return arg[0].val.pop(arg[1]);
+    }),
+    "joinl": new BuiltinFunctionValue(2,function(arg, frame) {
+        if (arg[0].type != TYPE_LIST) {
+            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+        if (arg[1].type != TYPE_LIST) {
+            throw new RuntimeException("second argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+        let lst = arg[0].val.join(arg[1].val);
+        return new Value(TYPE_LIST, lst);
+    }),
 }
 
 class Frame {
@@ -414,6 +476,12 @@ MAP_OP_TO_FUNC={
     ">=" : function(lhs,rhs) {
         return new Value(TYPE_BOOL, value2Num(lhs) >= value2Num(rhs));
     },
+    "==" : function(lhs,rhs) {
+        return new Value(TYPE_BOOL, value2Num(lhs) == value2Num(rhs));
+    },
+    "!=" : function(lhs,rhs) {
+        return new Value(TYPE_BOOL, value2Num(lhs) != value2Num(rhs));
+    },
     "+" : function(lhs,rhs) {
         return new Value(TYPE_NUM, value2Num(lhs) + value2Num(rhs));
     },
@@ -424,7 +492,12 @@ MAP_OP_TO_FUNC={
         return new Value(TYPE_NUM, value2Num(lhs) * value2Num(rhs));
     },
     "/" : function(lhs,rhs) {
-        return new Value(TYPE_NUM,value2Num(lhs) / value2Num(rhs));
+        let rhsVal = value2Num(rhs);
+        if (rhsVal == 0) {
+            // javascript allows to divide by zero, amazing.
+            throw new RuntimeException("Can't divide by zero");
+        }
+        return new Value(TYPE_NUM,value2Num(lhs) / rhsVal);
     },
 }
 
@@ -591,14 +664,14 @@ function makeLambdaExpression(functionDef) {
 function lookupIndex(frame, value, refExpr) {
     for(let i=0; i<refExpr.length; ++i) {
         if (value.type != TYPE_LIST && value.type != TYPE_MAP) {
-            throw new Error("Can't index expression of variable " + this.identifierName);
+            throw new RuntimeException("Can't index expression of variable " + this.identifierName);
         }
         let expr = refExpr[i];
         let indexValue = expr.eval(frame);
 
         value = value.val[ indexValue.val ];
         if (value == null) {
-            throw new Error("Can't lookup value " + indexValue.val)
+            throw new RuntimeException("Can't lookup value " + indexValue.val)
         }
     }
     return value;
@@ -649,14 +722,14 @@ class AstAssign extends AstBase {
             this._assign(frame, singleLhs, value);
         } else {
             if (value.type != TYPE_LIST) {
-                throw new Error("list value expected on right hand side of assignment");
+                throw new RuntimeException("list value expected on right hand side of assignment");
             }
             let rhsVal = value.val;
             if (this.lhs.length != rhsVal.length) {
                 if (this.lhs.length < rhsVal.length) {
-                    throw new Error("not enough values to assign");
+                    throw new RuntimeException("not enough values to assign");
                 } else {
-                    throw new Error("too many values to assign");
+                    throw new RuntimeException("too many values to assign");
                 }
             }
             for(let i=0; i<rhsVal.length; ++i) {
@@ -684,7 +757,7 @@ class AstAssign extends AstBase {
         let i=0;
         for(; i<refExpr.length; ++i) {
             if (value.type != TYPE_LIST && value.type != TYPE_MAP) {
-                throw new Error("Can't index expression of variable " + this.identifierName);
+                throw new RuntimeException("Can't index expression of variable " + this.identifierName);
             }
             let expr = refExpr[i];
             let indexValue = expr.eval(frame);
@@ -893,14 +966,21 @@ class AstFunctionCall extends AstBase {
     eval(frame) {
         let funcVal = frame.lookup(this.name);
         if (funcVal == undefined) {
-            throw new Error("Can't call undefined function " + this.name);
+            throw new RuntimeException("Can't call undefined function " + this.name, this.startOffset);
         }
-        return this._evalFunc(funcVal, frame);
+        try {
+            return this._evalFunc(funcVal, frame);
+        } catch(er) {
+            if (er instanceof RuntimeException) {
+                er.addToStack(this.startOffset);
+            }
+            throw er;
+        }
     }
 
     _evalFunc(funcVal, frame) {
         if (funcVal.type != TYPE_CLOSURE && funcVal.type != TYPE_BUILTIN_FUNCTION) {
-            throw new Error("variable is not a function/closure, it is a " + mapTypeToName[funcVal.type.toString()]);
+            throw new RuntimeException("variable is not a function/closure, it is a " + mapTypeToName[funcVal.type.toString()], this.startOffset);
         }
 
         let args = [];
@@ -959,6 +1039,7 @@ if (typeof(module) == 'object') {
         makeFunctionDef,
         makeFunctionCall,
         eval,
-        showList
+        showList,
+        setLogHook
     }
 }

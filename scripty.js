@@ -627,7 +627,11 @@ function runParser(parser, data, showAst = false) {
         return true;
 
     } catch(er) {
-        console.log(prs.formatParserError(er, data));
+        if (er instanceof rt.RuntimeException) {
+            console.log(er.showStackTrace(data));
+        } else {
+            console.log(prs.formatParserError(er, data));
+        }
     }
     return false;
 }

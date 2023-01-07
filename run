@@ -13,16 +13,12 @@ Runs the interpreter on the argument file
 }
 
 function runMain() {
-    console.log("argv: " + process.argv);
 
     if (process.argv.length < 3) {
         printHelp();
     }
 
     let sourceCode = fs.readFileSync(process.argv[2]);
-
-    //console.log("source: " + sourceCode);
-    //prs.setTrace(true);
 
     let parser = scr.makeParser();
     let result = 0;

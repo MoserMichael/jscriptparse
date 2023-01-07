@@ -144,7 +144,7 @@ function logHook(msg) {
 function testParser() {
 
     let parser = scr.makeParser();
-    let showAst = true;
+    let showAst = false;
 
     let i = 0;
     let failures = 0;

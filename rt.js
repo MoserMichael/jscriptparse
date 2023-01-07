@@ -88,6 +88,7 @@ class RuntimeException  extends Error {
         if (frameOffset != null) {
             this.addToStack(frameOffset);
         }
+        this.firstChance = true;
     }
     addToStack(frameOffset) {
         this.stackTrace.push(frameOffset);
@@ -503,7 +504,7 @@ MAP_OP_TO_FUNC={
 
 class AstBinaryExpression extends AstBase {
     constructor(lhs, op, rhs, offset) {
-        super(lhs.offset);
+        super(op[1]); //lhs.offset);
         this.lhs = lhs;
         this.rhs = rhs;
         this.op = op[0];
@@ -514,9 +515,17 @@ class AstBinaryExpression extends AstBase {
     }
     
     eval(frame) {
-        let lhsVal = this.lhs.eval(frame);
-        let rhsVal = this.rhs.eval(frame);
-        return this.fun(lhsVal, rhsVal);
+        try {
+            let lhsVal = this.lhs.eval(frame);
+            let rhsVal = this.rhs.eval(frame);
+            return this.fun(lhsVal, rhsVal);
+        } catch(er) {
+            if (er instanceof RuntimeException && er.firstChance) {
+                er.firstChance = false;
+                er.addToStack(this.startOffset);
+            }
+            throw er;
+        }
     }
 
     show() {
@@ -566,8 +575,16 @@ class AstUnaryExpression extends AstBase {
     }
 
     eval(frame) {
-        let exprVal = this.expr.eval(frame);
-        return this.fun(exprVal);
+        try {
+            let exprVal = this.expr.eval(frame);
+            return this.fun(exprVal);
+        } catch(er) {
+            if (er instanceof RuntimeException && er.firstChance) {
+                er.firstChance = false;
+                er.addToStack(this.startOffset);
+            }
+            throw er;
+        }
     }
 
     show() {

@@ -130,7 +130,35 @@ product: 6 sum product of squares: 13
     }        
     
     rec(5)
-`, null, false),
+`,
+`Error: Can't divide by zero
+#(13)             return 1 / 0
+       ....................^
+#(12)     def rec(num) {
+       ...^
+#(11)         return rec(num - 1)
+       ..............^
+#(10)     def rec(num) {
+       ...^
+#(9)         return rec(num - 1)
+      ..............^
+#(8)     def rec(num) {
+      ...^
+#(7)         return rec(num - 1)
+      ..............^
+#(6)     def rec(num) {
+      ...^
+#(5)         return rec(num - 1)
+      ..............^
+#(4)     def rec(num) {
+      ...^
+#(3)         return rec(num - 1)
+      ..............^
+#(2)     def rec(num) {
+      ...^
+#(1)     rec(5)
+      ...^
+`, false),
 
 
 ];

@@ -628,7 +628,7 @@ function runParser(parser, data, showAst = false) {
 
     } catch(er) {
         if (er instanceof rt.RuntimeException) {
-            console.log(er.showStackTrace(data));
+            er.showStackTrace(data);
         } else {
             console.log(prs.formatParserError(er, data));
         }

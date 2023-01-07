@@ -1,5 +1,11 @@
 const prs=require("./prs.js");
 
+let doLogHook = function(msg) { process.stdout.write(msg); }
+
+function setLogHook(hook) {
+    doLogHook = hook;
+}
+
 TYPE_BOOL=0
 TYPE_NUM=1
 TYPE_STR=2
@@ -106,6 +112,7 @@ class RuntimeException  extends Error {
             ret += prefix + entry[0] + "\n";
             ret += (Array(prefix.length+2).join(' ')) +  Array(entry[1]).join(".") + "^\n";
         }
+        doLogHook(ret);
         return ret;
     }
 }
@@ -182,11 +189,6 @@ function _evalClosure(funcVal, frame, args) {
     }
 }
 
-let doLogHook = function(msg) { process.stdout.write(msg); }
-
-function setLogHook(hook) {
-    doLogHook = hook;
-}
 
 RTLIB={
     "max" : new BuiltinFunctionValue(2, function(arg) {

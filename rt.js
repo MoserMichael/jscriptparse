@@ -1,4 +1,4 @@
-const path=require("path");
+const path=require("node:path");
 const prs=require(path.join(__dirname,"prs.js"));
 
 let doLogHook = function(msg) { process.stdout.write(msg); }

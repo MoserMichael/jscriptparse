@@ -46,11 +46,11 @@ function showRec(arg) {
  * The returned output is an object that represents the parsed value:
  */
 class State {
-    constructor(pos, data, result = null) {
+    constructor(pos, data, result = null, lastError = null) {
         this.pos = pos;
         this.data = data;
         this.result = result;
-        this.lastError = null
+        this.lastError = lastError;
     }
 
     show() {
@@ -63,11 +63,15 @@ class ParserError extends Error {
         super(message);
         this.pos = pos;
 
-        if (nextException != null && !(nextException instanceof ParserError) ) {
-            console.trace("nextException is not a ParserError " + nextException.constructor.name);
-            console.trace("nextException " + nextException.stack);
+        this.nextException = null;
+        if (nextException != null) {
+            if (nextException instanceof ParserError) {
+                this.nextException = nextException;
+            } else {
+                console.error("nextException is not a ParserError " + nextException.constructor.name);
+                console.error("nextException " + nextException.stack);
+            }
         }
-        this.nextException = nextException;
     }
 
     getDeepest() {
@@ -103,6 +107,10 @@ function getMostMatchingError(errors) {
 function makeError(message, state, nested = null) {
     if (nested == null) {
         nested = state.lastError;
+    } else {
+        if (state.lastError != null && state.lastError.getErrorPos() > nested.getErrorPos()) {
+            nested = state.lastError;
+        }
     }
     throw new ParserError(message, state.pos, nested);
 }
@@ -154,7 +162,6 @@ const makeTracer = function(parser, title) {
         try {
             ret = parser(state);
         } catch(e) {
-            console.log("error parsing: " + title + " error: " + e.message);
             throw e;
         }
 
@@ -450,11 +457,15 @@ const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser
         }
         // pick the most advanced error
         let nested = getMostMatchingError(errors);
-        if (nested != null && nested.pos == initialPos) {
+
+        if (nested != null && nested.getErrorPos() == initialPos) {
             nested = null; // disregard error of nested clause that did not consume input
+        } else {
+            state.lastError = nested;
         }
 
-        makeError("none of the argument parser matches in " + name, state, nested);
+
+        makeError("none of the argument parser matches in " + name, state);
         return null;
     }, name);
 }

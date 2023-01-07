@@ -1,0 +1,42 @@
+#!/usr/bin/env node
+
+const scr=require("./scripty.js");
+const prs=require("./prs.js");
+const rt=require("./rt.js");
+const fs=require("fs");
+
+function printHelp() {
+    process.write(`run <file_name>
+
+Runs the interpreter on the argument file
+`);
+    process.exit(1);
+}
+
+function runMain() {
+    //console.log("argv: " + process.argv);
+
+    if (process.argv.length < 2) {
+        printHelp();
+    }
+
+    let sourceCode = fs.readFileSync(process.argv[2]);
+
+    //console.log("source: " + sourceCode);
+    //prs.setTrace(true);
+
+    let parser = scr.makeParser();
+    let result = 0;
+
+    if (!scr.runParser(parser, sourceCode.toString())) {
+        result = 1;
+    }
+    
+    process.exit(result);
+}
+
+runMain();
+
+
+
+

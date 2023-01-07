@@ -579,7 +579,7 @@ function makeParser() {
     let statementList = prs.makeTransformer(
         prs.makeRepetitionParser(
             statement,
-            0
+            0, -1, "statementsRep"
         ),
         function(arg) {
             return rt.makeStatementList(arg);

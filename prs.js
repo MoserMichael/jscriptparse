@@ -1,4 +1,3 @@
-const assert = require('assert');
 
 let trace_on = false;
 let location_with_token = false;

@@ -1,6 +1,7 @@
 
-const scr=require("./scripty.js");
-const rt=require("./rt.js");
+const path=require("node:path");
+const scr=require(path.join(__dirname,"scripty.js"));
+const rt=require(path.join(__dirname,"rt.js"));
 
 class TestCase {
     constructor(sourceCode, expectedOutput="", expectSuccess= true) {

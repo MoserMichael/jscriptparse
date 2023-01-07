@@ -23,8 +23,9 @@
 // try/catch - maybe later
 
 
-const prs=require("./prs.js");
-const rt=require("./rt.js");
+const path=require("node:path");
+const prs=require(path.join(__dirname,"prs.js"));
+const rt=require(path.join(__dirname,"rt.js"));
 
 KEYWORDS = {
     'def': 1,

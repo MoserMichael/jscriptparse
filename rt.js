@@ -1,4 +1,5 @@
-const prs=require("./prs.js");
+const path=require("path");
+const prs=require(path.join(__dirname,"prs.js"));
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
@@ -32,7 +33,7 @@ mapTypeToName = {
 
 class ClosureValue {
     // needs the function definition and the frame of the current function (for lookup of captured vars)
-        constructor(functionDef, defaultParamValues, frame) {
+    constructor(functionDef, defaultParamValues, frame) {
         this.type = TYPE_CLOSURE;
         this.functionDef = functionDef;
         this.defaultParamValues = defaultParamValues; // default params are set when function/closure is evaluated.

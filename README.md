@@ -1,8 +1,6 @@
 ## prs.js - A small Javascript module for building parser combinators
 
-Had to build a parser and wrote this instead.
-
-The module is in ```prs.js```
+A module to build parser combinators ```prs.js``` - the resulting parser is a top-down parser, also known a parsing expression parser [PEG](https://en.wikipedia.org/wiki/Parsing_expression_grammar)
 
 To run the tests: ```node test.js```
 
@@ -13,7 +11,6 @@ The tests are a small scripting language and interpreter for the scripting langu
 ## Documentation of the module
 
 See the [generated documentation](https://mosermichael.github.io/jscriptparse/out/index.html)
-
 
 ## what I learned while writing this project
 

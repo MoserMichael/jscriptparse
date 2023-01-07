@@ -15,6 +15,7 @@ TYPE_NONE=5
 TYPE_CLOSURE=6
 TYPE_BUILTIN_FUNCTION=7
 TYPE_FORCE_RETURN=8
+TYPE_FORCE_BREAK=9
 
 mapTypeToName = {
     0 : "Boolean",
@@ -25,7 +26,8 @@ mapTypeToName = {
     5 : "None",
     6 : "Closure",
     7 : "BuiltinFunction",
-    8 : "ForceReturn"
+    8 : "ForceReturn",
+    9 : "Break"
 }
 
 class ClosureValue {
@@ -421,7 +423,7 @@ class AstStmtList extends AstBase {
 
             let val = stmt.eval(frame);
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
-            if (val.type == TYPE_FORCE_RETURN) {
+            if (val.type >= TYPE_FORCE_RETURN) {
                 return val;
             }
         }
@@ -869,7 +871,10 @@ class AstWhileStmt extends AstBase {
             }
 
             let rt = this.stmtList.eval(frame);
-            if (rt.type == TYPE_FORCE_RETURN) {
+            if (rt.type >= TYPE_FORCE_RETURN) {
+                if (rt.type == TYPE_FORCE_BREAK) {
+                    break;
+                }
                 return rt;
             }
         }
@@ -903,6 +908,26 @@ class AstReturnStmt extends AstBase {
 
 function makeReturnStmt(expr, offset) {
     return new AstReturnStmt(expr, offset);
+}
+
+class AstBreakStmt extends AstBase {
+    constructor(expr, offset) {
+        super(offset);
+        this.expr = expr;
+    }
+
+    eval(frame) {
+        let retValue = this.expr.eval(frame);
+        return new Value(TYPE_FORCE_BREAK, retValue);
+    }
+
+    show() {
+        return "(break)";
+    }
+}
+
+function makeBreakStmt(offset) {
+    return new AstBreakStmt(offset);
 }
 
 function _evalDefaultParams(frame, params) {
@@ -1055,6 +1080,7 @@ if (typeof(module) == 'object') {
         makeIfStmt,
         makeWhileStmt,
         makeReturnStmt,
+        makeBreakStmt,
         makeFunctionDef,
         makeFunctionCall,
         eval,

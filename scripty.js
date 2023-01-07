@@ -29,6 +29,7 @@ const rt=require("./rt.js");
 KEYWORDS = {
     'def': 1,
     'return': 1,
+    'break': 1,
     'if':   1,
     'else': 1,
     'elif': 1,
@@ -506,6 +507,13 @@ function makeParser() {
         }
     );
 
+    let breakStmt = prs.makeTransformer(
+        prs.makeTokenParser("break"),
+        function(arg) {
+            return rt.makeBreakStmt(arg[1]);
+        }
+    );
+
     let paramDef = prs.makeSequenceParser([
             identifier,
             prs.makeOptParser(
@@ -569,6 +577,7 @@ function makeParser() {
     let statement = prs.makeAlternativeParser([
         ifStmt,
         whileStmt,
+        breakStmt,
         assignment,
         functionCall,
         functionDef,

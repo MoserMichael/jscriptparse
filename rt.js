@@ -659,6 +659,15 @@ MAP_OP_TO_FUNC={
         }
         return new Value(TYPE_NUM,value2Num(lhs) / rhsVal);
     },
+    "%" : function(lhs,rhs) {
+        let rhsVal = value2Num(rhs);
+        if (rhsVal == 0) {
+            // javascript allows to divide by zero, amazing.
+            throw new RuntimeException("Can't divide modulo by zero");
+        }
+        return new Value(TYPE_NUM,value2Num(lhs) % rhsVal);
+    },
+
 }
 
 class AstBinaryExpression extends AstBase {

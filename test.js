@@ -162,18 +162,19 @@ product: 6 sum product of squares: 13
 `, false),
 
     new TestCase(`    
-    dct = { "persons": { "id": "323412343123", "name": "Michael", "surname": "Moser", "age": 53 }, "stuff": [3, 2, 1] }
+    dct = { "persons": { "id": "323412343123", "name": "Michael", "surname": "Moser", "age": 52 }, "stuff": [3, 2, 1] }
     js = variable2json( dct )
     println( "json: {js}" )
     
     vl = json2variable(js)
     vl['persons']['id'] = 123
+    vl['persons']['age'] = 22
     js = variable2json(vl)
     println( "json: {js}" )
        
 `,
-`json: {"persons":{"id":"323412343123","name":"Michael","surname":"Moser","age":53},"stuff":[3,2,1]}
-json: {"persons":{"id":123,"name":"Michael","surname":"Moser","age":53},"stuff":[3,2,1]}
+`json: {"persons":{"id":"323412343123","name":"Michael","surname":"Moser","age":52},"stuff":[3,2,1]}
+json: {"persons":{"id":123,"name":"Michael","surname":"Moser","age":22},"stuff":[3,2,1]}
 `)
 ];
 

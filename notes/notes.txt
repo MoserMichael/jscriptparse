@@ -1,4 +1,33 @@
 
+String concat
+
+    python
+
+        >>> "111" + "222"
+        '111222'
+        >>> "111" + 123
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        TypeError: can only concatenate str (not "int") to str
+
+    node
+        > "aaa" + 123
+        'aaa123'
+        > "aaa" + "bbb"
+        'aaabbb'
+
+    php - has a special operator for string concatenation, does not allow string + number
+
+        php > $a="123";
+        php > $b = $a . "456";
+        php > echo $b;
+        123456
+        php > $b = $a + 123;
+        PHP Parse error:  syntax error, unexpected '$b' (T_VARIABLE) in php shell code on line 2
+
+        Parse error: syntax error, unexpected '$b' (T_VARIABLE) in php shell code on line 2
+
+
 Divide by zero
 
     javascript allows to do that!

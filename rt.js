@@ -1,5 +1,6 @@
 const path=require("node:path");
 const prs=require(path.join(__dirname,"prs.js"));
+//const {TYPE_STR} = require("./rt");
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
@@ -58,6 +59,8 @@ class Value {
     show() { return "(" + mapTypeToName[ this.type.toString() ] + " " + this.val +  ")"; }
 }
 
+VALUE_NONE=new Value(TYPE_NONE,null);
+
 function value2Bool(val) {
     if (val.type == TYPE_BOOL) {
         return val.val;
@@ -88,7 +91,62 @@ function value2Str(val) {
     }
 }
 
-VALUE_NONE=new Value(TYPE_NONE,null);
+function jsValueToRtVal(value) {
+    if (Array.isArray(value)) {
+        let rt = [];
+        for(let i=0; i<value.length; ++i) {
+            rt.push( jsValueToRtVal(value[i]) );
+        }
+        return new Value(TYPE_LIST, rt);
+    }
+
+    if (value.constructor == Object) { // check if dictionary.
+        let rt = {};
+        let keys = Object.keys(value);
+        for(let i=0; i<keys.length; ++i) {
+            rt[ new String(keys[i]) ] = jsValueToRtVal( value[keys[i]] );
+        }
+    }
+
+    if (typeof(value) == "boolean") {
+        return new Value(TYPE_BOOL, value);
+    }
+
+    if (typeof(value) == 'number') {
+        return new Value(TYPE_NUM, value)
+    }
+
+    if (typeof(value) == null) {
+        return VALUE_NONE;
+    }
+
+    throw new RuntimeException("Unknown type " + typeof(value));
+}
+
+function rtValueToJsVal(value) {
+    if (value.type == TYPE_LIST) {
+        let ret = [];
+        for(let i=0; i<value.val; ++i) {
+            ret.push( rtValueToJsVal( value.val[i] ) );
+        }
+        return ret;
+    }
+
+    if (value.type == TYPE_MAP) {
+        let ret = {};
+        let keys = Object.keys(value.val);
+        for (let i = 0; i < keys.length; ++i) {
+            ret[keys[i]] = rtValueToJsVal(value.val[keys[i]]);
+        }
+        return ret;
+    }
+
+    if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM) {
+        return value.val;
+    }
+    throw new RuntimeException("Can't convert value " + mapTypeToName[ value.type ] )
+}
+
 
 class RuntimeException  extends Error {
     constructor(message, frameOffset = null) {
@@ -270,7 +328,12 @@ RTLIB={
     }),
     "keys": new BuiltinFunctionValue(1, function(arg) {
         if (arg[0].type == TYPE_MAP) {
-            return new Value(TYPE_LIST, Object.keys(arg[0].val));
+            let keys = Object.keys(arg[0].val);
+            let rt = [];
+            for(let i=0; i<keys.length;++i) {
+                rt.push( new Value(TYPE_STR, str(rt[i]) ));
+            }
+            return new Value(TYPE_LIST, rt);
         }
         throw new RuntimeException("map argument required");
     }),
@@ -332,10 +395,22 @@ RTLIB={
             throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
         }
         if (arg[1].type != TYPE_LIST) {
-            throw new RuntimeException("second argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("second argument: list argument required. is: " + mapTypeToName[arg[1].type]);
         }
         let lst = arg[0].val.join(arg[1].val);
         return new Value(TYPE_LIST, lst);
+    }),
+
+    "val2json": new BuiltinFunctionValue(1,function(arg, frame) {
+        let jsVal = rtValueToJsVal(arg[0]);
+        return new Value(TYPE_STR, JSON.stringify(jsVal));
+    }),
+    "json2val": new BuiltinFunctionValue(1,function(arg, frame) {
+        if(arg[0].type != TYPE_STR) {
+            throw new RuntimeException("first argument: string argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+        let val = JSON.parse(arg[0].val);
+        return jsValueToRtVal(val);
     }),
 }
 
@@ -494,6 +569,16 @@ MAP_OP_TO_FUNC={
     "-" : function(lhs,rhs) {
         return new Value(TYPE_NUM, value2Num(lhs) - value2Num(rhs));
     },
+    "." : function(lhs,rhs) {
+        if (lhs.type != TYPE_STR) {
+            throw new RuntimeException("First argument must be a string");
+        }
+        if (rhs.type != TYPE_STR) {
+            throw new RuntimeException("Second argument must be a string");
+        }
+        return new Value(TYPE_STR, lhs.val + rhs.val);
+    },
+
     "*" : function(lhs,rhs) {
         return new Value(TYPE_NUM, value2Num(lhs) * value2Num(rhs));
     },

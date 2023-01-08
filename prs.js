@@ -350,7 +350,11 @@ const makeRepetitionRecClause = function(parserMandatory, parserRepetition, titl
                     result.push( state.result );
                 }
             } catch(er) {
-                state.lastError = er;
+                if (!(er instanceof ParserError)) {
+                    console.log(er.message + " " + er.stack)
+                } else {
+                    state.lastError = er;
+                }
                 break;
             }
         }
@@ -450,7 +454,7 @@ const makeAlternativeParser = function(arrayOfParsers, name = "AlternativeParser
                 if (er instanceof ParserError) {
                     errors.push(er);
                 } else {
-                    console.trace("unknown exception: " + er.stack);
+                    console.trace("!unknown exception: " + er.stack);
                 }
             }
         }

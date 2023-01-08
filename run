@@ -23,7 +23,7 @@ function runMain() {
     let parser = scr.makeParser();
     let result = 0;
 
-    if (!scr.runParser(parser, sourceCode.toString())) {
+    if (!scr.runParserAndEval(parser, sourceCode.toString())) {
         result = 1;
     }
     

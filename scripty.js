@@ -181,7 +181,7 @@ function makeParser() {
             ]), function (arg) {
                 return arg[1];
             }
-        ), 0
+        ), "dictionaryClause"
     );
 
     let dictExpr = prs.makeTransformer(
@@ -191,11 +191,10 @@ function makeParser() {
             prs.makeTokenParser( "}")
         ]), function(arg) {
 
-            arg = arg[1];
-
+            let innerArg = arg[1];
             let cl = [];
-            if (arg.length != 0) {
-                cl = arg[0]
+            if (innerArg.length != 0) {
+                cl = innerArg[0]
             }
             return rt.newDictListCtorExpression(cl, arg[0][1]);
         }
@@ -621,7 +620,7 @@ function makeParser() {
     return prs.makeConsumeAll(statementList);
 }
 
-function runParser(parser, data, showAst = false) {
+function runParserAndEval(parser, data, showAst = false) {
 
     let s = new prs.State(0, data);
 
@@ -651,7 +650,7 @@ function runParser(parser, data, showAst = false) {
 if (typeof(module) == 'object') {
     module.exports = {
         makeParser,
-        runParser,
+        runParserAndEval,
     }
 }
 

@@ -43,10 +43,11 @@ class ClosureValue {
 }
 
 class BuiltinFunctionValue {
-    constructor(numParams, funcImpl) {
+    constructor(numParams, funcImpl, defaultParamValues = []) {
         this.type = TYPE_BUILTIN_FUNCTION;
         this.numParams = numParams;
         this.funcImpl = funcImpl;
+        this.defaultParamValues = defaultParamValues;
     }
 }
 
@@ -106,6 +107,7 @@ function jsValueToRtVal(value) {
         for(let i=0; i<keys.length; ++i) {
             rt[ new String(keys[i]) ] = jsValueToRtVal( value[keys[i]] );
         }
+        return new Value(TYPE_MAP, rt);
     }
 
     if (typeof(value) == "boolean") {
@@ -114,6 +116,10 @@ function jsValueToRtVal(value) {
 
     if (typeof(value) == 'number') {
         return new Value(TYPE_NUM, value)
+    }
+
+    if (typeof(value) == 'string') {
+        return new Value(TYPE_STR, value)
     }
 
     if (typeof(value) == null) {
@@ -126,7 +132,7 @@ function jsValueToRtVal(value) {
 function rtValueToJsVal(value) {
     if (value.type == TYPE_LIST) {
         let ret = [];
-        for(let i=0; i<value.val; ++i) {
+        for(let i=0; i<value.val.length; ++i) {
             ret.push( rtValueToJsVal( value.val[i] ) );
         }
         return ret;
@@ -144,7 +150,7 @@ function rtValueToJsVal(value) {
     if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM) {
         return value.val;
     }
-    throw new RuntimeException("Can't convert value " + mapTypeToName[ value.type ] )
+    throw new RuntimeException("Can't convert value " + mapTypeToName[ value.type ] );
 }
 
 
@@ -196,6 +202,15 @@ function evalClosure(funcVal, args, frame) {
 }
 
 function _evalBuiltinFunc(funcVal, frame, args) {
+    if (funcVal.defaultParamValues != null) {
+        // try to add omitted params with default values;
+        if (args.length < funcVal.defaultParamValues.length) {
+            for(let i = args.length;i<funcVal.defaultParamValues.length;++i) {
+                args.push( funcVal.defaultParamValues[i] );
+            }
+        }
+    }
+
     if (funcVal.numParams != args.length) {
         throw new RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
             "  parameters are passed in call");
@@ -252,6 +267,53 @@ function _evalClosure(funcVal, frame, args) {
 
 
 RTLIB={
+
+    // function on scalars or strings
+    "find": new BuiltinFunctionValue(3, function(arg) {
+        let hay = value2Str(arg[0]);
+        let needle = value2Str(arg[1]);
+        let index = 0;
+        if (arg[2] != null) {
+            index = parseInt(value2Num(arg[2]));
+        }
+
+        let res = hay.indexOf(needle, index)
+        return new Value(TYPE_NUM, res);
+    }, [null, null, null]),
+    "mid": new BuiltinFunctionValue(3, function(arg) {
+        let sval = value2Str(arg[0]);
+        let from = parseInt(value2Num(arg[1]), 10);
+        let to = null;
+
+        if (arg[2] != null) {
+            to = parseInt(value2Num(arg[2]), 10);
+        }
+
+        if (to == null) {
+            sval = sval.substring(from)
+        } else {
+            sval = sval.substring(from, to);
+        }
+
+        return new Value(TYPE_STR, sval);
+    }, [null, null, null]),
+    "lc": new BuiltinFunctionValue(1, function(arg) {
+        let val = value2Str(arg[0]);
+        return new Value(TYPE_STR, val.toLowerCase());
+    }),
+    "uc": new BuiltinFunctionValue(1, function(arg) {
+        let val = value2Str(arg[0]);
+        return new Value(TYPE_STR, val.toUpperCase());
+    }),
+    "reverse": new BuiltinFunctionValue(1, function(arg) {
+        if (arg[0].type == TYPE_LIST) {
+            return new Value(TYPE_LIST, arg[0].val.reverse());
+        }
+        let val = value2Str(arg[0]);
+        return new Value(TYPE_STR, val.split("").reverse().join(""));
+    }),
+
+    // Numeric functions
     "max" : new BuiltinFunctionValue(2, function(arg) {
         let num = value2Num(arg[0]);
         let num2 = value2Num(arg[1]);
@@ -305,6 +367,8 @@ RTLIB={
     "random" : new BuiltinFunctionValue(0, function(arg) {
         return new Value(TYPE_NUM, Math.random());
     }),
+
+    // Input and output functions
     "print" : new BuiltinFunctionValue(1, function(arg) {
         let msg = value2Str(arg[0]);
         doLogHook(msg)
@@ -314,6 +378,7 @@ RTLIB={
         doLogHook(msg + "\n")
     }),
 
+    // function for arrays
     "len" : new BuiltinFunctionValue(1, function(arg) {
         if (arg[0].type == TYPE_STR && arg[0].type == TYPE_LIST) {
             return new Value(TYPE_NUM, arg[0].val.length);
@@ -326,18 +391,6 @@ RTLIB={
         }
         throw new RuntimeException("list argument required. is: " + mapTypeToName[ arg[0].type ]);
     }),
-    "keys": new BuiltinFunctionValue(1, function(arg) {
-        if (arg[0].type == TYPE_MAP) {
-            let keys = Object.keys(arg[0].val);
-            let rt = [];
-            for(let i=0; i<keys.length;++i) {
-                rt.push( new Value(TYPE_STR, str(rt[i]) ));
-            }
-            return new Value(TYPE_LIST, rt);
-        }
-        throw new RuntimeException("map argument required");
-    }),
-
     "map": new BuiltinFunctionValue(2, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
@@ -373,14 +426,6 @@ RTLIB={
         }
         return rVal;
     }),
-
-    "push": new BuiltinFunctionValue(2, function(arg, frame) {
-        if (arg[0].type != TYPE_LIST) {
-            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
-        }
-        arg[0].val.push(arg[1]);
-        return arg[0];
-    }),
     "pop": new BuiltinFunctionValue(1,function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
@@ -389,6 +434,13 @@ RTLIB={
             throw new RuntimeException("Can't pop from an empty list");
         }
         return arg[0].val.pop(arg[1]);
+    }),
+    "push": new BuiltinFunctionValue(2, function(arg, frame) {
+        if (arg[0].type != TYPE_LIST) {
+            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+        }
+        arg[0].val.push(arg[1]);
+        return arg[0];
     }),
     "joinl": new BuiltinFunctionValue(2,function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
@@ -401,17 +453,34 @@ RTLIB={
         return new Value(TYPE_LIST, lst);
     }),
 
-    "val2json": new BuiltinFunctionValue(1,function(arg, frame) {
+    // functions for maps/hashes
+    "keys": new BuiltinFunctionValue(1, function(arg) {
+        if (arg[0].type == TYPE_MAP) {
+            let keys = Object.keys(arg[0].val);
+            let rt = [];
+            for(let i=0; i<keys.length;++i) {
+                rt.push( new Value(TYPE_STR, str(rt[i]) ));
+            }
+            return new Value(TYPE_LIST, rt);
+        }
+        throw new RuntimeException("map argument required");
+    }),
+
+    // functions for working with json
+    "variable2json": new BuiltinFunctionValue(1,function(arg, frame) {
         let jsVal = rtValueToJsVal(arg[0]);
         return new Value(TYPE_STR, JSON.stringify(jsVal));
     }),
-    "json2val": new BuiltinFunctionValue(1,function(arg, frame) {
+    "json2variable": new BuiltinFunctionValue(1,function(arg, frame) {
         if(arg[0].type != TYPE_STR) {
             throw new RuntimeException("first argument: string argument required. is: " + mapTypeToName[arg[0].type]);
         }
         let val = JSON.parse(arg[0].val);
-        return jsValueToRtVal(val);
+        let rt = jsValueToRtVal(val);
+        console.log(JSON.stringify(rt));
+        return rt;
     }),
+
 }
 
 class Frame {
@@ -1138,7 +1207,8 @@ function makeFunctionCall(name, expressionList) {
 
 function eval(stmt) {
     let glob = new Frame()
-    glob.vars = RTLIB
+    glob.vars = RTLIB;
+
     return stmt.eval(glob)
 }
 

@@ -161,7 +161,20 @@ product: 6 sum product of squares: 13
       ...^
 `, false),
 
-
+    new TestCase(`    
+    dct = { "persons": { "id": "323412343123", "name": "Michael", "surname": "Moser", "age": 53 }, "stuff": [3, 2, 1] }
+    js = variable2json( dct )
+    println( "json: {js}" )
+    
+    vl = json2variable(js)
+    vl['persons']['id'] = 123
+    js = variable2json(vl)
+    println( "json: {js}" )
+       
+`,
+`json: {"persons":{"id":"323412343123","name":"Michael","surname":"Moser","age":53},"stuff":[3,2,1]}
+json: {"persons":{"id":123,"name":"Michael","surname":"Moser","age":53},"stuff":[3,2,1]}
+`)
 ];
 
 let evalPrintMsg = "";
@@ -188,12 +201,13 @@ function testParser() {
         evalPrintMsg = "";
         rt.setLogHook(logHook);
 
-        let result = scr.runParser(parser, prog.sourceCode, showAst);
+        let result = scr.runParserAndEval(parser, prog.sourceCode, showAst);
 
         console.log("--\n" + evalPrintMsg + "\n--");
 
         if (result != prog.expectSuccess) {
             failures += 1;
+            continue;
         }
 
         if (prog.expectedOutput != null && prog.expectedOutput != evalPrintMsg) {

@@ -266,6 +266,17 @@ function _evalClosure(funcVal, frame, args) {
     }
 }
 
+function _system(cmd) {
+    let status = 0;
+    let out = "";
+    try {
+        out = cp.execSync(cmd).toString();
+    } catch(e) {
+        status = 1;//e.status;
+    }
+    let val = [ new Value(TYPE_STR, out), new Value(TYPE_NUM, status) ];
+    return new Value(TYPE_LIST, val);
+}
 
 RTLIB={
 
@@ -494,17 +505,20 @@ RTLIB={
                 cmd = arg[0].val.map(value2Str).join(" ");
             }
         }
-        let status = 0;
-        let out = "";
-        try {
-            out = cp.execSync(cmd).toString();
-        } catch(e) {
-            status = 1;//e.status;
-        }
-        let val = [ new Value(TYPE_STR, out), new Value(TYPE_NUM, status) ];
-        return new Value(TYPE_LIST, val);
-    })
+        return _system(cmd);
+    }),
 
+    "system#backtick": new BuiltinFunctionValue(1,function(arg, frame) {
+
+        let cmd ="";
+
+        if (arg[0].type == TYPE_LIST) {
+           cmd = arg[0].val.map(value2Str).join("");
+        } else {
+            throw new RuntimeException("list parameter required");
+        }
+        return _system(cmd);
+    })
 }
 
 class Frame {

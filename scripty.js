@@ -97,6 +97,7 @@ function makeParser() {
             return rt.makeConstValue(rt.TYPE_NONE, arg);
         });
 
+    // f-string tokens
     let formatStringStartConst = prs.makeTransformer(
         prs.makeRegexParser( /^"(\\\\.|[^"{])*{/, "string-const" ),
         function(arg) {
@@ -116,6 +117,28 @@ function makeParser() {
             return rt.makeConstValue(rt.TYPE_STR, arg);
         })
 
+    // backtick string tokens
+
+    let backtickStringConst = prs.makeTransformer(
+        prs.makeRegexParser( /^`(\\\\.|[^`{])*`/, "string-const" ),
+        function(arg) {
+            arg[0] = arg[0].slice(1,-1);
+            return [ rt.makeConstValue(rt.TYPE_STR, arg) ];
+        }
+    );
+
+    let backtickStringStartConst = prs.makeTransformer(
+        prs.makeRegexParser( /^`(\\\\.|[^`{])*{/, "backtick-string-const" ),
+        function(arg) {
+            arg[0] = arg[0].slice(1,-1);
+            return rt.makeConstValue(rt.TYPE_STR, arg);
+        });
+    let backtickStringEndConst = prs.makeTransformer(
+        prs.makeRegexParser( /^}(\\\\.|[^`{])*`/, "backtick-string-const" ),
+        function(arg) {
+            arg[0] = arg[0].slice(1,-1);
+            return rt.makeConstValue(rt.TYPE_STR, arg);
+        });
 
     let forwardExpr = new prs.makeForwarder();
 
@@ -200,6 +223,7 @@ function makeParser() {
         }
     );
 
+    // f-strings
     let formatStringContinuation = prs.makeTransformer(
         prs.makeSequenceParser([
             forwardExpr.forward(),
@@ -247,6 +271,64 @@ function makeParser() {
             return rt.makeFunctionCall(funcTok, [ argVal ]);
         }
     );
+
+    //backtick strings
+    let backtickStringContinuation = prs.makeTransformer(
+        prs.makeSequenceParser([
+            forwardExpr.forward(),
+            prs.makeRepetitionParser(
+                prs.makeSequenceParser([
+                    formatStringMidConst,
+                    forwardExpr.forward()
+                ]),
+                0
+            ),
+            backtickStringEndConst
+        ]), function(arg) {
+            let rVal = [];
+
+            rVal.push(arg[0]);
+            let mid = arg[1];
+            for(let i=0; i< mid.length;++i) {
+                let seqMid = mid[i];
+                rVal.push( seqMid[0] );
+                rVal.push( seqMid[1] );
+            }
+            rVal.push(arg[2]);
+            return rVal;
+        }
+    );
+
+    let backtickExpr = prs.makeTransformer(
+        prs.makeAlternativeParser([
+            prs.makeSequenceParser([
+                backtickStringStartConst,
+                backtickStringContinuation
+            ]),
+            backtickStringConst
+        ]), function(arg) {
+
+            //console.log("system-arg: " + JSON.stringify(arg));
+
+            let argExpr = [ arg[0] ];
+
+            if (arg.length > 1) {
+                if (arg[1].length != 0) {
+                    argExpr = argExpr.concat(arg[1]);
+                }
+            }
+
+            let funcTok = [ "system#backtick", arg[0].startOffset ];
+
+            let a = [];
+            a[0] = argExpr;
+
+
+            let argVal = [ rt.newListCtorExpression(a, arg[0].offset) ];
+            return rt.makeFunctionCall(funcTok, [ argVal ]);
+        }
+    );
+
 
     let identifierWithOptIndex = prs.makeTransformer(
             prs.makeSequenceParser([
@@ -302,7 +384,8 @@ function makeParser() {
             nestedExpr,
             listExpr,
             dictExpr,
-            formatExpr
+            formatExpr,
+            backtickExpr
         ],
         "primaryExpression");
 

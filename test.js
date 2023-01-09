@@ -179,7 +179,15 @@ json: {"persons":{"id":123,"name":"Michael","surname":"Moser","age":22},"stuff":
     new TestCase(`
     out, status = system("echo 'hello world'")
     print("status: {status} output: {out}")
-`, "status: 0 output: hello world\n"),
+    
+    a = "!hello"
+    b = "world!"
+    out, status = \`echo "{a} {b}"\`
+    print("status: {status} output: {out}")
+    
+`, `status: 0 output: hello world
+status: 0 output: !hello world!
+`),
 ];
 
 let evalPrintMsg = "";

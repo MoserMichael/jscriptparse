@@ -620,7 +620,7 @@ function makeParser() {
     return prs.makeConsumeAll(statementList);
 }
 
-function runParserAndEval(parser, data, showAst = false) {
+function runParserAndEval(parser, data, showAst = false, frame = null) {
 
     let s = new prs.State(0, data);
 
@@ -634,7 +634,7 @@ function runParserAndEval(parser, data, showAst = false) {
             console.log("parse result: " + result.show());
         }
 
-        rt.eval(result);
+        rt.eval(result, frame);
         return true;
 
     } catch(er) {

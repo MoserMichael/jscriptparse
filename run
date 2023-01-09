@@ -2,23 +2,42 @@
 
 const path=require("node:path");
 const fs=require("fs");
+const repl=require("node:repl");
+const rt=require(path.join(__dirname,"rt.js"));
 const scr=require(path.join(__dirname,"scripty.js"));
 
-function printHelp() {
-    process.stdout.write(`run <file_name>
 
-Runs the interpreter on the argument file
-`);
-    process.exit(1);
+function runEvalLoop() {
+
+    let runEvalImp = function() {
+
+        let glob = new rt.Frame();
+        let parser = scr.makeParser();
+        let evalIn = function(data, context, filename, callback) {
+
+            let evalPrintMsg = "";
+
+            function logHook(msg) {
+                evalPrintMsg += msg;
+            }
+
+            rt.setLogHook(logHook);
+
+            try {
+                scr.runParserAndEval(parser, data, false, glob);
+            } catch(e) {
+                return callback(e, new repl.Recoverable(e));
+            }
+            callback(null,evalPrintMsg);
+        }
+
+        repl.start({ prompt: "> ", eval: evalIn });
+    }
+    runEvalImp();
 }
 
-function runMain() {
-
-    if (process.argv.length < 3) {
-        printHelp();
-    }
-
-    let sourceCode = fs.readFileSync(process.argv[2]);
+function evalFile(file) {
+    let sourceCode = fs.readFileSync(file);
 
     let parser = scr.makeParser();
     let result = 0;
@@ -26,8 +45,18 @@ function runMain() {
     if (!scr.runParserAndEval(parser, sourceCode.toString())) {
         result = 1;
     }
-    
+
     process.exit(result);
+}
+
+function runMain() {
+
+    if (process.argv.length < 3) {
+        runEvalLoop()
+    } else {
+        evalFile(process.argv[2]);
+    }
+
 }
 
 runMain();

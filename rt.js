@@ -1214,8 +1214,10 @@ function makeFunctionCall(name, expressionList) {
     return new AstFunctionCall(name[0], expr, name[1]);
 }
 
-function eval(stmt) {
-    let glob = new Frame()
+function eval(stmt, glob = null) {
+    if (glob == null) {
+        glob = new Frame();
+    }
     glob.vars = RTLIB;
 
     return stmt.eval(glob)

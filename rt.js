@@ -278,6 +278,7 @@ function _system(cmd) {
     return new Value(TYPE_LIST, val);
 }
 
+// the runtime library is defined here
 RTLIB={
 
     // function on scalars or strings
@@ -521,6 +522,9 @@ RTLIB={
     })
 }
 
+// there is a global frame, also each function invocation has is own frame.a
+// closures have a parent frame - which is the frame where they where evaluated.
+// simple rules. aren't they?
 class Frame {
     constructor(parentFrame = null) {
         this.vars = {}; // maps variable name to Value instance

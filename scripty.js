@@ -424,11 +424,15 @@ function makeParser() {
 
     let assignLhs = prs.makeRepetitionRecClause(
         assignLhsSingle,
-        prs.makeSequenceParser([
-            prs.makeTokenParser(","),
-            assignLhsSingle
-        ]),
-        "assignmentLhs",
+        prs.makeTransformer(
+            prs.makeSequenceParser([
+                prs.makeTokenParser(","),
+                assignLhsSingle
+            ]), function(arg) {
+                return arg[1]
+            },
+        ),
+        "assignmentLhs"
     );
 
     let assignment = prs.makeTransformer(

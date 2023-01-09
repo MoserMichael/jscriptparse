@@ -175,7 +175,11 @@ product: 6 sum product of squares: 13
 `,
 `json: {"persons":{"id":"323412343123","name":"Michael","surname":"Moser","age":52},"stuff":[3,2,1]}
 json: {"persons":{"id":123,"name":"Michael","surname":"Moser","age":22},"stuff":[3,2,1]}
-`)
+`),
+    new TestCase(`
+    out, status = system("echo 'hello world'")
+    print("status: {status} output: {out}")
+`, "status: 0 output: hello world\n"),
 ];
 
 let evalPrintMsg = "";

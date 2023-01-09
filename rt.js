@@ -1,4 +1,5 @@
 const path=require("node:path");
+const cp=require("node:child_process");
 const prs=require(path.join(__dirname,"prs.js"));
 //const {TYPE_STR} = require("./rt");
 
@@ -480,6 +481,29 @@ RTLIB={
         console.log(JSON.stringify(rt));
         return rt;
     }),
+
+    // functions for working with processes
+    "system": new BuiltinFunctionValue(1,function(arg, frame) {
+
+        let cmd ="";
+
+        if (arg[0].type == TYPE_STR) {
+            cmd = arg[0].val;
+        } else {
+            if (arg[0].type == TYPE_LIST) {
+                cmd = arg[0].val.map(value2Str).join(" ");
+            }
+        }
+        let status = 0;
+        let out = "";
+        try {
+            out = cp.execSync(cmd).toString();
+        } catch(e) {
+            status = 1;//e.status;
+        }
+        let val = [ new Value(TYPE_STR, out), new Value(TYPE_NUM, status) ];
+        return new Value(TYPE_LIST, val);
+    })
 
 }
 

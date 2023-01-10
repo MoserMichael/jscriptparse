@@ -13,6 +13,9 @@ function runEvalLoop() {
 
         let glob = new rt.Frame();
         let parser = scr.makeParser();
+
+        let doWrite = function(arg) { return arg };
+
         let evalIn = function(data, context, filename, callback) {
 
             let evalPrintMsg = "";
@@ -40,7 +43,7 @@ function runEvalLoop() {
             callback(null,evalPrintMsg);
         }
 
-        repl.start({ prompt: "> ", eval: evalIn });
+        repl.start({ prompt: "> ", eval: evalIn, writer: doWrite });
     }
     runEvalImp();
 }

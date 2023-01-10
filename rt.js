@@ -88,6 +88,8 @@ function value2Str(val) {
         return val.val;
     } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
         return val.val.toString();
+    } else if (val.type == TYPE_NONE) {
+        return "none";
     } else {
         throw new RuntimeException("can't convert " + mapTypeToName[val.type.toString] + " to string");
     }
@@ -605,16 +607,17 @@ class AstStmtList extends AstBase {
     }
 
     eval(frame) {
+        let val = VALUE_NONE;
         for(let i=0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
 
-            let val = stmt.eval(frame);
+            val = stmt.eval(frame);
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
             if (val.type >= TYPE_FORCE_RETURN) {
                 return val;
             }
         }
-        return VALUE_NONE;
+        return val;
     }
 
     show() {
@@ -1294,6 +1297,7 @@ if (typeof(module) == 'object') {
         makeFunctionCall,
         eval,
         showList,
-        setLogHook
+        setLogHook,
+        rtValueToJsVal
     }
 }

@@ -668,9 +668,9 @@ function makeParser() {
         whileStmt,
         breakStmt,
         assignment,
-        functionCall,
         functionDef,
-        returnStmt
+        returnStmt,
+        expression
     ], "anyOfStatement")
 
 
@@ -721,8 +721,7 @@ function runParserAndEval(parser, data, showAst = false, frame = null) {
             console.log("parse result: " + result.show());
         }
 
-        rt.eval(result, frame);
-        return true;
+        return rt.eval(result, frame);
 
     } catch(er) {
         if (er instanceof rt.RuntimeException) {
@@ -731,7 +730,7 @@ function runParserAndEval(parser, data, showAst = false, frame = null) {
             console.log(prs.formatParserError(er, data));
         }
     }
-    return false;
+    return null;
 }
 
 if (typeof(module) == 'object') {

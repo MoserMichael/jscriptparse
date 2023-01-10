@@ -218,13 +218,15 @@ function testParser() {
 
         console.log("--\n" + evalPrintMsg + "\n--");
 
-        if (result != prog.expectSuccess) {
+        let res = result != null;
+        if (res != prog.expectSuccess) {
+            console.log("Test failed: expected status: " + prog.expectSuccess);
             failures += 1;
             continue;
         }
 
         if (prog.expectedOutput != null && prog.expectedOutput != evalPrintMsg) {
-            console.log("Failure: output is not expected\n???\n" + prog.expectedOutput + "\n???");
+            console.log("Test failed: output is not expected\n???\n" + prog.expectedOutput + "\n???");
             failures += 1;
         }
     }

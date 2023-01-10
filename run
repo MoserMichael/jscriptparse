@@ -24,7 +24,16 @@ function runEvalLoop() {
             rt.setLogHook(logHook);
 
             try {
-                scr.runParserAndEval(parser, data, false, glob);
+                let res = scr.runParserAndEval(parser, data, false, glob);
+
+                try {
+                    if (res != 0) {
+                        evalPrintMsg += JSON.stringify(rt.rtValueToJsVal(res));
+                    }
+                } catch(e) {
+                    // ignore
+                }
+
             } catch(e) {
                 return callback(e, new repl.Recoverable(e));
             }

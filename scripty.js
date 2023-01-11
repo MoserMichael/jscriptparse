@@ -746,10 +746,26 @@ function runParse(data, openFile) {
     }
 
     let filePath = null
+
     if (openFile) {
-        filePath = resolvePath(data);
-        data = fs.readFileSync(filePath).toString();
+        try {
+            filePath = resolvePath(data);
+        } catch(er) {
+            throw new Error("Can't find used/included file: " + data + " : " + er);
+        }
+
+        if (filePath == null) {
+            throw new Error("Can't find used/included file: " + data + " : " + er);
+        }
+
+        try {
+            data = fs.readFileSync(filePath).toString();
+        } catch(er) {
+            throw new Error("Can't read used/included file " + filePath);
+        }
+
     }
+
     try {
         return parseFromData(data);
     } catch(er) {

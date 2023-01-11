@@ -1140,8 +1140,17 @@ class AstUseStatement extends AstBase {
 
     eval(frame) {
         if (this.statements == null) {
+
             let fileToInclude = this.expr.eval(frame);
-            this.statements = this.parserFunction(value2Str(fileToInclude), true);
+            let includedFile = value2Str(fileToInclude);
+            if (includedFile == "" || includedFile==null) {
+                throw new RuntimeException("expression in use statement gives an empty value. (should be a string with the name of a file)", this.startOffset);
+            }
+            try {
+                this.statements = this.parserFunction(includedFile, true);
+            } catch(er) {
+                throw er;
+            }
         }
         return this.statements.eval(frame);
     }
@@ -1292,13 +1301,13 @@ function makeFunctionCall(name, expressionList) {
     return new AstFunctionCall(name[0], expr, name[1]);
 }
 
-function eval(stmt, glob = null) {
-    if (glob == null) {
-        glob = new Frame();
+function eval(stmt, globFrame = null) {
+    if (globFrame == null) {
+        globFrame = new Frame();
     }
-    glob.vars = RTLIB;
+    globFrame.vars = RTLIB;
 
-    return stmt.eval(glob)
+    return stmt.eval(globFrame)
 }
 
 if (typeof(module) == 'object') {

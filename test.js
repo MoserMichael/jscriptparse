@@ -194,7 +194,15 @@ status: 0 output: !hello world!
     c = newComplex(2,3)
     d = newComplex(4,5)
     e = cmul(c, d)
-    println("complex product: {cshow(e)}")`,"complex product: -7+i22\n")
+    println("complex product: {cshow(e)}")`,"complex product: -7+i22\n"
+ ),
+/*
+    new TestCase(`
+    use "throwfromuse.p"
+    
+    countdownAndError(5)
+    `, ``),
+*/
 
 ];
 
@@ -219,7 +227,7 @@ function testParser() {
         evalPrintMsg = "";
         rt.setLogHook(logHook);
 
-        let result = scr.runParserAndEval(prog.sourceCode, prog.sourceCode, false);
+        let result = scr.runParserAndEval(prog.sourceCode, false);
 
         console.log("--\n" + evalPrintMsg + "\n--");
 

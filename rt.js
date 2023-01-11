@@ -201,7 +201,7 @@ class RuntimeException  extends Error {
             let nFrame = this.stackTrace.length - i;
             let prefix = "#(" + fname + nFrame + ") ";
             ret += prefix + entry[0] + "\n";
-            ret += (Array(prefix.length+2).join(' ')) +  Array(entry[1]).join(".") + "^\n";
+            ret += (Array(prefix.length-1).join(' ')) + "|" +  Array(entry[1]+1).join(".") + "^\n";
         }
         doLogHook(ret);
         return ret;

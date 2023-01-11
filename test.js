@@ -134,31 +134,31 @@ product: 6 sum product of squares: 13
 `,
 `Error: Can't divide by zero
 #(13)             return 1 / 0
-       ....................^
+    |......................^
 #(12)     def rec(num) {
-       ...^
+    |.....^
 #(11)         return rec(num - 1)
-       ..............^
+    |................^
 #(10)     def rec(num) {
-       ...^
+    |.....^
 #(9)         return rec(num - 1)
-      ..............^
+   |................^
 #(8)     def rec(num) {
-      ...^
+   |.....^
 #(7)         return rec(num - 1)
-      ..............^
+   |................^
 #(6)     def rec(num) {
-      ...^
+   |.....^
 #(5)         return rec(num - 1)
-      ..............^
+   |................^
 #(4)     def rec(num) {
-      ...^
+   |.....^
 #(3)         return rec(num - 1)
-      ..............^
+   |................^
 #(2)     def rec(num) {
-      ...^
+   |.....^
 #(1)     rec(5)
-      ...^
+   |.....^
 `, false),
 
     new TestCase(`    
@@ -189,7 +189,7 @@ json: {"persons":{"id":123,"name":"Michael","surname":"Moser","age":22},"stuff":
 status: 0 output: !hello world!
 `),
     new TestCase(`
-    use "testuse.p"
+    use "tests/testuse.p"
     
     c = newComplex(2,3)
     d = newComplex(4,5)
@@ -197,37 +197,37 @@ status: 0 output: !hello world!
     println("complex product: {cshow(e)}")`,"complex product: -7+i22\n"
  ),
     new TestCase(`
-    use "throwfromuse.p"
+    use "tests/throwfromuse.p"
     
     countdownAndError(5)
     `,
         `Error: Can't divide by zero
-#(throwfromuse.p:13)     return 42 / 0
-                      .............^
-#(throwfromuse.p:12) def countdownAndError(n) {
-                      ^
-#(throwfromuse.p:11)         return countdownAndError(n-1)
-                      ..............^
-#(throwfromuse.p:10) def countdownAndError(n) {
-                      ^
-#(throwfromuse.p:9)         return countdownAndError(n-1)
-                     ..............^
-#(throwfromuse.p:8) def countdownAndError(n) {
-                     ^
-#(throwfromuse.p:7)         return countdownAndError(n-1)
-                     ..............^
-#(throwfromuse.p:6) def countdownAndError(n) {
-                     ^
-#(throwfromuse.p:5)         return countdownAndError(n-1)
-                     ..............^
-#(throwfromuse.p:4) def countdownAndError(n) {
-                     ^
-#(throwfromuse.p:3)         return countdownAndError(n-1)
-                     ..............^
-#(throwfromuse.p:2) def countdownAndError(n) {
-                     ^
+#(tests/throwfromuse.p:13)     return 42 / 0
+                         |...............^
+#(tests/throwfromuse.p:12) def countdownAndError(n) {
+                         |.^
+#(tests/throwfromuse.p:11)         return countdownAndError(n-1)
+                         |................^
+#(tests/throwfromuse.p:10) def countdownAndError(n) {
+                         |.^
+#(tests/throwfromuse.p:9)         return countdownAndError(n-1)
+                        |................^
+#(tests/throwfromuse.p:8) def countdownAndError(n) {
+                        |.^
+#(tests/throwfromuse.p:7)         return countdownAndError(n-1)
+                        |................^
+#(tests/throwfromuse.p:6) def countdownAndError(n) {
+                        |.^
+#(tests/throwfromuse.p:5)         return countdownAndError(n-1)
+                        |................^
+#(tests/throwfromuse.p:4) def countdownAndError(n) {
+                        |.^
+#(tests/throwfromuse.p:3)         return countdownAndError(n-1)
+                        |................^
+#(tests/throwfromuse.p:2) def countdownAndError(n) {
+                        |.^
 #(1)     countdownAndError(5)
-      ...^
+   |.....^
 `, false),
 
 ];

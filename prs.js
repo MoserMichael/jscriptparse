@@ -125,7 +125,7 @@ function getLineAt(data, pos) {
     if (start > pos) {
         start = pos;
     }
-    return [ data.substring(start, end), pos-start];
+    return [ data.substring(start, end), pos-start+1];
 }
 
 

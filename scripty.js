@@ -765,7 +765,7 @@ function runParse(data, openFile) {
 
 }
 
-function runParserAndEval(parser, data, openFile,  frame = null) {
+function runParserAndEval(data, openFile,  frame = null) {
 
     try {
         let result = runParse(data, openFile);

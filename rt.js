@@ -655,6 +655,8 @@ function makeConstValue(type, value) {
     return new AstConstValue(new Value(type, value[0]), value[1]);
 }
 
+
+
 MAP_OP_TO_FUNC={
     "and" : function(lhs,rhs) {
         return new Value(TYPE_BOOL, value2Bool(lhs) && value2Bool(rhs));
@@ -663,28 +665,34 @@ MAP_OP_TO_FUNC={
         return new Value(TYPE_BOOL, value2Bool(lhs) || value2Bool(rhs));
     },
     "<" : function(lhs,rhs) {
-        return new Value(TYPE_BOOL, value2Num(lhs) < value2Num(rhs));
+        return new Value(TYPE_BOOL, lhs.val < rhs.val);
     },
     ">" : function(lhs,rhs) {
-        return new Value(TYPE_BOOL, value2Num(lhs) > value2Num(rhs));
+        return new Value(TYPE_BOOL, lhs.val > rhs.val);
     },
     "<=" : function(lhs,rhs) {
-        return new Value(TYPE_BOOL, value2Num(lhs) <= value2Num(rhs));
+        return new Value(TYPE_BOOL, lhs.val <= rhs.val);
     },
     ">=" : function(lhs,rhs) {
-        return new Value(TYPE_BOOL, value2Num(lhs) >= value2Num(rhs));
+        return new Value(TYPE_BOOL, lhs.val >= rhs.val);
     },
     "==" : function(lhs,rhs) {
-        return new Value(TYPE_BOOL, value2Num(lhs) == value2Num(rhs));
+        return new Value(TYPE_BOOL, lhs.val == rhs.val);
     },
     "!=" : function(lhs,rhs) {
-        return new Value(TYPE_BOOL, value2Num(lhs) != value2Num(rhs));
+        return new Value(TYPE_BOOL, lhs.val != rhs.val);
     },
     "+" : function(lhs,rhs) {
-        return new Value(TYPE_NUM, value2Num(lhs) + value2Num(rhs));
+        if (lhs.type != rhs.type) {
+            throw new RuntimeException("Can't add " + mapTypeToName[lhs.type] + " to " + mapTypeToName[rhs.type] );
+        }
+        return new Value(lhs.type, lhs.val + rhs.val);
     },
     "-" : function(lhs,rhs) {
-        return new Value(TYPE_NUM, value2Num(lhs) - value2Num(rhs));
+        if (lhs.type != rhs.type) {
+            throw new RuntimeException("Can't subtract " + mapTypeToName[lhs.type] + " to " + mapTypeToName[rhs.type] );
+        }
+        return new Value(lhs.type, lhs.val - rhs.val);
     },
     "." : function(lhs,rhs) {
         if (lhs.type != TYPE_STR) {

@@ -746,9 +746,11 @@ function runParse(data, openFile) {
     }
 
     let filePath = null
+    let origPath = null
 
     if (openFile) {
         try {
+            origPath = data;
             filePath = resolvePath(data);
         } catch(er) {
             throw new Error("Can't find used/included file: " + data + " : " + er);
@@ -767,7 +769,10 @@ function runParse(data, openFile) {
     }
 
     try {
-        return parseFromData(data);
+        let prevValue = rt.setCurrentSourceInfo([ origPath, data]);
+        let rVal = parseFromData(data);
+        rt.setCurrentSourceInfo(prevValue);
+        return rVal;
     } catch(er) {
         if (er instanceof prs.ParserError) {
             let origError = er.getDeepest();
@@ -795,7 +800,7 @@ function runParserAndEval(data, openFile,  frame = null) {
 
     } catch(er) {
         if (er instanceof rt.RuntimeException) {
-            er.showStackTrace(data);
+            er.showStackTrace();
         } else {
             console.log(prs.formatParserError(er, data));
         }

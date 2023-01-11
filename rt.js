@@ -6,8 +6,19 @@ const prs=require(path.join(__dirname,"prs.js"));
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
+
+// the file that is being parsed right now. Can't pass that around.
+// Should be thread local, or something like this.
+let currentSourceInfo = null;
+
 function setLogHook(hook) {
     doLogHook = hook;
+}
+
+function setCurrentSourceInfo(info) {
+    let prevValue = currentSourceInfo;
+    currentSourceInfo = info;
+    return prevValue;
 }
 
 TYPE_BOOL=0
@@ -161,27 +172,34 @@ function rtValueToJsVal(value) {
 
 
 class RuntimeException  extends Error {
-    constructor(message, frameOffset = null) {
+    constructor(message, frameInfo = null) {
         super(message);
         this.stackTrace = [];
-        if (frameOffset != null) {
-            this.addToStack(frameOffset);
+        if (frameInfo != null) {
+            this.addToStack(frameInfo);
         }
         this.firstChance = true;
     }
-    addToStack(frameOffset) {
-        this.stackTrace.push(frameOffset);
+    addToStack(frameInfo) {
+        this.stackTrace.push(frameInfo);
     }
 
-    showStackTrace(data) {
+    showStackTrace() {
         let ret = "Error: " + this.message + "\n";
 
         for(let i=0; i<this.stackTrace.length; ++i) {
-            let pos = this.stackTrace[i];
+            let stackTraceEntry = this.stackTrace[i];
+            let offset = stackTraceEntry[0];
+            let sourceInfo = stackTraceEntry[1];
+            let fileInfo = sourceInfo[0];
+            let fname = "";
+            if (fileInfo != null) {
+                fname = fileInfo + ":";
+            }
 
-            let entry = prs.getLineAt(data, pos);
+            let entry = prs.getLineAt(sourceInfo[1], offset);
             let nFrame = this.stackTrace.length - i;
-            let prefix = "#(" + nFrame + ") ";
+            let prefix = "#(" + fname + nFrame + ") ";
             ret += prefix + entry[0] + "\n";
             ret += (Array(prefix.length+2).join(' ')) +  Array(entry[1]).join(".") + "^\n";
         }
@@ -233,7 +251,7 @@ function _evalClosure(funcVal, frame, args) {
     let funcFrame = new Frame(frame);
 
     if (args.length > functionDef.params.length) {
-        throw new RuntimeException("function takes " + functionDef.params.length + " params, but " + args.length + " were given", funcVal.startOffset);
+        throw new RuntimeException("function takes " + functionDef.params.length + " params, but " + args.length + " were given", [funcVal.startOffset, funcVal.currentSourceInfo]);
     }
 
     // define all provided parameters in the new function frmae
@@ -250,7 +268,7 @@ function _evalClosure(funcVal, frame, args) {
 
         let defaultParamValue = funcVal.defaultParamValues[i];
         if (defaultParamValue == null) {
-            throw new RuntimeException(" no value for parameter " + paramDef[0], funcVal.startOffset);
+            throw new RuntimeException(" no value for parameter " + paramDef[0], [funcVal.startOffset, funcVal.currentSourceInfo]);
         }
         funcFrame.defineVar(paramDef[0][0], defaultParamValue);
     }
@@ -265,7 +283,7 @@ function _evalClosure(funcVal, frame, args) {
         return VALUE_NONE
     } catch(er) {
         if (er instanceof RuntimeException) {
-            er.addToStack(functionDef.startOffset);
+            er.addToStack([functionDef.startOffset, functionDef.currentSourceInfo]);
         }
         throw er;
     }
@@ -600,6 +618,7 @@ function showList(lst, dsp = null) {
 class AstBase {
     constructor(startOffset) {
         this.startOffset = startOffset;
+        this.currentSourceInfo = currentSourceInfo;
     }
 }
 
@@ -746,7 +765,7 @@ class AstBinaryExpression extends AstBase {
         } catch(er) {
             if (er instanceof RuntimeException && er.firstChance) {
                 er.firstChance = false;
-                er.addToStack(this.startOffset);
+                er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
             throw er;
         }
@@ -805,7 +824,8 @@ class AstUnaryExpression extends AstBase {
         } catch(er) {
             if (er instanceof RuntimeException && er.firstChance) {
                 er.firstChance = false;
-                er.addToStack(this.startOffset);
+                er.currentSourceInfo = this.currentSourceInfo;
+                er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
             throw er;
         }
@@ -1267,7 +1287,7 @@ class AstFunctionCall extends AstBase {
             return this._evalFunc(funcVal, frame);
         } catch(er) {
             if (er instanceof RuntimeException) {
-                er.addToStack(this.startOffset);
+                er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
             throw er;
         }
@@ -1340,6 +1360,7 @@ if (typeof(module) == 'object') {
         makeFunctionCall,
         eval,
         setLogHook,
+        setCurrentSourceInfo,
         rtValueToJsVal,
     }
 }

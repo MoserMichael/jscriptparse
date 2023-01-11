@@ -196,13 +196,39 @@ status: 0 output: !hello world!
     e = cmul(c, d)
     println("complex product: {cshow(e)}")`,"complex product: -7+i22\n"
  ),
-/*
     new TestCase(`
     use "throwfromuse.p"
     
     countdownAndError(5)
-    `, ``),
-*/
+    `,
+        `Error: Can't divide by zero
+#(throwfromuse.p:13)     return 42 / 0
+                      .............^
+#(throwfromuse.p:12) def countdownAndError(n) {
+                      ^
+#(throwfromuse.p:11)         return countdownAndError(n-1)
+                      ..............^
+#(throwfromuse.p:10) def countdownAndError(n) {
+                      ^
+#(throwfromuse.p:9)         return countdownAndError(n-1)
+                     ..............^
+#(throwfromuse.p:8) def countdownAndError(n) {
+                     ^
+#(throwfromuse.p:7)         return countdownAndError(n-1)
+                     ..............^
+#(throwfromuse.p:6) def countdownAndError(n) {
+                     ^
+#(throwfromuse.p:5)         return countdownAndError(n-1)
+                     ..............^
+#(throwfromuse.p:4) def countdownAndError(n) {
+                     ^
+#(throwfromuse.p:3)         return countdownAndError(n-1)
+                     ..............^
+#(throwfromuse.p:2) def countdownAndError(n) {
+                     ^
+#(1)     countdownAndError(5)
+      ...^
+`, false),
 
 ];
 

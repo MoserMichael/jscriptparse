@@ -163,13 +163,13 @@ product: 6 sum product of squares: 13
 
     new TestCase(`    
     dct = { "persons": { "id": "323412343123", "name": "Michael", "surname": "Moser", "age": 52 }, "stuff": [3, 2, 1] }
-    js = variable2json( dct )
+    js = toJsonString( dct )
     println( "json: {js}" )
     
-    vl = json2variable(js)
+    vl = parseJsonString(js)
     vl['persons']['id'] = 123
     vl['persons']['age'] = 22
-    js = variable2json(vl)
+    js = toJsonString(vl)
     println( "json: {js}" )
        
 `,
@@ -188,6 +188,14 @@ json: {"persons":{"id":123,"name":"Michael","surname":"Moser","age":22},"stuff":
 `, `status: 0 output: hello world
 status: 0 output: !hello world!
 `),
+    new TestCase(`
+    use "testuse.p"
+    
+    c = newComplex(2,3)
+    d = newComplex(4,5)
+    e = cmul(c, d)
+    println("complex product: {cshow(e)}")`,"complex product: -7+i22\n")
+
 ];
 
 let evalPrintMsg = "";
@@ -197,9 +205,6 @@ function logHook(msg) {
 }
 
 function testParser() {
-
-    let parser = scr.makeParser();
-    let showAst = false;
 
     let i = 0;
     let failures = 0;
@@ -214,7 +219,7 @@ function testParser() {
         evalPrintMsg = "";
         rt.setLogHook(logHook);
 
-        let result = scr.runParserAndEval(parser, prog.sourceCode, showAst);
+        let result = scr.runParserAndEval(prog.sourceCode, prog.sourceCode, false);
 
         console.log("--\n" + evalPrintMsg + "\n--");
 

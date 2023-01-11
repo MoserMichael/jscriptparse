@@ -1,4 +1,5 @@
 const path=require("node:path");
+const fs=require("fs");
 const cp=require("node:child_process");
 const prs=require(path.join(__dirname,"prs.js"));
 //const {TYPE_STR} = require("./rt");
@@ -17,8 +18,10 @@ TYPE_MAP=4
 TYPE_NONE=5
 TYPE_CLOSURE=6
 TYPE_BUILTIN_FUNCTION=7
+
 TYPE_FORCE_RETURN=8
 TYPE_FORCE_BREAK=9
+
 
 mapTypeToName = {
     0 : "Boolean",
@@ -482,11 +485,7 @@ RTLIB={
     }),
 
     // functions for working with json
-    "variable2json": new BuiltinFunctionValue(1,function(arg, frame) {
-        let jsVal = rtValueToJsVal(arg[0]);
-        return new Value(TYPE_STR, JSON.stringify(jsVal));
-    }),
-    "json2variable": new BuiltinFunctionValue(1,function(arg, frame) {
+    "parseJsonString": new BuiltinFunctionValue(1,function(arg, frame) {
         if(arg[0].type != TYPE_STR) {
             throw new RuntimeException("first argument: string argument required. is: " + mapTypeToName[arg[0].type]);
         }
@@ -494,6 +493,10 @@ RTLIB={
         let rt = jsValueToRtVal(val);
         console.log(JSON.stringify(rt));
         return rt;
+    }),
+    "toJsonString": new BuiltinFunctionValue(1,function(arg, frame) {
+        let jsVal = rtValueToJsVal(arg[0]);
+        return new Value(TYPE_STR, JSON.stringify(jsVal));
     }),
 
     // functions for working with processes
@@ -1119,6 +1122,28 @@ function makeReturnStmt(expr, offset) {
     return new AstReturnStmt(expr, offset);
 }
 
+class AstUseStatement extends AstBase {
+    constructor(expr, offset, parserFunction) {
+        super(offset);
+        this.expr = expr;
+        this.parserFunction = parserFunction;
+        this.statements = null;
+    }
+
+    eval(frame) {
+        if (this.statements == null) {
+            let fileToInclude = this.expr.eval(frame);
+            this.statements = this.parserFunction(value2Str(fileToInclude), true);
+        }
+        return this.statements.eval(frame);
+    }
+}
+
+function makeUseStmt(parser, expression, offset) {
+    return new AstUseStatement(expression, offset, parser);
+}
+
+
 class AstBreakStmt extends AstBase {
     constructor(expr, offset) {
         super(offset);
@@ -1292,12 +1317,12 @@ if (typeof(module) == 'object') {
         makeIfStmt,
         makeWhileStmt,
         makeReturnStmt,
+        makeUseStmt,
         makeBreakStmt,
         makeFunctionDef,
         makeFunctionCall,
         eval,
-        showList,
         setLogHook,
-        rtValueToJsVal
+        rtValueToJsVal,
     }
 }

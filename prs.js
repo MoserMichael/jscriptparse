@@ -61,6 +61,8 @@ class ParserError extends Error {
     constructor(message, pos, nextException = null) {
         super(message);
         this.pos = pos;
+        this.data = null;
+        this.filePath = null;
 
         this.nextException = null;
         if (nextException != null) {
@@ -127,14 +129,19 @@ function getLineAt(data, pos) {
 }
 
 
-function formatParserError(er, data) {
+function formatParserError(er) {
     if (er instanceof ParserError) {
         er = er.getDeepest();
 
-        let msg = er.message;
+        let msg = "";
         let pos = er.pos;
 
-        let entry = getLineAt(data,pos);
+        if (er.filePath != null) {
+            msg = er.filePath + ": ";
+        }
+
+        msg += er.message;
+        let entry = getLineAt(er.data,pos);
         msg += "\n" + entry[0] + "\n" +  Array(entry[1]).join(".") + "^";
         if (er.nextException != null) {
             msg += "\n";

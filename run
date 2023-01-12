@@ -77,18 +77,30 @@ function runEvalLoop() {
 
         let doComplete = function(line) {
 
-            // get last string
+
+            let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '}' , 'if', 'while', "def" ];
+            let index = -1;
+            for(let i=0; i<sym.length;++i) {
+                let lastIndex = line.lastIndexOf(sym[i]);
+                if (lastIndex > index) {
+                    index = lastIndex + sym[i].length;
+                }
+            }
             let lastToken = "";
-            let tokens = line.split(/[ \t\r\n]/);
-            if (tokens.length > 0) {
-                lastToken = tokens.pop();
+            let prevLine = "";
+            if (index != -1) {
+                lastToken = line.substring(index);
+                prevLine = line.substring(0, index);
+            } else {
+                lastToken = line;
+                index = 0;
             }
 
             let completions = completeKeywords(lastToken);
             let varCompletions = completeVars(lastToken, glob);
             completions = completions.concat(varCompletions);
 
-            return [completions, line];
+            return [completions, prevLine];
         }
 
         let r = repl.start({

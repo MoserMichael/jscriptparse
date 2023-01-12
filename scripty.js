@@ -36,6 +36,7 @@ KEYWORDS = {
     'def': 1,
     'return': 1,
     'break': 1,
+    'continue' : 1,
     'if':   1,
     'else': 1,
     'elif': 1,
@@ -618,6 +619,13 @@ function makeParserImp() {
         }
     );
 
+    let continueStmt = prs.makeTransformer(
+        prs.makeTokenParser("continue"),
+        function (arg) {
+            return rt.makeContinueStmt(arg[1]);
+        }
+    );
+
     let paramDef = prs.makeSequenceParser([
         identifier,
         prs.makeOptParser(
@@ -682,6 +690,7 @@ function makeParserImp() {
         ifStmt,
         whileStmt,
         breakStmt,
+        continueStmt,
         assignment,
         functionDef,
         returnStmt,

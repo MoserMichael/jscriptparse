@@ -32,6 +32,7 @@ TYPE_BUILTIN_FUNCTION=7
 
 TYPE_FORCE_RETURN=8
 TYPE_FORCE_BREAK=9
+TYPE_FORCE_CONTINUE=10
 
 
 mapTypeToName = {
@@ -532,6 +533,13 @@ RTLIB={
         return _system(cmd);
     }),
 
+    // control flow
+    "exit": new BuiltinFunctionValue(1,function(arg, frame) {
+        let num = value2Num(arg[0]);
+        process.exit(num);
+    }),
+
+    // internal functions
     "system#backtick": new BuiltinFunctionValue(1,function(arg, frame) {
 
         let cmd ="";
@@ -636,6 +644,9 @@ class AstStmtList extends AstBase {
             val = stmt.eval(frame);
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
             if (val.type >= TYPE_FORCE_RETURN) {
+                if (val.type == TYPE_FORCE_CONTINUE) {
+                    return VALUE_NONE;
+                }
                 return val;
             }
         }
@@ -1115,7 +1126,9 @@ class AstWhileStmt extends AstBase {
                 if (rt.type == TYPE_FORCE_BREAK) {
                     break;
                 }
-                return rt;
+                if (rt.type == TYPE_FORCE_RETURN) {
+                    return rt;
+                }
             }
         }
         return VALUE_NONE;
@@ -1197,6 +1210,24 @@ class AstBreakStmt extends AstBase {
 
 function makeBreakStmt(offset) {
     return new AstBreakStmt(offset);
+}
+
+class AstContinueStmt extends AstBase {
+    constructor(offset) {
+        super(offset);
+    }
+
+    eval(frame) {
+        return new Value(TYPE_FORCE_CONTINUE, null);
+    }
+
+    show() {
+        return "(continue)";
+    }
+}
+
+function makeContinueStmt(offset) {
+    return new AstContinueStmt(offset);
 }
 
 function _evalDefaultParams(frame, params) {
@@ -1354,6 +1385,7 @@ if (typeof(module) == 'object') {
         makeReturnStmt,
         makeUseStmt,
         makeBreakStmt,
+        makeContinueStmt,
         makeFunctionDef,
         makeFunctionCall,
         eval,

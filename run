@@ -2,6 +2,7 @@
 
 const path=require("node:path");
 const repl=require("node:repl");
+//const repl=require(path.join(__dirname,"repln.js")) //"node:repl");
 const rt=require(path.join(__dirname,"rt.js"));
 const scr=require(path.join(__dirname,"scripty.js"));
 const prs=require(path.join(__dirname,"prs.js"));
@@ -27,7 +28,7 @@ function runEvalLoop() {
                 evalPrintMsg += msg;
             }
 
-            rt.setLogHook(logHook);
+            //rt.setLogHook(logHook);
 
             try {
                 let res = scr.runParserAndEval(data, false, glob, true);
@@ -55,7 +56,10 @@ function runEvalLoop() {
             callback(null,evalPrintMsg);
         }
 
-        repl.start({ prompt: "> ", eval: evalIn, writer: doWrite });
+        let r = repl.start({ prompt: "> ", eval: evalIn, writer: doWrite });
+        r.on('SIGINT', function onSigInt() {
+            process.exit(0);
+        });
     }
     runEvalImp();
 }

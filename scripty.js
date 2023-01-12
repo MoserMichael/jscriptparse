@@ -775,9 +775,12 @@ function runParse(data, openFile) {
         return rVal;
     } catch(er) {
         if (er instanceof prs.ParserError) {
+            //console.log(JSON.stringify(er));
             let origError = er.getDeepest();
             if (origError.data == null) {
-                origError.filePath = path.parse(filePath).base;
+                if (filePath != null) {
+                    origError.filePath = path.parse(filePath).base;
+                }
                 origError.data = data;
             }
         }
@@ -786,7 +789,7 @@ function runParse(data, openFile) {
 
 }
 
-function runParserAndEval(data, openFile,  frame = null) {
+function runParserAndEval(data, openFile,  frame = null, passException = false) {
 
     try {
         let result = runParse(data, openFile);
@@ -802,7 +805,11 @@ function runParserAndEval(data, openFile,  frame = null) {
         if (er instanceof rt.RuntimeException) {
             er.showStackTrace();
         } else {
-            console.log(prs.formatParserError(er, data));
+            if (!passException) {
+                console.log(prs.formatParserError(er, data));
+            } else {
+                throw er;
+            }
         }
     }
     return null;

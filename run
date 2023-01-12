@@ -4,7 +4,12 @@ const path=require("node:path");
 const repl=require("node:repl");
 const rt=require(path.join(__dirname,"rt.js"));
 const scr=require(path.join(__dirname,"scripty.js"));
+const prs=require(path.join(__dirname,"prs.js"));
 
+function skipSpace(data, pos) {
+    for(;pos < data.length && prs.isSpace(data.charAt(pos));++pos);
+    return pos;
+}
 
 function runEvalLoop() {
 
@@ -25,7 +30,7 @@ function runEvalLoop() {
             rt.setLogHook(logHook);
 
             try {
-                let res = scr.runParserAndEval(data, false, glob);
+                let res = scr.runParserAndEval(data, false, glob, true);
 
                 try {
                     if (res != 0) {
@@ -36,7 +41,16 @@ function runEvalLoop() {
                 }
 
             } catch(e) {
-                return callback(e, new repl.Recoverable(e));
+                if (e instanceof prs.ParserError) {
+                    e = e.getDeepest();
+                    //console.log(JSON.stringify(e));
+                    e.pos = skipSpace(data, e.pos);
+
+                    if (e.pos >= data.length) {
+                        return callback(new repl.Recoverable(e));
+                    }
+                    callback(null,prs.formatParserError(e, data));
+                }
             }
             callback(null,evalPrintMsg);
         }

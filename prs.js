@@ -117,6 +117,14 @@ function makeError(message, state, nested = null) {
 }
 
 function getLineAt(data, pos) {
+
+    if (pos >= data.length) {
+        pos = data.length - 1;
+    }
+
+    // skip back whitespaces.
+    for(;pos>0 && isSpace(data.charAt(pos));--pos);
+
     let start = pos;
     for(;start>=0 && data.charAt(start) != '\n'; --start);
     start += 1;
@@ -407,10 +415,10 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
                     result.push(state.result);
                 }
             } catch(er) {
-                if (er.pos == state.pos) {
+                if (er.pos == state.pos || i == 0) {
                     er = null; // do not propagate inner error if no input has been consumed.
                 }
-                makeError("Parsing error in " + name + " at term " + i, state, er);
+                makeError("Parsing error in " + title + " at term " + i, state, er);
             }
         }
 
@@ -493,7 +501,11 @@ const makeConsumeAll = function(nestedParser) {
         let res = nestedParser(state);
         skipWhitespace(res);
         if (res.pos < state.data.length) {
-            makeError("error at:",res);
+            if (state.lastError == null) {
+                makeError("error at:", res);
+            } else {
+                throw state.lastError;
+            }
         }
         return res;
     }
@@ -557,6 +569,7 @@ if (typeof(module) == 'object') {
         setTrace,
         setKeepLocationWithToken,
         ParserError,
-        getLineAt
+        getLineAt,
+        isSpace
     }
 }

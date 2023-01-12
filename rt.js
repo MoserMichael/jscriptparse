@@ -539,6 +539,11 @@ RTLIB={
         process.exit(num);
     }),
 
+    // other functions
+    "type": new BuiltinFunctionValue(1,function(arg, frame) {
+        return new Value(TYPE_STR, mapTypeToName[ arg[0].type ]);
+    }),
+
     // internal functions
     "system#backtick": new BuiltinFunctionValue(1,function(arg, frame) {
 
@@ -686,6 +691,11 @@ function makeConstValue(type, value) {
 }
 
 
+function checkMixedType(op, lhs, rhs) {
+    if (lhs.type != rhs.type) {
+        throw new RuntimeException(op + " not allowed between " + mapTypeToName[rhs.type] + " and " + mapTypeToName[lhs.type])
+    }
+}
 
 MAP_OP_TO_FUNC={
     "and" : function(lhs,rhs) {
@@ -695,21 +705,27 @@ MAP_OP_TO_FUNC={
         return new Value(TYPE_BOOL, value2Bool(lhs) || value2Bool(rhs));
     },
     "<" : function(lhs,rhs) {
-        return new Value(TYPE_BOOL, lhs.val < rhs.val);
+        checkMixedType("<", lhs, rhs);
+        return new Value(TYPE_BOOL, lhs.val < rhs.val); // javascript takes care of it, does it?
     },
     ">" : function(lhs,rhs) {
+        checkMixedType(">", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val > rhs.val);
     },
     "<=" : function(lhs,rhs) {
+        checkMixedType("<=", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val <= rhs.val);
     },
     ">=" : function(lhs,rhs) {
+        checkMixedType(">=", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val >= rhs.val);
     },
     "==" : function(lhs,rhs) {
+        checkMixedType("==", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val == rhs.val);
     },
     "!=" : function(lhs,rhs) {
+        checkMixedType("!=", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val != rhs.val);
     },
     "+" : function(lhs,rhs) {

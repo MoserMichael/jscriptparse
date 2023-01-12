@@ -379,14 +379,14 @@ function makeParserImp() {
 
     let primaryExpr = prs.makeAlternativeParser(
         [
+            trueConst,
+            falseConst,
+            noneConst,
             functionCall,
             identifierWithOptIndex,
             signedNumber,
             stringConst,
             formatStringConst,
-            trueConst,
-            falseConst,
-            noneConst,
             nestedExpr,
             listExpr,
             dictExpr,

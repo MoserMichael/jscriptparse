@@ -1182,14 +1182,12 @@ function makeUseStmt(parser, expression, offset) {
 
 
 class AstBreakStmt extends AstBase {
-    constructor(expr, offset) {
+    constructor(offset) {
         super(offset);
-        this.expr = expr;
     }
 
     eval(frame) {
-        let retValue = this.expr.eval(frame);
-        return new Value(TYPE_FORCE_BREAK, retValue);
+        return new Value(TYPE_FORCE_BREAK, null);
     }
 
     show() {

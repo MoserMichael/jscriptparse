@@ -545,7 +545,7 @@ RTLIB={
     }),
 
     // internal functions
-    "system#backtick": new BuiltinFunctionValue(1,function(arg, frame) {
+    "_system_backtick": new BuiltinFunctionValue(1,function(arg, frame) {
 
         let cmd ="";
 
@@ -603,6 +603,26 @@ class Frame {
 
     defineVar(name, value) {
        this.vars[name] = copyPrimitiveVal(value);
+    }
+
+    complete(prefix, resultList) {
+        let keys = Object.keys(this.vars);
+        for(let i=0; i<keys.length; ++i) {
+            let it=keys[i];
+            if (prefix == "" || it.startsWith(prefix)) {
+                let varVal = this.vars[keys[i]];
+                if (varVal.type == TYPE_CLOSURE || varVal.type == TYPE_BUILTIN_FUNCTION) {
+                    if (it.startsWith("_")) {
+                        continue;
+                    }
+                    it += "(";
+                }
+                resultList.push(it);
+            }
+        }
+        if (this.parentFrame != null) {
+            this.parentFrame.complete(prefix, resultList);
+        }
     }
 }
 
@@ -1366,11 +1386,17 @@ function makeFunctionCall(name, expressionList) {
     return new AstFunctionCall(name[0], expr, name[1]);
 }
 
+function makeFrame() {
+    let frame = new Frame();
+    frame.vars = RTLIB;
+    return frame;
+
+}
+
 function eval(stmt, globFrame = null) {
     if (globFrame == null) {
-        globFrame = new Frame();
+        globFrame = makeFrame();
     }
-    globFrame.vars = RTLIB;
 
     return stmt.eval(globFrame)
 }
@@ -1404,6 +1430,7 @@ if (typeof(module) == 'object') {
         makeContinueStmt,
         makeFunctionDef,
         makeFunctionCall,
+        makeFrame,
         eval,
         setLogHook,
         setCurrentSourceInfo,

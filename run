@@ -12,11 +12,30 @@ function skipSpace(data, pos) {
     return pos;
 }
 
+function completeKeywords(prefix) {
+    let keywords = Object.keys(scr.KEYWORDS);
+    let result = []
+    for(let i=0; i<keywords.length; ++i) {
+        let kw = keywords[i];
+        if (prefix=="" || kw.startsWith(prefix)) {
+            result.push(kw);
+        }
+    }
+    result.sort();
+    return result;
+}
+
+function completeVars(lastToken, frame) {
+    let res = [];
+    frame.complete(lastToken, res);
+    return res.sort();
+}
+
 function runEvalLoop() {
 
     let runEvalImp = function() {
 
-        let glob = new rt.Frame();
+        let glob = new rt.makeFrame();
 
         let doWrite = function(arg) { return arg };
 
@@ -56,7 +75,28 @@ function runEvalLoop() {
             callback(null,evalPrintMsg);
         }
 
-        let r = repl.start({ prompt: "> ", eval: evalIn, writer: doWrite });
+        let doComplete = function(line) {
+
+            // get last string
+            let lastToken = "";
+            let tokens = line.split(/[ \t\r\n]/);
+            if (tokens.length > 0) {
+                lastToken = tokens.pop();
+            }
+
+            let completions = completeKeywords(lastToken);
+            let varCompletions = completeVars(lastToken, glob);
+            completions = completions.concat(varCompletions);
+
+            return [completions, line];
+        }
+
+        let r = repl.start({
+            prompt: "> ",
+            eval: evalIn,
+            writer: doWrite,
+            completer: doComplete
+        });
         r.on('SIGINT', function onSigInt() {
             process.exit(0);
         });

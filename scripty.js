@@ -324,7 +324,7 @@ function makeParserImp() {
                 }
             }
 
-            let funcTok = ["system#backtick", arg[0].startOffset];
+            let funcTok = ["_system_backtick", arg[0].startOffset];
 
             let a = [];
             a[0] = argExpr;
@@ -827,6 +827,7 @@ function runParserAndEval(data, openFile,  frame = null, passException = false) 
 if (typeof(module) == 'object') {
     module.exports = {
         runParserAndEval,
+        KEYWORDS,
     }
 }
 

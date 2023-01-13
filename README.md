@@ -2,9 +2,6 @@
 
 A module to build parser combinators ```prs.js``` - the resulting parser is a top-down parser, also known a parsing expression parser [PEG](https://en.wikipedia.org/wiki/Parsing_expression_grammar)
 
-To run the tests: ```node test.js```
-
-
 ## pyx scripting language
 
 ![pux](pux.jpg) - the pyx scripting langauge and REPL shell.

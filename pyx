@@ -19,6 +19,7 @@ function completeKeywords(prefix) {
         let kw = keywords[i];
         if (prefix=="" || kw.startsWith(prefix)) {
             result.push(kw);
+            //result.push(kw.substring(prefix.length));
         }
     }
     result.sort();
@@ -77,30 +78,41 @@ function runEvalLoop() {
 
         let doComplete = function(line) {
 
-
             let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '}' , 'if', 'while', "def" ];
             let index = -1;
             for(let i=0; i<sym.length;++i) {
-                let lastIndex = line.lastIndexOf(sym[i]);
-                if (lastIndex > index) {
-                    index = lastIndex + sym[i].length;
+                let lastIndex = line.lastIndexOf(sym[i]) ;
+                if (lastIndex != -1) {
+                    lastIndex += sym[i].length;
+
+                    if (lastIndex > index) {
+                        index = lastIndex;
+                    }
                 }
             }
             let lastToken = "";
-            let prevLine = "";
+            //let prevLine = "";
             if (index != -1) {
                 lastToken = line.substring(index);
-                prevLine = line.substring(0, index);
+                //prevLine = line.substring(0, index);
             } else {
                 lastToken = line;
+                //prevLine=line;
                 index = 0;
             }
 
+            lastToken = lastToken.trim();
             let completions = completeKeywords(lastToken);
             let varCompletions = completeVars(lastToken, glob);
             completions = completions.concat(varCompletions);
 
-            return [completions, prevLine];
+            if (completions.length == 1) {
+                completions[0] = completions[0].substring(lastToken.length);
+            }
+
+            //console.log(">" + prevLine + "<");
+
+            return [completions,""]
         }
 
         let r = repl.start({

@@ -98,6 +98,7 @@ function value2Num(val) {
     throw new RuntimeException("can't convert " + mapTypeToName[val.type.toString]);
 }
 
+
 function value2Str(val) {
     if (val.type == TYPE_STR) {
         return val.val;
@@ -351,6 +352,20 @@ RTLIB={
     }),
 
     // Numeric functions
+    "int": new BuiltinFunctionValue(2, function(arg) {
+        if (arg[0].type != TYPE_STR) {
+            throw new RuntimeException("first argument must be a string, is " + mapTypeToName[val.type.toString]);
+        }
+        if (arg[1].type != TYPE_NUM) {
+            throw new RuntimeException("second argument must be a number, is " + mapTypeToName[val.type.toString]);
+        }
+        let res = parseInt(arg[0].val, arg[1].val);
+
+        if (res == null) {
+            throw new RuntimeException("Can't convert " + arg[0].val + " to integer with base " + parseInt(arg[1].val));
+        }
+        return new Value(TYPE_NUM, res);
+    }, [0, new Value(TYPE_NUM, 10)]),
     "max" : new BuiltinFunctionValue(2, function(arg) {
         let num = value2Num(arg[0]);
         let num2 = value2Num(arg[1]);
@@ -414,6 +429,7 @@ RTLIB={
         let msg = value2Str(arg[0]);
         doLogHook(msg + "\n")
     }),
+
 
     // function for arrays
     "len" : new BuiltinFunctionValue(1, function(arg) {
@@ -510,7 +526,6 @@ RTLIB={
         }
         let val = JSON.parse(arg[0].val);
         let rt = jsValueToRtVal(val);
-        console.log(JSON.stringify(rt));
         return rt;
     }),
     "toJsonString": new BuiltinFunctionValue(1,function(arg, frame) {
@@ -618,6 +633,7 @@ class Frame {
                     it += "(";
                 }
                 resultList.push(it);
+                //resultList.push(it.substring(prefix.length));
             }
         }
         if (this.parentFrame != null) {

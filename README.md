@@ -9,7 +9,7 @@ See the [generated documentation](https://mosermichael.github.io/jscriptparse/ou
 
 ![pux](pux.jpg) - the pyx scripting langauge and REPL shell.
 
-The programming language is named after Winnie the Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
+The programming language is named after Winnie-the-Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
 
 The scripting language and interpreter for the pyx language.  (see this [design document](PUX.md)
 

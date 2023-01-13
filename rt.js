@@ -555,6 +555,20 @@ RTLIB={
     }),
 
     // other functions
+    "exists": new BuiltinFunctionValue(2,function(arg, frame) {
+        if (arg[1].type == TYPE_MAP) {
+           // check if map has first argument as key
+           let key = value2Str(arg[0]);
+           return new Value(TYPE_BOOL, key in arg[1].val);
+        }
+        if (arg[1].type == TYPE_LIST) {
+            return new Value(TYPE_BOOL, arg[1].val.some( function(a) {
+                return arg[0].type == a.type && arg[0].val == a.val;
+            }));
+        }
+        throw new RuntimeException("second argument must be list or map, is: " + + mapTypeToName[arg[1].type]);
+    }),
+
     "type": new BuiltinFunctionValue(1,function(arg, frame) {
         return new Value(TYPE_STR, mapTypeToName[ arg[0].type ]);
     }),

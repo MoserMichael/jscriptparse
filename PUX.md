@@ -2,7 +2,7 @@
 
 ![pux](pux.jpg) - the pyx scripting langauge and REPL shell.
 
-The programming language is named after Winnie the Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
+The programming language is named after Winnie-the-Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
 
 - the language is not typed, simple language - supposed to be used in a REPL/shell
 

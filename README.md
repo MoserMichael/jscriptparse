@@ -11,6 +11,8 @@ To run the tests: ```node test.js```
 
 The scripting language and interpreter for the pyx language. 
 
+- the interpreter/repl script is [here](https://github.com/MoserMichael/jscriptparse/blob/main/pyx) - you need to have node installed for this.
+- Example tests scripts are [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) - see files with extension .p (.out - expected output of the script)
 - The parser/syntax tree is built [here](https://github.com/MoserMichael/jscriptparse/blob/main/scripty.js) the runtime for the interpeter is [here](https://github.com/MoserMichael/jscriptparse/blob/main/rt.js) 
 
 (don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress)

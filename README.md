@@ -11,7 +11,6 @@ See the [generated documentation](https://mosermichael.github.io/jscriptparse/ou
 
 The programming language is named after Winnie the Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
 
-
 The scripting language and interpreter for the pyx language.  (see this [design document](PUX.md)
 
 - the interpreter/repl script is [here](https://github.com/MoserMichael/jscriptparse/blob/main/pyx) - you need to have node installed for this.
@@ -20,10 +19,6 @@ The scripting language and interpreter for the pyx language.  (see this [design 
 
 (don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress)
  
-## Documentation of the module
-
-See the [generated documentation](https://mosermichael.github.io/jscriptparse/out/index.html)
-
 ## what I learned while writing this project
 
 i am learning about interpreted languages (such as python, php, javascript, perl, etc...) 

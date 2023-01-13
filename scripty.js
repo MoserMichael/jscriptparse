@@ -1,27 +1,5 @@
 
 
-// features of the scripting language (supposed to be used in a shell)
-//
-// runtime: ast interpreter
-//
-// go - like syntax (in the sense of: less frequent braces, but without strong typing)
-// types
-//   strings, floating point numbers - yes
-//   lists - yes
-//   maps - yes
-//   objects - as syntax sugar for maps - NO
-//   type hints - NO
-//   f-strings - yes
-// functions
-//  closures - YES
-//  named parameters - NO
-//  parameters with default values - yes
-//  multiple return values, multiple assignment - as list (similar to python) - yes
-// yield / generators / with statement - maybe later....
-//
-// modules/packages - no
-// try/catch - maybe later
-
 
 const path=require("node:path");
 const prs=require(path.join(__dirname,"prs.js"));

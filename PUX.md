@@ -31,3 +31,4 @@ The programming language is named after Winnie the Pooh, in the Russian translat
  try/catch - maybe later
 ```
 
+Instead of a language definition you currently get these tests scripts [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) - see files with extension .p (.out - expected output of the script)

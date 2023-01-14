@@ -489,6 +489,7 @@ RTLIB={
     "random" : new BuiltinFunctionValue(0, function(arg) {
         return new Value(TYPE_NUM, Math.random());
     }),
+
     // Input and output functions
     "print" : new BuiltinFunctionValue(1, function(arg) {
         let msg = value2Str(arg[0]);
@@ -501,7 +502,7 @@ RTLIB={
 
     // function for arrays
     "len" : new BuiltinFunctionValue(1, function(arg) {
-        if (arg[0].type == TYPE_STR && arg[0].type == TYPE_LIST) {
+        if (arg[0].type == TYPE_STR || arg[0].type == TYPE_LIST) {
             return new Value(TYPE_NUM, arg[0].val.length);
         }
         throw new RuntimeException("string or list argument required");

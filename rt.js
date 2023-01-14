@@ -588,6 +588,21 @@ RTLIB={
         }
         throw new RuntimeException("map argument required");
     }),
+    "sort": new BuiltinFunctionValue(1, function(arg) {
+        if (arg[0].type == TYPE_LIST) {
+            let rt = arg[0].val.sort(function(a, b) {
+                if (a.val < b.val) {
+                    return -1;
+                }
+                if (a.val > b.val) {
+                    return ;
+                }
+                return 0;
+            })
+            return new Value(TYPE_LIST, rt);
+        }
+        throw new RuntimeException("list argument required");
+    }),
 
     // functions for working with json
     "parseJsonString": new BuiltinFunctionValue(1,function(arg, frame) {

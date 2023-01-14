@@ -502,7 +502,7 @@ RTLIB={
     }),
     "pow" : new BuiltinFunctionValue(2, function(arg) {
         let pow = value2Num(arg[0]);
-        let exp = value2Num(arg[0]);
+        let exp = value2Num(arg[1]);
         return new Value(TYPE_NUM, Math.pow(pow,exp));
     }),
     "random" : new BuiltinFunctionValue(0, function(arg) {

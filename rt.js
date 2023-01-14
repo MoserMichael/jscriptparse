@@ -1756,8 +1756,18 @@ class AstFunctionCall extends AstBase {
     eval(frame) {
         let funcVal = this._getFuncVal(frame);
         try {
-            let args = this._evalCallArguments(frame);
-            return evalClosure(funcVal, args, frame);
+            if (!funcVal.hasYield(frame)) {
+                let args = this._evalCallArguments(frame);
+                return evalClosure(funcVal, args, frame);
+            } else {
+                let ret = [];
+
+                let args = this._evalCallArguments(frame);
+                for (let val of genEvalClosure(funcVal, args, frame)) {
+                    ret.push(val);
+                }
+                return new Value(TYPE_LIST, ret);
+            }
         } catch (er) {
             if (er instanceof RuntimeException) {
                 er.addToStack([this.startOffset, this.currentSourceInfo]);

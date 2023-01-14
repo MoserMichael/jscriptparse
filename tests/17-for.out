@@ -1,0 +1,18 @@
+loop over rangeof numbers
+1
+2
+3
+4
+5
+6
+7
+8
+9
+loop over dictionary entries
+key: name value: kermit
+key: surname value: frog
+key: profession value: tv producer
+loop over list entries
+3
+2
+1

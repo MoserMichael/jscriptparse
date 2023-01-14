@@ -25,8 +25,9 @@ The programming language is named after Winnie-the-Pooh, in the Russian translat
   named parameters - NO
   parameters with default values - yes
   multiple return values, multiple assignment - as list (similar to python) - yes
- yield / generators / with statement - maybe later....
-
+ yield / generators - yes
+ with statement - later
+ iterators - no (generators are good enough, less features)
  modules/packages - no
  try/catch - maybe later
 ```

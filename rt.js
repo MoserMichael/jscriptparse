@@ -31,8 +31,9 @@ TYPE_CLOSURE=6
 TYPE_BUILTIN_FUNCTION=7
 
 TYPE_FORCE_RETURN=8
-TYPE_FORCE_BREAK=9
-TYPE_FORCE_CONTINUE=10
+TYPE_FORCE_YIELD=9
+TYPE_FORCE_BREAK=10
+TYPE_FORCE_CONTINUE=11
 
 
 mapTypeToName = {
@@ -55,15 +56,29 @@ class ClosureValue {
         this.functionDef = functionDef;
         this.defaultParamValues = defaultParamValues; // default params are set when function/closure is evaluated.
         this.frame = frame;
+        this.hasYield_ = null;
     }
+    hasYield() {
+        if (this.hasYield_ == null) {
+            this.hasYield_ = this.functionDef.hasYield();
+        }
+        return this.hasYield_;
+    }
+
+
 }
 
 class BuiltinFunctionValue {
-    constructor(numParams, funcImpl, defaultParamValues = []) {
+    constructor(numParams, funcImpl, defaultParamValues = [], hasYield = false) {
         this.type = TYPE_BUILTIN_FUNCTION;
         this.numParams = numParams;
         this.funcImpl = funcImpl;
         this.defaultParamValues = defaultParamValues;
+        this.hasYield_ = hasYield;
+    }
+
+    hasYield() {
+        return this.hasYield_;
     }
 }
 
@@ -217,26 +232,67 @@ function copyPrimitiveVal(val) {
     return val;
 }
 
-function evalClosure(funcVal, args, frame) {
+function* genEvalClosure(funcVal, args, frame) {
     if (funcVal.type == TYPE_CLOSURE) {
-        if (funcVal.frame != null) {
-            return _evalClosure(funcVal, funcVal.frame, args);
+        let funcFrame = null;
+        if (funcVal.frame != null) { // closure with captured variables
+            funcFrame = _prepareClosureFrame(funcVal, funcVal.frame, args);
+        } else {
+            funcFrame = _prepareClosureFrame(funcVal, frame, args);
         }
-        return _evalClosure(funcVal, frame, args);
+
+        try {
+            // frame is ready, evaluate the statement list
+            yield* funcVal.functionDef.body.eval(funcFrame);
+
+        } catch(er) {
+            if (er instanceof RuntimeException) {
+                er.addToStack([functionDef.startOffset, functionDef.currentSourceInfo]);
+            }
+            throw er;
+        }
     }
-    return _evalBuiltinFunc(funcVal, frame, args);
+
+    // builtin functions
+    _prepareBuiltinFuncArgs(funcVal, frame, args);
+
+    // function call
+    if (funcVal.numParams != args.length) {
+        throw new RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
+            "  parameters are passed in call");
+    }
+    yield* funcVal.funcImpl(args);
 }
 
-function _evalBuiltinFunc(funcVal, frame, args) {
-    if (funcVal.defaultParamValues != null) {
-        // try to add omitted params with default values;
-        if (args.length < funcVal.defaultParamValues.length) {
-            for(let i = args.length;i<funcVal.defaultParamValues.length;++i) {
-                args.push( funcVal.defaultParamValues[i] );
+function evalClosure(funcVal, args, frame) {
+    if (funcVal.type == TYPE_CLOSURE) {
+        let funcFrame = null;
+        if (funcVal.frame != null) { // closure with captured variables
+            funcFrame = _prepareClosureFrame(funcVal, funcVal.frame, args);
+        } else {
+            funcFrame = _prepareClosureFrame(funcVal, frame, args);
+        }
+
+        try {
+            // frame is ready, evaluate the statement list
+            let rVal = funcVal.functionDef.body.eval(funcFrame);
+
+            if (rVal.type == TYPE_FORCE_RETURN) {
+                return rVal.val;
             }
+            return VALUE_NONE
+        } catch(er) {
+            if (er instanceof RuntimeException) {
+                er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
+            }
+            throw er;
         }
     }
 
+    // builtin functions
+    _prepareBuiltinFuncArgs(funcVal, frame, args);
+
+    // function call
     if (funcVal.numParams != args.length) {
         throw new RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
             "  parameters are passed in call");
@@ -248,7 +304,19 @@ function _evalBuiltinFunc(funcVal, frame, args) {
     return retVal;
 }
 
-function _evalClosure(funcVal, frame, args) {
+function _prepareBuiltinFuncArgs(funcVal, frame, args) {
+    if (funcVal.defaultParamValues != null) {
+        // try to add omitted params with default values;
+        if (args.length < funcVal.defaultParamValues.length) {
+            for (let i = args.length; i < funcVal.defaultParamValues.length; ++i) {
+                args.push(funcVal.defaultParamValues[i]);
+            }
+        }
+    }
+}
+
+
+function _prepareClosureFrame(funcVal, frame, args) {
     let functionDef = funcVal.functionDef;
     let funcFrame = new Frame(frame);
 
@@ -274,21 +342,8 @@ function _evalClosure(funcVal, frame, args) {
         }
         funcFrame.defineVar(paramDef[0][0], defaultParamValue);
     }
+    return funcFrame;
 
-    try {
-        // frame is ready, evaluate the statement list
-        let rVal = functionDef.body.eval(funcFrame);
-
-        if (rVal.type == TYPE_FORCE_RETURN) {
-            return rVal.val;
-        }
-        return VALUE_NONE
-    } catch(er) {
-        if (er instanceof RuntimeException) {
-            er.addToStack([functionDef.startOffset, functionDef.currentSourceInfo]);
-        }
-        throw er;
-    }
 }
 
 function _system(cmd) {
@@ -303,6 +358,20 @@ function _system(cmd) {
     return new Value(TYPE_LIST, val);
 }
 
+function * genValues(val) {
+    if (val.type == TYPE_LIST) {
+        for(let i=0; i <val.val.length; ++i) {
+            yield val.val[i];
+        }
+    }
+    if (val.type == TYPE_MAP) {
+        for (let keyVal of Object.entries(val.val)) {
+            let yval = [ new Value(TYPE_STR, keyVal[0]), keyVal[1] ];
+            yield new Value(TYPE_LIST, yval);
+        }
+    }
+}
+
 // the runtime library is defined here
 RTLIB={
 
@@ -311,10 +380,10 @@ RTLIB={
         let hay = value2Str(arg[0]);
         let needle = value2Str(arg[1]);
         let index = 0;
+
         if (arg[2] != null) {
             index = parseInt(value2Num(arg[2]));
         }
-
         let res = hay.indexOf(needle, index)
         return new Value(TYPE_NUM, res);
     }, [null, null, null]),
@@ -419,7 +488,9 @@ RTLIB={
     "random" : new BuiltinFunctionValue(0, function(arg) {
         return new Value(TYPE_NUM, Math.random());
     }),
-
+    "getpi" : new BuiltinFunctionValue(0, function(arg) {
+        return new Value(TYPE_NUM, 3.1415926535897932384626433832795028842); // 3.141592653589793);
+    }),
     // Input and output functions
     "print" : new BuiltinFunctionValue(1, function(arg) {
         let msg = value2Str(arg[0]);
@@ -429,7 +500,6 @@ RTLIB={
         let msg = value2Str(arg[0]);
         doLogHook(msg + "\n")
     }),
-
 
     // function for arrays
     "len" : new BuiltinFunctionValue(1, function(arg) {
@@ -573,6 +643,20 @@ RTLIB={
         return new Value(TYPE_STR, mapTypeToName[ arg[0].type ]);
     }),
 
+    // generators
+    "range": new BuiltinFunctionValue(3,function *(arg, frame) {
+        let from = value2Num(arg[0]);
+        let to = value2Num(arg[1]);
+        let step = 2;
+        if (arg[2] != null) {
+            step = value2Num(arg[2]);
+        }
+        while(from<to) {
+            yield new Value(TYPE_NUM, from);
+            from+=1;
+        }
+    }, [null, null, null], true),
+
     // internal functions
     "_system_backtick": new BuiltinFunctionValue(1,function(arg, frame) {
 
@@ -682,6 +766,11 @@ class AstBase {
     constructor(startOffset) {
         this.startOffset = startOffset;
         this.currentSourceInfo = currentSourceInfo;
+        this.hasGen = false; // has this statement a generator version? (genEval member function?)
+    }
+
+    hasYield() {
+        return false;
     }
 }
 
@@ -689,6 +778,7 @@ class AstStmtList extends AstBase {
     constructor(statements, offset) {
         super(offset)
         this.statements = statements;
+        this.hasGen = true;
     }
 
     eval(frame) {
@@ -706,6 +796,37 @@ class AstStmtList extends AstBase {
             }
         }
         return val;
+    }
+
+    *genEval(frame) {
+        let val = VALUE_NONE;
+        for (let i = 0; i < this.statements.length; ++i) {
+            let stmt = this.statements[i];
+
+            if (stmt.hasGen) {
+                val = yield* stmt.genEval(frame);
+            } else {
+                val = stmt.eval(frame);
+            }
+
+            //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
+            if (val.type >= TYPE_FORCE_RETURN) {
+                if (val.type == TYPE_FORCE_CONTINUE) {
+                    return VALUE_NONE;
+                }
+                return val;
+            }
+        }
+    }
+
+    hasYield() {
+        for (let i = 0; i < this.statements.length; ++i) {
+            let stmt = this.statements[i];
+            if (stmt.hasYield()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     show() {
@@ -1045,6 +1166,60 @@ function makeIdentifierRef(identifierName, refExpr) {
     return new AstIdentifierRef(identifierName[0], refExpr, identifierName[1]);
 }
 
+function _assignImp(frame, value, lhs) {
+    if (lhs.length == 1 ) {
+        let singleLhs = lhs[0]
+        _assign(frame, singleLhs, value);
+    } else {
+        if (value.type != TYPE_LIST) {
+            throw new RuntimeException("list value expected on right hand side of assignment");
+        }
+        let rhsVal = value.val;
+        if (lhs.length != rhsVal.length) {
+            if (lhs.length < rhsVal.length) {
+                throw new RuntimeException("not enough values to assign");
+            } else {
+                throw new RuntimeException("too many values to assign");
+            }
+        }
+        for(let i=0; i<rhsVal.length; ++i) {
+            _assign(frame, lhs[i], rhsVal[i]);
+        }
+    }
+    return VALUE_NONE;
+}
+
+function _assign(frame, singleLhs, value) {
+    let varName = singleLhs.identifierName;
+    let indexExpr = singleLhs.refExpr;
+
+    if (varName != "_") {
+        if (indexExpr != null) {
+            let lhsValue = frame.lookup(varName);
+            _indexAssign(frame, lhsValue, indexExpr, value)
+        } else {
+            frame.assign(varName, value);
+        }
+    }
+}
+
+function _indexAssign(frame, value, refExpr, newValue) {
+    let i=0;
+    for(; i<refExpr.length; ++i) {
+        if (value.type != TYPE_LIST && value.type != TYPE_MAP) {
+            throw new RuntimeException("Can't index expression of variable " + this.identifierName);
+        }
+        let expr = refExpr[i];
+        let indexValue = expr.eval(frame);
+
+        if (i != (refExpr.length-1)) {
+            value = value.val[indexValue.val];
+        } else {
+            value.val[indexValue.val] = newValue;
+        }
+    }
+}
+
 
 class AstAssign extends AstBase {
     constructor(lhs, rhs, offset) {
@@ -1055,57 +1230,7 @@ class AstAssign extends AstBase {
 
     eval(frame) {
         let value = this.rhs.eval(frame);
-        if (this.lhs.length == 1 ) {
-            let singleLhs = this.lhs[0]
-            this._assign(frame, singleLhs, value);
-        } else {
-            if (value.type != TYPE_LIST) {
-                throw new RuntimeException("list value expected on right hand side of assignment");
-            }
-            let rhsVal = value.val;
-            if (this.lhs.length != rhsVal.length) {
-                if (this.lhs.length < rhsVal.length) {
-                    throw new RuntimeException("not enough values to assign");
-                } else {
-                    throw new RuntimeException("too many values to assign");
-                }
-            }
-            for(let i=0; i<rhsVal.length; ++i) {
-                this._assign(frame, this.lhs[i], rhsVal[i]);
-            }
-        }
-        return VALUE_NONE;
-    }
-
-    _assign(frame, singleLhs, value) {
-        let varName = singleLhs.identifierName;
-        let indexExpr = singleLhs.refExpr;
-
-        if (varName != "_") {
-            if (indexExpr != null) {
-                let lhsValue = frame.lookup(varName);
-                this._indexAssign(frame, lhsValue, indexExpr, value)
-            } else {
-                frame.assign(varName, value);
-            }
-        }
-    }
-
-    _indexAssign(frame, value, refExpr, newValue) {
-        let i=0;
-        for(; i<refExpr.length; ++i) {
-            if (value.type != TYPE_LIST && value.type != TYPE_MAP) {
-                throw new RuntimeException("Can't index expression of variable " + this.identifierName);
-            }
-            let expr = refExpr[i];
-            let indexValue = expr.eval(frame);
-
-            if (i != (refExpr.length-1)) {
-                value = value.val[indexValue.val];
-            } else {
-                value.val[indexValue.val] = newValue;
-            }
-        }
+        return _assignImp(frame, value, this.lhs);
     }
 
     show() {
@@ -1122,6 +1247,7 @@ class AstIfStmt extends AstBase {
         super(offset);
         this.ifClauses = [];
         this.addIfClause(expr, stmtList);
+        this.hasGen = true;
 
         //console.log("else: " + JSON.stringify(elseStmtList));
         this.elseStmtList = null;
@@ -1147,6 +1273,42 @@ class AstIfStmt extends AstBase {
             return this.elseStmtList.eval(frame);
         }
         return VALUE_NONE;
+    }
+
+    *genEval(frame) {
+        for(let i=0; i< this.ifClauses.length; ++i) {
+            let clause = this.ifClauses[i];
+            let val = clause[0].eval(frame);
+            if (value2Bool(val)) {
+                if (clause[i].hasGen) {
+                   return yield* clause[1].eval(frame);
+                } else {
+                    return clause[1].eval(frame);
+                }
+            }
+        }
+        if (this.elseStmtList != null) {
+
+            if (this.elseStmtList.hasGen) {
+                return yield * this.elseStmtList.genEval(frame);
+            } else {
+                return this.elseStmtList.eval(frame);
+            }
+        }
+        return VALUE_NONE;
+    }
+
+    hasYield() {
+        for(let i=0; i< this.ifClauses.length; ++i) {
+            let clause = this.ifClauses[i];
+            if (clause[1].hasYield()) {
+                return true;
+            }
+        }
+        if (this.elseStmtList) {
+            return this.elseStmtList.hasYield();
+        }
+        return false;
     }
 
     show() {
@@ -1176,6 +1338,7 @@ class AstWhileStmt extends AstBase {
         super(offset);
         this.expr = expr;
         this.stmtList = stmtList;
+        this.hasGen = true;
     }
     eval(frame) {
         while(true) {
@@ -1200,6 +1363,41 @@ class AstWhileStmt extends AstBase {
         return VALUE_NONE;
     }
 
+    *genEval(frame) {
+        while(true) {
+            let condVal = this.expr.eval(frame);
+
+            let cond =  value2Bool(condVal);
+
+            if (cond.type == TYPE_BOOL && cond.val == false) {
+                break;
+            }
+
+            let rt = null;
+
+            if (this.stmtList.hasGen) {
+                rt = yield* this.stmtList.genEval(frame);
+            } else {
+                rt = this.stmtList.eval(frame);
+            }
+
+
+            if (rt.type >= TYPE_FORCE_RETURN) {
+                if (rt.type == TYPE_FORCE_BREAK) {
+                    break;
+                }
+                if (rt.type == TYPE_FORCE_RETURN) {
+                    return rt;
+                }
+            }
+        }
+        return VALUE_NONE;
+    }
+
+    hasYield() {
+        return this.stmtList.hasYield();
+    }
+
     show() {
         return "(while " + this.expr.show() + " " + this.stmtList.show() + " )";
      }
@@ -1207,6 +1405,61 @@ class AstWhileStmt extends AstBase {
 
 function makeWhileStmt(expr, stmtList, offset) {
     return new AstWhileStmt(expr, stmtList, offset);
+}
+
+class AstForStmt extends AstBase {
+    constructor(lhs, expr, stmtList, offset) {
+        super(offset);
+        this.lhs = lhs;
+        this.expr = expr;
+        this.stmtList = stmtList;
+    }
+
+    eval(frame) {
+        if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
+            for (let val of this.expr.genEval(frame)) {
+                let rt = this._evalOne(frame, val);
+                if (rt.type >= TYPE_FORCE_RETURN) {
+                    if (rt.type == TYPE_FORCE_BREAK) {
+                        break;
+                    }
+                    if (rt.type == TYPE_FORCE_RETURN) {
+                        return rt;
+                    }
+                }
+            }
+            return VALUE_NONE;
+        }
+
+        let rt = this.expr.eval(frame);
+        if (rt.type != TYPE_LIST && rt.type != TYPE_MAP) {
+            throw new RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
+        }
+        for(let val of genValues(rt)) {
+            let rt = this._evalOne(frame, val);
+            if (rt.type >= TYPE_FORCE_RETURN) {
+                if (rt.type == TYPE_FORCE_BREAK) {
+                    break;
+                }
+                if (rt.type == TYPE_FORCE_RETURN) {
+                    return rt;
+                }
+            }
+        }
+        return VALUE_NONE;
+    }
+
+    _evalOne(frame, val) {
+        _assignImp(frame, val, this.lhs);
+        return this.stmtList.eval(frame);
+    }
+
+    show() {
+        return "(for " + showList(this.lhs)  + " " + this.expr.show() + " " + this.stmtList.show() + " )";
+    }
+}
+function makeForStmt(lhs, expr, stmtList, offset) {
+    return new AstForStmt(lhs, expr, stmtList, offset);
 }
 
 class AstReturnStmt extends AstBase {
@@ -1227,6 +1480,35 @@ class AstReturnStmt extends AstBase {
 
 function makeReturnStmt(expr, offset) {
     return new AstReturnStmt(expr, offset);
+}
+
+class AstYieldStmt extends AstBase {
+    constructor(expr, offset) {
+        super(offset);
+        this.expr = expr;
+        this.hasGen = true;
+    }
+
+    eval(frame) {
+        throw new RuntimeException("yield must be called directly as a generator")
+    }
+
+    *genEval(frame) {
+        let retValue = this.expr.eval(frame);
+        yield new Value(TYPE_FORCE_YIELD, retValue);
+    }
+    hasYield() {
+        return true;
+    }
+
+
+        show() {
+        return "(yield " + this.expr.show() + " )";
+    }
+}
+
+function makeYieldStmt(expr, offset) {
+    return new AstYieldStmt(expr, offset);
 }
 
 class AstUseStatement extends AstBase {
@@ -1319,6 +1601,7 @@ class AstFunctionDef extends AstBase {
         }
         this.params = params;
         this.body = body;
+        this.isGeneratorFunction = false;
     }
 
     eval(frame) {
@@ -1348,6 +1631,10 @@ class AstFunctionDef extends AstBase {
         return ret;
     }
 
+    hasYield() {
+        return this.body.hasYield()
+    }
+
     show() {
         let ret = "(funcDef " + this.name + "("
 
@@ -1374,13 +1661,11 @@ class AstFunctionCall extends AstBase {
     }
 
     eval(frame) {
-        let funcVal = frame.lookup(this.name);
-        if (funcVal == undefined) {
-            throw new RuntimeException("Can't call undefined function " + this.name, this.startOffset);
-        }
+        let funcVal = this._getFuncVal(frame);
         try {
-            return this._evalFunc(funcVal, frame);
-        } catch(er) {
+            let args = this._evalCallArguments(frame);
+            return evalClosure(funcVal, args, frame);
+        } catch (er) {
             if (er instanceof RuntimeException) {
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
@@ -1388,18 +1673,40 @@ class AstFunctionCall extends AstBase {
         }
     }
 
-    _evalFunc(funcVal, frame) {
+    *genEval(frame) {
+        let funcVal = this._getFuncVal(frame);
+        if (funcVal.hasYield(frame)) {
+            let args = this._evalCallArguments(frame);
+            yield* genEvalClosure(funcVal, args, frame)
+        }
+    }
+
+    hasYield(frame) {
+        let funcVal = this._getFuncVal(frame);
+        return funcVal.hasYield();
+    }
+
+    _getFuncVal(frame) {
+        let funcVal = frame.lookup(this.name);
+        if (funcVal == undefined) {
+            throw new RuntimeException("Can't call undefined function " + this.name, this.startOffset);
+        }
+
         if (funcVal.type != TYPE_CLOSURE && funcVal.type != TYPE_BUILTIN_FUNCTION) {
             throw new RuntimeException("variable is not a function/closure, it is a " + mapTypeToName[funcVal.type.toString()], this.startOffset);
         }
+        return funcVal;
 
+    }
+
+    _evalCallArguments(frame) {
         let args = [];
         for (let i = 0; i < this.expressionList.length; ++i) {
             let argExpression = this.expressionList[i]; // parameter expression
             let argValue = argExpression.eval(frame); // evaluate parameter expression
             args.push(argValue);
         }
-        return evalClosure(funcVal, args, frame);
+        return args;
     }
 
     show() {
@@ -1427,7 +1734,6 @@ function eval(stmt, globFrame = null) {
     if (globFrame == null) {
         globFrame = makeFrame();
     }
-
     return stmt.eval(globFrame)
 }
 
@@ -1454,7 +1760,9 @@ if (typeof(module) == 'object') {
         makeAstAssignment,
         makeIfStmt,
         makeWhileStmt,
+        makeForStmt,
         makeReturnStmt,
+        makeYieldStmt,
         makeUseStmt,
         makeBreakStmt,
         makeContinueStmt,

@@ -15,9 +15,11 @@ KEYWORDS = {
     'return': 1,
     'break': 1,
     'continue' : 1,
+    'yield' : 1,
     'if':   1,
     'else': 1,
     'elif': 1,
+    'for' : 1,
     'while': 1,
     'not': 1,
     'or': 1,
@@ -569,6 +571,19 @@ function makeParserImp() {
         }
     );
 
+    let forStmt = prs.makeTransformer(
+        prs.makeSequenceParser([
+            prs.makeTokenParser("for"),
+            assignLhs,
+            expression,
+            statementOrStatementListFwd.forward(),
+        ]),
+        function (arg) {
+            return rt.makeForStmt(arg[1], arg[2], arg[3], arg[0][1]);
+        }
+    );
+
+
     let returnStmt = prs.makeTransformer(
         prs.makeSequenceParser([
             prs.makeTokenParser("return"),
@@ -576,6 +591,16 @@ function makeParserImp() {
         ], "returnStatement"),
         function (arg) {
             return rt.makeReturnStmt(arg[1], arg[0][1]);
+        }
+    );
+
+    let yieldStmt = prs.makeTransformer(
+        prs.makeSequenceParser([
+            prs.makeTokenParser("yield"),
+            expression
+        ], "yieldStatement"),
+        function (arg) {
+            return rt.makeYieldStmt(arg[1], arg[0][1]);
         }
     );
 
@@ -667,11 +692,13 @@ function makeParserImp() {
     let statement = prs.makeAlternativeParser([
         ifStmt,
         whileStmt,
+        forStmt,
         breakStmt,
         continueStmt,
         assignment,
         functionDef,
         returnStmt,
+        yieldStmt,
         useStmt,
         expression
     ], "anyOfStatement")

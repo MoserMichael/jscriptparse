@@ -393,8 +393,6 @@ function makeParserImp() {
     let addOperator = prs.makeAlternativeParser([
         prs.makeTokenParser("+"),
         prs.makeTokenParser("-"),
-        prs.makeTokenParser(".")   // string concat
-
     ], "addOperation");
 
     let forwardLambdaFunctionDef = new prs.makeForwarder();

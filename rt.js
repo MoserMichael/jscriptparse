@@ -434,6 +434,10 @@ RTLIB={
             yield new Value(TYPE_STR, n);
         }
     }, [null, null], true),
+    "str": new BuiltinFunctionValue(1, function(arg) {
+        let val = value2Str(arg[0]);
+        return new Value(TYPE_STR, val);
+    }),
 
     // Numeric functions
     "int": new BuiltinFunctionValue(2, function(arg) {
@@ -973,16 +977,6 @@ MAP_OP_TO_FUNC={
         }
         return new Value(lhs.type, lhs.val - rhs.val);
     },
-    "." : function(lhs,rhs) {
-        if (lhs.type != TYPE_STR) {
-            throw new RuntimeException("First argument must be a string");
-        }
-        if (rhs.type != TYPE_STR) {
-            throw new RuntimeException("Second argument must be a string");
-        }
-        return new Value(TYPE_STR, lhs.val + rhs.val);
-    },
-
     "*" : function(lhs,rhs) {
         return new Value(TYPE_NUM, value2Num(lhs) * value2Num(rhs));
     },

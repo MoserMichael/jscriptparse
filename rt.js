@@ -32,7 +32,6 @@ TYPE_CLOSURE=6
 TYPE_BUILTIN_FUNCTION=7
 
 TYPE_FORCE_RETURN=8
-//TYPE_FORCE_YIELD=9
 TYPE_FORCE_BREAK=10
 TYPE_FORCE_CONTINUE=11
 
@@ -47,7 +46,6 @@ mapTypeToName = {
     6 : "Closure",
     7 : "BuiltinFunction",
     8 : "Return",
-  //9 : "Yield",
     10 : "Break",
     11 : "Continue",
 }
@@ -1416,6 +1414,7 @@ class AstForStmt extends AstBase {
         this.lhs = lhs;
         this.expr = expr;
         this.stmtList = stmtList;
+        this.hasGen = true;
     }
 
     eval(frame) {
@@ -1462,7 +1461,7 @@ class AstForStmt extends AstBase {
                 _assignImp(frame, val, this.lhs);
                 let rt = yield *this.stmtList.genEval(frame);
 
-                if (rt.type >= TYPE_FORCE_RETURN) {
+                if (rt != null && rt.type >= TYPE_FORCE_RETURN) {
                     if (rt.type == TYPE_FORCE_BREAK) {
                         break;
                     }

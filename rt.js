@@ -1421,7 +1421,9 @@ class AstForStmt extends AstBase {
     eval(frame) {
         if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
             for (let val of this.expr.genEval(frame)) {
-                let rt = this._evalOne(frame, val);
+                _assignImp(frame, val, this.lhs);
+                let rt = this.stmtList.eval(frame);
+
                 if (rt.type >= TYPE_FORCE_RETURN) {
                     if (rt.type == TYPE_FORCE_BREAK) {
                         break;
@@ -1439,7 +1441,9 @@ class AstForStmt extends AstBase {
             throw new RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
         }
         for(let val of genValues(rt)) {
-            let rt = this._evalOne(frame, val);
+            _assignImp(frame, val, this.lhs);
+            let rt = this.stmtList.eval(frame);
+
             if (rt.type >= TYPE_FORCE_RETURN) {
                 if (rt.type == TYPE_FORCE_BREAK) {
                     break;
@@ -1452,10 +1456,44 @@ class AstForStmt extends AstBase {
         return VALUE_NONE;
     }
 
-    _evalOne(frame, val) {
-        _assignImp(frame, val, this.lhs);
-        return this.stmtList.eval(frame);
+    *genEval(frame) {
+        if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
+            for (let val of this.expr.genEval(frame)) {
+                _assignImp(frame, val, this.lhs);
+                let rt = yield *this.stmtList.genEval(frame);
+
+                if (rt.type >= TYPE_FORCE_RETURN) {
+                    if (rt.type == TYPE_FORCE_BREAK) {
+                        break;
+                    }
+                    if (rt.type == TYPE_FORCE_RETURN) {
+                        return rt;
+                    }
+                }
+            }
+            return VALUE_NONE;
+        }
+
+        let rt = this.expr.eval(frame);
+        if (rt.type != TYPE_LIST && rt.type != TYPE_MAP) {
+            throw new RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
+        }
+        for(let val of genValues(rt)) {
+            _assignImp(frame, val, this.lhs);
+            let rt = yield* this.stmtList.genEval(frame);
+
+            if (rt.type >= TYPE_FORCE_RETURN) {
+                if (rt.type == TYPE_FORCE_BREAK) {
+                    break;
+                }
+                if (rt.type == TYPE_FORCE_RETURN) {
+                    return rt;
+                }
+            }
+        }
+        return VALUE_NONE;
     }
+
 
     hasYield(frame) {
         return this.stmtList.hasYield(frame);

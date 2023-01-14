@@ -2,8 +2,6 @@ const path=require("node:path");
 const fs=require("fs");
 const cp=require("node:child_process");
 const prs=require(path.join(__dirname,"prs.js"));
-const {progress} = require("mocha/lib/reporters");
-//const {TYPE_STR} = require("./rt");
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
@@ -671,6 +669,29 @@ RTLIB={
             from+=1;
         }
     }, [null, null, null], true),
+
+    // functions for working with time
+    "time": new BuiltinFunctionValue(0,function(arg, frame) {
+        let secondsSinceEpoch = new Date().getTime() / 1000;
+        return new Value(TYPE_NUM, secondsSinceEpoch);
+    }),
+    "localtime": new BuiltinFunctionValue(1,function(arg, frame) {
+        let date = null;
+        if (arg[0] == null) {
+            date = new Date();
+        } else {
+            date = new Date(value2Num(arg[0]) * 1000);
+        }
+        let retMap = {
+            "seconds": new Value(TYPE_NUM, date.getSeconds()),
+            "minutes": new Value(TYPE_NUM, date.getMinutes()),
+            "hours": new Value(TYPE_NUM, date.getHours()),
+            "days": new Value(TYPE_NUM, date.getDay()),
+            "year": new Value(TYPE_NUM, date.getFullYear()),
+            "month": new Value(TYPE_NUM, date.getMonth()),
+        };
+        return new Value(TYPE_MAP, retMap);
+    }, [null]),
 
     // internal functions
     "_system_backtick": new BuiltinFunctionValue(1,function(arg, frame) {

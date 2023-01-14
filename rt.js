@@ -94,6 +94,10 @@ class Value {
 
 VALUE_NONE=new Value(TYPE_NONE,null);
 
+function typeName(val) {
+    return mapTypeToName[val.type];
+
+}
 function value2Bool(val) {
     if (val.type == TYPE_BOOL) {
         return val.val;
@@ -102,7 +106,7 @@ function value2Bool(val) {
     } else if (val.type == TYPE_STR) {
         return val.val == "true";
     }
-    throw new RuntimeException("can't convert " + mapTypeToName[val.type.toString()] + " to boolean");
+    throw new RuntimeException("can't convert " + typeName(val) + " to boolean");
 }
 
 function value2Num(val) {
@@ -111,7 +115,7 @@ function value2Num(val) {
     } else if (val.type == TYPE_STR) {
         return parseFloat(val.val);
     }
-    throw new RuntimeException("can't convert " + mapTypeToName[val.type.toString]);
+    throw new RuntimeException("can't convert " + typeName(val));
 }
 
 
@@ -123,7 +127,7 @@ function value2Str(val) {
     } else if (val.type == TYPE_NONE) {
         return "none";
     } else {
-        throw new RuntimeException("can't convert " + mapTypeToName[val.type.toString] + " to string");
+        throw new RuntimeException("can't convert " + typeName(val) + " to string");
     }
 }
 
@@ -185,7 +189,7 @@ function rtValueToJsVal(value) {
     if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM) {
         return value.val;
     }
-    throw new RuntimeException("Can't convert value " + mapTypeToName[ value.type ] );
+    throw new RuntimeException("Can't convert value " + typeName(value) );
 }
 
 
@@ -424,10 +428,10 @@ RTLIB={
     // Numeric functions
     "int": new BuiltinFunctionValue(2, function(arg) {
         if (arg[0].type != TYPE_STR) {
-            throw new RuntimeException("first argument must be a string, is " + mapTypeToName[val.type.toString]);
+            throw new RuntimeException("first argument must be a string, is " + typeName(arg[0]));
         }
         if (arg[1].type != TYPE_NUM) {
-            throw new RuntimeException("second argument must be a number, is " + mapTypeToName[val.type.toString]);
+            throw new RuntimeException("second argument must be a number, is " + typeName(arg[1]));
         }
         let res = parseInt(arg[0].val, arg[1].val);
 
@@ -511,14 +515,14 @@ RTLIB={
         if (arg[0].type == TYPE_LIST) {
             return new Value(TYPE_STR, arg[0].val.map(value2Str).join(""));
         }
-        throw new RuntimeException("list argument required. is: " + mapTypeToName[ arg[0].type ]);
+        throw new RuntimeException("list argument required. is: " + typeName(arg[0]));
     }),
     "map": new BuiltinFunctionValue(2, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
-            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
         if (arg[1].type != TYPE_CLOSURE) {
-            throw new RuntimeException("second argument: function argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("second argument: function argument required. is: " + typeName(arg[1]));
         }
         let ret = [];
         let argList = arg[0];
@@ -533,10 +537,10 @@ RTLIB={
     }),
     "reduce": new BuiltinFunctionValue(3, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
-            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
         if (arg[1].type != TYPE_CLOSURE) {
-            throw new RuntimeException("second argument: function argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("second argument: function argument required. is: " + typeName(arg[1]));
         }
         let argList = arg[0];
         let funVal = arg[1];
@@ -550,7 +554,7 @@ RTLIB={
     }),
     "pop": new BuiltinFunctionValue(1,function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
-            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
         if (arg[0].val.length == 0) {
             throw new RuntimeException("Can't pop from an empty list");
@@ -559,17 +563,17 @@ RTLIB={
     }),
     "push": new BuiltinFunctionValue(2, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
-            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
         arg[0].val.push(arg[1]);
         return arg[0];
     }),
     "joinl": new BuiltinFunctionValue(2,function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
-            throw new RuntimeException("first argument: list argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
         if (arg[1].type != TYPE_LIST) {
-            throw new RuntimeException("second argument: list argument required. is: " + mapTypeToName[arg[1].type]);
+            throw new RuntimeException("second argument: list argument required. is: " + typeName(arg[1]));
         }
         let lst = arg[0].val.join(arg[1].val);
         return new Value(TYPE_LIST, lst);
@@ -606,7 +610,7 @@ RTLIB={
     // functions for working with json
     "parseJsonString": new BuiltinFunctionValue(1,function(arg, frame) {
         if(arg[0].type != TYPE_STR) {
-            throw new RuntimeException("first argument: string argument required. is: " + mapTypeToName[arg[0].type]);
+            throw new RuntimeException("first argument: string argument required. is: " + typeName(arg[0]));
         }
         let val = JSON.parse(arg[0].val);
         let rt = jsValueToRtVal(val);
@@ -650,11 +654,11 @@ RTLIB={
                 return arg[0].type == a.type && arg[0].val == a.val;
             }));
         }
-        throw new RuntimeException("second argument must be list or map, is: " + + mapTypeToName[arg[1].type]);
+        throw new RuntimeException("second argument must be list or map, is: " + typeName(arg[1]));
     }),
 
     "type": new BuiltinFunctionValue(1,function(arg, frame) {
-        return new Value(TYPE_STR, mapTypeToName[ arg[0].type ]);
+        return new Value(TYPE_STR, typeName(arg[0]));
     }),
 
     // generators
@@ -912,7 +916,7 @@ function makeConstValue(type, value) {
 
 function checkMixedType(op, lhs, rhs) {
     if (lhs.type != rhs.type) {
-        throw new RuntimeException(op + " not allowed between " + mapTypeToName[rhs.type] + " and " + mapTypeToName[lhs.type])
+        throw new RuntimeException(op + " not allowed between " + typeName(rhs) + " and " + typeName(lhs))
     }
 }
 
@@ -949,13 +953,13 @@ MAP_OP_TO_FUNC={
     },
     "+" : function(lhs,rhs) {
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't add " + mapTypeToName[lhs.type] + " to " + mapTypeToName[rhs.type] );
+            throw new RuntimeException("Can't add " + typeName(lhs) + " to " + typeName(rhs));
         }
         return new Value(lhs.type, lhs.val + rhs.val);
     },
     "-" : function(lhs,rhs) {
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't subtract " + mapTypeToName[lhs.type] + " to " + mapTypeToName[rhs.type] );
+            throw new RuntimeException("Can't subtract " + typeName(lhs) + " to " + typeName(rhs) );
         }
         return new Value(lhs.type, lhs.val - rhs.val);
     },
@@ -1782,7 +1786,7 @@ class AstFunctionCall extends AstBase {
         }
 
         if (funcVal.type != TYPE_CLOSURE && funcVal.type != TYPE_BUILTIN_FUNCTION) {
-            throw new RuntimeException("variable is not a function/closure, it is a " + mapTypeToName[funcVal.type.toString()], this.startOffset);
+            throw new RuntimeException("variable is not a function/closure, it is a " + typeName(funcVal), this.startOffset);
         }
         return funcVal;
 

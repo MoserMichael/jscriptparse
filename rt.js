@@ -424,6 +424,16 @@ RTLIB={
         let val = value2Str(arg[0]);
         return new Value(TYPE_STR, val.split("").reverse().join(""));
     }),
+    "split": new BuiltinFunctionValue(2,function *(arg, frame) {
+        let hay = value2Str(arg[0]);
+        let delim = "\n";
+        if (arg[1] != null) {
+            delim = value2Str(arg[1]);
+        }
+        for(let n of hay.split(delim)) {
+            yield new Value(TYPE_STR, n);
+        }
+    }, [null, null], true),
 
     // Numeric functions
     "int": new BuiltinFunctionValue(2, function(arg) {

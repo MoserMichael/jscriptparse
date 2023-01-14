@@ -89,7 +89,9 @@ class Value {
         this.val = val;
     }
 
-    show() { return "(" + mapTypeToName[ this.type.toString() ] + " " + this.val +  ")"; }
+    show() {
+        return this.val.toString()
+    }
 }
 
 VALUE_NONE=new Value(TYPE_NONE,null);
@@ -489,9 +491,6 @@ RTLIB={
     "random" : new BuiltinFunctionValue(0, function(arg) {
         return new Value(TYPE_NUM, Math.random());
     }),
-    "getpi" : new BuiltinFunctionValue(0, function(arg) {
-        return new Value(TYPE_NUM, 3.1415926535897932384626433832795028842); // 3.141592653589793);
-    }),
     // Input and output functions
     "print" : new BuiltinFunctionValue(1, function(arg) {
         let msg = value2Str(arg[0]);
@@ -583,7 +582,7 @@ RTLIB={
             let keys = Object.keys(arg[0].val);
             let rt = [];
             for(let i=0; i<keys.length;++i) {
-                rt.push( new Value(TYPE_STR, str(rt[i]) ));
+                rt.push( new Value(TYPE_STR, keys[i] ) );
             }
             return new Value(TYPE_LIST, rt);
         }
@@ -669,7 +668,19 @@ RTLIB={
             throw new RuntimeException("list parameter required");
         }
         return _system(cmd);
-    })
+    }),
+
+    "mathconst" : new Value(TYPE_MAP, {
+        pi: new Value(TYPE_NUM, Math.PI),
+        e: new Value(TYPE_NUM, Math.E),
+        ln10: new Value(TYPE_NUM, Math.LN10),
+        ln2: new Value(TYPE_NUM, Math.LN2),
+        log10e: new Value(TYPE_NUM, Math.LOG10E),
+        log2e: new Value(TYPE_NUM, Math.LOG2E),
+        sqrt1_2: new Value(TYPE_NUM, Math.SQRT1_2),
+        sqrt2: new Value(TYPE_NUM, Math.SQRT2),
+    }),
+
 }
 
 // there is a global frame, also each function invocation has is own frame.a
@@ -741,14 +752,14 @@ class Frame {
     }
 }
 
-function showList(lst, dsp = null) {
+function showList(lst, dsp = null, separator = "\n") {
     if (lst == null) {
-        return "(null-list)";
+        return "";
     }
     let retVal = "";
     for (let i = 0; i < lst.length; ++i) {
         if (i > 0) {
-            retVal += ", ";
+            retVal += separator;
         }
         if (dsp != null) {
             retVal += dsp(lst[i]);
@@ -849,7 +860,7 @@ class AstConstValue extends AstBase {
     }
 
     show() {
-        return "(const " + this.value.show() + ")"
+        return this.value.show();
     }
 }
 
@@ -970,7 +981,7 @@ class AstBinaryExpression extends AstBase {
     }
 
     show() {
-        return "(" + this.op + ": " + this.lhs.show() + " ," + this.rhs.show() + ")";
+        return this.op + ": " + this.lhs.show() + " " + this.op + " " + this.rhs.show();
     }
 
 }
@@ -1030,7 +1041,7 @@ class AstUnaryExpression extends AstBase {
     }
 
     show() {
-        return "(" + this.op + " " + this.expr.show() + ")";
+        return this.op + " " + this.expr.show();
     }
 }
 
@@ -1056,9 +1067,7 @@ class AstDictCtorExpression extends AstBase {
     }
 
     show() {
-        let rval = "{";
-        rval += showList(this.exprList, function(arg) { return arg[0].show() + ": " + arg[1].show()})
-        return rval + "}";
+        return "{" + showList(this.exprList, function(arg) { return arg[0].show() + ": " + arg[1].show()}) + "}";
     }
 }
 
@@ -1082,7 +1091,7 @@ class AstListCtorExpression extends AstBase {
     }
 
     show() {
-        return "[" + showList(this.exprList)  + "]";
+        return "[" + showList(this.exprList, null, ", ")  + "]";
     }
 
 }
@@ -1234,7 +1243,7 @@ class AstAssign extends AstBase {
     }
 
     show() {
-        return "(" + showList(this.lhs) + " := " + this.rhs.show() + ")";
+        return showList(this.lhs, null, ",") + " = " + this.rhs.show();
     }
 }
 
@@ -1312,15 +1321,13 @@ class AstIfStmt extends AstBase {
     }
 
     show() {
-        let ret = "(";
+        let ret = "if ";
         for(let i=0; i< this.ifClauses.length; ++i) {
             let clause = this.ifClauses[i];
-            if (i==0) {
-                ret += "if";
-            } else {
-                ret += "else";
+            if (i!=0) {
+                ret += "\nelif ";
             }
-            ret += " " + clause[0].show() + " " + clause[1].show();
+            ret += " " + clause[0].show() + "\n" + clause[1].show();
         }
         if (this.elseStmtList != null) {
             ret += " else " + this.elseStmtList.show();
@@ -1400,7 +1407,7 @@ class AstWhileStmt extends AstBase {
     }
 
     show() {
-        return "(while " + this.expr.show() + " " + this.stmtList.show() + " )";
+        return "while " + this.expr.show() + " " + this.stmtList.show();
      }
 }
 
@@ -1499,7 +1506,7 @@ class AstForStmt extends AstBase {
     }
 
     show() {
-        return "(for " + showList(this.lhs)  + " " + this.expr.show() + " " + this.stmtList.show() + " )";
+        return "for " + showList(this.lhs)  + " " + this.expr.show() + " " + this.stmtList.show();
     }
 }
 function makeForStmt(lhs, expr, stmtList, offset) {
@@ -1518,7 +1525,7 @@ class AstReturnStmt extends AstBase {
     }
 
     show() {
-        return "(return " + this.expr.show() + " )";
+        return "return " + this.expr.show();
     }
 }
 
@@ -1548,7 +1555,7 @@ class AstYieldStmt extends AstBase {
     }
 
     show() {
-        return "(yield " + this.expr.show() + " )";
+        return "yield " + this.expr.show();
     }
 }
 
@@ -1597,7 +1604,7 @@ class AstBreakStmt extends AstBase {
     }
 
     show() {
-        return "(break)";
+        return "break";
     }
 }
 
@@ -1615,7 +1622,7 @@ class AstContinueStmt extends AstBase {
     }
 
     show() {
-        return "(continue)";
+        return "continue";
     }
 }
 
@@ -1681,7 +1688,7 @@ class AstFunctionDef extends AstBase {
     }
 
     show() {
-        let ret = "(funcDef " + this.name + "("
+        let ret = "def " + this.name + "("
 
         ret += showList(this.params, function(arg) {
             let ret = arg[0][0];
@@ -1690,7 +1697,7 @@ class AstFunctionDef extends AstBase {
             }
             return ret;
         })
-        return ret + ") " + this.body.show() + ")";
+        return ret + ") " + this.body.show();
     }
 }
 
@@ -1755,7 +1762,7 @@ class AstFunctionCall extends AstBase {
     }
 
     show() {
-        return "(functionCall " + this.name + " (" + showList(this.expressionList) + "))";
+        return  this.name + " (" + showList(this.expressionList) + ")";
     }
 
 }

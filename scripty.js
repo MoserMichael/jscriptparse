@@ -6,7 +6,6 @@ const prs=require(path.join(__dirname,"prs.js"));
 const rt=require(path.join(__dirname,"rt.js"));
 const fs=require("fs");
 
-let showAst = false;
 let theParser = null;
 
 KEYWORDS = {
@@ -807,12 +806,6 @@ function runParserAndEval(data, openFile,  frame = null, passException = false) 
 
     try {
         let result = runParse(data, openFile);
-
-        if (showAst) {
-            console.log("parsing succeeded!");
-            console.log("parse result: " + result.show());
-        }
-
         return rt.eval(result, frame);
 
     } catch(er) {

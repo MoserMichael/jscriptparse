@@ -240,6 +240,7 @@ function copyPrimitiveVal(val) {
 function* genEvalClosure(funcVal, args, frame) {
     if (funcVal.type == TYPE_CLOSURE) {
         let funcFrame = null;
+
         if (funcVal.frame != null) { // closure with captured variables
             funcFrame = _prepareClosureFrame(funcVal, funcVal.frame, args);
         } else {
@@ -285,7 +286,7 @@ function evalClosure(funcVal, args, frame) {
             if (rVal.type == TYPE_FORCE_RETURN) {
                 return rVal.val;
             }
-            return VALUE_NONE
+            return rVal;
         } catch(er) {
             if (er instanceof RuntimeException) {
                 er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
@@ -302,7 +303,7 @@ function evalClosure(funcVal, args, frame) {
         throw new RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
             "  parameters are passed in call");
     }
-    let retVal = funcVal.funcImpl(args);
+    let retVal = funcVal.funcImpl(args, frame);
     if (retVal == undefined) {
         return VALUE_NONE;
     }
@@ -535,7 +536,7 @@ RTLIB={
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
-        if (arg[1].type != TYPE_CLOSURE) {
+        if (arg[1].type != TYPE_CLOSURE && arg[1].type != TYPE_BUILTIN_FUNCTION) {
             throw new RuntimeException("second argument: function argument required. is: " + typeName(arg[1]));
         }
         let ret = [];
@@ -761,7 +762,7 @@ class Frame {
         if (this.parentFrame != null) {
             return this.parentFrame._lookup(name);
         }
-        throw new RuntimeException("undefined variable: " + name );
+        throw new RuntimeException("undefined variable: " + name  );
     }
 
     assign(name, value) {

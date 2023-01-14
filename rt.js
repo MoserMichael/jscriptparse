@@ -2,6 +2,7 @@ const path=require("node:path");
 const fs=require("fs");
 const cp=require("node:child_process");
 const prs=require(path.join(__dirname,"prs.js"));
+const {progress} = require("mocha/lib/reporters");
 //const {TYPE_STR} = require("./rt");
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
@@ -31,7 +32,7 @@ TYPE_CLOSURE=6
 TYPE_BUILTIN_FUNCTION=7
 
 TYPE_FORCE_RETURN=8
-TYPE_FORCE_YIELD=9
+//TYPE_FORCE_YIELD=9
 TYPE_FORCE_BREAK=10
 TYPE_FORCE_CONTINUE=11
 
@@ -45,8 +46,10 @@ mapTypeToName = {
     5 : "None",
     6 : "Closure",
     7 : "BuiltinFunction",
-    8 : "ForceReturn",
-    9 : "Break"
+    8 : "Return",
+  //9 : "Yield",
+    10 : "Break",
+    11 : "Continue",
 }
 
 class ClosureValue {
@@ -58,9 +61,9 @@ class ClosureValue {
         this.frame = frame;
         this.hasYield_ = null;
     }
-    hasYield() {
+    hasYield(frame) {
         if (this.hasYield_ == null) {
-            this.hasYield_ = this.functionDef.hasYield();
+            this.hasYield_ = this.functionDef.hasYield(frame);
         }
         return this.hasYield_;
     }
@@ -243,14 +246,14 @@ function* genEvalClosure(funcVal, args, frame) {
 
         try {
             // frame is ready, evaluate the statement list
-            yield* funcVal.functionDef.body.eval(funcFrame);
-
+            yield *funcVal.functionDef.body.genEval(funcFrame);
         } catch(er) {
             if (er instanceof RuntimeException) {
-                er.addToStack([functionDef.startOffset, functionDef.currentSourceInfo]);
+                er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
             }
             throw er;
         }
+        return;
     }
 
     // builtin functions
@@ -258,7 +261,7 @@ function* genEvalClosure(funcVal, args, frame) {
 
     // function call
     if (funcVal.numParams != args.length) {
-        throw new RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
+        throw new RuntimeException("generator takes " + funcVal.numParams + " parameters, whereas " + args.length +
             "  parameters are passed in call");
     }
     yield* funcVal.funcImpl(args);
@@ -809,7 +812,6 @@ class AstStmtList extends AstBase {
                 val = stmt.eval(frame);
             }
 
-            //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
             if (val.type >= TYPE_FORCE_RETURN) {
                 if (val.type == TYPE_FORCE_CONTINUE) {
                     return VALUE_NONE;
@@ -819,10 +821,10 @@ class AstStmtList extends AstBase {
         }
     }
 
-    hasYield() {
+    hasYield(frame) {
         for (let i = 0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
-            if (stmt.hasYield()) {
+            if (stmt.hasYield(frame)) {
                 return true;
             }
         }
@@ -1298,15 +1300,15 @@ class AstIfStmt extends AstBase {
         return VALUE_NONE;
     }
 
-    hasYield() {
+    hasYield(frame) {
         for(let i=0; i< this.ifClauses.length; ++i) {
             let clause = this.ifClauses[i];
-            if (clause[1].hasYield()) {
+            if (clause[1].hasYield(frame)) {
                 return true;
             }
         }
         if (this.elseStmtList) {
-            return this.elseStmtList.hasYield();
+            return this.elseStmtList.hasYield(frame);
         }
         return false;
     }
@@ -1345,8 +1347,7 @@ class AstWhileStmt extends AstBase {
             let condVal = this.expr.eval(frame);
 
             let cond =  value2Bool(condVal);
-
-             if (cond.type == TYPE_BOOL && cond.val == false) {
+            if (cond == false) {
                 break;
             }
 
@@ -1369,7 +1370,7 @@ class AstWhileStmt extends AstBase {
 
             let cond =  value2Bool(condVal);
 
-            if (cond.type == TYPE_BOOL && cond.val == false) {
+            if (cond == false) {
                 break;
             }
 
@@ -1377,10 +1378,12 @@ class AstWhileStmt extends AstBase {
 
             if (this.stmtList.hasGen) {
                 rt = yield* this.stmtList.genEval(frame);
+                if (rt == null) {
+                    continue;
+                }
             } else {
                 rt = this.stmtList.eval(frame);
             }
-
 
             if (rt.type >= TYPE_FORCE_RETURN) {
                 if (rt.type == TYPE_FORCE_BREAK) {
@@ -1394,8 +1397,8 @@ class AstWhileStmt extends AstBase {
         return VALUE_NONE;
     }
 
-    hasYield() {
-        return this.stmtList.hasYield();
+    hasYield(frame) {
+        return this.stmtList.hasYield(frame);
     }
 
     show() {
@@ -1454,6 +1457,10 @@ class AstForStmt extends AstBase {
         return this.stmtList.eval(frame);
     }
 
+    hasYield(frame) {
+        return this.stmtList.hasYield(frame);
+    }
+
     show() {
         return "(for " + showList(this.lhs)  + " " + this.expr.show() + " " + this.stmtList.show() + " )";
     }
@@ -1490,19 +1497,20 @@ class AstYieldStmt extends AstBase {
     }
 
     eval(frame) {
-        throw new RuntimeException("yield must be called directly as a generator")
+        return VALUE_NONE;
     }
 
     *genEval(frame) {
         let retValue = this.expr.eval(frame);
-        yield new Value(TYPE_FORCE_YIELD, retValue);
+        yield retValue;
+        return VALUE_NONE;
     }
+
     hasYield() {
         return true;
     }
 
-
-        show() {
+    show() {
         return "(yield " + this.expr.show() + " )";
     }
 }
@@ -1631,8 +1639,8 @@ class AstFunctionDef extends AstBase {
         return ret;
     }
 
-    hasYield() {
-        return this.body.hasYield()
+    hasYield(frame) {
+        return this.body.hasYield(frame)
     }
 
     show() {
@@ -1683,7 +1691,7 @@ class AstFunctionCall extends AstBase {
 
     hasYield(frame) {
         let funcVal = this._getFuncVal(frame);
-        return funcVal.hasYield();
+        return funcVal.hasYield(frame);
     }
 
     _getFuncVal(frame) {

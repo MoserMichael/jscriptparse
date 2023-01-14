@@ -345,8 +345,8 @@ function makeParserImp() {
                 prs.makeTokenParser("-"),
                 number
             ]), function (arg) {
-                arg[0] = -1 * Number(arg[0]);
-                return rt.makeConstValue(rt.TYPE_NUM, -1 * Number(arg[1]));
+                arg[1][0] = -1 * Number(arg[1][0]);
+                return rt.makeConstValue(rt.TYPE_NUM, arg[1]);
             }
         ),
         prs.makeTransformer(number, function (arg) {

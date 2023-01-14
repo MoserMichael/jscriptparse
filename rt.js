@@ -606,21 +606,48 @@ RTLIB={
         }
         throw new RuntimeException("map argument required");
     }),
-    "sort": new BuiltinFunctionValue(1, function(arg) {
+    "sort": new BuiltinFunctionValue(2, function(arg, frame) {
+
+        let funVal = null;
+
+        if (arg[1] != null) {
+            funVal = arg[1];
+            if (funVal.type != TYPE_CLOSURE && funVal.type != TYPE_BUILTIN_FUNCTION) {
+                throw new RuntimeException("second argument must be a function. is: " + typeName(funVal));
+            }
+        }
+
         if (arg[0].type == TYPE_LIST) {
-            let rt = arg[0].val.sort(function(a, b) {
-                if (a.val < b.val) {
-                    return -1;
-                }
-                if (a.val > b.val) {
-                    return ;
-                }
-                return 0;
-            })
+
+            let rt = null;
+            if (funVal == null) {
+                rt = arg[0].val.sort(function (a, b) {
+                    if (a.val < b.val) {
+                        return -1;
+                    }
+                    if (a.val > b.val) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            } else {
+                rt = arg[0].val.sort(function (a, b) {
+                    let arg = [ a, b ];
+                    let mapVal = evalClosure(funVal, arg, frame);
+                    let nVal = value2Num(mapVal);
+                    if (nVal < 0) {
+                        return -1;
+                    }
+                    if (nVal > 0) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            }
             return new Value(TYPE_LIST, rt);
         }
         throw new RuntimeException("list argument required");
-    }),
+    }, [null, null]),
 
     // functions for working with json
     "parseJsonString": new BuiltinFunctionValue(1,function(arg, frame) {
@@ -680,13 +707,21 @@ RTLIB={
     "range": new BuiltinFunctionValue(3,function *(arg, frame) {
         let from = value2Num(arg[0]);
         let to = value2Num(arg[1]);
-        let step = 2;
+        let step = 1;
         if (arg[2] != null) {
             step = value2Num(arg[2]);
         }
-        while(from<to) {
-            yield new Value(TYPE_NUM, from);
-            from+=1;
+        if (step>0) {
+            while (from < to) {
+                yield new Value(TYPE_NUM, from);
+                from += step;
+            }
+        }
+        if (step<0) {
+            while (from > to) {
+                yield new Value(TYPE_NUM, from);
+                from += step;
+            }
         }
     }, [null, null, null], true),
 
@@ -1285,7 +1320,8 @@ class AstAssign extends AstBase {
 
     eval(frame) {
         let value = this.rhs.eval(frame);
-        return _assignImp(frame, value, this.lhs);
+        _assignImp(frame, value, this.lhs);
+        return value;
     }
 
     show() {

@@ -82,7 +82,7 @@ function runEvalLoop() {
         let doComplete = function(line) {
 
             let index = -1;
-            for(let i=sym.length-1; i>0; --i) {
+            for(let i=0; i<sym.length; ++i) {
                 let lastIndex = line.lastIndexOf(sym[i]) ;
                 if (lastIndex != -1) {
                     lastIndex += sym[i].length;
@@ -93,21 +93,18 @@ function runEvalLoop() {
                 }
             }
             let lastToken = "";
-            //let prevLine = "";
             if (index != -1) {
                 lastToken = line.substring(index);
-                //prevLine = line.substring(0, index);
             } else {
                 lastToken = line;
-                //prevLine=line;
-                index = 0;
             }
 
             lastToken = lastToken.trim();
+
             let completions = completeKeywords(lastToken);
             let varCompletions = completeVars(lastToken, glob);
             completions = completions.concat(varCompletions);
-            
+
             return [completions, lastToken]
         }
 

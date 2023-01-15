@@ -439,11 +439,16 @@ RTLIB={
         let val = value2Str(arg[0]);
         return new Value(TYPE_STR, val);
     }),
+    "repeat" : new BuiltinFunctionValue(2, function(arg) {
+        let val = value2Str(arg[0]);
+        let rep = value2Num(arg[1]);
+        return new Value(TYPE_STR, val.repeat(rep));
+    }),
 
-    // Numeric functions
+// Numeric functions
     "int": new BuiltinFunctionValue(2, function(arg) {
-        if (arg[0].type != TYPE_STR) {
-            throw new RuntimeException("first argument must be a string, is " + typeName(arg[0]));
+        if (arg[0].type != TYPE_STR && arg[0].type != TYPE_NUM) {
+            throw new RuntimeException("first argument must be a string or number, is " + typeName(arg[0]));
         }
         if (arg[1].type != TYPE_NUM) {
             throw new RuntimeException("second argument must be a number, is " + typeName(arg[1]));

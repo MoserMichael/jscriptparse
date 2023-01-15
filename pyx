@@ -2,6 +2,7 @@
 
 const path=require("node:path");
 const repl=require("node:repl");
+const rl=require("node:readline");
 //const repl=require(path.join(__dirname,"repln.js")) //"node:repl");
 const rt=require(path.join(__dirname,"rt.js"));
 const scr=require(path.join(__dirname,"scripty.js"));
@@ -10,6 +11,15 @@ const prs=require(path.join(__dirname,"prs.js"));
 function skipSpace(data, pos) {
     for(;pos < data.length && prs.isSpace(data.charAt(pos));++pos);
     return pos;
+}
+
+let isRunning = false;
+
+function onSig() {
+    console.log("onSig");
+    if (isRunning) {
+        rt.setForceStopEval();
+    }
 }
 
 function completeKeywords(prefix) {
@@ -54,7 +64,9 @@ function runEvalLoop() {
             //rt.setLogHook(logHook);
 
             try {
+                isRunning = true;
                 let res = scr.runParserAndEval(data, false, glob, true);
+                isRunning = false;
 
                 try {
                     if (res != 0) {
@@ -112,11 +124,16 @@ function runEvalLoop() {
             prompt: "> ",
             eval: evalIn,
             writer: doWrite,
-            completer: doComplete
+            completer: doComplete,
         });
-        r.on('SIGINT', function onSigInt() {
-            process.exit(0);
+
+        r.on('SIGINT', function() {
+            onSig();
         });
+        r.on('SIGTERM', function() {
+            onSig()
+        });
+
     }
     runEvalImp();
 }
@@ -132,6 +149,7 @@ function evalFile(file) {
 }
 
 function runMain() {
+
 
     if (process.argv.length < 3) {
         runEvalLoop()

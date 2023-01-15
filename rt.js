@@ -5,7 +5,6 @@ const prs=require(path.join(__dirname,"prs.js"));
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
-
 // the file that is being parsed right now. Can't pass that around.
 // Should be thread local, or something like this.
 let currentSourceInfo = null;
@@ -19,6 +18,22 @@ function setCurrentSourceInfo(info) {
     currentSourceInfo = info;
     return prevValue;
 }
+
+let evalForceStop = false;
+
+function setForceStopEval() {
+    console.log("force stop");
+    evalForceStop = true;
+}
+
+function checkEvalForceStop() {
+    if (evalForceStop) {
+        evalForceStop = false;
+        throw new RuntimeException("_forcedStop_", null, true);
+    }
+}
+
+
 
 TYPE_BOOL=0
 TYPE_NUM=1
@@ -92,7 +107,7 @@ class Value {
     }
 }
 
-VALUE_NONE=new Value(TYPE_NONE,null);
+let VALUE_NONE=new Value(TYPE_NONE,null);
 
 function typeName(val) {
     return mapTypeToName[val.type];
@@ -194,12 +209,13 @@ function rtValueToJsVal(value) {
 
 
 class RuntimeException  extends Error {
-    constructor(message, frameInfo = null) {
+    constructor(message, frameInfo = null, forcedStop = false) {
         super(message);
         this.stackTrace = [];
         if (frameInfo != null) {
             this.addToStack(frameInfo);
         }
+        this.forcedStop = forcedStop;
         this.firstChance = true;
     }
     addToStack(frameInfo) {
@@ -682,6 +698,32 @@ RTLIB={
         }
         return _system(cmd);
     }),
+    "sleep": new BuiltinFunctionValue(1,function(arg, frame) {
+        let num = value2Num(arg[0]);
+        let sleepy = async function (ms) {
+            {
+                let p = new Promise((resolve) => setTimeout(resolve, ms));
+                await p
+            }
+        }
+
+        console.log("before sleep");
+        sleepy(num * 1000);
+        console.log("after sleep");
+
+        return VALUE_NONE;
+    }),
+    "_system_backtick": new BuiltinFunctionValue(1,function(arg, frame) {
+
+        let cmd ="";
+
+        if (arg[0].type == TYPE_LIST) {
+            cmd = arg[0].val.map(value2Str).join("");
+        } else {
+            throw new RuntimeException("list parameter required");
+        }
+        return _system(cmd);
+    }),
 
     // control flow
     "exit": new BuiltinFunctionValue(1,function(arg, frame) {
@@ -753,18 +795,6 @@ RTLIB={
         return new Value(TYPE_MAP, retMap);
     }, [null]),
 
-    // internal functions
-    "_system_backtick": new BuiltinFunctionValue(1,function(arg, frame) {
-
-        let cmd ="";
-
-        if (arg[0].type == TYPE_LIST) {
-           cmd = arg[0].val.map(value2Str).join("");
-        } else {
-            throw new RuntimeException("list parameter required");
-        }
-        return _system(cmd);
-    }),
 
     "mathconst" : new Value(TYPE_MAP, {
         pi: new Value(TYPE_NUM, Math.PI),
@@ -893,6 +923,8 @@ class AstStmtList extends AstBase {
         let val = VALUE_NONE;
         for(let i=0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
+
+            checkEvalForceStop();
 
             val = stmt.eval(frame);
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
@@ -1217,17 +1249,23 @@ function makeLambdaExpression(functionDef) {
 
 function lookupIndex(frame, value, refExpr) {
     for(let i=0; i<refExpr.length; ++i) {
-        if (value.type != TYPE_LIST && value.type != TYPE_MAP) {
-            throw new RuntimeException("Can't index expression of variable " + this.identifierName);
+        let curValue = value.type;
+        if (curValue != TYPE_LIST && curValue != TYPE_MAP && curValue != TYPE_STR) {
+            throw new RuntimeException("Can't access expression of type " + typeName(value) + " by index");
         }
         let expr = refExpr[i];
         let indexValue = expr.eval(frame);
 
         value = value.val[ indexValue.val ];
         if (value == null) {
-            throw new RuntimeException("Can't lookup value " + indexValue.val)
+            throw new RuntimeException("Can't lookup index " + indexValue.val)
+        }
+
+        if (curValue == TYPE_STR) {
+            value = new Value(TYPE_STR, value);
         }
     }
+
     return value;
 }
 
@@ -1535,6 +1573,9 @@ class AstForStmt extends AstBase {
         }
         for(let val of genValues(rt)) {
             _assignImp(frame, val, this.lhs);
+
+            checkEvalForceStop();
+
             let rt = this.stmtList.eval(frame);
 
             if (rt.type >= TYPE_FORCE_RETURN) {
@@ -1800,6 +1841,8 @@ class AstFunctionCall extends AstBase {
     }
 
     eval(frame) {
+        checkEvalForceStop();
+
         let funcVal = this._getFuncVal(frame);
         try {
             if (!funcVal.hasYield(frame)) {
@@ -1921,6 +1964,7 @@ if (typeof(module) == 'object') {
         eval,
         setLogHook,
         setCurrentSourceInfo,
+        setForceStopEval,
         rtValueToJsVal,
     }
 }

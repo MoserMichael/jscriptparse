@@ -808,7 +808,11 @@ function runParserAndEval(data, openFile,  frame = null, passException = false) 
 
     } catch(er) {
         if (er instanceof rt.RuntimeException) {
-            er.showStackTrace();
+            if (!er.forcedStop) {
+                er.showStackTrace();
+            } else {
+                console.log("on break");
+            }
         } else {
             if (!passException) {
                 console.log(prs.formatParserError(er, data));

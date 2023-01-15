@@ -34,6 +34,9 @@ function completeVars(lastToken, frame) {
 
 function runEvalLoop() {
 
+    let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '}' ];
+    sym = sym.concat( Object.keys(scr.KEYWORDS) );
+
     let runEvalImp = function() {
 
         let glob = new rt.makeFrame();
@@ -78,9 +81,8 @@ function runEvalLoop() {
 
         let doComplete = function(line) {
 
-            let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '}' , 'if', 'while', "def" ];
             let index = -1;
-            for(let i=0; i<sym.length;++i) {
+            for(let i=sym.length-1; i>0; --i) {
                 let lastIndex = line.lastIndexOf(sym[i]) ;
                 if (lastIndex != -1) {
                     lastIndex += sym[i].length;
@@ -105,14 +107,8 @@ function runEvalLoop() {
             let completions = completeKeywords(lastToken);
             let varCompletions = completeVars(lastToken, glob);
             completions = completions.concat(varCompletions);
-
-            if (completions.length == 1) {
-                completions[0] = completions[0].substring(lastToken.length);
-            }
-
-            //console.log(">" + prevLine + "<");
-
-            return [completions,""]
+            
+            return [completions, lastToken]
         }
 
         let r = repl.start({

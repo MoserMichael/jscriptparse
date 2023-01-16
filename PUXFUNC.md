@@ -1,4 +1,4 @@
-#PYX functions by Category
+# PYX functions by Category
 
 ## functions on scalars or strings
 <a href='#s-1'>find</a>&nbsp;<a href='#s-2'>mid</a>&nbsp;<a href='#s-3'>lc</a>&nbsp;<a href='#s-4'>uc</a>&nbsp;<a href='#s-5'>reverse</a>&nbsp;<a href='#s-6'>str</a>&nbsp;<a href='#s-7'>repeat</a>&nbsp;<a href='#s-8'>len</a>&nbsp;

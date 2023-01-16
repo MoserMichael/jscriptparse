@@ -1,21 +1,24 @@
-# functions on scalars or strings
+#PYX functions by Category
+
+## functions on scalars or strings
 <a href='#find'>find</a>&nbsp;<a href='#mid'>mid</a>&nbsp;<a href='#lc'>lc</a>&nbsp;<a href='#uc'>uc</a>&nbsp;<a href='#reverse'>reverse</a>&nbsp;<a href='#str'>str</a>&nbsp;<a href='#repeat'>repeat</a>&nbsp;<a href='#len'>len</a>&nbsp;
-# Numeric functions
+## Numeric functions
 <a href='#int'>int</a>&nbsp;<a href='#max'>max</a>&nbsp;<a href='#min'>min</a>&nbsp;<a href='#abs'>abs</a>&nbsp;<a href='#sqrt'>sqrt</a>&nbsp;<a href='#sin'>sin</a>&nbsp;<a href='#cos'>cos</a>&nbsp;<a href='#tan'>tan</a>&nbsp;<a href='#atan'>atan</a>&nbsp;<a href='#pow'>pow</a>&nbsp;<a href='#random'>random</a>&nbsp;
-# Input and output functions
+## Input and output functions
 <a href='#print'>print</a>&nbsp;<a href='#println'>println</a>&nbsp;
-# Functions on arrays
+## Functions on arrays
 <a href='#len'>len</a>&nbsp;<a href='#join'>join</a>&nbsp;<a href='#map'>map</a>&nbsp;<a href='#reduce'>reduce</a>&nbsp;<a href='#pop'>pop</a>&nbsp;<a href='#push'>push</a>&nbsp;<a href='#joinl'>joinl</a>&nbsp;<a href='#keys'>keys</a>&nbsp;<a href='#sort'>sort</a>&nbsp;<a href='#exists'>exists</a>&nbsp;<a href='#range'>range</a>&nbsp;
-# function with json
+## function with json
 <a href='#parseJsonString'>parseJsonString</a>&nbsp;<a href='#toJsonString'>toJsonString</a>&nbsp;
-# functions for working with processes
+## functions for working with processes
 <a href='#system'>system</a>&nbsp;<a href='#exit'>exit</a>&nbsp;
-# Other functions
+## Other functions
 <a href='#help'>help</a>&nbsp;<a href='#type'>type</a>&nbsp;<a href='#time'>time</a>&nbsp;<a href='#localtime'>localtime</a>&nbsp;
-# global variables
+## global variables
 <a href='#mathconst'>mathconst</a>&nbsp;<a href='#ARGV'>ARGV</a>&nbsp;<a href='#ARGC'>ARGC</a>&nbsp;
 
-<a id='ARGC'/>### functions on scalars or strings
+<a id='ARGC'/>
+## functions on scalars or strings
 <hr>function: find
 
 ```
@@ -112,7 +115,8 @@ How to use in shell:
 3
 
 ```
-<a id='len'/>### Numeric functions
+<a id='len'/>
+## Numeric functions
 <hr>function: int
 
 ```
@@ -242,7 +246,8 @@ How to use in shell:
 returns random number with value between 0 and 1
 
 ```
-<a id='random'/>### Input and output functions
+<a id='random'/>
+## Input and output functions
 <hr>function: print
 
 ```
@@ -261,7 +266,8 @@ How to use in shell:
 prints argument value to console, followed by newline
 
 ```
-<a id='println'/>### Functions on arrays
+<a id='println'/>
+## Functions on arrays
 <hr>function: len
 
 ```
@@ -412,7 +418,8 @@ number: 2
 number: 3
 
 ```
-<a id='range'/>### function with json
+<a id='range'/>
+## function with json
 <hr>function: parseJsonString
 
 ```
@@ -437,7 +444,8 @@ How to use in shell:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='toJsonString'/>### functions for working with processes
+<a id='toJsonString'/>
+## functions for working with processes
 <hr>function: system
 
 ```
@@ -479,7 +487,8 @@ exit() - exit program with status 0 (success)
 exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='exit'/>### Other functions
+<a id='exit'/>
+## Other functions
 <hr>function: help
 
 ```
@@ -526,7 +535,8 @@ decodes epoch time into map
 
 
 ```
-<a id='localtime'/>### global variables
+<a id='localtime'/>
+## global variables
 <hr>function: mathconst
 
 ```

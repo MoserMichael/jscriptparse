@@ -30,8 +30,11 @@ funcCats = [
 ]
 
 def doIt() {
+    println("#PYX functions by Category")
+    println("")
+    
     for e funcCats {
-      println("# {e['name']}")
+      println("## {e['name']}")
       for name e['func'] {
          print("<a href='#{name}'>{name}</a>&nbsp;")
       }
@@ -40,7 +43,7 @@ def doIt() {
     println("")
 
     for e funcCats {
-      println("<a id='{name}'/>### {e['name']}")
+      println("<a id='{name}'/>\n## {e['name']}")
       for name e['func'] {
          print("<hr>")
          fn = system("./pyx -e 'help({name})'")

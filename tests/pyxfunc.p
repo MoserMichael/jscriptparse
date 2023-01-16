@@ -33,21 +33,36 @@ def doIt() {
     println("#PYX functions by Category")
     println("")
 
+    link_num=1
+    link_map={}
+
     for e funcCats {
       println("## {e['name']}")
+      first = true
+
       for name e['func'] {
-         print("<a href='#{name}'>{name}</a>&nbsp;")
+         link_name="s-{link_num}"
+         if exists(name, link_map)
+           link_name = link_map[name]
+         else
+           link_name="s-{link_num}"
+           link_map[name] = link_name
+           link_num = link_num + 1
+
+         if not first print(";&nbsp")
+           first = false
+
+         print("<a href='#{link_name}'>{name}</a>&nbsp;")
       }
       println("")
     }
     println("")
 
     for e funcCats {
-      println("<a id='{name}'/>## {e['name']}")
-      first = true
       for name e['func'] {
-         if not first print(";&nbsp")
-         first = false
+
+         link_name = link_map[name]
+         println("<a id='{link_name}'/>\n## {e['name']}")
 
          print("<hr>")
          fn = system("./pyx -e 'help({name})'")

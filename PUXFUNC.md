@@ -1,23 +1,24 @@
 #PYX functions by Category
 
 ## functions on scalars or strings
-<a href='#find'>find</a>&nbsp;<a href='#mid'>mid</a>&nbsp;<a href='#lc'>lc</a>&nbsp;<a href='#uc'>uc</a>&nbsp;<a href='#reverse'>reverse</a>&nbsp;<a href='#str'>str</a>&nbsp;<a href='#repeat'>repeat</a>&nbsp;<a href='#len'>len</a>&nbsp;
+<a href='#s-1'>find</a>&nbsp;<a href='#s-2'>mid</a>&nbsp;<a href='#s-3'>lc</a>&nbsp;<a href='#s-4'>uc</a>&nbsp;<a href='#s-5'>reverse</a>&nbsp;<a href='#s-6'>str</a>&nbsp;<a href='#s-7'>repeat</a>&nbsp;<a href='#s-8'>len</a>&nbsp;
 ## Numeric functions
-<a href='#int'>int</a>&nbsp;<a href='#max'>max</a>&nbsp;<a href='#min'>min</a>&nbsp;<a href='#abs'>abs</a>&nbsp;<a href='#sqrt'>sqrt</a>&nbsp;<a href='#sin'>sin</a>&nbsp;<a href='#cos'>cos</a>&nbsp;<a href='#tan'>tan</a>&nbsp;<a href='#atan'>atan</a>&nbsp;<a href='#pow'>pow</a>&nbsp;<a href='#random'>random</a>&nbsp;
+<a href='#s-9'>int</a>&nbsp;<a href='#s-10'>max</a>&nbsp;<a href='#s-11'>min</a>&nbsp;<a href='#s-12'>abs</a>&nbsp;<a href='#s-13'>sqrt</a>&nbsp;<a href='#s-14'>sin</a>&nbsp;<a href='#s-15'>cos</a>&nbsp;<a href='#s-16'>tan</a>&nbsp;<a href='#s-17'>atan</a>&nbsp;<a href='#s-18'>pow</a>&nbsp;<a href='#s-19'>random</a>&nbsp;
 ## Input and output functions
-<a href='#print'>print</a>&nbsp;<a href='#println'>println</a>&nbsp;
+<a href='#s-20'>print</a>&nbsp;<a href='#s-21'>println</a>&nbsp;
 ## Functions on arrays
-<a href='#len'>len</a>&nbsp;<a href='#join'>join</a>&nbsp;<a href='#map'>map</a>&nbsp;<a href='#reduce'>reduce</a>&nbsp;<a href='#pop'>pop</a>&nbsp;<a href='#push'>push</a>&nbsp;<a href='#joinl'>joinl</a>&nbsp;<a href='#keys'>keys</a>&nbsp;<a href='#sort'>sort</a>&nbsp;<a href='#exists'>exists</a>&nbsp;<a href='#range'>range</a>&nbsp;
+<a href='#s-8'>len</a>&nbsp;<a href='#s-23'>join</a>&nbsp;<a href='#s-24'>map</a>&nbsp;<a href='#s-25'>reduce</a>&nbsp;<a href='#s-26'>pop</a>&nbsp;<a href='#s-27'>push</a>&nbsp;<a href='#s-28'>joinl</a>&nbsp;<a href='#s-29'>keys</a>&nbsp;<a href='#s-30'>sort</a>&nbsp;<a href='#s-31'>exists</a>&nbsp;<a href='#s-32'>range</a>&nbsp;
 ## function with json
-<a href='#parseJsonString'>parseJsonString</a>&nbsp;<a href='#toJsonString'>toJsonString</a>&nbsp;
+<a href='#s-33'>parseJsonString</a>&nbsp;<a href='#s-34'>toJsonString</a>&nbsp;
 ## functions for working with processes
-<a href='#system'>system</a>&nbsp;<a href='#exit'>exit</a>&nbsp;
+<a href='#s-35'>system</a>&nbsp;<a href='#s-36'>exit</a>&nbsp;
 ## Other functions
-<a href='#help'>help</a>&nbsp;<a href='#type'>type</a>&nbsp;<a href='#time'>time</a>&nbsp;<a href='#localtime'>localtime</a>&nbsp;
+<a href='#s-37'>help</a>&nbsp;<a href='#s-38'>type</a>&nbsp;<a href='#s-39'>time</a>&nbsp;<a href='#s-40'>localtime</a>&nbsp;
 ## global variables
-<a href='#mathconst'>mathconst</a>&nbsp;<a href='#ARGV'>ARGV</a>&nbsp;<a href='#ARGC'>ARGC</a>&nbsp;
+<a href='#s-41'>mathconst</a>&nbsp;<a href='#s-42'>ARGV</a>&nbsp;<a href='#s-43'>ARGC</a>&nbsp;
 
-<a id='ARGC'/>## functions on scalars or strings
+<a id='s-1'/>
+## functions on scalars or strings
 <hr>function: find
 
 ```
@@ -34,6 +35,8 @@ How to use in shell:
 
 
 ```
+<a id='s-2'/>
+## functions on scalars or strings
 <hr>function: mid
 
 ```
@@ -46,6 +49,8 @@ How to use in shell:
 "am"
 
 ```
+<a id='s-3'/>
+## functions on scalars or strings
 <hr>function: lc
 
 ```
@@ -56,6 +61,8 @@ How to use in shell:
 "big little"
 
 ```
+<a id='s-4'/>
+## functions on scalars or strings
 <hr>function: uc
 
 ```
@@ -66,6 +73,8 @@ How to use in shell:
 "BIG LITTLE"
 
 ```
+<a id='s-5'/>
+## functions on scalars or strings
 <hr>function: reverse
 
 ```
@@ -78,6 +87,8 @@ How to use in shell:
 "dcba"
 
 ```
+<a id='s-6'/>
+## functions on scalars or strings
 <hr>function: str
 
 ```
@@ -90,6 +101,8 @@ How to use in shell:
 "abc"
 
 ```
+<a id='s-7'/>
+## functions on scalars or strings
 <hr>function: repeat
 
 ```
@@ -102,6 +115,8 @@ How to use in shell:
 "ababab"
 
 ```
+<a id='s-8'/>
+## functions on scalars or strings
 <hr>function: len
 
 ```
@@ -114,7 +129,8 @@ How to use in shell:
 3
 
 ```
-<a id='len'/>## Numeric functions
+<a id='s-9'/>
+## Numeric functions
 <hr>function: int
 
 ```
@@ -131,6 +147,8 @@ How to use in shell:
 123
 
 ```
+<a id='s-10'/>
+## Numeric functions
 <hr>function: max
 
 ```
@@ -143,6 +161,8 @@ How to use in shell:
 4
 
 ```
+<a id='s-11'/>
+## Numeric functions
 <hr>function: min
 
 ```
@@ -155,6 +175,8 @@ How to use in shell:
 3
 
 ```
+<a id='s-12'/>
+## Numeric functions
 <hr>function: abs
 
 ```
@@ -167,6 +189,8 @@ How to use in shell:
 3
 
 ```
+<a id='s-13'/>
+## Numeric functions
 <hr>function: sqrt
 
 ```
@@ -181,6 +205,8 @@ How to use in shell:
 1.414213562373095
 
 ```
+<a id='s-14'/>
+## Numeric functions
 <hr>function: sin
 
 ```
@@ -192,6 +218,8 @@ returns the sine of a number in radians
 1
 
 ```
+<a id='s-15'/>
+## Numeric functions
 <hr>function: cos
 
 ```
@@ -203,6 +231,8 @@ returns the cosine of a number in radians
 -1
 
 ```
+<a id='s-16'/>
+## Numeric functions
 <hr>function: tan
 
 ```
@@ -212,6 +242,8 @@ How to use in shell:
 returns the tangent of a number in radians
 
 ```
+<a id='s-17'/>
+## Numeric functions
 <hr>function: atan
 
 ```
@@ -221,6 +253,8 @@ How to use in shell:
 returns the inverse tangent (in radians) of a number
 
 ```
+<a id='s-18'/>
+## Numeric functions
 <hr>function: pow
 
 ```
@@ -235,6 +269,8 @@ How to use in shell:
 16
 
 ```
+<a id='s-19'/>
+## Numeric functions
 <hr>function: random
 
 ```
@@ -244,7 +280,8 @@ How to use in shell:
 returns random number with value between 0 and 1
 
 ```
-<a id='random'/>## Input and output functions
+<a id='s-20'/>
+## Input and output functions
 <hr>function: print
 
 ```
@@ -254,6 +291,8 @@ How to use in shell:
 prints argument value to console
 
 ```
+<a id='s-21'/>
+## Input and output functions
 <hr>function: println
 
 ```
@@ -263,7 +302,8 @@ How to use in shell:
 prints argument value to console, followed by newline
 
 ```
-<a id='println'/>## Functions on arrays
+<a id='s-8'/>
+## Functions on arrays
 <hr>function: len
 
 ```
@@ -276,6 +316,8 @@ How to use in shell:
 3
 
 ```
+<a id='s-23'/>
+## Functions on arrays
 <hr>function: join
 
 ```
@@ -286,6 +328,8 @@ How to use in shell:
 "a: 1 b: true"
 
 ```
+<a id='s-24'/>
+## Functions on arrays
 <hr>function: map
 
 ```
@@ -298,6 +342,8 @@ How to use in shell:
 [1,4,9]
 
 ```
+<a id='s-25'/>
+## Functions on arrays
 <hr>function: reduce
 
 ```
@@ -310,6 +356,8 @@ How to use in shell:
 8
 
 ```
+<a id='s-26'/>
+## Functions on arrays
 <hr>function: pop
 
 ```
@@ -324,6 +372,8 @@ How to use in shell:
 [1,2]
 
 ```
+<a id='s-27'/>
+## Functions on arrays
 <hr>function: push
 
 ```
@@ -338,6 +388,8 @@ How to use in shell:
 [1,2,3]
 
 ```
+<a id='s-28'/>
+## Functions on arrays
 <hr>function: joinl
 
 ```
@@ -348,6 +400,8 @@ How to use in shell:
 [1,2,3,4]
 
 ```
+<a id='s-29'/>
+## Functions on arrays
 <hr>function: keys
 
 ```
@@ -360,6 +414,8 @@ How to use in shell:
 ["first","second","third"]
 
 ```
+<a id='s-30'/>
+## Functions on arrays
 <hr>function: sort
 
 ```
@@ -378,6 +434,8 @@ How to use in shell:
 [["b",1],["a",100],["c",1000]]
 
 ```
+<a id='s-31'/>
+## Functions on arrays
 <hr>function: exists
 
 ```
@@ -400,6 +458,8 @@ true
 false
 
 ```
+<a id='s-32'/>
+## Functions on arrays
 <hr>function: range
 
 ```
@@ -414,7 +474,8 @@ number: 2
 number: 3
 
 ```
-<a id='range'/>## function with json
+<a id='s-33'/>
+## function with json
 <hr>function: parseJsonString
 
 ```
@@ -427,6 +488,8 @@ How to use in shell:
 [1,2,3]
 
 ```
+<a id='s-34'/>
+## function with json
 <hr>function: toJsonString
 
 ```
@@ -439,7 +502,8 @@ How to use in shell:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='toJsonString'/>## functions for working with processes
+<a id='s-35'/>
+## functions for working with processes
 <hr>function: system
 
 ```
@@ -471,6 +535,8 @@ var
 0
 
 ```
+<a id='s-36'/>
+## functions for working with processes
 <hr>function: exit
 
 ```
@@ -481,13 +547,16 @@ exit() - exit program with status 0 (success)
 exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='exit'/>## Other functions
+<a id='s-37'/>
+## Other functions
 <hr>function: help
 
 ```
 BuiltinFunction
 
 ```
+<a id='s-38'/>
+## Other functions
 <hr>function: type
 
 ```
@@ -506,6 +575,8 @@ How to use in shell:
 "Closure"
 
 ```
+<a id='s-39'/>
+## Other functions
 <hr>function: time
 
 ```
@@ -515,6 +586,8 @@ How to use in shell:
 returns epoch time in seconds
 
 ```
+<a id='s-40'/>
+## Other functions
 <hr>function: localtime
 
 ```
@@ -528,7 +601,8 @@ decodes epoch time into map
 
 
 ```
-<a id='localtime'/>## global variables
+<a id='s-41'/>
+## global variables
 <hr>function: mathconst
 
 ```
@@ -538,6 +612,8 @@ How to use in shell:
 map of mathematical constant
 
 ```
+<a id='s-42'/>
+## global variables
 <hr>function: ARGV
 
 ```
@@ -547,6 +623,8 @@ How to use in shell:
 command line arguments (array)
 
 ```
+<a id='s-43'/>
+## global variables
 <hr>function: ARGC
 
 ```

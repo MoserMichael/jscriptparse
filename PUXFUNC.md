@@ -7,15 +7,17 @@
 ## Input and output functions
 <a href='#s-20'>print</a>&nbsp;,&nbsp;<a href='#s-21'>println</a>
 ## Functions on arrays
-<a href='#s-8'>len</a>&nbsp;,&nbsp;<a href='#s-23'>join</a>&nbsp;,&nbsp;<a href='#s-24'>map</a>&nbsp;,&nbsp;<a href='#s-25'>reduce</a>&nbsp;,&nbsp;<a href='#s-26'>pop</a>&nbsp;,&nbsp;<a href='#s-27'>push</a>&nbsp;,&nbsp;<a href='#s-28'>joinl</a>&nbsp;,&nbsp;<a href='#s-29'>keys</a>&nbsp;,&nbsp;<a href='#s-30'>sort</a>&nbsp;,&nbsp;<a href='#s-31'>exists</a>&nbsp;,&nbsp;<a href='#s-32'>range</a>
+<a href='#s-8'>len</a>&nbsp;,&nbsp;<a href='#s-23'>join</a>&nbsp;,&nbsp;<a href='#s-24'>map</a>&nbsp;,&nbsp;<a href='#s-25'>reduce</a>&nbsp;,&nbsp;<a href='#s-26'>pop</a>&nbsp;,&nbsp;<a href='#s-27'>push</a>&nbsp;,&nbsp;<a href='#s-28'>joinl</a>&nbsp;,&nbsp;<a href='#s-29'>sort</a>&nbsp;,&nbsp;<a href='#s-30'>exists</a>&nbsp;,&nbsp;<a href='#s-31'>range</a>
+## functions for maps/hashes
+<a href='#s-32'>each</a>&nbsp;,&nbsp;<a href='#s-33'>keys</a>&nbsp;,&nbsp;<a href='#s-30'>exists</a>
 ## function with json
-<a href='#s-33'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-34'>toJsonString</a>
+<a href='#s-35'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-36'>toJsonString</a>
 ## functions for working with processes
-<a href='#s-35'>system</a>&nbsp;,&nbsp;<a href='#s-36'>exit</a>
+<a href='#s-37'>system</a>&nbsp;,&nbsp;<a href='#s-38'>exit</a>
 ## Other functions
-<a href='#s-37'>help</a>&nbsp;,&nbsp;<a href='#s-38'>type</a>&nbsp;,&nbsp;<a href='#s-39'>time</a>&nbsp;,&nbsp;<a href='#s-40'>localtime</a>
+<a href='#s-39'>help</a>&nbsp;,&nbsp;<a href='#s-40'>type</a>&nbsp;,&nbsp;<a href='#s-41'>time</a>&nbsp;,&nbsp;<a href='#s-42'>localtime</a>
 ## global variables
-<a href='#s-41'>mathconst</a>&nbsp;,&nbsp;<a href='#s-42'>ARGV</a>&nbsp;,&nbsp;<a href='#s-43'>ENV</a>
+<a href='#s-43'>mathconst</a>&nbsp;,&nbsp;<a href='#s-44'>ARGV</a>&nbsp;,&nbsp;<a href='#s-45'>ENV</a>
 
 <a id='s-1'/>
 <hr>function: <b>find</b>
@@ -373,19 +375,6 @@ How to use in shell:
 
 ```
 <a id='s-29'/>
-<hr>function: <b>keys</b>
-
-```python
-
-How to use in shell:
-
-> a={ "first":1, "second": 2, "third": 3}
-{"first":1,"second":2,"third":3}
-> keys(a)
-["first","second","third"]
-
-```
-<a id='s-30'/>
 <hr>function: <b>sort</b>
 
 ```python
@@ -404,7 +393,7 @@ How to use in shell:
 [["b",1],["a",100],["c",1000]]
 
 ```
-<a id='s-31'/>
+<a id='s-30'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -427,7 +416,7 @@ true
 false
 
 ```
-<a id='s-32'/>
+<a id='s-31'/>
 <hr>function: <b>range</b>
 
 ```python
@@ -442,7 +431,56 @@ number: 2
 number: 3
 
 ```
+<a id='s-32'/>
+<hr>function: <b>each</b>
+
+```python
+
+How to use in shell:
+
+
+> each({"a":1,"b":2,"c":3})
+[["a",1],["b",2],["c",3]]    
+
+
+```
 <a id='s-33'/>
+<hr>function: <b>keys</b>
+
+```python
+
+How to use in shell:
+
+> a={ "first":1, "second": 2, "third": 3}
+{"first":1,"second":2,"third":3}
+> keys(a)
+["first","second","third"]
+
+```
+<a id='s-30'/>
+<hr>function: <b>exists</b>
+
+```python
+
+How to use in shell:
+
+> a={"first":1}
+{"first":1}
+> exists("first", a)
+true
+> exists("second", a)
+false
+> a=[3,4]
+[3,4]
+> exists(3, a)
+true
+> exists(4, a)
+true
+> exists(5, a)
+false
+
+```
+<a id='s-35'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -455,7 +493,7 @@ How to use in shell:
 [1,2,3]
 
 ```
-<a id='s-34'/>
+<a id='s-36'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -468,7 +506,7 @@ How to use in shell:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-35'/>
+<a id='s-37'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -500,7 +538,7 @@ var
 0
 
 ```
-<a id='s-36'/>
+<a id='s-38'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -511,7 +549,7 @@ exit() - exit program with status 0 (success)
 exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-37'/>
+<a id='s-39'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -526,7 +564,7 @@ Show help text for built-in functions: Example usage:
 
 
 ```
-<a id='s-38'/>
+<a id='s-40'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -545,7 +583,7 @@ How to use in shell:
 "Closure"
 
 ```
-<a id='s-39'/>
+<a id='s-41'/>
 <hr>function: <b>time</b>
 
 ```python
@@ -555,7 +593,7 @@ How to use in shell:
 returns epoch time in seconds
 
 ```
-<a id='s-40'/>
+<a id='s-42'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -569,7 +607,7 @@ decodes epoch time into map
 
 
 ```
-<a id='s-41'/>
+<a id='s-43'/>
 <hr>function: <b>mathconst</b>
 
 ```python
@@ -579,7 +617,7 @@ How to use in shell:
 map of mathematical constant
 
 ```
-<a id='s-42'/>
+<a id='s-44'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -589,7 +627,7 @@ How to use in shell:
 command line arguments (array)
 
 ```
-<a id='s-43'/>
+<a id='s-45'/>
 <hr>function: <b>ENV</b>
 
 ```python

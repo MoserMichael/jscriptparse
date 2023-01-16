@@ -699,22 +699,6 @@ RTLIB={
         let lst = arg[0].val.concat(arg[1].val);
         return new Value(TYPE_LIST, lst);
     }),
-
-    // functions for maps/hashes
-    "keys": new BuiltinFunctionValue(`> a={ "first":1, "second": 2, "third": 3}
-{"first":1,"second":2,"third":3}
-> keys(a)
-["first","second","third"]`, 1, function(arg) {
-        if (arg[0].type == TYPE_MAP) {
-            let keys = Object.keys(arg[0].val);
-            let rt = [];
-            for(let i=0; i<keys.length;++i) {
-                rt.push( new Value(TYPE_STR, keys[i] ) );
-            }
-            return new Value(TYPE_LIST, rt);
-        }
-        throw new RuntimeException("map argument required");
-    }),
     "sort": new BuiltinFunctionValue(`> sort([3,1,4,2,5])
 [1,2,3,4,5]
 > def cmp(x, y) {
@@ -766,6 +750,31 @@ RTLIB={
         }
         throw new RuntimeException("list argument required");
     }, [null, null]),
+
+    // functions for maps/hashes
+    "each" : new BuiltinFunctionValue( `
+> each({"a":1,"b":2,"c":3})
+[["a",1],["b",2],["c",3]]    
+`, 1, function*(arg) {
+        if (arg[0].type != TYPE_MAP && arg[0].type != TYPE_LIST) {
+            throw new RuntimeException("map or list expected. got " + typeName(arg[0]));
+        }
+        yield* genValues(arg[0]);
+    },null, true),
+    "keys": new BuiltinFunctionValue(`> a={ "first":1, "second": 2, "third": 3}
+{"first":1,"second":2,"third":3}
+> keys(a)
+["first","second","third"]`, 1, function(arg) {
+        if (arg[0].type == TYPE_MAP) {
+            let keys = Object.keys(arg[0].val);
+            let rt = [];
+            for(let i=0; i<keys.length;++i) {
+                rt.push( new Value(TYPE_STR, keys[i] ) );
+            }
+            return new Value(TYPE_LIST, rt);
+        }
+        throw new RuntimeException("map argument required");
+    }),
 
     // functions for working with json
     "parseJsonString": new BuiltinFunctionValue(`> parseJsonString('{"name": "Kermit", "surname": "Frog"}')

@@ -13,7 +13,10 @@ funcCats = [
    "func": [ "print", "println" ]
  },
  { "name": "Functions on arrays",
-    "func": [ "len", "join", "map", "reduce", "pop", "push", "joinl", "keys", "sort", "exists", "range" ]
+    "func": [ "len", "join", "map", "reduce", "pop", "push", "joinl", "sort", "exists", "range" ]
+ },
+ { "name": "functions for maps/hashes",
+    "func": [ "each", "keys", "exists" ]
  },
  { "name": "function with json",
    "func": [ "parseJsonString", "toJsonString" ]

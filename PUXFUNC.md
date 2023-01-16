@@ -15,7 +15,7 @@
 # global variables
 <a href='#mathconst'>mathconst</a>&nbsp;<a href='#ARGV'>ARGV</a>&nbsp;<a href='#ARGC'>ARGC</a>&nbsp;
 
-<a id='#ARGC'/>### functions on scalars or strings
+<a id='ARGC'/>### functions on scalars or strings
 <hr>function: find
 
 ```
@@ -112,7 +112,7 @@ How to use in shell:
 3
 
 ```
-<a id='#len'/>### Numeric functions
+<a id='len'/>### Numeric functions
 <hr>function: int
 
 ```
@@ -242,7 +242,7 @@ How to use in shell:
 returns random number with value between 0 and 1
 
 ```
-<a id='#random'/>### Input and output functions
+<a id='random'/>### Input and output functions
 <hr>function: print
 
 ```
@@ -261,7 +261,7 @@ How to use in shell:
 prints argument value to console, followed by newline
 
 ```
-<a id='#println'/>### Functions on arrays
+<a id='println'/>### Functions on arrays
 <hr>function: len
 
 ```
@@ -412,7 +412,7 @@ number: 2
 number: 3
 
 ```
-<a id='#range'/>### function with json
+<a id='range'/>### function with json
 <hr>function: parseJsonString
 
 ```
@@ -437,7 +437,7 @@ How to use in shell:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='#toJsonString'/>### functions for working with processes
+<a id='toJsonString'/>### functions for working with processes
 <hr>function: system
 
 ```
@@ -479,7 +479,7 @@ exit() - exit program with status 0 (success)
 exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='#exit'/>### Other functions
+<a id='exit'/>### Other functions
 <hr>function: help
 
 ```
@@ -526,7 +526,7 @@ decodes epoch time into map
 
 
 ```
-<a id='#localtime'/>### global variables
+<a id='localtime'/>### global variables
 <hr>function: mathconst
 
 ```

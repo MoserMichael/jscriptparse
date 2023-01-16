@@ -459,7 +459,14 @@ RTLIB={
         let val = value2Str(arg[0]);
         return new Value(TYPE_STR, val.split("").reverse().join(""));
     }),
-    "split": new BuiltinFunctionValue(null, 2,function *(arg, frame) {
+    "split": new BuiltinFunctionValue(`> split("first line\\nsecond line")
+["first line","second line"]
+> split("a,b,c", ",")
+["a","b","c"]
+> split("a:b:c", ":")
+["a","b","c"]
+> split("a:b:c", "")
+["a",":","b",":","c"]`, 2,function *(arg, frame) {
         let hay = value2Str(arg[0]);
         let delim = "\n";
         if (arg[1] != null) {
@@ -576,7 +583,7 @@ RTLIB={
         let exp = value2Num(arg[1]);
         return new Value(TYPE_NUM, Math.pow(pow,exp));
     }),
-    "random" : new BuiltinFunctionValue(null, 0, function(arg) {
+    "random" : new BuiltinFunctionValue(`returns random number with value between 0 and 1`, 0, function(arg) {
         return new Value(TYPE_NUM, Math.random());
     }),
 
@@ -806,6 +813,7 @@ var
         }
         return _system(cmd);
     }),
+    /*
     "sleep": new BuiltinFunctionValue(null, 1,function(arg, frame) {
         let num = value2Num(arg[0]);
         let sleepy = async function (ms) {
@@ -821,6 +829,7 @@ var
 
         return VALUE_NONE;
     }),
+     */
     "_system_backtick": new BuiltinFunctionValue(null, 1,function(arg, frame) {
 
         let cmd ="";
@@ -834,8 +843,12 @@ var
     }),
 
     // control flow
-    "exit": new BuiltinFunctionValue(null, 1,function(arg, frame) {
-        let num = value2Num(arg[0]);
+    "exit": new BuiltinFunctionValue(`exit() - exit program with status 0 (success)\nexit(1) - exit program with status 1 (failure)`,
+        1,function(arg, frame) {
+        let num = 0;
+        if (arg[0] != null) {
+            num = value2Num(arg[0]);
+        }
         process.exit(num);
     }),
 
@@ -867,13 +880,24 @@ false`, 2,function(arg, frame) {
         throw new RuntimeException("second argument must be list or map, is: " + typeName(arg[1]));
     }),
     "help": new BuiltinFunctionValue(null, 1,function(arg, frame) {
+        if (arg[0]==null) {
+            console.log("Show help text for built-in functions: Example usage:\n" +
+`> help(min)
+
+How to use:
+
+> min(4,3)
+3
+> min(3,4)
+3`);
+        }
         if ('help' in arg[0]) {
             console.log("\nHow to use:\n\n" + arg[0].help);
         } else {
             console.log(typeName(arg[0]));
         }
         return VALUE_NONE
-    }),
+    }, [null]),
 
     "type": new BuiltinFunctionValue(`> type(1)
 "Number"

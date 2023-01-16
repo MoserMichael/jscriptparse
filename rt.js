@@ -974,6 +974,22 @@ number: 3`, 3,function *(arg, frame) {
         sqrt2: new Value(TYPE_NUM, Math.SQRT2),
     }),
 
+    "ARGV" : new Value(TYPE_LIST,
+        process.argv.map(x => x).reduce(
+            (prev,current)=>{
+                prev.push(new Value(TYPE_STR, current));
+                return prev
+            } , [])
+    ),
+
+    "ENV": new Value(TYPE_MAP,
+        Object.entries(process.env).reduce(
+            (prev,current)=>{
+                prev[current[0]]= new Value(TYPE_STR, current[1]);
+                return prev
+            } , {})
+    ),
+
 }
 
 // there is a global frame, also each function invocation has is own frame.a

@@ -62,7 +62,7 @@ def doIt() {
       for name e['func'] {
 
          link_name = link_map[name]
-         println("<a id='{link_name}'/><br/>## {name}")
+         println("<a id='{link_name}'/>")
 
          print("<hr>")
          fn = system("./pyx -e 'help({name})'")

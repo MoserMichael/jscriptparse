@@ -71,7 +71,7 @@ def doIt() {
          println("function: <b>{name}</b>")
 
          println("")
-         println("```")
+         println("```python")
          println(fn[0])
          println("```")
       }

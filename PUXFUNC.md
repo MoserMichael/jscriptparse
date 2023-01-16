@@ -20,7 +20,7 @@
 <a id='s-1'/>
 <hr>function: <b>find</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -37,7 +37,7 @@ How to use in shell:
 <a id='s-2'/>
 <hr>function: <b>mid</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -50,7 +50,7 @@ How to use in shell:
 <a id='s-3'/>
 <hr>function: <b>lc</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -61,7 +61,7 @@ How to use in shell:
 <a id='s-4'/>
 <hr>function: <b>uc</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -72,7 +72,7 @@ How to use in shell:
 <a id='s-5'/>
 <hr>function: <b>reverse</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -85,7 +85,7 @@ How to use in shell:
 <a id='s-6'/>
 <hr>function: <b>str</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -98,7 +98,7 @@ How to use in shell:
 <a id='s-7'/>
 <hr>function: <b>repeat</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -111,7 +111,7 @@ How to use in shell:
 <a id='s-8'/>
 <hr>function: <b>len</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -124,7 +124,7 @@ How to use in shell:
 <a id='s-9'/>
 <hr>function: <b>int</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -141,7 +141,7 @@ How to use in shell:
 <a id='s-10'/>
 <hr>function: <b>max</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -154,7 +154,7 @@ How to use in shell:
 <a id='s-11'/>
 <hr>function: <b>min</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -167,7 +167,7 @@ How to use in shell:
 <a id='s-12'/>
 <hr>function: <b>abs</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -180,7 +180,7 @@ How to use in shell:
 <a id='s-13'/>
 <hr>function: <b>sqrt</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -195,7 +195,7 @@ How to use in shell:
 <a id='s-14'/>
 <hr>function: <b>sin</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -207,7 +207,7 @@ returns the sine of a number in radians
 <a id='s-15'/>
 <hr>function: <b>cos</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -219,7 +219,7 @@ returns the cosine of a number in radians
 <a id='s-16'/>
 <hr>function: <b>tan</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -229,7 +229,7 @@ returns the tangent of a number in radians
 <a id='s-17'/>
 <hr>function: <b>atan</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -239,7 +239,7 @@ returns the inverse tangent (in radians) of a number
 <a id='s-18'/>
 <hr>function: <b>pow</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -254,7 +254,7 @@ How to use in shell:
 <a id='s-19'/>
 <hr>function: <b>random</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -264,7 +264,7 @@ returns random number with value between 0 and 1
 <a id='s-20'/>
 <hr>function: <b>print</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -274,7 +274,7 @@ prints argument value to console
 <a id='s-21'/>
 <hr>function: <b>println</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -284,7 +284,7 @@ prints argument value to console, followed by newline
 <a id='s-8'/>
 <hr>function: <b>len</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -297,7 +297,7 @@ How to use in shell:
 <a id='s-23'/>
 <hr>function: <b>join</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -308,7 +308,7 @@ How to use in shell:
 <a id='s-24'/>
 <hr>function: <b>map</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -321,7 +321,7 @@ How to use in shell:
 <a id='s-25'/>
 <hr>function: <b>reduce</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -334,7 +334,7 @@ How to use in shell:
 <a id='s-26'/>
 <hr>function: <b>pop</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -349,7 +349,7 @@ How to use in shell:
 <a id='s-27'/>
 <hr>function: <b>push</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -364,7 +364,7 @@ How to use in shell:
 <a id='s-28'/>
 <hr>function: <b>joinl</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -375,7 +375,7 @@ How to use in shell:
 <a id='s-29'/>
 <hr>function: <b>keys</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -388,7 +388,7 @@ How to use in shell:
 <a id='s-30'/>
 <hr>function: <b>sort</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -407,7 +407,7 @@ How to use in shell:
 <a id='s-31'/>
 <hr>function: <b>exists</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -430,7 +430,7 @@ false
 <a id='s-32'/>
 <hr>function: <b>range</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -445,7 +445,7 @@ number: 3
 <a id='s-33'/>
 <hr>function: <b>parseJsonString</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -458,7 +458,7 @@ How to use in shell:
 <a id='s-34'/>
 <hr>function: <b>toJsonString</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -471,7 +471,7 @@ How to use in shell:
 <a id='s-35'/>
 <hr>function: <b>system</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -503,7 +503,7 @@ var
 <a id='s-36'/>
 <hr>function: <b>exit</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -514,14 +514,14 @@ exit(1) - exit program with status 1 (failure)
 <a id='s-37'/>
 <hr>function: <b>help</b>
 
-```
+```python
 BuiltinFunction
 
 ```
 <a id='s-38'/>
 <hr>function: <b>type</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -540,7 +540,7 @@ How to use in shell:
 <a id='s-39'/>
 <hr>function: <b>time</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -550,7 +550,7 @@ returns epoch time in seconds
 <a id='s-40'/>
 <hr>function: <b>localtime</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -564,7 +564,7 @@ decodes epoch time into map
 <a id='s-41'/>
 <hr>function: <b>mathconst</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -574,7 +574,7 @@ map of mathematical constant
 <a id='s-42'/>
 <hr>function: <b>ARGV</b>
 
-```
+```python
 
 How to use in shell:
 
@@ -584,7 +584,7 @@ command line arguments (array)
 <a id='s-43'/>
 <hr>function: <b>ENV</b>
 
-```
+```python
 
 How to use in shell:
 

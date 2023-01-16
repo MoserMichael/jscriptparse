@@ -33,8 +33,6 @@ function checkEvalForceStop() {
     }
 }
 
-
-
 TYPE_BOOL=0
 TYPE_NUM=1
 TYPE_STR=2
@@ -557,19 +555,23 @@ RTLIB={
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.sqrt(num));
     }),
-    "sin" : new BuiltinFunctionValue(null, 1, function(arg) {
+    "sin" : new BuiltinFunctionValue(`returns the sine of a number in radians
+> sin(mathconst['pi']/2)
+1`, 1, function(arg) {
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.sin(num));
     }),
-    "cos" : new BuiltinFunctionValue(null, 1, function(arg) {
+    "cos" : new BuiltinFunctionValue(`returns the cosine of a number in radians
+> cos(mathconst['pi'])
+-1`, 1, function(arg) {
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.cos(num));
     }),
-    "tan" : new BuiltinFunctionValue(null, 1, function(arg) {
+    "tan" : new BuiltinFunctionValue(`returns the tangent of a number in radians`, 1, function(arg) {
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.tan(num));
     }),
-    "atan" : new BuiltinFunctionValue(null, 1, function(arg) {
+    "atan" : new BuiltinFunctionValue(`returns the inverse tangent (in radians) of a number`, 1, function(arg) {
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.atan(num));
     }),
@@ -588,11 +590,11 @@ RTLIB={
     }),
 
     // Input and output functions
-    "print" : new BuiltinFunctionValue(null, 1, function(arg) {
+    "print" : new BuiltinFunctionValue("prints argument value to console", 1, function(arg) {
         let msg = value2Str(arg[0]);
         doLogHook(msg)
     }),
-    "println" : new BuiltinFunctionValue(null, 1, function(arg) {
+    "println" : new BuiltinFunctionValue("prints argument value to console, followed by newline", 1, function(arg) {
         let msg = value2Str(arg[0]);
         doLogHook(msg + "\n")
     }),
@@ -761,7 +763,10 @@ RTLIB={
     }, [null, null]),
 
     // functions for working with json
-    "parseJsonString": new BuiltinFunctionValue(null, 1,function(arg, frame) {
+    "parseJsonString": new BuiltinFunctionValue(`> parseJsonString('{"name": "Kermit", "surname": "Frog"}')
+{"name":"Kermit","surname":"Frog"}
+> parseJsonString('[1,2,3]')
+[1,2,3]`, 1,function(arg, frame) {
         if(arg[0].type != TYPE_STR) {
             throw new RuntimeException("first argument: string argument required. is: " + typeName(arg[0]));
         }
@@ -769,10 +774,10 @@ RTLIB={
         let rt = jsValueToRtVal(val);
         return rt;
     }),
-    "toJsonString": new BuiltinFunctionValue(`> parseJsonString('{"name": "Kermit", "surname": "Frog"}')
-{"name":"Kermit","surname":"Frog"}
-> parseJsonString('[1,2,3]')
-[1,2,3]`, 1,function(arg, frame) {
+    "toJsonString": new BuiltinFunctionValue(`> toJsonString([1,2,3])
+"[1,2,3]"
+> toJsonString({"name":"Pooh","family":"Bear","likes":["Honey","Songs","Friends"]})
+"{\\"name\\":\\"Pooh\\",\\"family\\":\\"Bear\\",\\"likes\\":[\\"Honey\\",\\"Songs\\",\\"Friends\\"]}"`, 1,function(arg, frame) {
         let jsVal = rtValueToJsVal(arg[0]);
         return new Value(TYPE_STR, JSON.stringify(jsVal));
     }),
@@ -884,7 +889,7 @@ false`, 2,function(arg, frame) {
             console.log("Show help text for built-in functions: Example usage:\n" +
 `> help(min)
 
-How to use:
+How to use in shell:
 
 > min(4,3)
 3
@@ -892,7 +897,7 @@ How to use:
 3`);
         }
         if ('help' in arg[0]) {
-            console.log("\nHow to use:\n\n" + arg[0].help);
+            console.log("\nHow to use in shell:\n\n" + arg[0].help);
         } else {
             console.log(typeName(arg[0]));
         }
@@ -940,11 +945,15 @@ number: 3`, 3,function *(arg, frame) {
     }, [null, null, null], true),
 
     // functions for working with time
-    "time": new BuiltinFunctionValue(null, 0,function(arg, frame) {
+    "time": new BuiltinFunctionValue("returns epoch time in seconds", 0,function(arg, frame) {
         let secondsSinceEpoch = new Date().getTime() / 1000;
         return new Value(TYPE_NUM, secondsSinceEpoch);
     }),
-    "localtime": new BuiltinFunctionValue(null, 1,function(arg, frame) {
+    "localtime": new BuiltinFunctionValue(`decodes epoch time into map
+    
+> localtime(time())
+{"seconds":22,"minutes":33,"hours":7,"days":1,"year":2023,"month":0}    
+`, 1,function(arg, frame) {
         let date = null;
         if (arg[0] == null) {
             date = new Date();

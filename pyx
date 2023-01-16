@@ -173,7 +173,6 @@ function cmdLine() {
             process.exit(result);
         }
     }
-
     printHelp();
 }
 
@@ -184,7 +183,7 @@ function runMain() {
         runEvalLoop()
     } else {
         if (process.argv.length == 3) {
-            if (process.argv[2] == '-h') {
+            if (process.argv[2] == '-h' || process.argv[2] == '--help') {
                 printHelp();
             }
             evalFile(process.argv[2]);

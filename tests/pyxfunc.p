@@ -32,7 +32,7 @@ funcCats = [
 def doIt() {
     println("#PYX functions by Category")
     println("")
-    
+
     for e funcCats {
       println("## {e['name']}")
       for name e['func'] {
@@ -43,8 +43,12 @@ def doIt() {
     println("")
 
     for e funcCats {
-      println("<a id='{name}'/>\n## {e['name']}")
+      println("<a id='{name}'/>## {e['name']}")
+      first = true
       for name e['func'] {
+         if not first print(";&nbsp")
+         first = false
+
          print("<hr>")
          fn = system("./pyx -e 'help({name})'")
          println("function: {name}")

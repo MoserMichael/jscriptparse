@@ -19,6 +19,11 @@ The scripting language and interpreter for the pyx language.  (see this [design 
 
 (don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress)
  
+## pyx documentation 
+
+See [pyx functions by category (pyxfunc)](PUXFUNC.md)
+
+
 ## what I learned while writing this project
 
 i am learning about interpreted languages (such as python, php, javascript, perl, etc...) 

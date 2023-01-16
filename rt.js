@@ -900,11 +900,12 @@ How to use in shell:
 3
 > min(3,4)
 3`);
-        }
-        if ('help' in arg[0]) {
-            console.log("\nHow to use in shell:\n\n" + arg[0].help);
         } else {
-            console.log(typeName(arg[0]));
+            if ('help' in arg[0]) {
+                console.log("\nHow to use in shell:\n\n" + arg[0].help);
+            } else {
+                console.log(typeName(arg[0]));
+            }
         }
         return VALUE_NONE
     }, [null]),

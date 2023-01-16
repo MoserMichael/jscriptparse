@@ -30,7 +30,7 @@ funcCats = [
 ]
 
 def doIt() {
-    println("# PYX functions by Category")
+    println("# pyxfunc - PYX functions by Category")
     println("")
 
     link_num=1
@@ -66,7 +66,7 @@ def doIt() {
 
          print("<hr>")
          fn = system("./pyx -e 'help({name})'")
-         println("function: {name}")
+         println("function: <b>{name}</b>")
 
          println("")
          println("```")

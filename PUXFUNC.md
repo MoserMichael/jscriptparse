@@ -1,4 +1,4 @@
-# PYX functions by Category
+# pyxfunc - PYX functions by Category
 
 ## functions on scalars or strings
 <a href='#s-1'>find</a>&nbsp;<a href='#s-2'>mid</a>&nbsp;<a href='#s-3'>lc</a>&nbsp;<a href='#s-4'>uc</a>&nbsp;<a href='#s-5'>reverse</a>&nbsp;<a href='#s-6'>str</a>&nbsp;<a href='#s-7'>repeat</a>&nbsp;<a href='#s-8'>len</a>&nbsp;
@@ -18,7 +18,7 @@
 <a href='#s-41'>mathconst</a>&nbsp;<a href='#s-42'>ARGV</a>&nbsp;<a href='#s-43'>ARGC</a>&nbsp;
 
 <a id='s-1'/>
-<hr>function: find
+<hr>function: <b>find</b>
 
 ```
 
@@ -35,7 +35,7 @@ How to use in shell:
 
 ```
 <a id='s-2'/>
-<hr>function: mid
+<hr>function: <b>mid</b>
 
 ```
 
@@ -48,7 +48,7 @@ How to use in shell:
 
 ```
 <a id='s-3'/>
-<hr>function: lc
+<hr>function: <b>lc</b>
 
 ```
 
@@ -59,7 +59,7 @@ How to use in shell:
 
 ```
 <a id='s-4'/>
-<hr>function: uc
+<hr>function: <b>uc</b>
 
 ```
 
@@ -70,7 +70,7 @@ How to use in shell:
 
 ```
 <a id='s-5'/>
-<hr>function: reverse
+<hr>function: <b>reverse</b>
 
 ```
 
@@ -83,7 +83,7 @@ How to use in shell:
 
 ```
 <a id='s-6'/>
-<hr>function: str
+<hr>function: <b>str</b>
 
 ```
 
@@ -96,7 +96,7 @@ How to use in shell:
 
 ```
 <a id='s-7'/>
-<hr>function: repeat
+<hr>function: <b>repeat</b>
 
 ```
 
@@ -109,7 +109,7 @@ How to use in shell:
 
 ```
 <a id='s-8'/>
-<hr>function: len
+<hr>function: <b>len</b>
 
 ```
 
@@ -122,7 +122,7 @@ How to use in shell:
 
 ```
 <a id='s-9'/>
-<hr>function: int
+<hr>function: <b>int</b>
 
 ```
 
@@ -139,7 +139,7 @@ How to use in shell:
 
 ```
 <a id='s-10'/>
-<hr>function: max
+<hr>function: <b>max</b>
 
 ```
 
@@ -152,7 +152,7 @@ How to use in shell:
 
 ```
 <a id='s-11'/>
-<hr>function: min
+<hr>function: <b>min</b>
 
 ```
 
@@ -165,7 +165,7 @@ How to use in shell:
 
 ```
 <a id='s-12'/>
-<hr>function: abs
+<hr>function: <b>abs</b>
 
 ```
 
@@ -178,7 +178,7 @@ How to use in shell:
 
 ```
 <a id='s-13'/>
-<hr>function: sqrt
+<hr>function: <b>sqrt</b>
 
 ```
 
@@ -193,7 +193,7 @@ How to use in shell:
 
 ```
 <a id='s-14'/>
-<hr>function: sin
+<hr>function: <b>sin</b>
 
 ```
 
@@ -205,7 +205,7 @@ returns the sine of a number in radians
 
 ```
 <a id='s-15'/>
-<hr>function: cos
+<hr>function: <b>cos</b>
 
 ```
 
@@ -217,7 +217,7 @@ returns the cosine of a number in radians
 
 ```
 <a id='s-16'/>
-<hr>function: tan
+<hr>function: <b>tan</b>
 
 ```
 
@@ -227,7 +227,7 @@ returns the tangent of a number in radians
 
 ```
 <a id='s-17'/>
-<hr>function: atan
+<hr>function: <b>atan</b>
 
 ```
 
@@ -237,7 +237,7 @@ returns the inverse tangent (in radians) of a number
 
 ```
 <a id='s-18'/>
-<hr>function: pow
+<hr>function: <b>pow</b>
 
 ```
 
@@ -252,7 +252,7 @@ How to use in shell:
 
 ```
 <a id='s-19'/>
-<hr>function: random
+<hr>function: <b>random</b>
 
 ```
 
@@ -262,7 +262,7 @@ returns random number with value between 0 and 1
 
 ```
 <a id='s-20'/>
-<hr>function: print
+<hr>function: <b>print</b>
 
 ```
 
@@ -272,7 +272,7 @@ prints argument value to console
 
 ```
 <a id='s-21'/>
-<hr>function: println
+<hr>function: <b>println</b>
 
 ```
 
@@ -282,7 +282,7 @@ prints argument value to console, followed by newline
 
 ```
 <a id='s-8'/>
-<hr>function: len
+<hr>function: <b>len</b>
 
 ```
 
@@ -295,7 +295,7 @@ How to use in shell:
 
 ```
 <a id='s-23'/>
-<hr>function: join
+<hr>function: <b>join</b>
 
 ```
 
@@ -306,7 +306,7 @@ How to use in shell:
 
 ```
 <a id='s-24'/>
-<hr>function: map
+<hr>function: <b>map</b>
 
 ```
 
@@ -319,7 +319,7 @@ How to use in shell:
 
 ```
 <a id='s-25'/>
-<hr>function: reduce
+<hr>function: <b>reduce</b>
 
 ```
 
@@ -332,7 +332,7 @@ How to use in shell:
 
 ```
 <a id='s-26'/>
-<hr>function: pop
+<hr>function: <b>pop</b>
 
 ```
 
@@ -347,7 +347,7 @@ How to use in shell:
 
 ```
 <a id='s-27'/>
-<hr>function: push
+<hr>function: <b>push</b>
 
 ```
 
@@ -362,7 +362,7 @@ How to use in shell:
 
 ```
 <a id='s-28'/>
-<hr>function: joinl
+<hr>function: <b>joinl</b>
 
 ```
 
@@ -373,7 +373,7 @@ How to use in shell:
 
 ```
 <a id='s-29'/>
-<hr>function: keys
+<hr>function: <b>keys</b>
 
 ```
 
@@ -386,7 +386,7 @@ How to use in shell:
 
 ```
 <a id='s-30'/>
-<hr>function: sort
+<hr>function: <b>sort</b>
 
 ```
 
@@ -405,7 +405,7 @@ How to use in shell:
 
 ```
 <a id='s-31'/>
-<hr>function: exists
+<hr>function: <b>exists</b>
 
 ```
 
@@ -428,7 +428,7 @@ false
 
 ```
 <a id='s-32'/>
-<hr>function: range
+<hr>function: <b>range</b>
 
 ```
 
@@ -443,7 +443,7 @@ number: 3
 
 ```
 <a id='s-33'/>
-<hr>function: parseJsonString
+<hr>function: <b>parseJsonString</b>
 
 ```
 
@@ -456,7 +456,7 @@ How to use in shell:
 
 ```
 <a id='s-34'/>
-<hr>function: toJsonString
+<hr>function: <b>toJsonString</b>
 
 ```
 
@@ -469,7 +469,7 @@ How to use in shell:
 
 ```
 <a id='s-35'/>
-<hr>function: system
+<hr>function: <b>system</b>
 
 ```
 
@@ -501,7 +501,7 @@ var
 
 ```
 <a id='s-36'/>
-<hr>function: exit
+<hr>function: <b>exit</b>
 
 ```
 
@@ -512,14 +512,14 @@ exit(1) - exit program with status 1 (failure)
 
 ```
 <a id='s-37'/>
-<hr>function: help
+<hr>function: <b>help</b>
 
 ```
 BuiltinFunction
 
 ```
 <a id='s-38'/>
-<hr>function: type
+<hr>function: <b>type</b>
 
 ```
 
@@ -538,7 +538,7 @@ How to use in shell:
 
 ```
 <a id='s-39'/>
-<hr>function: time
+<hr>function: <b>time</b>
 
 ```
 
@@ -548,7 +548,7 @@ returns epoch time in seconds
 
 ```
 <a id='s-40'/>
-<hr>function: localtime
+<hr>function: <b>localtime</b>
 
 ```
 
@@ -562,7 +562,7 @@ decodes epoch time into map
 
 ```
 <a id='s-41'/>
-<hr>function: mathconst
+<hr>function: <b>mathconst</b>
 
 ```
 
@@ -572,7 +572,7 @@ map of mathematical constant
 
 ```
 <a id='s-42'/>
-<hr>function: ARGV
+<hr>function: <b>ARGV</b>
 
 ```
 
@@ -582,7 +582,7 @@ command line arguments (array)
 
 ```
 <a id='s-43'/>
-<hr>function: ARGC
+<hr>function: <b>ARGC</b>
 
 ```
 

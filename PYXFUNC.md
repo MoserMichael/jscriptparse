@@ -440,7 +440,11 @@ How to use in shell:
 
 
 > each({"a":1,"b":2,"c":3})
-[["a",1],["b",2],["c",3]]    
+[["a",1],["b",2],["c",3]]
+
+> pairs = each({"a":1,"b":2,"c":3})
+> map( pairs, def (arg) [ arg[0]+arg[0], arg[1]*arg[1] ] )
+[["aa",1],["bb",4],["cc",9]]    
 
 
 ```

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-./pyx tests/pyxfunc.p > PUXFUNC.md
+./pyx tests/pyxfunc.p > PYXFUNC.md
 

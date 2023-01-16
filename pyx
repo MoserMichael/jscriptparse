@@ -44,7 +44,7 @@ function completeVars(lastToken, frame) {
 
 function runEvalLoop() {
 
-    let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '}' ];
+    let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '(', '}' ];
     sym = sym.concat( Object.keys(scr.KEYWORDS) );
 
     let runEvalImp = function() {
@@ -110,6 +110,7 @@ function runEvalLoop() {
             } else {
                 lastToken = line;
             }
+
 
             lastToken = lastToken.trim();
 

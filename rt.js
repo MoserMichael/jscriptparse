@@ -83,12 +83,15 @@ class ClosureValue {
 }
 
 class BuiltinFunctionValue {
-    constructor(numParams, funcImpl, defaultParamValues = [], hasYield = false) {
+    constructor(help_, numParams, funcImpl, defaultParamValues = [], hasYield = false) {
         this.type = TYPE_BUILTIN_FUNCTION;
         this.numParams = numParams;
         this.funcImpl = funcImpl;
         this.defaultParamValues = defaultParamValues;
         this.hasYield_ = hasYield;
+        if (help_ != null) {
+            this.help = help_;
+        }
     }
 
     hasYield() {
@@ -398,7 +401,14 @@ function * genValues(val) {
 RTLIB={
 
     // function on scalars or strings
-    "find": new BuiltinFunctionValue(3, function(arg) {
+    "find": new BuiltinFunctionValue(`> find("big cat", "big")
+0
+> find("big cat", "cat")
+4
+> find("big cat", "bear")
+-1
+
+`, 3, function(arg) {
         let hay = value2Str(arg[0]);
         let needle = value2Str(arg[1]);
         let index = 0;
@@ -409,7 +419,10 @@ RTLIB={
         let res = hay.indexOf(needle, index)
         return new Value(TYPE_NUM, res);
     }, [null, null, null]),
-    "mid": new BuiltinFunctionValue(3, function(arg) {
+    "mid": new BuiltinFunctionValue(`> mid("I am me", 2)
+"am me"
+> mid("I am me", 2, 4)
+"am"`, 3, function(arg) {
         let sval = value2Str(arg[0]);
         let from = parseInt(value2Num(arg[1]), 10);
         let to = null;
@@ -426,22 +439,27 @@ RTLIB={
 
         return new Value(TYPE_STR, sval);
     }, [null, null, null]),
-    "lc": new BuiltinFunctionValue(1, function(arg) {
+    "lc": new BuiltinFunctionValue(`> lc("BIG little")
+"big little"`, 1, function(arg) {
         let val = value2Str(arg[0]);
         return new Value(TYPE_STR, val.toLowerCase());
     }),
-    "uc": new BuiltinFunctionValue(1, function(arg) {
+    "uc": new BuiltinFunctionValue(`> uc("BIG little")
+"BIG LITTLE"`, 1, function(arg) {
         let val = value2Str(arg[0]);
         return new Value(TYPE_STR, val.toUpperCase());
     }),
-    "reverse": new BuiltinFunctionValue(1, function(arg) {
+    "reverse": new BuiltinFunctionValue(`> reverse([1,2,3,4])
+[4,3,2,1]
+> reverse("abcd")
+"dcba"`, 1, function(arg) {
         if (arg[0].type == TYPE_LIST) {
             return new Value(TYPE_LIST, arg[0].val.reverse());
         }
         let val = value2Str(arg[0]);
         return new Value(TYPE_STR, val.split("").reverse().join(""));
     }),
-    "split": new BuiltinFunctionValue(2,function *(arg, frame) {
+    "split": new BuiltinFunctionValue(null, 2,function *(arg, frame) {
         let hay = value2Str(arg[0]);
         let delim = "\n";
         if (arg[1] != null) {
@@ -451,18 +469,31 @@ RTLIB={
             yield new Value(TYPE_STR, n);
         }
     }, [null, null], true),
-    "str": new BuiltinFunctionValue(1, function(arg) {
+    "str": new BuiltinFunctionValue(`> str(123)
+"123"
+> str("abc")
+"abc"`, 1, function(arg) {
         let val = value2Str(arg[0]);
         return new Value(TYPE_STR, val);
     }),
-    "repeat" : new BuiltinFunctionValue(2, function(arg) {
+    "repeat" : new BuiltinFunctionValue(`> repeat("a",3)
+"aaa"
+> repeat("ab",3)
+"ababab"`, 2, function(arg) {
         let val = value2Str(arg[0]);
         let rep = value2Num(arg[1]);
         return new Value(TYPE_STR, val.repeat(rep));
     }),
 
 // Numeric functions
-    "int": new BuiltinFunctionValue(2, function(arg) {
+    "int": new BuiltinFunctionValue(`> int("123")
+123
+> int("123.5")
+123
+> int(123.5)
+123
+> int(123)
+123`, 2, function(arg) {
         if (arg[0].type != TYPE_STR && arg[0].type != TYPE_NUM) {
             throw new RuntimeException("first argument must be a string or number, is " + typeName(arg[0]));
         }
@@ -476,7 +507,10 @@ RTLIB={
         }
         return new Value(TYPE_NUM, res);
     }, [0, new Value(TYPE_NUM, 10)]),
-    "max" : new BuiltinFunctionValue(2, function(arg) {
+    "max" : new BuiltinFunctionValue(`> max(3,4)
+4
+> max(4,3)
+4`, 2, function(arg) {
         let num = value2Num(arg[0]);
         let num2 = value2Num(arg[1]);
         let res = num;
@@ -485,7 +519,10 @@ RTLIB={
         }
         return new Value(TYPE_NUM, res);
     }),
-    "min" : new BuiltinFunctionValue(2, function(arg) {
+    "min" : new BuiltinFunctionValue(`> min(4,3)
+3
+> min(3,4)
+3`, 2, function(arg) {
         let num = value2Num(arg[0]);
         let num2 = value2Num(arg[1]);
         let res = num;
@@ -494,66 +531,86 @@ RTLIB={
         }
         return new Value(TYPE_NUM, res);
     }),
-    "abs" : new BuiltinFunctionValue(1, function(arg) {
+    "abs" : new BuiltinFunctionValue(`> abs(-3)
+3
+> abs(3)
+3`, 1, function(arg) {
         let num = value2Num(arg[0]);
         if (num < 0) {
             num = -num;
         }
         return new Value(TYPE_NUM, num);
     }),
-    "sqrt" : new BuiltinFunctionValue(1, function(arg) {
+    "sqrt" : new BuiltinFunctionValue(`> sqrt(9)
+3
+> sqrt(4)
+2
+> sqrt(2)
+1.414213562373095`, 1, function(arg) {
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.sqrt(num));
     }),
-    "sin" : new BuiltinFunctionValue(1, function(arg) {
+    "sin" : new BuiltinFunctionValue(null, 1, function(arg) {
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.sin(num));
     }),
-    "cos" : new BuiltinFunctionValue(1, function(arg) {
+    "cos" : new BuiltinFunctionValue(null, 1, function(arg) {
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.cos(num));
     }),
-    "tan" : new BuiltinFunctionValue(1, function(arg) {
+    "tan" : new BuiltinFunctionValue(null, 1, function(arg) {
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.tan(num));
     }),
-    "atan" : new BuiltinFunctionValue(1, function(arg) {
+    "atan" : new BuiltinFunctionValue(null, 1, function(arg) {
         let num = value2Num(arg[0]);
         return new Value(TYPE_NUM, Math.atan(num));
     }),
-    "pow" : new BuiltinFunctionValue(2, function(arg) {
+    "pow" : new BuiltinFunctionValue(`> pow(2,2)
+4
+> pow(2,3)
+8
+> pow(2,4)
+16`, 2, function(arg) {
         let pow = value2Num(arg[0]);
         let exp = value2Num(arg[1]);
         return new Value(TYPE_NUM, Math.pow(pow,exp));
     }),
-    "random" : new BuiltinFunctionValue(0, function(arg) {
+    "random" : new BuiltinFunctionValue(null, 0, function(arg) {
         return new Value(TYPE_NUM, Math.random());
     }),
 
     // Input and output functions
-    "print" : new BuiltinFunctionValue(1, function(arg) {
+    "print" : new BuiltinFunctionValue(null, 1, function(arg) {
         let msg = value2Str(arg[0]);
         doLogHook(msg)
     }),
-    "println" : new BuiltinFunctionValue(1, function(arg) {
+    "println" : new BuiltinFunctionValue(null, 1, function(arg) {
         let msg = value2Str(arg[0]);
         doLogHook(msg + "\n")
     }),
 
     // function for arrays
-    "len" : new BuiltinFunctionValue(1, function(arg) {
+    "len" : new BuiltinFunctionValue(`> len("abc")
+3
+> len([1,2,3])
+3`, 1, function(arg) {
         if (arg[0].type == TYPE_STR || arg[0].type == TYPE_LIST) {
             return new Value(TYPE_NUM, arg[0].val.length);
         }
         throw new RuntimeException("string or list argument required");
     }),
-    "join": new BuiltinFunctionValue(1, function(arg) {
+    "join": new BuiltinFunctionValue(`> join(["a: ",1," b: ", true])
+"a: 1 b: true"`, 1, function(arg) {
         if (arg[0].type == TYPE_LIST) {
             return new Value(TYPE_STR, arg[0].val.map(value2Str).join(""));
         }
         throw new RuntimeException("list argument required. is: " + typeName(arg[0]));
     }),
-    "map": new BuiltinFunctionValue(2, function(arg, frame) {
+    "map": new BuiltinFunctionValue(`> map([1,2,3], def (x) 1 + x)
+[2,3,4]
+> map([1,2,3], def (x) x * x)
+[1,4,9]`, 2, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
@@ -571,7 +628,10 @@ RTLIB={
         }
         return new Value(TYPE_LIST, ret);
     }),
-    "reduce": new BuiltinFunctionValue(3, function(arg, frame) {
+    "reduce": new BuiltinFunctionValue(`> reduce([1,2,3], def (x,y) x+y, 0)
+6
+> reduce([1,2,3], def (x,y) x+y, 2)
+8`, 3, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
@@ -588,7 +648,12 @@ RTLIB={
         }
         return rVal;
     }),
-    "pop": new BuiltinFunctionValue(1,function(arg, frame) {
+    "pop": new BuiltinFunctionValue(`> a=[1, 2, 3]
+[1,2,3]
+> pop(a)
+3
+> a
+[1,2]`, 1,function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
@@ -597,26 +662,35 @@ RTLIB={
         }
         return arg[0].val.pop(arg[1]);
     }),
-    "push": new BuiltinFunctionValue(2, function(arg, frame) {
+    "push": new BuiltinFunctionValue(`> a=[1, 2]
+[1,2]
+> push(a,3)
+[1,2,3]
+> a
+[1,2,3]`, 2, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
         arg[0].val.push(arg[1]);
         return arg[0];
     }),
-    "joinl": new BuiltinFunctionValue(2,function(arg, frame) {
+    "joinl": new BuiltinFunctionValue(`> joinl([1,2],[3,4])
+[1,2,3,4]`, 2,function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
         if (arg[1].type != TYPE_LIST) {
             throw new RuntimeException("second argument: list argument required. is: " + typeName(arg[1]));
         }
-        let lst = arg[0].val.join(arg[1].val);
+        let lst = arg[0].val.concat(arg[1].val);
         return new Value(TYPE_LIST, lst);
     }),
 
     // functions for maps/hashes
-    "keys": new BuiltinFunctionValue(1, function(arg) {
+    "keys": new BuiltinFunctionValue(`> a={ "first":1, "second": 2, "third": 3}
+{"first":1,"second":2,"third":3}
+> keys(a)
+["first","second","third"]`, 1, function(arg) {
         if (arg[0].type == TYPE_MAP) {
             let keys = Object.keys(arg[0].val);
             let rt = [];
@@ -627,7 +701,16 @@ RTLIB={
         }
         throw new RuntimeException("map argument required");
     }),
-    "sort": new BuiltinFunctionValue(2, function(arg, frame) {
+    "sort": new BuiltinFunctionValue(`> sort([3,1,4,2,5])
+[1,2,3,4,5]
+> def cmp(x, y) {
+...     if x[1] < y[1] return -1
+...     if x[1] > y[1] return 1
+...     return 0
+... }
+
+> r=sort([['a',100],['b',1],['c',1000]],cmp)
+[["b",1],["a",100],["c",1000]]`, 2, function(arg, frame) {
 
         let funVal = null;
 
@@ -671,7 +754,7 @@ RTLIB={
     }, [null, null]),
 
     // functions for working with json
-    "parseJsonString": new BuiltinFunctionValue(1,function(arg, frame) {
+    "parseJsonString": new BuiltinFunctionValue(null, 1,function(arg, frame) {
         if(arg[0].type != TYPE_STR) {
             throw new RuntimeException("first argument: string argument required. is: " + typeName(arg[0]));
         }
@@ -679,13 +762,38 @@ RTLIB={
         let rt = jsValueToRtVal(val);
         return rt;
     }),
-    "toJsonString": new BuiltinFunctionValue(1,function(arg, frame) {
+    "toJsonString": new BuiltinFunctionValue(`> parseJsonString('{"name": "Kermit", "surname": "Frog"}')
+{"name":"Kermit","surname":"Frog"}
+> parseJsonString('[1,2,3]')
+[1,2,3]`, 1,function(arg, frame) {
         let jsVal = rtValueToJsVal(arg[0]);
         return new Value(TYPE_STR, JSON.stringify(jsVal));
     }),
 
     // functions for working with processes
-    "system": new BuiltinFunctionValue(1,function(arg, frame) {
+    "system": new BuiltinFunctionValue(`> a=system("ls /")
+["Applications\\nLibrary\\nSystem\\nUsers\\nVolumes\\nbin\\ncores\\ndev\\netc\\nhome\\nopt\\nprivate\\nsbin\\ntmp\\nusr\\nvar\\n",0]
+> println(a[0])
+Applications
+Library
+System
+Users
+Volumes
+bin
+cores
+dev
+etc
+home
+opt
+private
+sbin
+tmp
+usr
+var
+
+
+> println(a[1])
+0`, 1,function(arg, frame) {
 
         let cmd ="";
 
@@ -698,7 +806,7 @@ RTLIB={
         }
         return _system(cmd);
     }),
-    "sleep": new BuiltinFunctionValue(1,function(arg, frame) {
+    "sleep": new BuiltinFunctionValue(null, 1,function(arg, frame) {
         let num = value2Num(arg[0]);
         let sleepy = async function (ms) {
             {
@@ -713,7 +821,7 @@ RTLIB={
 
         return VALUE_NONE;
     }),
-    "_system_backtick": new BuiltinFunctionValue(1,function(arg, frame) {
+    "_system_backtick": new BuiltinFunctionValue(null, 1,function(arg, frame) {
 
         let cmd ="";
 
@@ -726,13 +834,26 @@ RTLIB={
     }),
 
     // control flow
-    "exit": new BuiltinFunctionValue(1,function(arg, frame) {
+    "exit": new BuiltinFunctionValue(null, 1,function(arg, frame) {
         let num = value2Num(arg[0]);
         process.exit(num);
     }),
 
     // other functions
-    "exists": new BuiltinFunctionValue(2,function(arg, frame) {
+    "exists": new BuiltinFunctionValue(`> a={"first":1}
+{"first":1}
+> exists("first", a)
+true
+> exists("second", a)
+false
+> a=[3,4]
+[3,4]
+> exists(3, a)
+true
+> exists(4, a)
+true
+> exists(5, a)
+false`, 2,function(arg, frame) {
         if (arg[1].type == TYPE_MAP) {
            // check if map has first argument as key
            let key = value2Str(arg[0]);
@@ -745,13 +866,35 @@ RTLIB={
         }
         throw new RuntimeException("second argument must be list or map, is: " + typeName(arg[1]));
     }),
+    "help": new BuiltinFunctionValue(null, 1,function(arg, frame) {
+        if ('help' in arg[0]) {
+            console.log("\nHow to use:\n\n" + arg[0].help);
+        } else {
+            console.log(typeName(arg[0]));
+        }
+        return VALUE_NONE
+    }),
 
-    "type": new BuiltinFunctionValue(1,function(arg, frame) {
+    "type": new BuiltinFunctionValue(`> type(1)
+"Number"
+> type("abc")
+"String"
+> type([1,2,3])
+"List"
+> type({"first": 1, "second": 2})
+"Map"
+> type(def(x) 1+x)
+"Closure"`, 1,function(arg, frame) {
         return new Value(TYPE_STR, typeName(arg[0]));
     }),
 
     // generators
-    "range": new BuiltinFunctionValue(3,function *(arg, frame) {
+    "range": new BuiltinFunctionValue(`> range(1,4)
+[1,2,3]
+> for n range(1,4) println("number: {n}")
+number: 1
+number: 2
+number: 3`, 3,function *(arg, frame) {
         let from = value2Num(arg[0]);
         let to = value2Num(arg[1]);
         let step = 1;
@@ -773,11 +916,11 @@ RTLIB={
     }, [null, null, null], true),
 
     // functions for working with time
-    "time": new BuiltinFunctionValue(0,function(arg, frame) {
+    "time": new BuiltinFunctionValue(null, 0,function(arg, frame) {
         let secondsSinceEpoch = new Date().getTime() / 1000;
         return new Value(TYPE_NUM, secondsSinceEpoch);
     }),
-    "localtime": new BuiltinFunctionValue(1,function(arg, frame) {
+    "localtime": new BuiltinFunctionValue(null, 1,function(arg, frame) {
         let date = null;
         if (arg[0] == null) {
             date = new Date();

@@ -32,6 +32,11 @@ function isKeyword(arg) {
     return arg in KEYWORDS;
 }
 
+function unquote(str, quote) {
+    let s = quote + str + quote;
+    return eval(s);
+}
+
 function makeParserImp() {
 
     prs.setKeepLocationWithToken(true);
@@ -51,7 +56,8 @@ function makeParserImp() {
     let stringConst = prs.makeTransformer(
         prs.makeRegexParser(/^'(\\\\.|[^'])*'/, "string-const"),
         function (arg) {
-            arg[0] = arg[0].slice(1, -1);
+            //arg[0] = arg[0].slice(1, -1);
+            arg[0] = eval(arg[0]);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         }
     );
@@ -59,7 +65,8 @@ function makeParserImp() {
     let formatStringConst = prs.makeTransformer(
         prs.makeRegexParser(/^"(\\\\.|[^"{])*"/, "string-const"),
         function (arg) {
-            arg[0] = arg[0].slice(1, -1);
+            //arg[0] = arg[0].slice(1, -1);
+            arg[0] = eval(arg[0]);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         }
     );
@@ -87,18 +94,21 @@ function makeParserImp() {
         prs.makeRegexParser(/^"(\\\\.|[^"{])*{/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
+            arg[0] = unquote( arg[0], '"');
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
     let formatStringMidConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^"{])*{/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
+            arg[0] = unquote( arg[0], '"');
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
     let formatStringEndConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^"{])*"/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
+            arg[0] = unquote( arg[0], '"');
             return rt.makeConstValue(rt.TYPE_STR, arg);
         })
 
@@ -108,6 +118,7 @@ function makeParserImp() {
         prs.makeRegexParser(/^`(\\\\.|[^`{])*`/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
+            arg[0] = unquote( arg[0], '`');
             return [rt.makeConstValue(rt.TYPE_STR, arg)];
         }
     );
@@ -116,12 +127,14 @@ function makeParserImp() {
         prs.makeRegexParser(/^`(\\\\.|[^`{])*{/, "backtick-string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
+            arg[0] = unquote( arg[0], '`');
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
     let backtickStringEndConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^`{])*`/, "backtick-string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
+            arg[0] = unquote( arg[0], '`');
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
 

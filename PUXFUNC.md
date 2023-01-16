@@ -515,7 +515,15 @@ exit(1) - exit program with status 1 (failure)
 <hr>function: <b>help</b>
 
 ```python
-BuiltinFunction
+
+How to use in shell:
+
+How to use in shell:
+
+Show help text for built-in functions: Example usage:
+ 
+ help(sort)
+
 
 ```
 <a id='s-38'/>

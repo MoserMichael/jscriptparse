@@ -889,9 +889,14 @@ false`, 2,function(arg, frame) {
         }
         throw new RuntimeException("second argument must be list or map, is: " + typeName(arg[1]));
     }),
-    "help": new BuiltinFunctionValue(null, 1,function(arg, frame) {
+    "help": new BuiltinFunctionValue(`How to use in shell:
+
+Show help text for built-in functions: Example usage:
+ 
+ help(sort)
+`, 1,function(arg, frame) {
         if (arg[0]==null) {
-            console.log("Show help text for built-in functions: Example usage:\n" +
+            console.log( +
 `> help(min)
 
 How to use in shell:

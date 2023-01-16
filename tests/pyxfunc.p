@@ -13,7 +13,7 @@ funcCats = [
    "func": [ "print", "println" ]
  },
  { "name": "Functions on arrays",
-    "func": [ "len", "join", "map", "reduce", "pop", "push", "joinl", "sort", "exists", "range" ]
+    "func": [ "len", "join", "map", "reduce", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex" ]
  },
  { "name": "functions for maps/hashes",
     "func": [ "each", "keys", "exists" ]

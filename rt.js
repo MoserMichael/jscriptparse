@@ -642,6 +642,25 @@ RTLIB={
         }
         return new Value(TYPE_LIST, ret);
     }),
+    "mapIndex": new BuiltinFunctionValue(`> mapIndex([3,4,5,6],def(x,y) [2*x, y])
+[[6,0],[8,1],[10,2],[12,3]]`, 2, function(arg, frame) {
+        if (arg[0].type !== TYPE_LIST) {
+            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
+        }
+        if (arg[1].type != TYPE_CLOSURE && arg[1].type != TYPE_BUILTIN_FUNCTION) {
+            throw new RuntimeException("second argument: function argument required. is: " + typeName(arg[1]));
+        }
+        let ret = [];
+        let argList = arg[0];
+        let funVal = arg[1];
+
+        for(let i=0; i<argList.val.length;++i) {
+            let arg = [ argList.val[i], new Value(TYPE_NUM, i) ];
+            let mapVal = evalClosure(funVal, arg, frame);
+            ret.push(mapVal)
+        }
+        return new Value(TYPE_LIST, ret);
+    }),
     "reduce": new BuiltinFunctionValue(`> reduce([1,2,3], def (x,y) x+y, 0)
 6
 > reduce([1,2,3], def (x,y) x+y, 2)

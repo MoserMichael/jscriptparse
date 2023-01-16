@@ -73,6 +73,8 @@ class ParserError extends Error {
                 console.error("nextException " + nextException.stack);
             }
         }
+
+        //console.debug("throw ParserError: pos: " + this.pos + (this.nextException != null ? " deepest.pos: " + this.getDeepest().pos : ""));
     }
 
     getDeepest() {
@@ -184,6 +186,8 @@ const makeTracer = function(parser, title) {
         console.log(msg);
 
         console.log("exit parser: " + title);
+        //console.debug("exit parser: state.pos: " + this.pos + (this.lastError != null ? " lastError.pos: " + this.lastError.getDeepest().pos : ""));
+
         return ret;
     }
 }

@@ -34,6 +34,7 @@ function isKeyword(arg) {
 
 function unquote(str, quote) {
     let s = quote + str + quote;
+    // there must be a better way, this is not very safe...
     return eval(s);
 }
 
@@ -57,7 +58,7 @@ function makeParserImp() {
         prs.makeRegexParser(/^'(\\\\.|[^'])*'/, "string-const"),
         function (arg) {
             //arg[0] = arg[0].slice(1, -1);
-            arg[0] = eval(arg[0]);
+            arg[0] = eval(arg[0]); // bad idea...
             return rt.makeConstValue(rt.TYPE_STR, arg);
         }
     );
@@ -66,7 +67,7 @@ function makeParserImp() {
         prs.makeRegexParser(/^"(\\\\.|[^"{])*"/, "string-const"),
         function (arg) {
             //arg[0] = arg[0].slice(1, -1);
-            arg[0] = eval(arg[0]);
+            arg[0] = eval(arg[0]); // bad idea...
             return rt.makeConstValue(rt.TYPE_STR, arg);
         }
     );

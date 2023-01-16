@@ -125,7 +125,7 @@ function value2Bool(val) {
     } else if (val.type == TYPE_NUM) {
         return val.val != 0;
     } else if (val.type == TYPE_STR) {
-        return val.val == "true";
+        return val.val;
     }
     throw new RuntimeException("can't convert " + typeName(val) + " to boolean");
 }
@@ -1193,8 +1193,11 @@ class AstConstValue extends AstBase {
 
 function makeConstValue(type, value) {
     let val = value[0];
+    if (type == TYPE_BOOL) {
+        value[0] = val == "true";
+    }
     if (val == "none") {
-        val = null;
+        val[0] = null;
     }
     return new AstConstValue(new Value(type, value[0]), value[1]);
 }

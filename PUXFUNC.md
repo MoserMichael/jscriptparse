@@ -1,21 +1,21 @@
 # pyxfunc - PYX functions by Category
 
 ## functions on scalars or strings
-<a href='#s-1'>find</a>&nbsp;<a href='#s-2'>mid</a>&nbsp;<a href='#s-3'>lc</a>&nbsp;<a href='#s-4'>uc</a>&nbsp;<a href='#s-5'>reverse</a>&nbsp;<a href='#s-6'>str</a>&nbsp;<a href='#s-7'>repeat</a>&nbsp;<a href='#s-8'>len</a>&nbsp;
+<a href='#s-1'>find</a>&nbsp;,&nbsp;<a href='#s-2'>mid</a>&nbsp;,&nbsp;<a href='#s-3'>lc</a>&nbsp;,&nbsp;<a href='#s-4'>uc</a>&nbsp;,&nbsp;<a href='#s-5'>reverse</a>&nbsp;,&nbsp;<a href='#s-6'>str</a>&nbsp;,&nbsp;<a href='#s-7'>repeat</a>&nbsp;,&nbsp;<a href='#s-8'>len</a>
 ## Numeric functions
-<a href='#s-9'>int</a>&nbsp;<a href='#s-10'>max</a>&nbsp;<a href='#s-11'>min</a>&nbsp;<a href='#s-12'>abs</a>&nbsp;<a href='#s-13'>sqrt</a>&nbsp;<a href='#s-14'>sin</a>&nbsp;<a href='#s-15'>cos</a>&nbsp;<a href='#s-16'>tan</a>&nbsp;<a href='#s-17'>atan</a>&nbsp;<a href='#s-18'>pow</a>&nbsp;<a href='#s-19'>random</a>&nbsp;
+<a href='#s-9'>int</a>&nbsp;,&nbsp;<a href='#s-10'>max</a>&nbsp;,&nbsp;<a href='#s-11'>min</a>&nbsp;,&nbsp;<a href='#s-12'>abs</a>&nbsp;,&nbsp;<a href='#s-13'>sqrt</a>&nbsp;,&nbsp;<a href='#s-14'>sin</a>&nbsp;,&nbsp;<a href='#s-15'>cos</a>&nbsp;,&nbsp;<a href='#s-16'>tan</a>&nbsp;,&nbsp;<a href='#s-17'>atan</a>&nbsp;,&nbsp;<a href='#s-18'>pow</a>&nbsp;,&nbsp;<a href='#s-19'>random</a>
 ## Input and output functions
-<a href='#s-20'>print</a>&nbsp;<a href='#s-21'>println</a>&nbsp;
+<a href='#s-20'>print</a>&nbsp;,&nbsp;<a href='#s-21'>println</a>
 ## Functions on arrays
-<a href='#s-8'>len</a>&nbsp;<a href='#s-23'>join</a>&nbsp;<a href='#s-24'>map</a>&nbsp;<a href='#s-25'>reduce</a>&nbsp;<a href='#s-26'>pop</a>&nbsp;<a href='#s-27'>push</a>&nbsp;<a href='#s-28'>joinl</a>&nbsp;<a href='#s-29'>keys</a>&nbsp;<a href='#s-30'>sort</a>&nbsp;<a href='#s-31'>exists</a>&nbsp;<a href='#s-32'>range</a>&nbsp;
+<a href='#s-8'>len</a>&nbsp;,&nbsp;<a href='#s-23'>join</a>&nbsp;,&nbsp;<a href='#s-24'>map</a>&nbsp;,&nbsp;<a href='#s-25'>reduce</a>&nbsp;,&nbsp;<a href='#s-26'>pop</a>&nbsp;,&nbsp;<a href='#s-27'>push</a>&nbsp;,&nbsp;<a href='#s-28'>joinl</a>&nbsp;,&nbsp;<a href='#s-29'>keys</a>&nbsp;,&nbsp;<a href='#s-30'>sort</a>&nbsp;,&nbsp;<a href='#s-31'>exists</a>&nbsp;,&nbsp;<a href='#s-32'>range</a>
 ## function with json
-<a href='#s-33'>parseJsonString</a>&nbsp;<a href='#s-34'>toJsonString</a>&nbsp;
+<a href='#s-33'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-34'>toJsonString</a>
 ## functions for working with processes
-<a href='#s-35'>system</a>&nbsp;<a href='#s-36'>exit</a>&nbsp;
+<a href='#s-35'>system</a>&nbsp;,&nbsp;<a href='#s-36'>exit</a>
 ## Other functions
-<a href='#s-37'>help</a>&nbsp;<a href='#s-38'>type</a>&nbsp;<a href='#s-39'>time</a>&nbsp;<a href='#s-40'>localtime</a>&nbsp;
+<a href='#s-37'>help</a>&nbsp;,&nbsp;<a href='#s-38'>type</a>&nbsp;,&nbsp;<a href='#s-39'>time</a>&nbsp;,&nbsp;<a href='#s-40'>localtime</a>
 ## global variables
-<a href='#s-41'>mathconst</a>&nbsp;<a href='#s-42'>ARGV</a>&nbsp;<a href='#s-43'>ENV</a>&nbsp;
+<a href='#s-41'>mathconst</a>&nbsp;,&nbsp;<a href='#s-42'>ARGV</a>&nbsp;,&nbsp;<a href='#s-43'>ENV</a>
 
 <a id='s-1'/>
 <hr>function: <b>find</b>

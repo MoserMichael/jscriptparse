@@ -49,10 +49,12 @@ def doIt() {
            link_map[name] = link_name
            link_num = link_num + 1
 
-         if not first print(";&nbsp")
-           first = false
+         if not first
+            print("&nbsp;,&nbsp;")
 
-         print("<a href='#{link_name}'>{name}</a>&nbsp;")
+         first = false
+
+         print("<a href='#{link_name}'>{name}</a>")
       }
       println("")
     }

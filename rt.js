@@ -754,7 +754,11 @@ RTLIB={
     // functions for maps/hashes
     "each" : new BuiltinFunctionValue( `
 > each({"a":1,"b":2,"c":3})
-[["a",1],["b",2],["c",3]]    
+[["a",1],["b",2],["c",3]]
+
+> pairs = each({"a":1,"b":2,"c":3})
+> map( pairs, def (arg) [ arg[0]+arg[0], arg[1]*arg[1] ] )
+[["aa",1],["bb",4],["cc",9]]    
 `, 1, function*(arg) {
         if (arg[0].type != TYPE_MAP && arg[0].type != TYPE_LIST) {
             throw new RuntimeException("map or list expected. got " + typeName(arg[0]));

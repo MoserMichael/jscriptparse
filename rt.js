@@ -98,9 +98,14 @@ class BuiltinFunctionValue {
 }
 
 class Value {
-    constructor(type, val) {
+    constructor(type, val, help_ = null) {
         this.type = type;
         this.val = val;
+
+        if (help_ != null) {
+            this.help = help_;
+        }
+
     }
 
     show() {
@@ -981,14 +986,15 @@ number: 3`, 3,function *(arg, frame) {
         log2e: new Value(TYPE_NUM, Math.LOG2E),
         sqrt1_2: new Value(TYPE_NUM, Math.SQRT1_2),
         sqrt2: new Value(TYPE_NUM, Math.SQRT2),
-    }),
+    }, "map of mathematical constant"),
 
     "ARGV" : new Value(TYPE_LIST,
         process.argv.map(x => x).reduce(
             (prev,current)=>{
                 prev.push(new Value(TYPE_STR, current));
                 return prev
-            } , [])
+            } , []),
+        "command line arguments (array)"
     ),
 
     "ENV": new Value(TYPE_MAP,
@@ -996,9 +1002,9 @@ number: 3`, 3,function *(arg, frame) {
             (prev,current)=>{
                 prev[current[0]]= new Value(TYPE_STR, current[1]);
                 return prev
-            } , {})
+            } , {}) ,
+        "environment variables, entry key is the name of the environment variable, the entry value is it's value"
     ),
-
 }
 
 // there is a global frame, also each function invocation has is own frame.a

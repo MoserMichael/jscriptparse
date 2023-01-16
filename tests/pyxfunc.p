@@ -25,7 +25,7 @@ funcCats = [
    "func": [ "help", "type", "time", "localtime" ]
  },
  { "name": "global variables",
-    "func": [ "mathconst", "ARGV", "ARGC" ]
+    "func": [ "mathconst", "ARGV", "ENV" ]
  }
 ]
 

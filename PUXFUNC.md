@@ -15,7 +15,7 @@
 ## Other functions
 <a href='#s-37'>help</a>&nbsp;<a href='#s-38'>type</a>&nbsp;<a href='#s-39'>time</a>&nbsp;<a href='#s-40'>localtime</a>&nbsp;
 ## global variables
-<a href='#s-41'>mathconst</a>&nbsp;<a href='#s-42'>ARGV</a>&nbsp;<a href='#s-43'>ARGC</a>&nbsp;
+<a href='#s-41'>mathconst</a>&nbsp;<a href='#s-42'>ARGV</a>&nbsp;<a href='#s-43'>ENV</a>&nbsp;
 
 <a id='s-1'/>
 <hr>function: <b>find</b>
@@ -582,8 +582,12 @@ command line arguments (array)
 
 ```
 <a id='s-43'/>
-<hr>function: <b>ARGC</b>
+<hr>function: <b>ENV</b>
 
 ```
+
+How to use in shell:
+
+environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```

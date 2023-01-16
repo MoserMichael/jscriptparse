@@ -149,15 +149,48 @@ function evalFile(file) {
     process.exit(result);
 }
 
+function printHelp() {
+    console.log(`pyx [-h] <file> [-e 'println("hello world")']
+
+pyx          : Starts shell/repl if run without arguments
+
+pyx <file>   : run the provided pyx program
+
+pyx -e 'val' : run the string 'val' as a pyx program (one liner)
+
+-h           : show this help text   
+    `);
+    process.exit(1);
+}
+
+function cmdLine() {
+    if (process.argv.length == 4) {
+        if (process.argv[2] == '-e') {
+            let result = 0;
+            if (!scr.runParserAndEval(process.argv[3], false)) {
+                result = 1;
+            }
+            process.exit(result);
+        }
+    }
+
+    printHelp();
+}
+
 function runMain() {
 
 
     if (process.argv.length < 3) {
         runEvalLoop()
     } else {
-        evalFile(process.argv[2]);
+        if (process.argv.length == 3) {
+            if (process.argv[2] == '-h') {
+                printHelp();
+            }
+            evalFile(process.argv[2]);
+        }
+        cmdLine();
     }
-
 }
 
 runMain();

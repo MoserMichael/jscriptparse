@@ -40,11 +40,13 @@ def doIt() {
     println("")
 
     for e funcCats {
-      println("<a name='#{name}'/>### {e['name']}")
+      println("<a id='#{name}'/>### {e['name']}")
       for name e['func'] {
          print("<hr>")
          fn = system("./pyx -e 'help({name})'")
          println("function: {name}")
+
+         println("")
          println("```")
          println(fn[0])
          println("```")

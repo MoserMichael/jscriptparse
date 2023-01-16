@@ -15,8 +15,9 @@
 # global variables
 <a href='#mathconst'>mathconst</a>&nbsp;<a href='#ARGV'>ARGV</a>&nbsp;<a href='#ARGC'>ARGC</a>&nbsp;
 
-<a name='#ARGC'/>### functions on scalars or strings
+<a id='#ARGC'/>### functions on scalars or strings
 <hr>function: find
+
 ```
 
 How to use in shell:
@@ -32,6 +33,7 @@ How to use in shell:
 
 ```
 <hr>function: mid
+
 ```
 
 How to use in shell:
@@ -43,6 +45,7 @@ How to use in shell:
 
 ```
 <hr>function: lc
+
 ```
 
 How to use in shell:
@@ -52,6 +55,7 @@ How to use in shell:
 
 ```
 <hr>function: uc
+
 ```
 
 How to use in shell:
@@ -61,6 +65,7 @@ How to use in shell:
 
 ```
 <hr>function: reverse
+
 ```
 
 How to use in shell:
@@ -72,6 +77,7 @@ How to use in shell:
 
 ```
 <hr>function: str
+
 ```
 
 How to use in shell:
@@ -83,6 +89,7 @@ How to use in shell:
 
 ```
 <hr>function: repeat
+
 ```
 
 How to use in shell:
@@ -94,6 +101,7 @@ How to use in shell:
 
 ```
 <hr>function: len
+
 ```
 
 How to use in shell:
@@ -104,8 +112,9 @@ How to use in shell:
 3
 
 ```
-<a name='#len'/>### Numeric functions
+<a id='#len'/>### Numeric functions
 <hr>function: int
+
 ```
 
 How to use in shell:
@@ -121,6 +130,7 @@ How to use in shell:
 
 ```
 <hr>function: max
+
 ```
 
 How to use in shell:
@@ -132,6 +142,7 @@ How to use in shell:
 
 ```
 <hr>function: min
+
 ```
 
 How to use in shell:
@@ -143,6 +154,7 @@ How to use in shell:
 
 ```
 <hr>function: abs
+
 ```
 
 How to use in shell:
@@ -154,6 +166,7 @@ How to use in shell:
 
 ```
 <hr>function: sqrt
+
 ```
 
 How to use in shell:
@@ -167,6 +180,7 @@ How to use in shell:
 
 ```
 <hr>function: sin
+
 ```
 
 How to use in shell:
@@ -177,6 +191,7 @@ returns the sine of a number in radians
 
 ```
 <hr>function: cos
+
 ```
 
 How to use in shell:
@@ -187,6 +202,7 @@ returns the cosine of a number in radians
 
 ```
 <hr>function: tan
+
 ```
 
 How to use in shell:
@@ -195,6 +211,7 @@ returns the tangent of a number in radians
 
 ```
 <hr>function: atan
+
 ```
 
 How to use in shell:
@@ -203,6 +220,7 @@ returns the inverse tangent (in radians) of a number
 
 ```
 <hr>function: pow
+
 ```
 
 How to use in shell:
@@ -216,6 +234,7 @@ How to use in shell:
 
 ```
 <hr>function: random
+
 ```
 
 How to use in shell:
@@ -223,8 +242,9 @@ How to use in shell:
 returns random number with value between 0 and 1
 
 ```
-<a name='#random'/>### Input and output functions
+<a id='#random'/>### Input and output functions
 <hr>function: print
+
 ```
 
 How to use in shell:
@@ -233,6 +253,7 @@ prints argument value to console
 
 ```
 <hr>function: println
+
 ```
 
 How to use in shell:
@@ -240,8 +261,9 @@ How to use in shell:
 prints argument value to console, followed by newline
 
 ```
-<a name='#println'/>### Functions on arrays
+<a id='#println'/>### Functions on arrays
 <hr>function: len
+
 ```
 
 How to use in shell:
@@ -253,6 +275,7 @@ How to use in shell:
 
 ```
 <hr>function: join
+
 ```
 
 How to use in shell:
@@ -262,6 +285,7 @@ How to use in shell:
 
 ```
 <hr>function: map
+
 ```
 
 How to use in shell:
@@ -273,6 +297,7 @@ How to use in shell:
 
 ```
 <hr>function: reduce
+
 ```
 
 How to use in shell:
@@ -284,6 +309,7 @@ How to use in shell:
 
 ```
 <hr>function: pop
+
 ```
 
 How to use in shell:
@@ -297,6 +323,7 @@ How to use in shell:
 
 ```
 <hr>function: push
+
 ```
 
 How to use in shell:
@@ -310,6 +337,7 @@ How to use in shell:
 
 ```
 <hr>function: joinl
+
 ```
 
 How to use in shell:
@@ -319,6 +347,7 @@ How to use in shell:
 
 ```
 <hr>function: keys
+
 ```
 
 How to use in shell:
@@ -330,6 +359,7 @@ How to use in shell:
 
 ```
 <hr>function: sort
+
 ```
 
 How to use in shell:
@@ -347,6 +377,7 @@ How to use in shell:
 
 ```
 <hr>function: exists
+
 ```
 
 How to use in shell:
@@ -368,6 +399,7 @@ false
 
 ```
 <hr>function: range
+
 ```
 
 How to use in shell:
@@ -380,8 +412,9 @@ number: 2
 number: 3
 
 ```
-<a name='#range'/>### function with json
+<a id='#range'/>### function with json
 <hr>function: parseJsonString
+
 ```
 
 How to use in shell:
@@ -393,6 +426,7 @@ How to use in shell:
 
 ```
 <hr>function: toJsonString
+
 ```
 
 How to use in shell:
@@ -403,8 +437,9 @@ How to use in shell:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a name='#toJsonString'/>### functions for working with processes
+<a id='#toJsonString'/>### functions for working with processes
 <hr>function: system
+
 ```
 
 How to use in shell:
@@ -435,6 +470,7 @@ var
 
 ```
 <hr>function: exit
+
 ```
 
 How to use in shell:
@@ -443,13 +479,15 @@ exit() - exit program with status 0 (success)
 exit(1) - exit program with status 1 (failure)
 
 ```
-<a name='#exit'/>### Other functions
+<a id='#exit'/>### Other functions
 <hr>function: help
+
 ```
 BuiltinFunction
 
 ```
 <hr>function: type
+
 ```
 
 How to use in shell:
@@ -467,6 +505,7 @@ How to use in shell:
 
 ```
 <hr>function: time
+
 ```
 
 How to use in shell:
@@ -475,6 +514,7 @@ returns epoch time in seconds
 
 ```
 <hr>function: localtime
+
 ```
 
 How to use in shell:
@@ -486,8 +526,9 @@ decodes epoch time into map
 
 
 ```
-<a name='#localtime'/>### global variables
+<a id='#localtime'/>### global variables
 <hr>function: mathconst
+
 ```
 
 How to use in shell:
@@ -496,6 +537,7 @@ map of mathematical constant
 
 ```
 <hr>function: ARGV
+
 ```
 
 How to use in shell:
@@ -504,6 +546,7 @@ command line arguments (array)
 
 ```
 <hr>function: ARGC
+
 ```
 
 ```

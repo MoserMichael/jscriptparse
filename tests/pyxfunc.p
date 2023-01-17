@@ -10,7 +10,7 @@ funcCats = [
  },
  {
    "name": "Input and output functions",
-   "func": [ "print", "println" ]
+   "func": [ "print", "println", "readFile", "writeFile" ]
  },
  { "name": "Functions on arrays",
     "func": [ "len", "join", "map", "reduce", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex" ]

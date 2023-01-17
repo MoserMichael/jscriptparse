@@ -603,7 +603,52 @@ RTLIB={
         let msg = value2Str(arg[0]);
         doLogHook(msg + "\n")
     }),
+    "readFile" : new BuiltinFunctionValue(`
+read text file and return string
 
+> fileText = readFile("fileName.txt")    
+    `, 1, function(arg) {
+        let fname = value2Str(arg[0]);
+        try {
+            let res = fs.readFileSync(fname, {encoding: 'utf8', flag: 'r'});
+            return new Value(TYPE_STR,res);
+        } catch(err) {
+            throw new RuntimeException("Can't read file: " + fname + " error: " + err);
+        };
+    }),
+    "writeFile" : new BuiltinFunctionValue(`
+write string parameter into text file
+
+> writeFile("fileName.txt","fileContent")
+
+append file
+> writeFile("fileName.txt","add this after end of file", "append")
+   
+    `, 3, function(arg) {
+        let fname = value2Str(arg[0]);
+        let data = value2Str(arg[1]);
+        let append = false;
+        if (arg[2] != null ) {
+            let mode = value2Str(arg[2]);
+            if (mode == "append") {
+                append = true;
+            } else if (mode == "write") {
+                append = false;
+            } else {
+                throw new RuntimeException("third argument is either 'append' or 'write'");
+            }
+        }
+        try {
+            if (append) {
+                fs.appendFileSync(fname, data);
+            } else {
+                fs.writeFileSync(fname, data);
+            }
+        } catch(err) {
+            throw new RuntimeException("Can't " + (append ? "append" : "write") + " file: " + fname + " error: " + err);
+        };
+        return VALUE_NONE;
+    }, [ null, null, null]),
     // function for arrays
     "len" : new BuiltinFunctionValue(`> len("abc")
 3

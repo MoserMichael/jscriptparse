@@ -9,20 +9,32 @@ See the [generated documentation](https://mosermichael.github.io/jscriptparse/ou
 
 ![pux](pux.jpg) - the pyx scripting langauge and REPL shell.
 
+/don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress/
+
 The programming language is named after Winnie-the-Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
 
 The scripting language and interpreter for the pyx language.  
 
 - See [pyx functions by category (pyxfunc)](PYXFUNC.md)
 - see the [design document](PYXDESIGN.md)
+- Example tests scripts are [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) - see files with extension .p (.out - expected output of the script)
 
-Source code 
+## Running it
+
+- you need to have ```nodejs``` and ```git``` installed on the system
+- run the shell: ```
+git clone https://github.com/MoserMichael/jscriptparse.git```
+cd jscriptparse
+./pyx
+```
+
+The shell has command completion (tab tab) and a command history (cursor up, cursor down)
+
+## Source code 
 
 - the interpreter/repl script is [here](https://github.com/MoserMichael/jscriptparse/blob/main/pyx) - you need to have node installed for this.
-- Example tests scripts are [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) - see files with extension .p (.out - expected output of the script)
 - The parser/syntax tree is built [here](https://github.com/MoserMichael/jscriptparse/blob/main/scripty.js) the runtime for the interpeter is [here](https://github.com/MoserMichael/jscriptparse/blob/main/rt.js) 
 
-(don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress)
  
 
 

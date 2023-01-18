@@ -1,4 +1,4 @@
-PYXTUT - tutorial for the PYX scripting language
+# PYXTUT - tutorial for the PYX scripting language
 
 Run the ```pyx``` program, first thing you see is a command prompt
 

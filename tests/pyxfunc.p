@@ -3,7 +3,7 @@ funcCats = [
  {
  "name": "functions on scalars or strings",
  "func": [ "find", "mid", "lc", "uc", "reverse", "str", "repeat", "len" ]
- },
+ }, 
  {
   "name": "Numeric functions",
   "func": [ "int", "max", "min", "abs", "sqrt", "sin", "cos", "tan", "atan", "pow", "random" ]
@@ -13,7 +13,7 @@ funcCats = [
    "func": [ "print", "println", "readFile", "writeFile" ]
  },
  { "name": "Functions on arrays",
-    "func": [ "len", "join", "map", "reduce", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex" ]
+    "func": [ "len", "join", "map", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex" ]
  },
  { "name": "functions for maps/hashes",
     "func": [ "each", "keys", "exists" ]

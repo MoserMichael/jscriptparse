@@ -77,15 +77,13 @@ function runEvalLoop() {
                 }
 
             } catch(e) {
-                if (e instanceof prs.ParserError) {
-                    e = e.getDeepest();
-                    //console.log(JSON.stringify(e));
-                    e.pos = skipSpace(data, e.pos);
-
-                    if (e.pos >= data.length) {
+                if (e instanceof scr.ScriptError) {
+                    if (e.eof) {
                         return callback(new repl.Recoverable(e));
                     }
-                    callback(null,prs.formatParserError(e, data));
+                   callback(null, e.message);
+                } else {
+                   callback(null, e.message);
                 }
             }
             callback(null,evalPrintMsg);

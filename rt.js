@@ -1395,7 +1395,6 @@ function makeExpression(exprList) {
     let prevExpression = null;
     let pos = exprList.length -1;
 
-    //console.log("@@" + JSON.stringify(exprList));
     while(pos > 0) {
         if (prevExpression == null) {
             //console.log("## " + JSON.stringify(exprList[pos-2]) + " # " +   JSON.stringify(exprList[pos-1]) + " # " + JSON.stringify(exprList[pos]));

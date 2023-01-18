@@ -1,4 +1,4 @@
-# pyxfunc - PYX functions by Category
+# pyxfunc - PYX functions reference by category
 
 ## functions on scalars or strings
 <a href='#s-1'>find</a>&nbsp;,&nbsp;<a href='#s-2'>mid</a>&nbsp;,&nbsp;<a href='#s-3'>lc</a>&nbsp;,&nbsp;<a href='#s-4'>uc</a>&nbsp;,&nbsp;<a href='#s-5'>reverse</a>&nbsp;,&nbsp;<a href='#s-6'>str</a>&nbsp;,&nbsp;<a href='#s-7'>repeat</a>&nbsp;,&nbsp;<a href='#s-8'>len</a>

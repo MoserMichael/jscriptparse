@@ -33,7 +33,7 @@ funcCats = [
 ]
 
 def doIt() {
-    println("# pyxfunc - PYX functions by Category")
+    println("# pyxfunc - PYX functions reference by category")
     println("")
 
     link_num=1

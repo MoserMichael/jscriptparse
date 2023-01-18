@@ -84,7 +84,8 @@ Of the cosine of pi:
 -1
 ```
 
-You have a lot of functions here: youst type tab two times and you get the whole list of reserved words and functions
+You have a lot of functions here: press on the TAB key twice and you get the whole list of reserved words and functions
+(The TAB key has the following label on the keyboard  ```->|```)
 
 ```
 >
@@ -97,13 +98,18 @@ repeat(           reverse(          sin(              sort(             split(  
 toJsonString(     type(             uc(               writeFile(
 ```
 
-You also have variables: assign a number ot a variable like this and use the value of the number in computations:
+You also have variables:  A variable is a name that can be assigned a value
 
 ```
 > two=2
 2
 > three=3
 3
+```
+
+If you use ```two``` in a mathematical expression, then the value ```2``` will be used - that's the value that we just assigned to the variable!
+
+```
 > two*three
 6
 ```

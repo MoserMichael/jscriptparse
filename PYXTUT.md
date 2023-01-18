@@ -159,7 +159,7 @@ s(       sin(     sort(    split(   sqrt(    str(     system(
 
 if you type ```si tab tab``` then there is only one function sin(  - so it will just put sin( at the place where you are typing. Believe me, that's a big time saver!
 
-## other types of data
+## lists and more about functions
 
 You can have a list of the numbers between one and five
 

@@ -663,6 +663,29 @@ How to use in shell:
 
 map of mathematical constant
 
+the number PI
+    
+> mathconst['pi']
+3.141592653589793
+
+the Euler constant 
+
+> mathconst['e']
+2.718281828459045
+
+The square root of two
+
+> mathconst["sqrt2"]
+1.4142135623730951
+
+Other values: 
+mathconst["sqrt1_2"] - square root of one half.
+mathconst["log2e"] - base e logarithm of 2 
+mathconst["log10e"] - base e logarithm of 10
+mathconst["log2e"] - base 2 logarithm of e
+mathconst["log10e"] - base 10 logarithm of e    
+    
+
 ```
 <a id='s-47'/>
 <hr>function: <b>ARGV</b>

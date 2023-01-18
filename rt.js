@@ -1069,7 +1069,30 @@ number: 3`, 3,function *(arg, frame) {
         log2e: new Value(TYPE_NUM, Math.LOG2E),
         sqrt1_2: new Value(TYPE_NUM, Math.SQRT1_2),
         sqrt2: new Value(TYPE_NUM, Math.SQRT2),
-    }, "map of mathematical constant"),
+    }, `map of mathematical constant
+
+the number PI
+    
+> mathconst['pi']
+3.141592653589793
+
+the Euler constant 
+
+> mathconst['e']
+2.718281828459045
+
+The square root of two
+
+> mathconst["sqrt2"]
+1.4142135623730951
+
+Other values: 
+mathconst["sqrt1_2"] - square root of one half.
+mathconst["log2e"] - base e logarithm of 2 
+mathconst["log10e"] - base e logarithm of 10
+mathconst["log2e"] - base 2 logarithm of e
+mathconst["log10e"] - base 10 logarithm of e    
+    `),
 
     "ARGV" : new Value(TYPE_LIST,
         process.argv.map(x => x).reduce(

@@ -802,7 +802,8 @@ function runParse(data, openFile, passException) {
                 //console.debug("---\n" + er.show() + "\n###\n");
                 console.log(msg);
             } else {
-                throw new ScriptError(msg, er.pos >= data.length )
+                let res = er.pos >= data.length;
+                throw new ScriptError(msg, res );
             }
         }
         throw er;
@@ -830,7 +831,10 @@ function runParserAndEval(data, openFile,  frame = null, passException = false) 
             } else {
                 console.log("on break");
             }
-        } else if (!(er instanceof  prs.ParserError) ) {
+        } else if (er instanceof ScriptError) {
+            throw er;
+        }
+        else if (!(er instanceof  prs.ParserError) ) {
             console.log(prs.formatParserError(er));
         }
     }

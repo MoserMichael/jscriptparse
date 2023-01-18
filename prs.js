@@ -198,8 +198,6 @@ function formatParserError(er, data) {
         let msg = "";
         let pos = er.pos;
 
-        console.log("pos: " + pos + " data: " + data);
-
         if (er.filePath != null) {
             msg = er.filePath + ": ";
         }

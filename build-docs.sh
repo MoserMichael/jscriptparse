@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ex
 git checkout main
-jsdoc prs.js README.md
+jsdoc prs.js PRS.md
 
 tmp=$(mktemp -d)
 mv out "${tmp}/"

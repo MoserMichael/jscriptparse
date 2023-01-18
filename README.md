@@ -1,28 +1,23 @@
-## prs.js - A small Javascript module for building parser combinators
-
-A module to build parser combinators ```prs.js``` - the resulting parser is a top-down parser, also known a parsing expression parser [PEG](https://en.wikipedia.org/wiki/Parsing_expression_grammar)
-
-This is a standalone script, you can use it both with nodejs and in a browser.
-See the [generated documentation](https://mosermichael.github.io/jscriptparse/out/index.html)
-
 ## pyx scripting language
 
 ![pux](pux.jpg) - the pyx scripting langauge and REPL shell.
-
-/don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress/
 
 The programming language is named after Winnie-the-Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
 
 The scripting language and interpreter for the pyx language.  
 
+- See [pyx tutorial (pyxtut)](PYXTUT.md)
 - See [pyx functions by category (pyxfunc)](PYXFUNC.md)
 - see the [design document](PYXDESIGN.md)
 - Example tests scripts are [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) - see files with extension .p (.out - expected output of the script)
 
+/don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress/
+
 ## Running it
 
 - you need to have ```nodejs``` and ```git``` installed on the system
-- run the shell: ```
+- run the shell: as follows:
+```
 git clone https://github.com/MoserMichael/jscriptparse.git```
 cd jscriptparse
 ./pyx
@@ -34,8 +29,6 @@ The shell has command completion (tab tab) and a command history (cursor up, cur
 
 - the interpreter/repl script is [here](https://github.com/MoserMichael/jscriptparse/blob/main/pyx) - you need to have node installed for this.
 - The parser/syntax tree is built [here](https://github.com/MoserMichael/jscriptparse/blob/main/scripty.js) the runtime for the interpeter is [here](https://github.com/MoserMichael/jscriptparse/blob/main/rt.js) 
-
- 
 
 
 ## what I learned while writing this project

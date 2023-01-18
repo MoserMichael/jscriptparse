@@ -708,8 +708,20 @@ append file
     }),
     "reduce": new BuiltinFunctionValue(`> reduce([1,2,3], def (x,y) x+y, 0)
 6
+
+same as:
+
+> (((0+1)+2)+3)
+6
+
 > reduce([1,2,3], def (x,y) x+y, 2)
-8`, 3, function(arg, frame) {
+8
+
+same as:
+ 
+> (((0+1)+2)+3)
+6
+`, 3, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
         }
@@ -726,6 +738,33 @@ append file
         }
         return rVal;
     }),
+
+    "reduceFromEnd": new BuiltinFunctionValue(`> def div(a,b) a/b
+
+> reduceFromEnd([4,8,32], div, 1024)
+1
+
+same as:
+
+> (((1024/32) / 8) / 4)
+1`, 3, function(arg, frame) {
+        if (arg[0].type != TYPE_LIST) {
+            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
+        }
+        if (arg[1].type != TYPE_CLOSURE) {
+            throw new RuntimeException("second argument: function argument required. is: " + typeName(arg[1]));
+        }
+        let argList = arg[0];
+        let funVal = arg[1];
+        let rVal = arg[2];
+
+        for(let i=argList.val.length-1; i>=0; i--) {
+            let arg = [rVal, argList.val[i]];
+            rVal = evalClosure(funVal, arg, frame);
+        }
+        return rVal;
+    }),
+
     "pop": new BuiltinFunctionValue(`> a=[1, 2, 3]
 [1,2,3]
 > pop(a)

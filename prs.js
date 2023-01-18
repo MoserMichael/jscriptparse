@@ -617,8 +617,9 @@ const makeTransformer = function(nestedParser, transformResult) {
     requireFunction(transformResult);
 
     return function(state) {
+        let posStart = state.pos;
         res = nestedParser(state);
-        return transformResult(res);
+        return transformResult(res, posStart, state.pos);
     }
 }
 

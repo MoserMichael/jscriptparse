@@ -334,6 +334,7 @@ Or you can make a function that computes the sum of all the squares of numbers f
 It is possible to write the same thing as a ```for``` loop.
 
 A for loop is quite similar, you have a number x that is running for every value provided by the ```range``` function.
+However you don't have to add one to a variable and check if the loop condition is try, the for loop just runs on all values provided by the range function..
 The following statement is run for each of these values.
 
 ```

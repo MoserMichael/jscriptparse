@@ -8,7 +8,7 @@ The scripting language and interpreter for the pyx language.
 
 - See [pyx tutorial (pyxtut)](PYXTUT.md)
 - See [pyx functions by category (pyxfunc)](PYXFUNC.md)
-- see the [design document](PYXDESIGN.md)
+- see the [design document (pyxdesign)](PYXDESIGN.md)
 - Example tests scripts are [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) - see files with extension .p (.out - expected output of the script)
 
 /don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress/

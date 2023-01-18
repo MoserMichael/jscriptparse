@@ -181,7 +181,7 @@ or get such a list with the ```range``` function
 [1,2,3,4,5,6,7,8,9]
 ```
 
-or get a list of the even numbers between one and twenty
+or get a list of the odd numbers between one and twenty (odd numbers do not divide by two)
 
 ```
 > a=range(1,20,2)

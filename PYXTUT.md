@@ -236,6 +236,7 @@ Now calling ```anypower(3)``` will return another function that will always comp
 > powOfThree(3)
 27
 > powOfThree(4)
+64
 
 ```
 
@@ -252,7 +253,7 @@ An now you can use that to compute the table of squares for any number
 [1,16,81,256,625,1296,2401,4096,6561]
 ```
 
-And now lets get the sum of the power of two for the numbers between one and one hundred
+And now lets get the sum of the power of three for the numbers between one and one hundred
 
 ```
 > reduce( map( range(1,100), anypower(3) ), sum, 0)

@@ -257,7 +257,7 @@ And now lets get the sum of the power of two for the numbers between one and one
 ```
 > reduce( map( range(1,100), anypower(3) ), sum, 0)
 24502500
-    ```
+```
 
 ### Statements
 

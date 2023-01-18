@@ -20,7 +20,7 @@ Or more complicated ones: the sum of the square of three with the square of two
 13
 ```
 
-or even more complicated ones: First the expression ```3*3``` is computed, that's because of the brackets. This can be usefull for disambiguation of expressions
+or even more complicated ones: First the expression ```5-2``` is computed, that's because of the brackets. This can be usefull: sometimes you are not quite sure which expression is computed first - the brackets force some order into all of this. 
 
 ```
 > 3*(5-3)+2*2
@@ -324,9 +324,60 @@ Or you can make a function that computes the sum of all the squares of numbers f
 328350
 ```
 
+
+## Maps
+
+There is a type of data called a map. It allows to give names to things.
+
+Like the days of the week - this map has the key, the number of the day of a week, and the name of the day.
+
+We put the map into a variable called dayOfWeek. 
+
+```
+> dayOfWeek = { 1: "Sunday", 2: "Monday", 3: "Tuesday", 4: "Wednesday", 5: "Thursday", 6: "Friday", 7: "Saturday" }
+{"1":"Sunday","2":"Monday","3":"Tuesday","4":"Wednesday","5":"Thursday","6":"Friday","7":"Saturday"}
+```
+
+And then show the name of the day of the week - ```dayOfWeek[6]``` shows the name of the sixth day.
+
+```
+> println(dayOfWeek[6])
+Friday
+```
+
+Now you can also map between the name of the day and its number.
+
+```
+> dayOfWeekReverse = { "Sunday" : 1, "Monday" : 2, "Tuesday" : 3, "Wednesday" : 4, "Thursday" : 5, "Friday" : 6, "Saturday" : 7 }
+{"Sunday":1,"Monday":2,"Tuesday":3,"Wednesday":4,"Thursday":5,"Friday":6,"Saturday":7}
+>
+
+> dayOfWeekRevers["Tuesday"]
+3
+```
+
+Of you can use the map to organize your data, like having a list of records for each employees in the muppet show:
+
+```
+> employees = [ { "Name": "Kermit", "Surname": "Frog", "Profession": "Producer" }, { "Name": "Fozzy", "Surname": "Bear", "Profession": "Comedian" } ]
+[{"Name":"Kermit","Surname":"Frog","Profession":"Producer"},{"Name":"Fozzy","Surname":"Bear","Profession":"Comedian"}]
+> firstEmployee=employees[0]
+{"Name":"Kermit","Surname":"Frog","Profession":"Producer"}
+
+> firstEmployee=employees[0]
+
+> firstEmployee["Name"]
+"Kermit"
+
+> secondEmployee=employees[1]
+{"Name":"Fozzy","Surname":"Bear","Profession":"Comedian"}
+
+> secondEmployee["Surname"]
+"Bear"
+
+```
+
 Or you can do all kinds of stuff, by putting togather all of this.
-
-
 
 
 

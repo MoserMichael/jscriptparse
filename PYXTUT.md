@@ -331,6 +331,28 @@ Or you can make a function that computes the sum of all the squares of numbers f
 328350
 ```
 
+It is possible to write the same thing as a ```for``` loop.
+
+A for loop is quite similar, you have a number x that is running for every value provided by the ```range``` function.
+The following statement is run for each of these values.
+
+```
+> def sumOfSquares(from,to) {
+... sum=0
+... for x range(from,to)
+... sum=sum+x*x
+... return sum
+... }
+
+> println(sumOfSquares(1,10))
+285
+
+> println(sumOfSquares(1,42))
+23821
+
+> println(sumOfSquares(1,100))
+328350
+```
 
 ## Maps
 

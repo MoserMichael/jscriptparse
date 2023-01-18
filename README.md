@@ -18,7 +18,7 @@ The scripting language and interpreter for the pyx language.
 - you need to have ```nodejs``` and ```git``` installed on the system
 - run the shell: as follows:
 ```
-git clone https://github.com/MoserMichael/jscriptparse.git```
+git clone https://github.com/MoserMichael/jscriptparse.git
 cd jscriptparse
 ./pyx
 ```

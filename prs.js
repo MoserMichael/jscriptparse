@@ -60,6 +60,9 @@ class State {
         if (!(lastError instanceof ParserError)) {
             throw lastError;
         }
+        if (lastError.noRecover) {
+            throw lastError;
+        }
         if (this.lastError != null) {
             if (this.lastError.getLatestPos() < lastError.getLatestPos()) {
                 this.lastError = lastError;
@@ -71,13 +74,14 @@ class State {
 }
 
 class ParserError extends Error {
-    constructor(message, pos, nextException = null) {
+    constructor(message, pos, nextException = null, noRecover = false) {
         super(message);
         this.pos = pos;
         this.latestPos = pos;
 
         this.data = null;
         this.filePath = null;
+        this.noRecover = noRecover
 
         this.setNextException(nextException);
     }

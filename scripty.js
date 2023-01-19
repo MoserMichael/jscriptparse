@@ -520,8 +520,8 @@ function makeParserImp() {
             prs.makeTokenParser("="),
             expression
         ], "assignment"),
-        function (arg, posRange) {
-            return rt.makeAstAssignment(arg[0], arg[2], arg[1][1], posRange);
+        function (arg) {
+            return rt.makeAstAssignment(arg[0], arg[2], arg[1][1]);
         }
     );
 
@@ -607,6 +607,7 @@ function makeParserImp() {
         prs.makeSequenceParser([
             prs.makeTokenParser("yield"),
             expression
+
         ], "yield statement"),
         function (arg) {
             return rt.makeYieldStmt(arg[1], arg[0][1]);
@@ -667,7 +668,7 @@ function makeParserImp() {
             prs.makeOptParser(paramList),
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
-        ], "function without name"), function (arg, posRange) {
+        ], "function without name"), function (arg) {
 
             let param = [];
             if (arg[2].length != 0) {
@@ -688,13 +689,13 @@ function makeParserImp() {
             prs.makeOptParser(paramList),
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
-        ]), function (arg, posRange) {
+        ]), function (arg) {
             //console.log("function-def stmt: " + JSON.stringify((arg[5])));
             let param = [];
             if (arg[3].length != 0) {
                 param = arg[3][0];
             }
-            return rt.makeFunctionDef(arg[1], param, arg[5], arg[0][1], posRange);
+            return rt.makeFunctionDef(arg[1], param, arg[5], arg[0][1]);
         }
     );
 
@@ -708,7 +709,7 @@ function makeParserImp() {
         functionDef,
         returnStmt,
         yieldStmt,
-        useStmt,
+        //useStmt,
         expression
     ], "any statement")
 
@@ -716,7 +717,7 @@ function makeParserImp() {
     let statementList = prs.makeTransformer(
         prs.makeRepetitionParser(
             statement,
-            0, -1, "statementsRep"
+            0, -1, "sequence of statements"
         ),
         function (arg) {
             return rt.makeStatementList(arg);
@@ -742,7 +743,46 @@ function makeParserImp() {
     ], "statement or statement list");
 
     statementOrStatementListFwd.setInner(statementOrStatementList);
-    return prs.makeConsumeAll(statementList);
+
+    // top level
+    let statementTopLevel = prs.makeTransformer(
+        prs.makeAlternativeParser([
+            ifStmt,
+            whileStmt,
+            forStmt,
+            breakStmt,
+            continueStmt,
+            assignment,
+            functionDef,
+            returnStmt,
+            yieldStmt,
+            useStmt,
+            expression
+        ], "any statement"),
+        function(arg, posRange) {
+            if (rt.isBreakOrContinue(arg)) {
+                throw new prs.ParserError("statement must be in a loop", arg.startOffset, null, true);
+            }
+            if (rt.isReturnOrYield(arg)) {
+                throw new prs.ParserError("statement must be in a function", arg.startOffset, null, true);
+            }
+            arg.posRange = posRange;
+            return arg;
+        }
+    );
+
+
+    let statementListTopLevel = prs.makeTransformer(
+        prs.makeRepetitionParser(
+            statementTopLevel,
+            0, -1, "statementsRep"
+        ),
+        function (arg) {
+            return rt.makeStatementList(arg);
+        }
+    );
+
+    return prs.makeConsumeAll(statementListTopLevel);
 
 }
 
@@ -759,7 +799,7 @@ function resolvePath(fileName) {
     return path.resolve(fileName);
 }
 
-function runParse(data, openFile, passException) {
+function runParse(data, openFile, replCommandParsedCallback = null) {
     let parseFromData = function(data) {
         let state = new prs.State(0, data);
         let parser = makeParser();
@@ -798,12 +838,12 @@ function runParse(data, openFile, passException) {
     } catch(er) {
         if (er instanceof prs.ParserError) {
             let msg = prs.formatParserError(er, data);
-            if (!passException) {
+            if (replCommandParsedCallback == null) {
                 //console.debug("---\n" + er.show() + "\n###\n");
                 console.log(msg);
             } else {
                 let res = er.pos >= data.length;
-                throw new ScriptError(msg, res );
+                throw new ScriptError(msg, res, er.noRecover);
             }
         }
         throw er;
@@ -811,18 +851,26 @@ function runParse(data, openFile, passException) {
 }
 
 class ScriptError extends Error {
-    constructor(message, eof) {
+    constructor(message, eof, noRecover) {
         super(message);
         this.eof = eof;
+        this.noRecover = noRecover;
     }
 }
 
 
-function runParserAndEval(data, openFile,  frame = null, passException = false) {
+function runParserAndEval(data, openFile,  frame = null, replCommandParsedCallback = null) {
 
     try {
-        let result = runParse(data, openFile, passException);
-        return rt.eval(result, frame);
+        let ast = runParse(data, openFile, replCommandParsedCallback);
+        let evalRet = rt.eval(ast, frame);
+        if (replCommandParsedCallback != null) {
+            let lst = rt.addSourceToTopLevelStmts(data,ast);
+            for(let i=0; i<lst.length; ++i) {
+                replCommandParsedCallback(lst[i].source);
+            }
+        }
+        return evalRet;
 
     } catch(er) {
         if (er instanceof rt.RuntimeException) {

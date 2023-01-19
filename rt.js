@@ -1244,11 +1244,10 @@ function showList(lst, dsp = null, separator = "\n") {
 }
 
 class AstBase {
-    constructor(startOffset, posRange = null) {
+    constructor(startOffset) {
         this.startOffset = startOffset;
         this.currentSourceInfo = currentSourceInfo;
         this.hasGen = false; // has this statement a generator version? (genEval member function?)
-        this.posRange = posRange;
     }
 
     hasYield() {
@@ -1701,8 +1700,8 @@ function _indexAssign(frame, value, refExpr, newValue) {
 
 
 class AstAssign extends AstBase {
-    constructor(lhs, rhs, offset, posRange) {
-        super(offset, posRange);
+    constructor(lhs, rhs, offset) {
+        super(offset);
         this.lhs = lhs;
         this.rhs = rhs;
     }
@@ -1718,8 +1717,8 @@ class AstAssign extends AstBase {
     }
 }
 
-function makeAstAssignment(lhs, rhs, offset, posRange) {
-    return new AstAssign(lhs, rhs, offset, posRange);
+function makeAstAssignment(lhs, rhs, offset) {
+    return new AstAssign(lhs, rhs, offset);
 }
 
 class AstIfStmt extends AstBase {
@@ -2119,8 +2118,8 @@ function _evalDefaultParams(frame, params) {
 }
 
 class AstFunctionDef extends AstBase {
-    constructor(name, params, body, offset, posRange) {
-        super(offset, posRange);
+    constructor(name, params, body, offset) {
+        super(offset);
         this.name = null;
         if (name != null) {
             this.name = name[0];
@@ -2175,8 +2174,8 @@ class AstFunctionDef extends AstBase {
     }
 }
 
-function makeFunctionDef(name, params, body, offset, posRange) {
-    return new AstFunctionDef(name, params, body, offset, posRange)
+function makeFunctionDef(name, params, body, offset) {
+    return new AstFunctionDef(name, params, body, offset)
 }
 
 class AstFunctionCall extends AstBase {
@@ -2261,6 +2260,14 @@ function makeFunctionCall(name, expressionList) {
     return new AstFunctionCall(name[0], expr, name[1]);
 }
 
+function isBreakOrContinue(arg) {
+    return arg instanceof AstContinueStmt || arg instanceof AstBreakStmt;
+}
+
+function isReturnOrYield(arg) {
+    return arg instanceof AstReturnStmt || arg instanceof AstYieldStmt;
+}
+
 function makeFrame() {
     let frame = new Frame();
     frame.vars = RTLIB;
@@ -2274,6 +2281,26 @@ function eval(stmt, globFrame = null) {
     }
     return stmt.eval(globFrame)
 }
+
+function addSourceToTopLevelStmts(data,ast) {
+    let retList = [];
+    let recImpl = function(retList, data, ast) {
+        if (ast instanceof AstStmtList) {
+            for(let i=0; i<ast.statements.length;++i) {
+                let stmt = ast.statements[i];
+                recImpl(retList, data, stmt);
+            }
+        } else {
+            if ("posRange" in ast) {
+                ast.source = data.substring(ast.posRange[0], ast.posRange[1]);
+                retList.push(ast);
+            }
+        }
+    }
+    recImpl(retList, data, ast);
+    return retList;
+}
+
 
 if (typeof(module) == 'object') {
     module.exports = {
@@ -2312,5 +2339,8 @@ if (typeof(module) == 'object') {
         setCurrentSourceInfo,
         setForceStopEval,
         rtValueToJsVal,
+        isBreakOrContinue,
+        isReturnOrYield,
+        addSourceToTopLevelStmts
     }
 }

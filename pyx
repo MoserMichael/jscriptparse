@@ -7,6 +7,11 @@ const rl=require("node:readline");
 const rt=require(path.join(__dirname,"rt.js"));
 const scr=require(path.join(__dirname,"scripty.js"));
 const prs=require(path.join(__dirname,"prs.js"));
+const fs=require("fs");
+
+
+let history_file_name = "pyx_history";
+let nodejsRepl = null;
 
 function skipSpace(data, pos) {
     for(;pos < data.length && prs.isSpace(data.charAt(pos));++pos);
@@ -42,6 +47,20 @@ function completeVars(lastToken, frame) {
     return res.sort();
 }
 
+
+function readHistory() {
+    let hist= fs.readFileSync(history_file_name);
+    let histLines = hist.toString().split("\n");
+    for(let i=0; i< histLines.length;++i) {
+        nodejsRepl.history.push(histLines[i]);
+    }
+}
+
+function replCommandParsedCallback(parsedSource) {
+    fs.appendFileSync(history_file_name, parsedSource + "\n");
+    nodejsRepl.history.push(parsedSource);
+}
+
 function runEvalLoop() {
 
     let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '(', '}' ];
@@ -65,7 +84,7 @@ function runEvalLoop() {
 
             try {
                 isRunning = true;
-                let res = scr.runParserAndEval(data, false, glob, true);
+                let res = scr.runParserAndEval(data, false, glob, replCommandParsedCallback);
                 isRunning = false;
 
                 try {
@@ -78,7 +97,7 @@ function runEvalLoop() {
 
             } catch(e) {
                 if (e instanceof scr.ScriptError) {
-                    if (e.eof) {
+                    if (e.eof && !e.noRecover) {
                         return callback(new repl.Recoverable(e));
                     }
                    callback(null, e.message);
@@ -119,17 +138,20 @@ function runEvalLoop() {
             return [completions, lastToken]
         }
 
-        let r = repl.start({
+        nodejsRepl = repl.start({
             prompt: "> ",
             eval: evalIn,
             writer: doWrite,
             completer: doComplete,
         });
 
-        r.on('SIGINT', function() {
+        readHistory();
+
+        // doesn't workd... :-(
+        nodejsRepl.on('SIGINT', function() {
             onSig();
         });
-        r.on('SIGTERM', function() {
+        nodejsRepl.on('SIGTERM', function() {
             onSig()
         });
 

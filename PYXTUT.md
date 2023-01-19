@@ -119,7 +119,7 @@ If you use ```two``` in a mathematical expression, then the value ```2``` will b
 ```
 
 
-You can make your own function that computes the sum of the suqare and the cube of a number
+You can make your own function that computes the sum of the square and the cube of a number
 
 ```
 > def s(x) x * x + x * x * x
@@ -193,7 +193,21 @@ or get a list of the odd numbers between one and twenty (odd numbers do not divi
 ```
 
 Now compute a list of the squares of all numbers between one and 10.
-The built-in ```map``` function will call the ```sq``` function on all element of the list and return a new list with the result!
+
+The first step is to define a function ```s``` that computes the square of the number given as argument
+
+```
+> def sq(x) x * x
+
+> sq(2)
+4
+> sq(3)
+9
+> sq(4)
+16
+```
+
+The built-in ```map``` function will call the ```sq``` function on all element of the list and return a new list with the result - where each number of the list is turned into its square!
 
 ```
 > def sq(x) x * x

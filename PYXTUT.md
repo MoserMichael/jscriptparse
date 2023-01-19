@@ -98,6 +98,8 @@ repeat(           reverse(          sin(              sort(             split(  
 toJsonString(     type(             uc(               writeFile(
 ```
 
+See more information about the built-in functions in [this reference](PYXFUNC.md)
+
 You also have variables:  A variable is a name that can be assigned a value
 
 ```
@@ -355,6 +357,13 @@ The following statement is run for each of these values.
 328350
 ```
 
+Is a for loop better than a while loop? Depends how you look on it,
+
+- on the one hand a while loop has a lot of flexibility - you are writing the expression that checks if you continue with the loop.
+- on the other hand a for loop means less code, less code means fewer opportunities to do something wrong.
+
+It's a kind of trade off - the world of programming has many trade offs...
+
 ## Maps
 
 There is a type of data called a map. It allows to give names to things.
@@ -406,6 +415,14 @@ Of you can use the map to organize your data, like having a list of records for 
 "Bear"
 
 ```
+
+## Working with text 
+
+
+## Running processes
+
+
+## Conclusion
 
 Or you can do all kinds of stuff, by putting togather all of this.
 

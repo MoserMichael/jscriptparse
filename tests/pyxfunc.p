@@ -1,7 +1,7 @@
 
 funcCats = [
  {
- "name": "functions on scalars or strings",
+ "name": "Functions for scalars or strings",
  "func": [ "find", "mid", "lc", "uc", "reverse", "str", "repeat", "len" ]
  }, 
  {
@@ -12,13 +12,13 @@ funcCats = [
    "name": "Input and output functions",
    "func": [ "print", "println", "readFile", "writeFile" ]
  },
- { "name": "Functions on arrays",
+ { "name": "Functions for arrays",
     "func": [ "len", "join", "map", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex" ]
  },
- { "name": "functions for maps/hashes",
+ { "name": "Functions for maps",
     "func": [ "each", "keys", "exists" ]
  },
- { "name": "function with json",
+ { "name": "Function for working with json",
    "func": [ "parseJsonString", "toJsonString" ]
  },
  { "name": "functions for working with processes",
@@ -27,7 +27,7 @@ funcCats = [
  { "name": "Other functions",
    "func": [ "help", "type", "time", "localtime" ]
  },
- { "name": "global variables",
+ { "name": "Global variables",
     "func": [ "mathconst", "ARGV", "ENV" ]
  }
 ]

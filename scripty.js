@@ -520,8 +520,8 @@ function makeParserImp() {
             prs.makeTokenParser("="),
             expression
         ], "assignment"),
-        function (arg) {
-            return rt.makeAstAssignment(arg[0], arg[2], arg[1][1]);
+        function (arg, posRange) {
+            return rt.makeAstAssignment(arg[0], arg[2], arg[1][1], posRange);
         }
     );
 
@@ -667,7 +667,7 @@ function makeParserImp() {
             prs.makeOptParser(paramList),
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
-        ], "function without name"), function (arg) {
+        ], "function without name"), function (arg, posRange) {
 
             let param = [];
             if (arg[2].length != 0) {
@@ -688,13 +688,13 @@ function makeParserImp() {
             prs.makeOptParser(paramList),
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
-        ]), function (arg) {
+        ]), function (arg, posRange) {
             //console.log("function-def stmt: " + JSON.stringify((arg[5])));
             let param = [];
             if (arg[3].length != 0) {
                 param = arg[3][0];
             }
-            return rt.makeFunctionDef(arg[1], param, arg[5], arg[0][1]);
+            return rt.makeFunctionDef(arg[1], param, arg[5], arg[0][1], posRange);
         }
     );
 

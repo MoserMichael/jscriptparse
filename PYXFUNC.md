@@ -1,22 +1,22 @@
 # pyxfunc - PYX functions reference by category
 
-## functions on scalars or strings
+## Functions for scalars or strings
 <a href='#s-1'>find</a>&nbsp;,&nbsp;<a href='#s-2'>mid</a>&nbsp;,&nbsp;<a href='#s-3'>lc</a>&nbsp;,&nbsp;<a href='#s-4'>uc</a>&nbsp;,&nbsp;<a href='#s-5'>reverse</a>&nbsp;,&nbsp;<a href='#s-6'>str</a>&nbsp;,&nbsp;<a href='#s-7'>repeat</a>&nbsp;,&nbsp;<a href='#s-8'>len</a>
 ## Numeric functions
 <a href='#s-9'>int</a>&nbsp;,&nbsp;<a href='#s-10'>max</a>&nbsp;,&nbsp;<a href='#s-11'>min</a>&nbsp;,&nbsp;<a href='#s-12'>abs</a>&nbsp;,&nbsp;<a href='#s-13'>sqrt</a>&nbsp;,&nbsp;<a href='#s-14'>sin</a>&nbsp;,&nbsp;<a href='#s-15'>cos</a>&nbsp;,&nbsp;<a href='#s-16'>tan</a>&nbsp;,&nbsp;<a href='#s-17'>atan</a>&nbsp;,&nbsp;<a href='#s-18'>pow</a>&nbsp;,&nbsp;<a href='#s-19'>random</a>
 ## Input and output functions
 <a href='#s-20'>print</a>&nbsp;,&nbsp;<a href='#s-21'>println</a>&nbsp;,&nbsp;<a href='#s-22'>readFile</a>&nbsp;,&nbsp;<a href='#s-23'>writeFile</a>
-## Functions on arrays
+## Functions for arrays
 <a href='#s-8'>len</a>&nbsp;,&nbsp;<a href='#s-25'>join</a>&nbsp;,&nbsp;<a href='#s-26'>map</a>&nbsp;,&nbsp;<a href='#s-27'>reduce</a>&nbsp;,&nbsp;<a href='#s-28'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-29'>pop</a>&nbsp;,&nbsp;<a href='#s-30'>push</a>&nbsp;,&nbsp;<a href='#s-31'>joinl</a>&nbsp;,&nbsp;<a href='#s-32'>sort</a>&nbsp;,&nbsp;<a href='#s-33'>exists</a>&nbsp;,&nbsp;<a href='#s-34'>range</a>&nbsp;,&nbsp;<a href='#s-35'>mapIndex</a>
-## functions for maps/hashes
+## Functions for maps
 <a href='#s-36'>each</a>&nbsp;,&nbsp;<a href='#s-37'>keys</a>&nbsp;,&nbsp;<a href='#s-33'>exists</a>
-## function with json
+## Function for working with json
 <a href='#s-39'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-40'>toJsonString</a>
 ## functions for working with processes
 <a href='#s-41'>system</a>&nbsp;,&nbsp;<a href='#s-42'>exit</a>
 ## Other functions
 <a href='#s-43'>help</a>&nbsp;,&nbsp;<a href='#s-44'>type</a>&nbsp;,&nbsp;<a href='#s-45'>time</a>&nbsp;,&nbsp;<a href='#s-46'>localtime</a>
-## global variables
+## Global variables
 <a href='#s-47'>mathconst</a>&nbsp;,&nbsp;<a href='#s-48'>ARGV</a>&nbsp;,&nbsp;<a href='#s-49'>ENV</a>
 
 <a id='s-1'/>

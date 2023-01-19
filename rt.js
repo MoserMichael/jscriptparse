@@ -1244,10 +1244,11 @@ function showList(lst, dsp = null, separator = "\n") {
 }
 
 class AstBase {
-    constructor(startOffset) {
+    constructor(startOffset, posRange = null) {
         this.startOffset = startOffset;
         this.currentSourceInfo = currentSourceInfo;
         this.hasGen = false; // has this statement a generator version? (genEval member function?)
+        this.posRange = posRange;
     }
 
     hasYield() {
@@ -1700,8 +1701,8 @@ function _indexAssign(frame, value, refExpr, newValue) {
 
 
 class AstAssign extends AstBase {
-    constructor(lhs, rhs, offset) {
-        super(offset);
+    constructor(lhs, rhs, offset, posRange) {
+        super(offset, posRange);
         this.lhs = lhs;
         this.rhs = rhs;
     }
@@ -1717,8 +1718,8 @@ class AstAssign extends AstBase {
     }
 }
 
-function makeAstAssignment(lhs, rhs, offset) {
-    return new AstAssign(lhs, rhs, offset);
+function makeAstAssignment(lhs, rhs, offset, posRange) {
+    return new AstAssign(lhs, rhs, offset, posRange);
 }
 
 class AstIfStmt extends AstBase {
@@ -2118,8 +2119,8 @@ function _evalDefaultParams(frame, params) {
 }
 
 class AstFunctionDef extends AstBase {
-    constructor(name, params, body, offset) {
-        super(offset);
+    constructor(name, params, body, offset, posRange) {
+        super(offset, posRange);
         this.name = null;
         if (name != null) {
             this.name = name[0];
@@ -2174,8 +2175,8 @@ class AstFunctionDef extends AstBase {
     }
 }
 
-function makeFunctionDef(name, params, body, offset) {
-    return new AstFunctionDef(name, params, body, offset)
+function makeFunctionDef(name, params, body, offset, posRange) {
+    return new AstFunctionDef(name, params, body, offset, posRange)
 }
 
 class AstFunctionCall extends AstBase {

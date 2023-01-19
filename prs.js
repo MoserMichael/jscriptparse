@@ -619,7 +619,8 @@ const makeTransformer = function(nestedParser, transformResult) {
     return function(state) {
         let posStart = state.pos;
         res = nestedParser(state);
-        return transformResult(res, posStart, state.pos);
+        let posRange = [ posStart, state.pos ];
+        return transformResult(res, posRange);
     }
 }
 

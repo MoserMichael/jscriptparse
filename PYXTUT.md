@@ -29,6 +29,8 @@ or even more complicated ones: First the expression ```5-2``` is computed, that'
 
 You can always return to the previous expression with arrow up and to the next expression with the arrow up and down - and change them all over (that's a big deal!)
 
+(the ```pyx``` program is also writing the ```pyx_history``` file, each time that you run a statement successfully it is written onto the end of this file)
+
 Now you also have mathematical constants = like pi and the euler constant
 
 ```

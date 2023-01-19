@@ -6,8 +6,8 @@ The programming language is named after Winnie-the-Pooh, in the Russian translat
 
 ## Objective 
 
-- an interpreted language that is easy to learn / educational programming language.
-- save some complexity, by throwing out some of the features of a regular scripting language (no classes here, no separated namespaces/imports)
+- an interpreted language that is easy to learn / educational programming language
+- save some complexity, by throwing out some of the features of a regular scripting language (no classes here, no separated namespaces/imports - you can still include source into the same namespace)
 - must provide a [Read–eval–print loop/Shell](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)  as a development environment.
 - should provide for concise expression (map/reduce/short functions/possibly one line scripts)
 - it should be easy to handle structured data, such as json.
@@ -24,7 +24,10 @@ However the objective of a general purpose shell may be out of scope, due to the
 
 - the runtime is interpreter that works on the AST (abstract syntax tree)
   
-  Strictness of semantics: should be similar to python: reading undefined variables is an error, does not allow too much type conversion.
+  Strictness of semantics: should be similar to python: 
+    - reading undefined variables is an error, 
+    - do not allow too much type conversion. (don't allow to add string to number - unlike javascript)
+    - multi assignment: it is an error if the number of elements in the right hand side does not match the number of left hand side
 
 - syntax: go - like syntax (in the sense of: less frequent braces, but without strong typing)
 
@@ -38,16 +41,27 @@ However the objective of a general purpose shell may be out of scope, due to the
    objects - as syntax sugar for maps - NO (can skip that, as an educational language) 
    type hints - NO
    f-strings - yes
+   regular expressions - (don't have them yet)
+
  functions
-  closures - YES
-  named parameters - NO
-  parameters with default values - yes
-  multiple return values, multiple assignment - as list (similar to python) - yes
+   closures - YES
+   named parameters - NO
+   parameters with default values - yes
+   multiple return values, multiple assignment - as list (similar to python) - yes
+
+f-strings - yes
+
  yield / generators - yes
- with statement - later
  iterators - no (generators are good enough, less features)
+ 
+ include of source code in another file - yes
  modules/packages - no (can skip that, as an educational language)
+
+
+with statement - later
  try/catch - maybe later
+
+
 ```
 
 Currently the language is defined by the [PEG parser](https://github.com/MoserMichael/jscriptparse/blob/main/scripty.js)

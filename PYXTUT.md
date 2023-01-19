@@ -207,7 +207,7 @@ The first step is to define a function ```s``` that computes the square of the n
 16
 ```
 
-The built-in ```map``` function will call the ```sq``` function on all element of the list and return a new list with the result - where each number of the list is turned into its square!
+The built-in ```map``` function will call the ```sq``` function on all element of the list of numbers from one to 9 - and return a new list with the result. In the returned list each number of the original list is turned into its square!
 
 ```
 > def sq(x) x * x

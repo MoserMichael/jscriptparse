@@ -6,6 +6,7 @@ const prs=require(path.join(__dirname,"prs.js"));
 const rt=require(path.join(__dirname,"rt.js"));
 const fs=require("fs");
 
+
 let theParser = null;
 
 KEYWORDS = {
@@ -32,10 +33,58 @@ function isKeyword(arg) {
     return arg in KEYWORDS;
 }
 
-function unquote(str, quote) {
-    let s = quote + str + quote;
-    // there must be a better way, this is not very safe...
-    return eval(s);
+escapeCharsDct = {
+    'b': '\b',
+    'f': '\f',
+    'n': '\n',
+    'r': '\r',
+    't': '\t',
+    'v': '\v',
+    '0': '\0',
+    "\'": '\'',
+    '\"': '\"',
+    '\\': '\\',
+};
+
+function unescapeChar(str, pos) {
+    let len = 1;
+    let ch = str.at(pos);
+    if (ch in escapeCharsDct) {
+        return [escapeCharsDct[ch], 1];
+    }
+    if (ch == 'u') {
+        let s = str.substring(pos+1, pos+5);
+        if (!/^[0-9a-fA-F]*$/.test(s)) {
+            return ["", -1];
+        }
+        return [ String.fromCharCode("0x" + s ), s.length+1 ];
+    }
+    return [ch, 1];
+}
+
+function unquote(str, posInData) {
+    let res = "";
+    let posInString = 0
+
+    while(true) {
+        let nextPos = str.indexOf("\\", posInString);
+        if (nextPos === -1) {
+            if (res != "") {
+                res += str.substring(posInString);
+                return res;
+            }
+            return str;
+        }
+        res += str.substring(posInString, nextPos);
+        posInString = nextPos + 1;
+
+        let [ unescapedStr, len ] = unescapeChar(str, posInString);
+        if (len == -1) {
+            throw new prs.ParserError("wrong unicode escape code", posInData + posInString);
+        }
+        res += unescapedStr;
+        posInString += len;
+    }
 }
 
 function makeParserImp() {
@@ -57,8 +106,8 @@ function makeParserImp() {
     let stringConst = prs.makeTransformer(
         prs.makeRegexParser(/^'(\\\\.|[^'])*'/, "string-const"),
         function (arg) {
-            //arg[0] = arg[0].slice(1, -1);
-            arg[0] = eval(arg[0]); // bad idea...
+            arg[0] = arg[0].slice(1, -1);
+            arg[0] = unquote( arg[0], arg[1]+1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         }
     );
@@ -66,8 +115,8 @@ function makeParserImp() {
     let formatStringConst = prs.makeTransformer(
         prs.makeRegexParser(/^"(\\\\.|[^"{])*"/, "string-const"),
         function (arg) {
-            //arg[0] = arg[0].slice(1, -1);
-            arg[0] = eval(arg[0]); // bad idea...
+            arg[0] = arg[0].slice(1, -1);
+            arg[0] = unquote( arg[0], arg[1]+1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
             }
     );
@@ -95,21 +144,21 @@ function makeParserImp() {
         prs.makeRegexParser(/^"(\\\\.|[^"{])*{/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
-            arg[0] = unquote( arg[0], '"');
+            arg[0] = unquote( arg[0], arg[1]+1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
     let formatStringMidConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^"{])*{/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
-            arg[0] = unquote( arg[0], '"');
+            arg[0] = unquote( arg[0], arg[1]+1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
     let formatStringEndConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^"{])*"/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
-            arg[0] = unquote( arg[0], '"');
+            arg[0] = unquote( arg[0], arg[1]+1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         })
 
@@ -119,7 +168,7 @@ function makeParserImp() {
         prs.makeRegexParser(/^`(\\\\.|[^`{])*`/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
-            arg[0] = unquote( arg[0], '`');
+            arg[0] = unquote( arg[0], arg[1]+1);
             return [rt.makeConstValue(rt.TYPE_STR, arg)];
         }
     );
@@ -128,14 +177,14 @@ function makeParserImp() {
         prs.makeRegexParser(/^`(\\\\.|[^`{])*{/, "backtick-string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
-            arg[0] = unquote( arg[0], '`');
+            arg[0] = unquote( arg[0], arg[1]+1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
     let backtickStringEndConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^`{])*`/, "backtick-string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
-            arg[0] = unquote( arg[0], '`');
+            arg[0] = unquote( arg[0], arg[1]+1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
 

@@ -13,11 +13,11 @@
 ## Function for working with json
 <a href='#s-39'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-40'>toJsonString</a>
 ## functions for working with processes
-<a href='#s-41'>system</a>&nbsp;,&nbsp;<a href='#s-42'>exit</a>
+<a href='#s-41'>system</a>&nbsp;,&nbsp;<a href='#s-42'>exit</a>&nbsp;,&nbsp;<a href='#s-43'>sleep</a>
 ## Other functions
-<a href='#s-43'>help</a>&nbsp;,&nbsp;<a href='#s-44'>type</a>&nbsp;,&nbsp;<a href='#s-45'>time</a>&nbsp;,&nbsp;<a href='#s-46'>localtime</a>
+<a href='#s-44'>help</a>&nbsp;,&nbsp;<a href='#s-45'>type</a>&nbsp;,&nbsp;<a href='#s-46'>time</a>&nbsp;,&nbsp;<a href='#s-47'>localtime</a>
 ## Global variables
-<a href='#s-47'>mathconst</a>&nbsp;,&nbsp;<a href='#s-48'>ARGV</a>&nbsp;,&nbsp;<a href='#s-49'>ENV</a>
+<a href='#s-48'>mathconst</a>&nbsp;,&nbsp;<a href='#s-49'>ARGV</a>&nbsp;,&nbsp;<a href='#s-50'>ENV</a>
 
 <a id='s-1'/>
 <hr>function: <b>find</b>
@@ -627,6 +627,19 @@ exit(1) - exit program with status 1 (failure)
 
 ```
 <a id='s-43'/>
+<hr>function: <b>sleep</b>
+
+```python
+
+How to use in shell:
+
+    
+sleep for three seconds    
+sleep(3)
+
+
+```
+<a id='s-44'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -641,7 +654,7 @@ Show help text for built-in functions: Example usage:
 
 
 ```
-<a id='s-44'/>
+<a id='s-45'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -660,7 +673,7 @@ How to use in shell:
 "Closure"
 
 ```
-<a id='s-45'/>
+<a id='s-46'/>
 <hr>function: <b>time</b>
 
 ```python
@@ -670,7 +683,7 @@ How to use in shell:
 returns epoch time in seconds
 
 ```
-<a id='s-46'/>
+<a id='s-47'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -684,7 +697,7 @@ decodes epoch time into map
 
 
 ```
-<a id='s-47'/>
+<a id='s-48'/>
 <hr>function: <b>mathconst</b>
 
 ```python
@@ -717,7 +730,7 @@ mathconst["log10e"] - base 10 logarithm of e
     
 
 ```
-<a id='s-48'/>
+<a id='s-49'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -727,7 +740,7 @@ How to use in shell:
 command line arguments (array)
 
 ```
-<a id='s-49'/>
+<a id='s-50'/>
 <hr>function: <b>ENV</b>
 
 ```python

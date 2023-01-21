@@ -939,23 +939,23 @@ var
         }
         return _system(cmd);
     }),
-    /*
-    "sleep": new BuiltinFunctionValue(null, 1,function(arg, frame) {
-        let num = value2Num(arg[0]);
-        let sleepy = async function (ms) {
-            {
-                let p = new Promise((resolve) => setTimeout(resolve, ms));
-                await p
-            }
-        }
+    "sleep": new BuiltinFunctionValue(`    
+sleep for three seconds    
+sleep(3)
+`, 1,function(arg, frame) {
+        let num = value2Num(arg[0]) * 1000;
 
-        console.log("before sleep");
-        sleepy(num * 1000);
-        console.log("after sleep");
+        let date = new Date();
+        let curDate = null;
+
+        // sigh...
+        do {
+            curDate = new Date();
+        }  while(curDate-date < num);
 
         return VALUE_NONE;
     }),
-     */
+
     "_system_backtick": new BuiltinFunctionValue(null, 1,function(arg, frame) {
 
         let cmd ="";

@@ -22,7 +22,7 @@ funcCats = [
    "func": [ "parseJsonString", "toJsonString" ]
  },
  { "name": "functions for working with processes",
-   "func": [ "system", "exit" ]
+   "func": [ "system", "exit", "sleep" ]
  },
  { "name": "Other functions",
    "func": [ "help", "type", "time", "localtime" ]

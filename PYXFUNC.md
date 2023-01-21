@@ -177,6 +177,10 @@ returns the cosine of a number in radians
 ```python
 # returns random number with value between 0 and 1
 
+> random()
+0.8424952895811049
+
+
 ```
 <a id='s-17'/>
 <hr>function: <b>sin</b>

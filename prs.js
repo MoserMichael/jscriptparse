@@ -636,7 +636,10 @@ const makeTransformer = function(nestedParser, transformResult) {
 }
 
 /**
- * returns a forwarding parser, the inner parser can be set later on by calling the setInner member function. This construct is used to express recursive grammars.
+ * returns a forwarding object,
+ *   - the inner parser can be set later on by calling the setInner(parser) member function.
+ *   - the forwarded parser is called by the forward() member function.
+ * This construct is used to express recursive grammars.
  * @returns the result of the forwarded function.
  */
 const makeForwarder = function (innerFunc = null) {
@@ -662,6 +665,7 @@ const makeForwarder = function (innerFunc = null) {
  * @param parser - a parser constructed by any of the makeXXXparser functions
  * @parser data - input string
  * @returns the result of the applied parser
+ * @throws ParserError - in case of syntax error. also see formatParserError function.
  */
 let parseString = function(parser, data) {
     let state = new State(0, data);

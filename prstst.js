@@ -130,7 +130,7 @@ function makeParser() {
 
     forwardExpression.setInner(expression);
 
-    return expression;
+    return prs.makeConsumeAll(expression);
 }
 
 let parser = makeParser();

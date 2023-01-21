@@ -3,6 +3,11 @@
 A module to build parser combinators ```prs.js``` - the resulting parser is a top-down parser, also known a parsing expression parser [PEG](https://en.wikipedia.org/wiki/Parsing_expression_grammar)
 
 This is a standalone script, you can use it both with nodejs and in a browser.
+
 See the [generated documentation](https://mosermichael.github.io/jscriptparse/out/index.html)
+
+See example usage in test [test](https://github.com/MoserMichael/jscriptparse/blob/main/prstst.js)
+
+Also the [PYX interpreter/shell](https://github.com/MoserMichael/jscriptparse/blob/main/README.md) is using this parser generator. [here](https://github.com/MoserMichael/jscriptparse/blob/main/scripty.js)
 
 

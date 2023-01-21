@@ -590,7 +590,11 @@ RTLIB={
         let exp = value2Num(arg[1]);
         return new Value(TYPE_NUM, Math.pow(pow,exp));
     }),
-    "random" : new BuiltinFunctionValue(`# returns random number with value between 0 and 1`, 0, function(arg) {
+    "random" : new BuiltinFunctionValue(`# returns random number with value between 0 and 1
+
+> random()
+0.8424952895811049
+`, 0, function(arg) {
         return new Value(TYPE_NUM, Math.random());
     }),
 

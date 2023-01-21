@@ -4,6 +4,14 @@ A module to build parser combinators ```prs.js``` - the resulting parser is a to
 
 This is a standalone script, you can use it both with nodejs and in a browser.
 
+## Installation
+
+```npm i prscombinator``` 
+
+See the [package page on npm](https://www.npmjs.com/package/prscombinator)
+
+## Documentation & Examples
+
 See the [generated documentation](https://mosermichael.github.io/jscriptparse/out/index.html)
 
 See example usage in test [test](https://github.com/MoserMichael/jscriptparse/blob/main/prstst.js)

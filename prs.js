@@ -3,7 +3,9 @@ let trace_on = false;
 let location_with_token = false;
 
 /**
- * Keep location with ast. This function must be called before calling any of the parser generating functions (like makeSequenceParser, etc.)
+ * Keep location with return value of token parsers.
+ * If set/true: the token functions return a list of [ <tokenvalue parsed", number-offset-of-token ]
+ * This function must be called before calling any of the token parser generating functions (like makeTokenParser, makeRegexParser)
  * @param on - boolean true - enable tracing. (default: off)
  */
 const setKeepLocationWithToken = function(on) {
@@ -45,15 +47,10 @@ function showRec(arg) {
  * The returned output is an object that represents the parsed value:
  */
 class State {
-    constructor(pos, data, result = null, lastError = null) {
+    constructor(pos, data) {
         this.pos = pos;
         this.data = data;
-        this.result = result;
-        this.lastError = lastError;
-    }
-
-    show() {
-        return showRec(this.result);
+        this.lastError = null;
     }
 
     setLastError(lastError) {
@@ -99,22 +96,11 @@ class ParserError extends Error {
             }
         }
         this.nextException = nextException;
-
         //console.debug("\n---\n" + this.show() + "\n+++\n");
     }
 
     getLatestPos() {
         return this.latestPos;
-    }
-
-    getDeepest() {
-        if (this.nextException != null) {
-            let deepest = this.nextException.getDeepest();
-            if (deepest.pos >= this.pos) {
-                return deepest;
-            }
-        }
-        return this;
     }
 
     show() {
@@ -183,7 +169,7 @@ function isSpace(ch) {
     return ch.trim() == "";
 }
 
-function skipWhitespace(state) {
+let skipWhitespace = function(state) {
     while(state.pos < state.data.length) {
         let ch = state.data.charAt(state.pos);
         if (!isSpace(ch)) {
@@ -193,11 +179,23 @@ function skipWhitespace(state) {
     }
 }
 
+function setSkipWhitespaceFunction(argFunction) {
+    skipWhitespace = argFunction;
+}
+
+function getSkipWhitespaceFunction() {
+    return skipWhitespace;
+}
+
+/**
+ * format a parser error
+ * @param er - instance of ParserError
+ * @param data - the string that was being parsed.
+ * @returns the formatted message
+ */
 function formatParserError(er, data) {
     if (er instanceof ParserError) {
         //console.log("er: " + JSON.stringify(er));
-
-        //er = er.getDeepest();
 
         let msg = "";
         let pos = er.pos;
@@ -255,8 +253,8 @@ const makeTracer = function(parser, title) {
 /**
  * Returns a parser that can matches/consumes a given regular expression
  * @param regex - the regex to match
- * @param name - optional name of the parser (for tracing purposes)
- * @returns parsing function that receives a State object for the current position within the input and returns the next state.
+ * @param name - optional name of the parser (for more readable error messages)
+ * @returns is setKeepLocationWithToken - returns a list [ "<token value>", offset_of_token ] , else the token string is returned.
  */
 const makeRegexParser = function (regex, name = null) {
     if (!(regex instanceof RegExp)) {
@@ -294,7 +292,7 @@ const makeRegexParser = function (regex, name = null) {
 /**
  * returns parser that consumes argument token string
  * @param token
- * @returns parsing function that receives a State object for the current position within the input and returns the next state.
+ * @returns is setKeepLocationWithToken - returns a list [ "<token value>", offset_of_token ] , else the token string is returned.
  */
 const makeTokenParser = function (token) {
 
@@ -349,11 +347,11 @@ function requireArrayOfFunctions(a) {
 }
 
 /**
- * returns parser that applies all argument parsers sequentially
+ * returns parser that applies all argument parsers sequentially. The parser succeeds if all argument parsers succeeded to parse their input.
  * @param arrayOfParsers - array of argument parsers, each one applied after the previous one.
- * @param name
-   * @param simplifyResult
- * @returns parsing function that receives a State object for the current position within the input and returns the next state.
+ * @param name - optional name of the parser (for more readable error messages)
+ * @param concat - if not true: result of each parser is pushed to result array. (default value). if set: result of each parser is concatenated to the result array
+ * @returns an array with the results returned by each of the sequence parser.
  */
 const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", concat = false) {
 
@@ -408,8 +406,9 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
  * @param parser - argument parsing function
  * @param minMatching - number of minimal matches (default 1)
  * @param maxMatching - number of maximum allowed matches, -1 - no limit
- * @param name
- * @returns parsing function that receives a State object for the current position within the input and returns the next state.
+ * @param name - optional name of the parser (for more readable error messages)
+ * @param concat - if not true: result of each parser is pushed to result array. (default value). if set: result of each parser is concatenated to the result array
+ * @returns a list with the results returned by each nested parser invocation
  */
 const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1, name = "RepetitionParser", concat = false) {
 
@@ -451,6 +450,14 @@ const makeRepetitionParser = function(parser, minMatching = 1, maxMatching = -1,
     }, name);
 }
 
+/**
+ * returns parser that applies argument parser repeatedly
+ * @param parserMandatory - argument parsing function
+ * @param parserRepetition - argument parsing function
+ * @param title - optional name of the parser (for more readable error messages)
+ * @param concat - if not true: result of each parser is pushed to result array. (default value). if set: result of each parser is concatenated to the result array
+ * @returns a list with the results returned by each nested parser invocation
+ */
 const makeRepetitionRecClause = function(parserMandatory, parserRepetition, title = "RecursiveClause", concat = false) {
 
     requireFunction(parserMandatory);
@@ -493,7 +500,7 @@ const makeRepetitionRecClause = function(parserMandatory, parserRepetition, titl
 /**
  * returns parser that applies the argument parser at least once
  * @param parser
- * @param name
+ * @param name - optional name of the parser (for more readable error messages)
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.*
  */
 const makeOptParser = function(parser, name = "OptParser") {
@@ -525,7 +532,7 @@ function makeDetailedAltErrorMessage(arrayOfParsers) {
 /**
  * returns parser that must requires one of the argument parsers to math the input
  * @param arrayOfParsers - array of argument parsers, tries to apply each of them, consecutively.
- * @param name
+ * @param name - optional name of the parser (for more readable error messages)
  * @param forwardWithIndex
  * @returns parsing function that receives a State object for the current position within the input and returns the next state.
  */
@@ -610,10 +617,10 @@ const makeConsumeAll = function(nestedParser) {
 }
 
 /**
- * returns parser that transforms the result of the argument parser/transforms parser error exception
- * @param nestedParser
- * @param transformResult
- * @returns parsing function that receives a State object for the current position within the input and returns the next state.
+ * returns parser that applies the argument parser to the input, then it calls the argument function to transform the result
+ * @param nestedParser - nested parser
+ * @param transformResult - transformation function, receives result of nested parser as input.
+ * @returns return the result of the transformResult parser
  */
 const makeTransformer = function(nestedParser, transformResult) {
 
@@ -629,9 +636,8 @@ const makeTransformer = function(nestedParser, transformResult) {
 }
 
 /**
- * returns a forwarding parser, the inner parser can be set later on. This is used to express recursive grammars.
- * @param nestedParser
- * @returns parsing function that receives a State object for the current position within the input and returns the next state.
+ * returns a forwarding parser, the inner parser can be set later on by calling the setInner member function. This construct is used to express recursive grammars.
+ * @returns the result of the forwarded function.
  */
 const makeForwarder = function (innerFunc = null) {
 
@@ -651,24 +657,39 @@ const makeForwarder = function (innerFunc = null) {
     }
 }
 
+/**
+ * Applies the parser on an input string.
+ * @param parser - a parser constructed by any of the makeXXXparser functions
+ * @parser data - input string
+ * @returns the result of the applied parser
+ */
+let parseString = function(parser, data) {
+    let state = new State(0, data);
+    return parser(state);
+}
+
+
 if (typeof(module) == 'object') {
     module.exports = {
         State,
+        ParserError,
+        formatParserError,
+        setTrace,
+        setKeepLocationWithToken,
         makeTokenParser,
         makeRegexParser,
         makeOptParser,
         makeRepetitionParser,
-        makeRepetitionRecClause,
         makeSequenceParser,
         makeAlternativeParser,
+        makeRepetitionRecClause,
         makeConsumeAll,
         makeTransformer,
         makeForwarder,
-        formatParserError,
-        setTrace,
-        setKeepLocationWithToken,
-        ParserError,
+        parseString,
         getLineAt,
-        isSpace
+        isSpace,
+        setSkipWhitespaceFunction,
+        getSkipWhitespaceFunction
     }
 }

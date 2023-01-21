@@ -87,7 +87,30 @@ function unquote(str, posInData) {
     }
 }
 
+let skipNestedWhitespace = null;
+
+function skipComments(state) {
+
+    skipNestedWhitespace(state);
+
+    if (state.pos < state.data.length) {
+        let ch = state.data.charAt(state.pos);
+        if (ch == '#') {
+            while (state.pos < state.data.length) {
+                ch = state.data.charAt(state.pos);
+                if (ch == '\r' || ch == '\n')
+                    break
+                state.pos += 1;
+            }
+            skipNestedWhitespace(state);
+        }
+    }
+}
+
 function makeParserImp() {
+
+    skipNestedWhitespace = prs.getSkipWhitespaceFunction();
+    prs.setSkipWhitespaceFunction(skipComments);
 
     prs.setKeepLocationWithToken(true);
     //prs.setTrace(true);

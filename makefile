@@ -1,4 +1,9 @@
 
+
+.PHONY: publish-prs
+publish-prs:
+		./build/publish-prs.sh			
+
 .PHONY: docs2
 docs2:
 		./build/build-docs2.sh

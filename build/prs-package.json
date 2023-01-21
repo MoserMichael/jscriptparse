@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+  },
+  "name": "prscombinator",
+  "description": "parser combinator library, produces recursive descent PEG parser. returns an abstract syntax tree as return value. Usable from both nodejs and browser",
+  "version": "0.0.2",
+  "main": "prs.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "node"
+  },
+  "files":[
+    "README.md",  
+    "prs.js",
+    "prstst.js"
+  ],    
+  "repository": {
+    "type": "git",
+    "url": "git+https://MoserMichael@github.com/MoserMichael/jscriptparse.git"
+  },
+  "keywords": [
+    "parser",
+    "combinator",
+    "peg",
+    "parser"
+  ],
+  "author": {
+      "name": "Michael Moser",
+      "email": "moser.michael@gmail.com",
+      "url": "https://github.com/mosermichael"
+  },    
+  "license": "MIT",
+  "homepage": "https://github.com/MoserMichael/jscriptparse/blob/main/PRS.md"
+}

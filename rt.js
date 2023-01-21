@@ -674,21 +674,41 @@ RTLIB={
     "map": new BuiltinFunctionValue(`> map([1,2,3], def (x) 1 + x)
 [2,3,4]
 > map([1,2,3], def (x) x * x)
-[1,4,9]`, 2, function(arg, frame) {
-        if (arg[0].type != TYPE_LIST) {
-            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
+[1,4,9]
+
+a={ 'Ernie': 3, 'Bert': 4, 'Cookie-Monster' : 5, 'GraphCount': 100 }
+map(a,def(k,v) { "key: {k} age: {v}" })
+> ["key: Ernie age: 3","key: Bert age: 4","key: Cookie-Monster age: 5","key: GraphCount age: 100"]
+`, 2, function(arg, frame) {
+        if (arg[0].type != TYPE_LIST && arg[0].type != TYPE_MAP) {
+            throw new RuntimeException("first argument: list or map argument required. is: " + typeName(arg[0]));
         }
         if (arg[1].type != TYPE_CLOSURE && arg[1].type != TYPE_BUILTIN_FUNCTION) {
             throw new RuntimeException("second argument: function argument required. is: " + typeName(arg[1]));
         }
+
         let ret = [];
-        let argList = arg[0];
         let funVal = arg[1];
 
-        for(let i=0; i<argList.val.length;++i) {
-            let arg = [ argList.val[i] ];
-            let mapVal = evalClosure(funVal, arg, frame);
-            ret.push(mapVal);
+        if (arg[0].type == TYPE_LIST) {
+            let argList = arg[0];
+
+            for(let i=0; i<argList.val.length;++i) {
+                let arg = [ argList.val[i] ];
+                let mapVal = evalClosure(funVal, arg, frame);
+                ret.push(mapVal);
+            }
+        }
+
+        if (arg[0].type == TYPE_MAP) {
+            let argMap = arg[0];
+
+            for(let k in argMap.val) {
+                let amap = [ new Value(TYPE_STR, new String(k)), argMap.val[k] ];
+                let mapVal = evalClosure(funVal, amap, frame);
+                ret.push(mapVal);
+            }
+
         }
         return new Value(TYPE_LIST, ret);
     }),

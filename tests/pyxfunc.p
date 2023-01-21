@@ -16,7 +16,7 @@ funcCats = [
     "func": [ "len", "join", "map", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex" ]
  },
  { "name": "Functions for maps",
-    "func": [ "each", "keys", "exists" ]
+    "func": [ "each", "keys", "exists", "map" ]
  },
  { "name": "Function for working with json",
    "func": [ "parseJsonString", "toJsonString" ]

@@ -9,15 +9,15 @@
 ## Functions for arrays
 <a href='#s-24'>exists</a>&nbsp;,&nbsp;<a href='#s-25'>join</a>&nbsp;,&nbsp;<a href='#s-26'>joinl</a>&nbsp;,&nbsp;<a href='#s-3'>len</a>&nbsp;,&nbsp;<a href='#s-28'>map</a>&nbsp;,&nbsp;<a href='#s-29'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-30'>pop</a>&nbsp;,&nbsp;<a href='#s-31'>push</a>&nbsp;,&nbsp;<a href='#s-32'>range</a>&nbsp;,&nbsp;<a href='#s-33'>reduce</a>&nbsp;,&nbsp;<a href='#s-34'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-35'>sort</a>
 ## Functions for maps
-<a href='#s-36'>each</a>&nbsp;,&nbsp;<a href='#s-24'>exists</a>&nbsp;,&nbsp;<a href='#s-38'>keys</a>
+<a href='#s-36'>each</a>&nbsp;,&nbsp;<a href='#s-24'>exists</a>&nbsp;,&nbsp;<a href='#s-38'>keys</a>&nbsp;,&nbsp;<a href='#s-28'>map</a>
 ## Function for working with json
-<a href='#s-39'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-40'>toJsonString</a>
+<a href='#s-40'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-41'>toJsonString</a>
 ## functions for working with processes
-<a href='#s-41'>exit</a>&nbsp;,&nbsp;<a href='#s-42'>sleep</a>&nbsp;,&nbsp;<a href='#s-43'>system</a>
+<a href='#s-42'>exit</a>&nbsp;,&nbsp;<a href='#s-43'>sleep</a>&nbsp;,&nbsp;<a href='#s-44'>system</a>
 ## Other functions
-<a href='#s-44'>help</a>&nbsp;,&nbsp;<a href='#s-45'>localtime</a>&nbsp;,&nbsp;<a href='#s-46'>time</a>&nbsp;,&nbsp;<a href='#s-47'>type</a>
+<a href='#s-45'>help</a>&nbsp;,&nbsp;<a href='#s-46'>localtime</a>&nbsp;,&nbsp;<a href='#s-47'>time</a>&nbsp;,&nbsp;<a href='#s-48'>type</a>
 ## Global variables
-<a href='#s-48'>ARGV</a>&nbsp;,&nbsp;<a href='#s-49'>ENV</a>&nbsp;,&nbsp;<a href='#s-50'>mathconst</a>
+<a href='#s-49'>ARGV</a>&nbsp;,&nbsp;<a href='#s-50'>ENV</a>&nbsp;,&nbsp;<a href='#s-51'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>find</b>
@@ -306,6 +306,11 @@ false
 > map([1,2,3], def (x) x * x)
 [1,4,9]
 
+a={ 'Ernie': 3, 'Bert': 4, 'Cookie-Monster' : 5, 'GraphCount': 100 }
+map(a,def(k,v) { "key: {k} age: {v}" })
+> ["key: Ernie age: 3","key: Bert age: 4","key: Cookie-Monster age: 5","key: GraphCount age: 100"]
+
+
 ```
 <a id='s-29'/>
 <hr>function: <b>mapIndex</b>
@@ -448,7 +453,22 @@ false
 ["first","second","third"]
 
 ```
-<a id='s-39'/>
+<a id='s-28'/>
+<hr>function: <b>map</b>
+
+```python
+> map([1,2,3], def (x) 1 + x)
+[2,3,4]
+> map([1,2,3], def (x) x * x)
+[1,4,9]
+
+a={ 'Ernie': 3, 'Bert': 4, 'Cookie-Monster' : 5, 'GraphCount': 100 }
+map(a,def(k,v) { "key: {k} age: {v}" })
+> ["key: Ernie age: 3","key: Bert age: 4","key: Cookie-Monster age: 5","key: GraphCount age: 100"]
+
+
+```
+<a id='s-40'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -458,7 +478,7 @@ false
 [1,2,3]
 
 ```
-<a id='s-40'/>
+<a id='s-41'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -468,7 +488,7 @@ false
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-41'/>
+<a id='s-42'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -476,7 +496,7 @@ false
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-42'/>
+<a id='s-43'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -486,7 +506,7 @@ sleep(3)
 
 
 ```
-<a id='s-43'/>
+<a id='s-44'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -515,7 +535,7 @@ var
 0
 
 ```
-<a id='s-44'/>
+<a id='s-45'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -526,7 +546,7 @@ help(sort)
 
 
 ```
-<a id='s-45'/>
+<a id='s-46'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -537,14 +557,14 @@ help(sort)
 
 
 ```
-<a id='s-46'/>
+<a id='s-47'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-47'/>
+<a id='s-48'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -560,21 +580,21 @@ help(sort)
 "Closure"
 
 ```
-<a id='s-48'/>
+<a id='s-49'/>
 <hr>function: <b>ARGV</b>
 
 ```python
 # command line arguments (array)
 
 ```
-<a id='s-49'/>
+<a id='s-50'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-50'/>
+<a id='s-51'/>
 <hr>function: <b>mathconst</b>
 
 ```python

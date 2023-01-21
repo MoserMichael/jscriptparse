@@ -23,9 +23,6 @@
 <hr>function: <b>find</b>
 
 ```python
-
-How to use in shell:
-
 > find("big cat", "big")
 0
 > find("big cat", "cat")
@@ -40,9 +37,6 @@ How to use in shell:
 <hr>function: <b>lc</b>
 
 ```python
-
-How to use in shell:
-
 > lc("BIG little")
 "big little"
 
@@ -51,9 +45,6 @@ How to use in shell:
 <hr>function: <b>len</b>
 
 ```python
-
-How to use in shell:
-
 > len("abc")
 3
 > len([1,2,3])
@@ -64,9 +55,6 @@ How to use in shell:
 <hr>function: <b>mid</b>
 
 ```python
-
-How to use in shell:
-
 > mid("I am me", 2)
 "am me"
 > mid("I am me", 2, 4)
@@ -77,9 +65,6 @@ How to use in shell:
 <hr>function: <b>repeat</b>
 
 ```python
-
-How to use in shell:
-
 > repeat("a",3)
 "aaa"
 > repeat("ab",3)
@@ -90,9 +75,6 @@ How to use in shell:
 <hr>function: <b>reverse</b>
 
 ```python
-
-How to use in shell:
-
 > reverse([1,2,3,4])
 [4,3,2,1]
 > reverse("abcd")
@@ -103,9 +85,6 @@ How to use in shell:
 <hr>function: <b>str</b>
 
 ```python
-
-How to use in shell:
-
 > str(123)
 "123"
 > str("abc")
@@ -116,9 +95,6 @@ How to use in shell:
 <hr>function: <b>uc</b>
 
 ```python
-
-How to use in shell:
-
 > uc("BIG little")
 "BIG LITTLE"
 
@@ -127,9 +103,6 @@ How to use in shell:
 <hr>function: <b>abs</b>
 
 ```python
-
-How to use in shell:
-
 > abs(-3)
 3
 > abs(3)
@@ -140,9 +113,6 @@ How to use in shell:
 <hr>function: <b>atan</b>
 
 ```python
-
-How to use in shell:
-
 returns the inverse tangent (in radians) of a number
 
 ```
@@ -150,9 +120,6 @@ returns the inverse tangent (in radians) of a number
 <hr>function: <b>cos</b>
 
 ```python
-
-How to use in shell:
-
 returns the cosine of a number in radians
 > cos(mathconst['pi'])
 -1
@@ -162,9 +129,6 @@ returns the cosine of a number in radians
 <hr>function: <b>int</b>
 
 ```python
-
-How to use in shell:
-
 > int("123")
 123
 > int("123.5")
@@ -179,9 +143,6 @@ How to use in shell:
 <hr>function: <b>max</b>
 
 ```python
-
-How to use in shell:
-
 > max(3,4)
 4
 > max(4,3)
@@ -192,9 +153,6 @@ How to use in shell:
 <hr>function: <b>min</b>
 
 ```python
-
-How to use in shell:
-
 > min(4,3)
 3
 > min(3,4)
@@ -205,9 +163,6 @@ How to use in shell:
 <hr>function: <b>pow</b>
 
 ```python
-
-How to use in shell:
-
 > pow(2,2)
 4
 > pow(2,3)
@@ -220,9 +175,6 @@ How to use in shell:
 <hr>function: <b>random</b>
 
 ```python
-
-How to use in shell:
-
 # returns random number with value between 0 and 1
 
 ```
@@ -230,9 +182,6 @@ How to use in shell:
 <hr>function: <b>sin</b>
 
 ```python
-
-How to use in shell:
-
 returns the sine of a number in radians
 > sin(mathconst['pi']/2)
 1
@@ -242,9 +191,6 @@ returns the sine of a number in radians
 <hr>function: <b>sqrt</b>
 
 ```python
-
-How to use in shell:
-
 > sqrt(9)
 3
 > sqrt(4)
@@ -257,9 +203,6 @@ How to use in shell:
 <hr>function: <b>tan</b>
 
 ```python
-
-How to use in shell:
-
 returns the tangent of a number in radians
 
 ```
@@ -267,9 +210,6 @@ returns the tangent of a number in radians
 <hr>function: <b>print</b>
 
 ```python
-
-How to use in shell:
-
 # prints argument value to console
 
 ```
@@ -277,9 +217,6 @@ How to use in shell:
 <hr>function: <b>println</b>
 
 ```python
-
-How to use in shell:
-
 # prints argument value to console, followed by newline
 
 ```
@@ -287,9 +224,6 @@ How to use in shell:
 <hr>function: <b>readFile</b>
 
 ```python
-
-How to use in shell:
-
 
 # read text file and return string
 
@@ -301,9 +235,6 @@ How to use in shell:
 <hr>function: <b>writeFile</b>
 
 ```python
-
-How to use in shell:
-
 
 # write string parameter into text file
 
@@ -320,9 +251,6 @@ How to use in shell:
 <hr>function: <b>exists</b>
 
 ```python
-
-How to use in shell:
-
 > a={"first":1}
 {"first":1}
 > exists("first", a)
@@ -343,9 +271,6 @@ false
 <hr>function: <b>join</b>
 
 ```python
-
-How to use in shell:
-
 > join(["a: ",1," b: ", true])
 "a: 1 b: true"
 
@@ -354,9 +279,6 @@ How to use in shell:
 <hr>function: <b>joinl</b>
 
 ```python
-
-How to use in shell:
-
 > joinl([1,2],[3,4])
 [1,2,3,4]
 
@@ -365,9 +287,6 @@ How to use in shell:
 <hr>function: <b>len</b>
 
 ```python
-
-How to use in shell:
-
 > len("abc")
 3
 > len([1,2,3])
@@ -378,9 +297,6 @@ How to use in shell:
 <hr>function: <b>map</b>
 
 ```python
-
-How to use in shell:
-
 > map([1,2,3], def (x) 1 + x)
 [2,3,4]
 > map([1,2,3], def (x) x * x)
@@ -391,9 +307,6 @@ How to use in shell:
 <hr>function: <b>mapIndex</b>
 
 ```python
-
-How to use in shell:
-
 > mapIndex([3,4,5,6],def(x,y) [2*x, y])
 [[6,0],[8,1],[10,2],[12,3]]
 
@@ -402,9 +315,6 @@ How to use in shell:
 <hr>function: <b>pop</b>
 
 ```python
-
-How to use in shell:
-
 > a=[1, 2, 3]
 [1,2,3]
 > pop(a)
@@ -417,9 +327,6 @@ How to use in shell:
 <hr>function: <b>push</b>
 
 ```python
-
-How to use in shell:
-
 > a=[1, 2]
 [1,2]
 > push(a,3)
@@ -432,9 +339,6 @@ How to use in shell:
 <hr>function: <b>range</b>
 
 ```python
-
-How to use in shell:
-
 > range(1,4)
 [1,2,3]
 > for n range(1,4) println("number: {n}")
@@ -447,9 +351,6 @@ number: 3
 <hr>function: <b>reduce</b>
 
 ```python
-
-How to use in shell:
-
 > reduce([1,2,3], def (x,y) x+y, 0)
 6
 
@@ -472,9 +373,6 @@ How to use in shell:
 <hr>function: <b>reduceFromEnd</b>
 
 ```python
-
-How to use in shell:
-
 > def div(a,b) a/b
 
 > reduceFromEnd([4,8,32], div, 1024)
@@ -490,9 +388,6 @@ same as:
 <hr>function: <b>sort</b>
 
 ```python
-
-How to use in shell:
-
 > sort([3,1,4,2,5])
 [1,2,3,4,5]
 > def cmp(x, y) {
@@ -510,9 +405,6 @@ How to use in shell:
 
 ```python
 
-How to use in shell:
-
-
 > each({"a":1,"b":2,"c":3})
 [["a",1],["b",2],["c",3]]
 
@@ -526,9 +418,6 @@ How to use in shell:
 <hr>function: <b>exists</b>
 
 ```python
-
-How to use in shell:
-
 > a={"first":1}
 {"first":1}
 > exists("first", a)
@@ -549,9 +438,6 @@ false
 <hr>function: <b>keys</b>
 
 ```python
-
-How to use in shell:
-
 > a={ "first":1, "second": 2, "third": 3}
 {"first":1,"second":2,"third":3}
 > keys(a)
@@ -562,9 +448,6 @@ How to use in shell:
 <hr>function: <b>parseJsonString</b>
 
 ```python
-
-How to use in shell:
-
 > parseJsonString('{"name": "Kermit", "surname": "Frog"}')
 {"name":"Kermit","surname":"Frog"}
 > parseJsonString('[1,2,3]')
@@ -575,9 +458,6 @@ How to use in shell:
 <hr>function: <b>toJsonString</b>
 
 ```python
-
-How to use in shell:
-
 > toJsonString([1,2,3])
 "[1,2,3]"
 > toJsonString({"name":"Pooh","family":"Bear","likes":["Honey","Songs","Friends"]})
@@ -588,9 +468,6 @@ How to use in shell:
 <hr>function: <b>exit</b>
 
 ```python
-
-How to use in shell:
-
 # exit() - exit program with status 0 (success)
 # exit(1) - exit program with status 1 (failure)
 
@@ -599,9 +476,6 @@ How to use in shell:
 <hr>function: <b>sleep</b>
 
 ```python
-
-How to use in shell:
-
     
 # sleep for three seconds    
 sleep(3)
@@ -612,9 +486,6 @@ sleep(3)
 <hr>function: <b>system</b>
 
 ```python
-
-How to use in shell:
-
 > a=system("ls /")
 ["Applications\nLibrary\nSystem\nUsers\nVolumes\nbin\ncores\ndev\netc\nhome\nopt\nprivate\nsbin\ntmp\nusr\nvar\n",0]
 > println(a[0])
@@ -645,9 +516,6 @@ var
 
 ```python
 
-How to use in shell:
-
-
 # Show help text for built-in functions: Example usage:
  
 help(sort)
@@ -658,9 +526,6 @@ help(sort)
 <hr>function: <b>localtime</b>
 
 ```python
-
-How to use in shell:
-
 # decodes epoch time into map
     
 > localtime(time())
@@ -672,9 +537,6 @@ How to use in shell:
 <hr>function: <b>time</b>
 
 ```python
-
-How to use in shell:
-
 # returns epoch time in seconds
 
 ```
@@ -682,9 +544,6 @@ How to use in shell:
 <hr>function: <b>type</b>
 
 ```python
-
-How to use in shell:
-
 > type(1)
 "Number"
 > type("abc")
@@ -701,9 +560,6 @@ How to use in shell:
 <hr>function: <b>ARGV</b>
 
 ```python
-
-How to use in shell:
-
 # command line arguments (array)
 
 ```
@@ -711,9 +567,6 @@ How to use in shell:
 <hr>function: <b>ENV</b>
 
 ```python
-
-How to use in shell:
-
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
@@ -721,9 +574,6 @@ How to use in shell:
 <hr>function: <b>mathconst</b>
 
 ```python
-
-How to use in shell:
-
 # map of mathematical constant
 
 # the number PI

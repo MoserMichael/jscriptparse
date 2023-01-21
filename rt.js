@@ -1015,15 +1015,13 @@ help(sort)
             console.log( +
 `> help(min)
 
-How to use in shell:
-
 > min(4,3)
 3
 > min(3,4)
 3`);
         } else {
             if ('help' in arg[0]) {
-                console.log("\nHow to use in shell:\n\n" + arg[0].help);
+                console.log(arg[0].help);
             } else {
                 console.log(typeName(arg[0]));
             }

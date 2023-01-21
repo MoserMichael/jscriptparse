@@ -374,11 +374,27 @@ function _prepareClosureFrame(funcVal, frame, args) {
 
 }
 
-function _system(cmd) {
+function _getEnv(frame) {
+    let val = frame.lookup("ENV");
+
+    if (val == null || val.type != TYPE_MAP) {
+        return {};
+    }
+
+    let envDct = {}
+    for (let [key, value] of Object.entries(val.val)) {
+        envDct[key] = value2Str(value);
+    }
+    return envDct;
+}
+
+function _system(cmd, frame) {
     let status = 0;
     let out = "";
+
+    let env = _getEnv(frame);
     try {
-        out = cp.execSync(cmd).toString();
+        out = cp.execSync(cmd,{env: env}).toString();
     } catch(e) {
         status = 1;//e.status;
     }
@@ -962,7 +978,7 @@ var
                 cmd = arg[0].val.map(value2Str).join(" ");
             }
         }
-        return _system(cmd);
+        return _system(cmd, frame);
     }),
     "sleep": new BuiltinFunctionValue(`    
 # sleep for three seconds    
@@ -990,7 +1006,7 @@ sleep(3)
         } else {
             throw new RuntimeException("list parameter required");
         }
-        return _system(cmd);
+        return _system(cmd, frame);
     }),
 
     // control flow
@@ -2296,6 +2312,7 @@ function makeFrame() {
     return frame;
 
 }
+
 
 function eval(stmt, globFrame = null) {
     if (globFrame == null) {

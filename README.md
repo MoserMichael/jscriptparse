@@ -1,6 +1,6 @@
 ## pyx scripting language
 
-![pux](pux.jpg) - the pyx educational programming language / scripting langauge and REPL shell.
+![pux](notes/pux.jpg) - the pyx educational programming language / scripting langauge and REPL shell.
 
 This programming language is named after Winnie-the-Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
 

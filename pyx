@@ -61,6 +61,35 @@ function replCommandParsedCallback(parsedSource) {
     nodejsRepl.history.push(parsedSource);
 }
 
+// syntax error due to string not closed is a lexical error. try to recover from it - so to know if repl is in 'continuation mode'
+// very brittle...
+function isSyntaxErrorDueToStringNotClosed(pos, data, glob) {
+    let next_ch = '"';
+    if (pos < data.length) {
+        next_ch = data[pos + 1];
+
+        let symStr = "'\"`";
+        let idx = symStr.indexOf(next_ch);
+        if (idx != -1) {
+            next_ch = symStr.substring(idx,idx+1);
+        } else {
+            return false;
+        }
+    }
+
+    data += next_ch;
+
+    try {
+        scr.runParse(data,false, true);
+        return true;
+    } catch(er) {
+        if (er.pos >= data.length) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function runEvalLoop() {
 
     let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '(', '}' ];
@@ -92,14 +121,19 @@ function runEvalLoop() {
                         evalPrintMsg += JSON.stringify(rt.rtValueToJsVal(res));
                     }
                 } catch(e) {
-                    // ignore
+                    console.error("Can't show result value. internal error");
                 }
 
             } catch(e) {
                 if (e instanceof scr.ScriptError) {
-                    if (e.eof && !e.noRecover) {
-                        return callback(new repl.Recoverable(e));
-                    }
+
+                   if (isSyntaxErrorDueToStringNotClosed(e.pos, data, glob)) {
+                       return callback(new repl.Recoverable(e));
+                   }
+
+                   if (e.eof && !e.noRecover) {
+                       return callback(new repl.Recoverable(e));
+                   }
                    callback(null, e.message);
                 } else {
                    callback(null, e.message);

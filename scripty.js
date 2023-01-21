@@ -871,7 +871,7 @@ function resolvePath(fileName) {
     return path.resolve(fileName);
 }
 
-function runParse(data, openFile, replCommandParsedCallback = null) {
+function runParse(data, openFile, isRepl) {
     let parseFromData = function(data) {
         let state = new prs.State(0, data);
         let parser = makeParser();
@@ -910,12 +910,12 @@ function runParse(data, openFile, replCommandParsedCallback = null) {
     } catch(er) {
         if (er instanceof prs.ParserError) {
             let msg = prs.formatParserError(er, data);
-            if (replCommandParsedCallback == null) {
+            if (!isRepl) {
                 //console.debug("---\n" + er.show() + "\n###\n");
                 console.log(msg);
             } else {
                 let res = er.pos >= data.length;
-                throw new ScriptError(msg, res, er.noRecover);
+                throw new ScriptError(msg, res, er.noRecover, er.pos);
             }
         }
         throw er;
@@ -923,9 +923,10 @@ function runParse(data, openFile, replCommandParsedCallback = null) {
 }
 
 class ScriptError extends Error {
-    constructor(message, eof, noRecover) {
+    constructor(message, eof, noRecover, pos) {
         super(message);
         this.eof = eof;
+        this.pos = pos;
         this.noRecover = noRecover;
     }
 }
@@ -934,7 +935,7 @@ class ScriptError extends Error {
 function runParserAndEval(data, openFile,  frame = null, replCommandParsedCallback = null) {
 
     try {
-        let ast = runParse(data, openFile, replCommandParsedCallback);
+        let ast = runParse(data, openFile, replCommandParsedCallback != null);
         let evalRet = rt.eval(ast, frame);
         if (replCommandParsedCallback != null) {
             let lst = rt.addSourceToTopLevelStmts(data,ast);
@@ -965,6 +966,7 @@ if (typeof(module) == 'object') {
     module.exports = {
         ScriptError,
         runParserAndEval,
+        runParse,
         KEYWORDS,
     }
 }

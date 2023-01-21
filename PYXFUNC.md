@@ -1,23 +1,23 @@
 # pyxfunc - PYX functions reference by category
 
 ## Functions for scalars or strings
-<a href='#s-1'>find</a>&nbsp;,&nbsp;<a href='#s-2'>mid</a>&nbsp;,&nbsp;<a href='#s-3'>lc</a>&nbsp;,&nbsp;<a href='#s-4'>uc</a>&nbsp;,&nbsp;<a href='#s-5'>reverse</a>&nbsp;,&nbsp;<a href='#s-6'>str</a>&nbsp;,&nbsp;<a href='#s-7'>repeat</a>&nbsp;,&nbsp;<a href='#s-8'>len</a>
+<a href='#s-1'>find</a>&nbsp;,&nbsp;<a href='#s-2'>lc</a>&nbsp;,&nbsp;<a href='#s-3'>len</a>&nbsp;,&nbsp;<a href='#s-4'>mid</a>&nbsp;,&nbsp;<a href='#s-5'>repeat</a>&nbsp;,&nbsp;<a href='#s-6'>reverse</a>&nbsp;,&nbsp;<a href='#s-7'>str</a>&nbsp;,&nbsp;<a href='#s-8'>uc</a>
 ## Numeric functions
-<a href='#s-9'>int</a>&nbsp;,&nbsp;<a href='#s-10'>max</a>&nbsp;,&nbsp;<a href='#s-11'>min</a>&nbsp;,&nbsp;<a href='#s-12'>abs</a>&nbsp;,&nbsp;<a href='#s-13'>sqrt</a>&nbsp;,&nbsp;<a href='#s-14'>sin</a>&nbsp;,&nbsp;<a href='#s-15'>cos</a>&nbsp;,&nbsp;<a href='#s-16'>tan</a>&nbsp;,&nbsp;<a href='#s-17'>atan</a>&nbsp;,&nbsp;<a href='#s-18'>pow</a>&nbsp;,&nbsp;<a href='#s-19'>random</a>
+<a href='#s-9'>abs</a>&nbsp;,&nbsp;<a href='#s-10'>atan</a>&nbsp;,&nbsp;<a href='#s-11'>cos</a>&nbsp;,&nbsp;<a href='#s-12'>int</a>&nbsp;,&nbsp;<a href='#s-13'>max</a>&nbsp;,&nbsp;<a href='#s-14'>min</a>&nbsp;,&nbsp;<a href='#s-15'>pow</a>&nbsp;,&nbsp;<a href='#s-16'>random</a>&nbsp;,&nbsp;<a href='#s-17'>sin</a>&nbsp;,&nbsp;<a href='#s-18'>sqrt</a>&nbsp;,&nbsp;<a href='#s-19'>tan</a>
 ## Input and output functions
 <a href='#s-20'>print</a>&nbsp;,&nbsp;<a href='#s-21'>println</a>&nbsp;,&nbsp;<a href='#s-22'>readFile</a>&nbsp;,&nbsp;<a href='#s-23'>writeFile</a>
 ## Functions for arrays
-<a href='#s-8'>len</a>&nbsp;,&nbsp;<a href='#s-25'>join</a>&nbsp;,&nbsp;<a href='#s-26'>map</a>&nbsp;,&nbsp;<a href='#s-27'>reduce</a>&nbsp;,&nbsp;<a href='#s-28'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-29'>pop</a>&nbsp;,&nbsp;<a href='#s-30'>push</a>&nbsp;,&nbsp;<a href='#s-31'>joinl</a>&nbsp;,&nbsp;<a href='#s-32'>sort</a>&nbsp;,&nbsp;<a href='#s-33'>exists</a>&nbsp;,&nbsp;<a href='#s-34'>range</a>&nbsp;,&nbsp;<a href='#s-35'>mapIndex</a>
+<a href='#s-24'>exists</a>&nbsp;,&nbsp;<a href='#s-25'>join</a>&nbsp;,&nbsp;<a href='#s-26'>joinl</a>&nbsp;,&nbsp;<a href='#s-3'>len</a>&nbsp;,&nbsp;<a href='#s-28'>map</a>&nbsp;,&nbsp;<a href='#s-29'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-30'>pop</a>&nbsp;,&nbsp;<a href='#s-31'>push</a>&nbsp;,&nbsp;<a href='#s-32'>range</a>&nbsp;,&nbsp;<a href='#s-33'>reduce</a>&nbsp;,&nbsp;<a href='#s-34'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-35'>sort</a>
 ## Functions for maps
-<a href='#s-36'>each</a>&nbsp;,&nbsp;<a href='#s-37'>keys</a>&nbsp;,&nbsp;<a href='#s-33'>exists</a>
+<a href='#s-36'>each</a>&nbsp;,&nbsp;<a href='#s-24'>exists</a>&nbsp;,&nbsp;<a href='#s-38'>keys</a>
 ## Function for working with json
 <a href='#s-39'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-40'>toJsonString</a>
 ## functions for working with processes
-<a href='#s-41'>system</a>&nbsp;,&nbsp;<a href='#s-42'>exit</a>&nbsp;,&nbsp;<a href='#s-43'>sleep</a>
+<a href='#s-41'>exit</a>&nbsp;,&nbsp;<a href='#s-42'>sleep</a>&nbsp;,&nbsp;<a href='#s-43'>system</a>
 ## Other functions
-<a href='#s-44'>help</a>&nbsp;,&nbsp;<a href='#s-45'>type</a>&nbsp;,&nbsp;<a href='#s-46'>time</a>&nbsp;,&nbsp;<a href='#s-47'>localtime</a>
+<a href='#s-44'>help</a>&nbsp;,&nbsp;<a href='#s-45'>localtime</a>&nbsp;,&nbsp;<a href='#s-46'>time</a>&nbsp;,&nbsp;<a href='#s-47'>type</a>
 ## Global variables
-<a href='#s-48'>mathconst</a>&nbsp;,&nbsp;<a href='#s-49'>ARGV</a>&nbsp;,&nbsp;<a href='#s-50'>ENV</a>
+<a href='#s-48'>ARGV</a>&nbsp;,&nbsp;<a href='#s-49'>ENV</a>&nbsp;,&nbsp;<a href='#s-50'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>find</b>
@@ -37,19 +37,6 @@ How to use in shell:
 
 ```
 <a id='s-2'/>
-<hr>function: <b>mid</b>
-
-```python
-
-How to use in shell:
-
-> mid("I am me", 2)
-"am me"
-> mid("I am me", 2, 4)
-"am"
-
-```
-<a id='s-3'/>
 <hr>function: <b>lc</b>
 
 ```python
@@ -60,57 +47,7 @@ How to use in shell:
 "big little"
 
 ```
-<a id='s-4'/>
-<hr>function: <b>uc</b>
-
-```python
-
-How to use in shell:
-
-> uc("BIG little")
-"BIG LITTLE"
-
-```
-<a id='s-5'/>
-<hr>function: <b>reverse</b>
-
-```python
-
-How to use in shell:
-
-> reverse([1,2,3,4])
-[4,3,2,1]
-> reverse("abcd")
-"dcba"
-
-```
-<a id='s-6'/>
-<hr>function: <b>str</b>
-
-```python
-
-How to use in shell:
-
-> str(123)
-"123"
-> str("abc")
-"abc"
-
-```
-<a id='s-7'/>
-<hr>function: <b>repeat</b>
-
-```python
-
-How to use in shell:
-
-> repeat("a",3)
-"aaa"
-> repeat("ab",3)
-"ababab"
-
-```
-<a id='s-8'/>
+<a id='s-3'/>
 <hr>function: <b>len</b>
 
 ```python
@@ -123,7 +60,105 @@ How to use in shell:
 3
 
 ```
+<a id='s-4'/>
+<hr>function: <b>mid</b>
+
+```python
+
+How to use in shell:
+
+> mid("I am me", 2)
+"am me"
+> mid("I am me", 2, 4)
+"am"
+
+```
+<a id='s-5'/>
+<hr>function: <b>repeat</b>
+
+```python
+
+How to use in shell:
+
+> repeat("a",3)
+"aaa"
+> repeat("ab",3)
+"ababab"
+
+```
+<a id='s-6'/>
+<hr>function: <b>reverse</b>
+
+```python
+
+How to use in shell:
+
+> reverse([1,2,3,4])
+[4,3,2,1]
+> reverse("abcd")
+"dcba"
+
+```
+<a id='s-7'/>
+<hr>function: <b>str</b>
+
+```python
+
+How to use in shell:
+
+> str(123)
+"123"
+> str("abc")
+"abc"
+
+```
+<a id='s-8'/>
+<hr>function: <b>uc</b>
+
+```python
+
+How to use in shell:
+
+> uc("BIG little")
+"BIG LITTLE"
+
+```
 <a id='s-9'/>
+<hr>function: <b>abs</b>
+
+```python
+
+How to use in shell:
+
+> abs(-3)
+3
+> abs(3)
+3
+
+```
+<a id='s-10'/>
+<hr>function: <b>atan</b>
+
+```python
+
+How to use in shell:
+
+returns the inverse tangent (in radians) of a number
+
+```
+<a id='s-11'/>
+<hr>function: <b>cos</b>
+
+```python
+
+How to use in shell:
+
+returns the cosine of a number in radians
+> cos(mathconst['pi'])
+-1
+
+```
+<a id='s-12'/>
 <hr>function: <b>int</b>
 
 ```python
@@ -140,7 +175,7 @@ How to use in shell:
 123
 
 ```
-<a id='s-10'/>
+<a id='s-13'/>
 <hr>function: <b>max</b>
 
 ```python
@@ -153,7 +188,7 @@ How to use in shell:
 4
 
 ```
-<a id='s-11'/>
+<a id='s-14'/>
 <hr>function: <b>min</b>
 
 ```python
@@ -166,79 +201,7 @@ How to use in shell:
 3
 
 ```
-<a id='s-12'/>
-<hr>function: <b>abs</b>
-
-```python
-
-How to use in shell:
-
-> abs(-3)
-3
-> abs(3)
-3
-
-```
-<a id='s-13'/>
-<hr>function: <b>sqrt</b>
-
-```python
-
-How to use in shell:
-
-> sqrt(9)
-3
-> sqrt(4)
-2
-> sqrt(2)
-1.414213562373095
-
-```
-<a id='s-14'/>
-<hr>function: <b>sin</b>
-
-```python
-
-How to use in shell:
-
-returns the sine of a number in radians
-> sin(mathconst['pi']/2)
-1
-
-```
 <a id='s-15'/>
-<hr>function: <b>cos</b>
-
-```python
-
-How to use in shell:
-
-returns the cosine of a number in radians
-> cos(mathconst['pi'])
--1
-
-```
-<a id='s-16'/>
-<hr>function: <b>tan</b>
-
-```python
-
-How to use in shell:
-
-returns the tangent of a number in radians
-
-```
-<a id='s-17'/>
-<hr>function: <b>atan</b>
-
-```python
-
-How to use in shell:
-
-returns the inverse tangent (in radians) of a number
-
-```
-<a id='s-18'/>
 <hr>function: <b>pow</b>
 
 ```python
@@ -253,7 +216,7 @@ How to use in shell:
 16
 
 ```
-<a id='s-19'/>
+<a id='s-16'/>
 <hr>function: <b>random</b>
 
 ```python
@@ -261,6 +224,43 @@ How to use in shell:
 How to use in shell:
 
 returns random number with value between 0 and 1
+
+```
+<a id='s-17'/>
+<hr>function: <b>sin</b>
+
+```python
+
+How to use in shell:
+
+returns the sine of a number in radians
+> sin(mathconst['pi']/2)
+1
+
+```
+<a id='s-18'/>
+<hr>function: <b>sqrt</b>
+
+```python
+
+How to use in shell:
+
+> sqrt(9)
+3
+> sqrt(4)
+2
+> sqrt(2)
+1.414213562373095
+
+```
+<a id='s-19'/>
+<hr>function: <b>tan</b>
+
+```python
+
+How to use in shell:
+
+returns the tangent of a number in radians
 
 ```
 <a id='s-20'/>
@@ -315,17 +315,27 @@ append file
     
 
 ```
-<a id='s-8'/>
-<hr>function: <b>len</b>
+<a id='s-24'/>
+<hr>function: <b>exists</b>
 
 ```python
 
 How to use in shell:
 
-> len("abc")
-3
-> len([1,2,3])
-3
+> a={"first":1}
+{"first":1}
+> exists("first", a)
+true
+> exists("second", a)
+false
+> a=[3,4]
+[3,4]
+> exists(3, a)
+true
+> exists(4, a)
+true
+> exists(5, a)
+false
 
 ```
 <a id='s-25'/>
@@ -340,6 +350,30 @@ How to use in shell:
 
 ```
 <a id='s-26'/>
+<hr>function: <b>joinl</b>
+
+```python
+
+How to use in shell:
+
+> joinl([1,2],[3,4])
+[1,2,3,4]
+
+```
+<a id='s-3'/>
+<hr>function: <b>len</b>
+
+```python
+
+How to use in shell:
+
+> len("abc")
+3
+> len([1,2,3])
+3
+
+```
+<a id='s-28'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -352,7 +386,63 @@ How to use in shell:
 [1,4,9]
 
 ```
-<a id='s-27'/>
+<a id='s-29'/>
+<hr>function: <b>mapIndex</b>
+
+```python
+
+How to use in shell:
+
+> mapIndex([3,4,5,6],def(x,y) [2*x, y])
+[[6,0],[8,1],[10,2],[12,3]]
+
+```
+<a id='s-30'/>
+<hr>function: <b>pop</b>
+
+```python
+
+How to use in shell:
+
+> a=[1, 2, 3]
+[1,2,3]
+> pop(a)
+3
+> a
+[1,2]
+
+```
+<a id='s-31'/>
+<hr>function: <b>push</b>
+
+```python
+
+How to use in shell:
+
+> a=[1, 2]
+[1,2]
+> push(a,3)
+[1,2,3]
+> a
+[1,2,3]
+
+```
+<a id='s-32'/>
+<hr>function: <b>range</b>
+
+```python
+
+How to use in shell:
+
+> range(1,4)
+[1,2,3]
+> for n range(1,4) println("number: {n}")
+number: 1
+number: 2
+number: 3
+
+```
+<a id='s-33'/>
 <hr>function: <b>reduce</b>
 
 ```python
@@ -377,7 +467,7 @@ same as:
 
 
 ```
-<a id='s-28'/>
+<a id='s-34'/>
 <hr>function: <b>reduceFromEnd</b>
 
 ```python
@@ -395,48 +485,7 @@ same as:
 1
 
 ```
-<a id='s-29'/>
-<hr>function: <b>pop</b>
-
-```python
-
-How to use in shell:
-
-> a=[1, 2, 3]
-[1,2,3]
-> pop(a)
-3
-> a
-[1,2]
-
-```
-<a id='s-30'/>
-<hr>function: <b>push</b>
-
-```python
-
-How to use in shell:
-
-> a=[1, 2]
-[1,2]
-> push(a,3)
-[1,2,3]
-> a
-[1,2,3]
-
-```
-<a id='s-31'/>
-<hr>function: <b>joinl</b>
-
-```python
-
-How to use in shell:
-
-> joinl([1,2],[3,4])
-[1,2,3,4]
-
-```
-<a id='s-32'/>
+<a id='s-35'/>
 <hr>function: <b>sort</b>
 
 ```python
@@ -453,55 +502,6 @@ How to use in shell:
 
 > r=sort([['a',100],['b',1],['c',1000]],cmp)
 [["b",1],["a",100],["c",1000]]
-
-```
-<a id='s-33'/>
-<hr>function: <b>exists</b>
-
-```python
-
-How to use in shell:
-
-> a={"first":1}
-{"first":1}
-> exists("first", a)
-true
-> exists("second", a)
-false
-> a=[3,4]
-[3,4]
-> exists(3, a)
-true
-> exists(4, a)
-true
-> exists(5, a)
-false
-
-```
-<a id='s-34'/>
-<hr>function: <b>range</b>
-
-```python
-
-How to use in shell:
-
-> range(1,4)
-[1,2,3]
-> for n range(1,4) println("number: {n}")
-number: 1
-number: 2
-number: 3
-
-```
-<a id='s-35'/>
-<hr>function: <b>mapIndex</b>
-
-```python
-
-How to use in shell:
-
-> mapIndex([3,4,5,6],def(x,y) [2*x, y])
-[[6,0],[8,1],[10,2],[12,3]]
 
 ```
 <a id='s-36'/>
@@ -521,20 +521,7 @@ How to use in shell:
 
 
 ```
-<a id='s-37'/>
-<hr>function: <b>keys</b>
-
-```python
-
-How to use in shell:
-
-> a={ "first":1, "second": 2, "third": 3}
-{"first":1,"second":2,"third":3}
-> keys(a)
-["first","second","third"]
-
-```
-<a id='s-33'/>
+<a id='s-24'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -555,6 +542,19 @@ true
 true
 > exists(5, a)
 false
+
+```
+<a id='s-38'/>
+<hr>function: <b>keys</b>
+
+```python
+
+How to use in shell:
+
+> a={ "first":1, "second": 2, "third": 3}
+{"first":1,"second":2,"third":3}
+> keys(a)
+["first","second","third"]
 
 ```
 <a id='s-39'/>
@@ -584,6 +584,30 @@ How to use in shell:
 
 ```
 <a id='s-41'/>
+<hr>function: <b>exit</b>
+
+```python
+
+How to use in shell:
+
+exit() - exit program with status 0 (success)
+exit(1) - exit program with status 1 (failure)
+
+```
+<a id='s-42'/>
+<hr>function: <b>sleep</b>
+
+```python
+
+How to use in shell:
+
+    
+sleep for three seconds    
+sleep(3)
+
+
+```
+<a id='s-43'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -615,30 +639,6 @@ var
 0
 
 ```
-<a id='s-42'/>
-<hr>function: <b>exit</b>
-
-```python
-
-How to use in shell:
-
-exit() - exit program with status 0 (success)
-exit(1) - exit program with status 1 (failure)
-
-```
-<a id='s-43'/>
-<hr>function: <b>sleep</b>
-
-```python
-
-How to use in shell:
-
-    
-sleep for three seconds    
-sleep(3)
-
-
-```
 <a id='s-44'/>
 <hr>function: <b>help</b>
 
@@ -655,6 +655,30 @@ Show help text for built-in functions: Example usage:
 
 ```
 <a id='s-45'/>
+<hr>function: <b>localtime</b>
+
+```python
+
+How to use in shell:
+
+decodes epoch time into map
+    
+> localtime(time())
+{"seconds":22,"minutes":33,"hours":7,"days":1,"year":2023,"month":0}    
+
+
+```
+<a id='s-46'/>
+<hr>function: <b>time</b>
+
+```python
+
+How to use in shell:
+
+returns epoch time in seconds
+
+```
+<a id='s-47'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -673,31 +697,27 @@ How to use in shell:
 "Closure"
 
 ```
-<a id='s-46'/>
-<hr>function: <b>time</b>
-
-```python
-
-How to use in shell:
-
-returns epoch time in seconds
-
-```
-<a id='s-47'/>
-<hr>function: <b>localtime</b>
-
-```python
-
-How to use in shell:
-
-decodes epoch time into map
-    
-> localtime(time())
-{"seconds":22,"minutes":33,"hours":7,"days":1,"year":2023,"month":0}    
-
-
-```
 <a id='s-48'/>
+<hr>function: <b>ARGV</b>
+
+```python
+
+How to use in shell:
+
+command line arguments (array)
+
+```
+<a id='s-49'/>
+<hr>function: <b>ENV</b>
+
+```python
+
+How to use in shell:
+
+environment variables, entry key is the name of the environment variable, the entry value is it's value
+
+```
+<a id='s-50'/>
 <hr>function: <b>mathconst</b>
 
 ```python
@@ -728,25 +748,5 @@ mathconst["log10e"] - base e logarithm of 10
 mathconst["log2e"] - base 2 logarithm of e
 mathconst["log10e"] - base 10 logarithm of e    
     
-
-```
-<a id='s-49'/>
-<hr>function: <b>ARGV</b>
-
-```python
-
-How to use in shell:
-
-command line arguments (array)
-
-```
-<a id='s-50'/>
-<hr>function: <b>ENV</b>
-
-```python
-
-How to use in shell:
-
-environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```

@@ -43,7 +43,7 @@ def doIt() {
       println("## {e['name']}")
       first = true
 
-      for name e['func'] {
+      for name sort(e['func']) {
          link_name="s-{link_num}"
          if exists(name, link_map)
            link_name = link_map[name]

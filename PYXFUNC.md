@@ -223,7 +223,7 @@ How to use in shell:
 
 How to use in shell:
 
-returns random number with value between 0 and 1
+# returns random number with value between 0 and 1
 
 ```
 <a id='s-17'/>
@@ -270,7 +270,7 @@ returns the tangent of a number in radians
 
 How to use in shell:
 
-prints argument value to console
+# prints argument value to console
 
 ```
 <a id='s-21'/>
@@ -280,7 +280,7 @@ prints argument value to console
 
 How to use in shell:
 
-prints argument value to console, followed by newline
+# prints argument value to console, followed by newline
 
 ```
 <a id='s-22'/>
@@ -291,7 +291,7 @@ prints argument value to console, followed by newline
 How to use in shell:
 
 
-read text file and return string
+# read text file and return string
 
 > fileText = readFile("fileName.txt")    
     
@@ -305,11 +305,12 @@ read text file and return string
 How to use in shell:
 
 
-write string parameter into text file
+# write string parameter into text file
 
 > writeFile("fileName.txt","fileContent")
 
-append file
+# append file
+
 > writeFile("fileName.txt","add this after end of file", "append")
    
     
@@ -452,7 +453,7 @@ How to use in shell:
 > reduce([1,2,3], def (x,y) x+y, 0)
 6
 
-same as:
+# same as:
 
 > (((0+1)+2)+3)
 6
@@ -460,7 +461,7 @@ same as:
 > reduce([1,2,3], def (x,y) x+y, 2)
 8
 
-same as:
+# same as:
  
 > (((0+1)+2)+3)
 6
@@ -590,8 +591,8 @@ How to use in shell:
 
 How to use in shell:
 
-exit() - exit program with status 0 (success)
-exit(1) - exit program with status 1 (failure)
+# exit() - exit program with status 0 (success)
+# exit(1) - exit program with status 1 (failure)
 
 ```
 <a id='s-42'/>
@@ -602,7 +603,7 @@ exit(1) - exit program with status 1 (failure)
 How to use in shell:
 
     
-sleep for three seconds    
+# sleep for three seconds    
 sleep(3)
 
 
@@ -646,11 +647,10 @@ var
 
 How to use in shell:
 
-How to use in shell:
 
-Show help text for built-in functions: Example usage:
+# Show help text for built-in functions: Example usage:
  
- help(sort)
+help(sort)
 
 
 ```
@@ -661,7 +661,7 @@ Show help text for built-in functions: Example usage:
 
 How to use in shell:
 
-decodes epoch time into map
+# decodes epoch time into map
     
 > localtime(time())
 {"seconds":22,"minutes":33,"hours":7,"days":1,"year":2023,"month":0}    
@@ -675,7 +675,7 @@ decodes epoch time into map
 
 How to use in shell:
 
-returns epoch time in seconds
+# returns epoch time in seconds
 
 ```
 <a id='s-47'/>
@@ -704,7 +704,7 @@ How to use in shell:
 
 How to use in shell:
 
-command line arguments (array)
+# command line arguments (array)
 
 ```
 <a id='s-49'/>
@@ -714,7 +714,7 @@ command line arguments (array)
 
 How to use in shell:
 
-environment variables, entry key is the name of the environment variable, the entry value is it's value
+# environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
 <a id='s-50'/>
@@ -724,29 +724,29 @@ environment variables, entry key is the name of the environment variable, the en
 
 How to use in shell:
 
-map of mathematical constant
+# map of mathematical constant
 
-the number PI
+# the number PI
     
 > mathconst['pi']
 3.141592653589793
 
-the Euler constant 
+# the Euler constant 
 
 > mathconst['e']
 2.718281828459045
 
-The square root of two
+# The square root of two
 
 > mathconst["sqrt2"]
 1.4142135623730951
 
-Other values: 
-mathconst["sqrt1_2"] - square root of one half.
-mathconst["log2e"] - base e logarithm of 2 
-mathconst["log10e"] - base e logarithm of 10
-mathconst["log2e"] - base 2 logarithm of e
-mathconst["log10e"] - base 10 logarithm of e    
+# Other values: 
+mathconst["sqrt1_2"] # - square root of one half.
+mathconst["log2e"]   # - base e logarithm of 2 
+mathconst["log10e"]  # - base e logarithm of 10
+mathconst["log2e"]   # - base 2 logarithm of e
+mathconst["log10e"]  # - base 10 logarithm of e    
     
 
 ```

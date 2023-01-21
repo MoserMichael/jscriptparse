@@ -1,4 +1,6 @@
 
+# test for loops / iteration over ranges and list / map values
+
 println("loop over rangeof numbers")
 for x range(1,10) {
     println(x)

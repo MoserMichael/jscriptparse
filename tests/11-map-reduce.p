@@ -1,3 +1,5 @@
+    # testing higher order functions: map and reduce
+
     a = [1, 2, 3, 4]
     b = map(a, def(x) { return x * x })
     

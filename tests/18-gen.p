@@ -1,4 +1,5 @@
 
+# test generator functions
 
 def mygen(from,to) {
     while from < to {

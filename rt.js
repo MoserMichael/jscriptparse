@@ -590,21 +590,21 @@ RTLIB={
         let exp = value2Num(arg[1]);
         return new Value(TYPE_NUM, Math.pow(pow,exp));
     }),
-    "random" : new BuiltinFunctionValue(`returns random number with value between 0 and 1`, 0, function(arg) {
+    "random" : new BuiltinFunctionValue(`# returns random number with value between 0 and 1`, 0, function(arg) {
         return new Value(TYPE_NUM, Math.random());
     }),
 
     // Input and output functions
-    "print" : new BuiltinFunctionValue("prints argument value to console", 1, function(arg) {
+    "print" : new BuiltinFunctionValue("# prints argument value to console", 1, function(arg) {
         let msg = value2Str(arg[0]);
         doLogHook(msg)
     }),
-    "println" : new BuiltinFunctionValue("prints argument value to console, followed by newline", 1, function(arg) {
+    "println" : new BuiltinFunctionValue("# prints argument value to console, followed by newline", 1, function(arg) {
         let msg = value2Str(arg[0]);
         doLogHook(msg + "\n")
     }),
     "readFile" : new BuiltinFunctionValue(`
-read text file and return string
+# read text file and return string
 
 > fileText = readFile("fileName.txt")    
     `, 1, function(arg) {
@@ -617,11 +617,12 @@ read text file and return string
         };
     }),
     "writeFile" : new BuiltinFunctionValue(`
-write string parameter into text file
+# write string parameter into text file
 
 > writeFile("fileName.txt","fileContent")
 
-append file
+# append file
+
 > writeFile("fileName.txt","add this after end of file", "append")
    
     `, 3, function(arg) {
@@ -709,7 +710,7 @@ append file
     "reduce": new BuiltinFunctionValue(`> reduce([1,2,3], def (x,y) x+y, 0)
 6
 
-same as:
+# same as:
 
 > (((0+1)+2)+3)
 6
@@ -717,7 +718,7 @@ same as:
 > reduce([1,2,3], def (x,y) x+y, 2)
 8
 
-same as:
+# same as:
  
 > (((0+1)+2)+3)
 6
@@ -940,7 +941,7 @@ var
         return _system(cmd);
     }),
     "sleep": new BuiltinFunctionValue(`    
-sleep for three seconds    
+# sleep for three seconds    
 sleep(3)
 `, 1,function(arg, frame) {
         let num = value2Num(arg[0]) * 1000;
@@ -969,7 +970,7 @@ sleep(3)
     }),
 
     // control flow
-    "exit": new BuiltinFunctionValue(`exit() - exit program with status 0 (success)\nexit(1) - exit program with status 1 (failure)`,
+    "exit": new BuiltinFunctionValue(`# exit() - exit program with status 0 (success)\n# exit(1) - exit program with status 1 (failure)`,
         1,function(arg, frame) {
         let num = 0;
         if (arg[0] != null) {
@@ -1005,11 +1006,10 @@ false`, 2,function(arg, frame) {
         }
         throw new RuntimeException("second argument must be list or map, is: " + typeName(arg[1]));
     }),
-    "help": new BuiltinFunctionValue(`How to use in shell:
-
-Show help text for built-in functions: Example usage:
+    "help": new BuiltinFunctionValue(`
+# Show help text for built-in functions: Example usage:
  
- help(sort)
+help(sort)
 `, 1,function(arg, frame) {
         if (arg[0]==null) {
             console.log( +
@@ -1072,11 +1072,11 @@ number: 3`, 3,function *(arg, frame) {
     }, [null, null, null], true),
 
     // functions for working with time
-    "time": new BuiltinFunctionValue("returns epoch time in seconds", 0,function(arg, frame) {
+    "time": new BuiltinFunctionValue("# returns epoch time in seconds", 0,function(arg, frame) {
         let secondsSinceEpoch = new Date().getTime() / 1000;
         return new Value(TYPE_NUM, secondsSinceEpoch);
     }),
-    "localtime": new BuiltinFunctionValue(`decodes epoch time into map
+    "localtime": new BuiltinFunctionValue(`# decodes epoch time into map
     
 > localtime(time())
 {"seconds":22,"minutes":33,"hours":7,"days":1,"year":2023,"month":0}    
@@ -1108,29 +1108,29 @@ number: 3`, 3,function *(arg, frame) {
         log2e: new Value(TYPE_NUM, Math.LOG2E),
         sqrt1_2: new Value(TYPE_NUM, Math.SQRT1_2),
         sqrt2: new Value(TYPE_NUM, Math.SQRT2),
-    }, `map of mathematical constant
+    }, `# map of mathematical constant
 
-the number PI
+# the number PI
     
 > mathconst['pi']
 3.141592653589793
 
-the Euler constant 
+# the Euler constant 
 
 > mathconst['e']
 2.718281828459045
 
-The square root of two
+# The square root of two
 
 > mathconst["sqrt2"]
 1.4142135623730951
 
-Other values: 
-mathconst["sqrt1_2"] - square root of one half.
-mathconst["log2e"] - base e logarithm of 2 
-mathconst["log10e"] - base e logarithm of 10
-mathconst["log2e"] - base 2 logarithm of e
-mathconst["log10e"] - base 10 logarithm of e    
+# Other values: 
+mathconst["sqrt1_2"] # - square root of one half.
+mathconst["log2e"]   # - base e logarithm of 2 
+mathconst["log10e"]  # - base e logarithm of 10
+mathconst["log2e"]   # - base 2 logarithm of e
+mathconst["log10e"]  # - base 10 logarithm of e    
     `),
 
     "ARGV" : new Value(TYPE_LIST,
@@ -1139,7 +1139,7 @@ mathconst["log10e"] - base 10 logarithm of e
                 prev.push(new Value(TYPE_STR, current));
                 return prev
             } , []),
-        "command line arguments (array)"
+        "# command line arguments (array)"
     ),
 
     "ENV": new Value(TYPE_MAP,
@@ -1148,7 +1148,7 @@ mathconst["log10e"] - base 10 logarithm of e
                 prev[current[0]]= new Value(TYPE_STR, current[1]);
                 return prev
             } , {}) ,
-        "environment variables, entry key is the name of the environment variable, the entry value is it's value"
+        "# environment variables, entry key is the name of the environment variable, the entry value is it's value"
     ),
 }
 

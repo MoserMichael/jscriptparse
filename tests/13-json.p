@@ -1,3 +1,5 @@
+    # conversion of variable to string and vice versa
+
     dct = { "persons": { "id": "323412343123", "name": "Michael", "surname": "Moser", "age": 52 }, "stuff": [3, 2, 1] }
     js = toJsonString( dct )
     println( "json: {js}" )

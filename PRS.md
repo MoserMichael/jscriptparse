@@ -6,7 +6,9 @@ This is a standalone script, you can use it both with nodejs and in a browser.
 
 ## Installation
 
-```npm i prscombinator``` 
+```npm i prscombinator```  
+
+or download library file from github: [link](https://raw.githubusercontent.com/MoserMichael/jscriptparse/main/prs.js)
 
 See the [package page on npm](https://www.npmjs.com/package/prscombinator)
 

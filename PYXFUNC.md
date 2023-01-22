@@ -11,7 +11,7 @@
 ## Functions for maps
 <a href='#s-36'>each</a>&nbsp;,&nbsp;<a href='#s-24'>exists</a>&nbsp;,&nbsp;<a href='#s-38'>keys</a>&nbsp;,&nbsp;<a href='#s-28'>map</a>
 ## Function for working with json/yaml
-<a href='#s-40'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-40'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-42'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-43'>toJsonString</a>
+<a href='#s-40'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-41'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-42'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-43'>toYamlString</a>
 ## functions for working with processes
 <a href='#s-44'>exit</a>&nbsp;,&nbsp;<a href='#s-45'>sleep</a>&nbsp;,&nbsp;<a href='#s-46'>system</a>
 ## Other functions
@@ -478,24 +478,27 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-40'/>
-<hr>function: <b>parseJsonString</b>
-
-```python
-> parseJsonString('{"name": "Kermit", "surname": "Frog"}')
-{"name":"Kermit","surname":"Frog"}
-> parseJsonString('[1,2,3]')
-[1,2,3]
-
-```
-<a id='s-42'/>
+<a id='s-41'/>
 <hr>function: <b>parseYamlString</b>
 
 ```python
 
+> a="a: 1\nb: 2\nc:\n  - 1\n  - 2\n  - 3\n"
+"a: 1\nb: 2\nc:\n  - 1\n  - 2\n  - 3\n"
+> println(a)
+a: 1
+b: 2
+c:
+  - 1
+  - 2
+  - 3
+  
+> parseYamlString("a: 1\nb: 2\nc:\n  - 1\n  - 2\n  - 3\n")
+{"a":1,"b":2,"c":[1,2,3]}    
+    
 
 ```
-<a id='s-43'/>
+<a id='s-42'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -503,6 +506,22 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 "[1,2,3]"
 > toJsonString({"name":"Pooh","family":"Bear","likes":["Honey","Songs","Friends"]})
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
+
+```
+<a id='s-43'/>
+<hr>function: <b>toYamlString</b>
+
+```python
+
+> a={"a":1, "b":2, "c":[1,2,3] }
+{"a":1,"b":2,"c":[1,2,3]}
+> println(toYamlString(a))
+a: 1
+b: 2
+c:
+  - 1
+  - 2
+  - 3
 
 ```
 <a id='s-44'/>

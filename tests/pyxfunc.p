@@ -19,7 +19,7 @@ funcCats = [
     "func": [ "each", "keys", "exists", "map" ]
  },
  { "name": "Function for working with json/yaml",
-   "func": [ "parseJsonString", "toJsonString", "parseJsonString", "parseYamlString" ]
+   "func": [ "parseJsonString", "toJsonString", "parseYamlString", "toYamlString" ]
  },
  { "name": "functions for working with processes",
    "func": [ "system", "exit", "sleep" ]

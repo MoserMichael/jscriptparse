@@ -959,7 +959,20 @@ same as:
     }),
 
     //functions for working with yaml
-    "parseYamlString": new BuiltinFunctionValue(``, 1,function(arg, frame) {
+    "parseYamlString": new BuiltinFunctionValue(`
+> a="a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n"
+"a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n"
+> println(a)
+a: 1
+b: 2
+c:
+  - 1
+  - 2
+  - 3
+  
+> parseYamlString("a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n")
+{"a":1,"b":2,"c":[1,2,3]}    
+    `, 1,function(arg, frame) {
         if(arg[0].type != TYPE_STR) {
             throw new RuntimeException("first argument: string argument required. is: " + typeName(arg[0]));
         }
@@ -967,7 +980,16 @@ same as:
         let rt = jsValueToRtVal(val);
         return rt;
     }),
-    "toYamlString": new BuiltinFunctionValue(``, 1,function(arg, frame) {
+    "toYamlString": new BuiltinFunctionValue(`
+> a={"a":1, "b":2, "c":[1,2,3] }
+{"a":1,"b":2,"c":[1,2,3]}
+> println(toYamlString(a))
+a: 1
+b: 2
+c:
+  - 1
+  - 2
+  - 3`, 1,function(arg, frame) {
         let jsVal = rtValueToJsVal(arg[0]);
         return new Value(TYPE_STR, yaml.stringify(jsVal));
     }),

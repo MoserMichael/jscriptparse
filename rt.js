@@ -2,6 +2,7 @@ const path=require("node:path");
 const fs=require("fs");
 const cp=require("node:child_process");
 const prs=require(path.join(__dirname,"prs.js"));
+//const yaml=require("yaml");
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
@@ -945,6 +946,22 @@ same as:
         return new Value(TYPE_STR, JSON.stringify(jsVal));
     }),
 
+    /*
+    //functions for working with yaml
+    "parseYamlString": new BuiltinFunctionValue(``, 1,function(arg, frame) {
+        if(arg[0].type != TYPE_STR) {
+            throw new RuntimeException("first argument: string argument required. is: " + typeName(arg[0]));
+        }
+        let val = yaml.parse(arg[0].val);
+        let rt = jsValueToRtVal(val);
+        return rt;
+    }),
+    "toYamlString": new BuiltinFunctionValue(``, 1,function(arg, frame) {
+        let jsVal = rtValueToJsVal(arg[0]);
+        return new Value(TYPE_STR, yaml.stringify(jsVal));
+    }),
+    */
+
     // functions for working with processes
     "system": new BuiltinFunctionValue(`> a=system("ls /")
 ["Applications\\nLibrary\\nSystem\\nUsers\\nVolumes\\nbin\\ncores\\ndev\\netc\\nhome\\nopt\\nprivate\\nsbin\\ntmp\\nusr\\nvar\\n",0]
@@ -1051,15 +1068,30 @@ false`, 2,function(arg, frame) {
 # Show help text for built-in functions: Example usage:
  
 help(sort)
+
+# to get a list of functions with help text:
+help()
+
 `, 1,function(arg, frame) {
         if (arg[0]==null) {
-            console.log( +
-`> help(min)
+
+            let msg =`
+Example usage:
+
+> help(min)
 
 > min(4,3)
 3
 > min(3,4)
-3`);
+3
+
+Names of functions with help text:
+
+`;
+            let funcs =[];
+            frame.listOfFuncsWithHelp(funcs);
+            msg += funcs.sort().join(", ");
+            console.log( msg );
         } else {
             if ('help' in arg[0]) {
                 console.log(arg[0].help);
@@ -1256,6 +1288,23 @@ class Frame {
         }
         if (this.parentFrame != null) {
             this.parentFrame.complete(prefix, resultList);
+        }
+    }
+
+    listOfFuncsWithHelp(resultList) {
+        let keys = Object.keys(this.vars);
+        for(let i=0; i<keys.length; ++i) {
+            let it=keys[i];
+
+            let varVal = this.vars[keys[i]];
+            if ((varVal.type == TYPE_CLOSURE || varVal.type == TYPE_BUILTIN_FUNCTION)) {
+                if ("help" in varVal) {
+                    resultList.push(it);
+                }
+            }
+        }
+        if (this.parentFrame != null) {
+            this.parentFrame.listOfFuncsWithHelp(resultList);
         }
     }
 }

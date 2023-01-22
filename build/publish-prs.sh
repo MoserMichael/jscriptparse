@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-set -ex
-
 if [[ ${NPM_TOKEN} == "" ]]; then 
     echo "Error: set NPM_TOKEN environment variable to the npm access token of your account"
     exit 1
 fi
+
+set -ex
 
 rm -rf tmp-publish || true
 mkdir tmp-publish

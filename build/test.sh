@@ -1,8 +1,13 @@
 #!/bin/bash
 
 FAILED_TESTS=0
+DIR="$1"
 
-for  f in $(ls tests/[0-9]*.p); do
+if [[ $DIR=="" ]]; then
+    DIR="tests"
+fi
+
+for  f in $(ls ${DIR}/[0-9]*.p); do
     echo "testing: $f"
     RESULT_F="tests/"$(basename "$f" .p)".result"
     ./pyx "$f" >${RESULT_F}

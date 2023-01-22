@@ -10,7 +10,7 @@
     "node"
   },
   "bin":{
-    "pyx":"./pyx"
+    "pyx":"./pyxcmd"
   },
   "files":[
     "README.md",  
@@ -21,7 +21,7 @@
     "scripty.js",
     "pyx"  
   ],    
-  "dependencies" {
+  "dependencies": {
     "prscombinator": "0.0.2"
   },
   "repository": {
@@ -29,10 +29,10 @@
     "url": "git+https://MoserMichael@github.com/MoserMichael/jscriptparse.git"
   },
   "keywords": [
-    "parser",
-    "combinator",
-    "peg",
-    "parser"
+    "programming language",
+    "educational programming language",
+    "repl",
+    "shell"
   ],
   "author": {
       "name": "Michael Moser",

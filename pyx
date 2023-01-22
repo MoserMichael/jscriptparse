@@ -208,13 +208,15 @@ function evalFile(file) {
 }
 
 function printHelp() {
-    console.log(`pyx [-h] <file> [-e 'println("hello world")']
+    console.log(`pyx [-h] [-x] <file> [-e 'println("hello world")']
 
 pyx          : Starts shell/repl if run without arguments
 
 pyx <file>   : run the provided pyx program
 
 pyx -e 'val' : run the string 'val' as a pyx program (one liner)
+
+-x           : set trace mode (statement evaluation is traced)
 
 -h           : show this help text   
     `);

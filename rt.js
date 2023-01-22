@@ -21,7 +21,7 @@ function setCurrentSourceInfo(info) {
 }
 
 // trace mode - trace evaluation of the program.
-let traceMode = false;
+let traceMode = true;
 
 // doesn't seem to make a difference...
 let evalForceStop = false;
@@ -278,9 +278,9 @@ function* genEvalClosure(funcVal, args, frame) {
         let funcFrame = null;
 
         if (funcVal.frame != null) { // closure with captured variables
-            funcFrame = _prepareClosureFrame(funcVal, funcVal.frame, args);
+            [ funcFrame, _ ] = _prepareClosureFrame(funcVal, funcVal.frame, args);
         } else {
-            funcFrame = _prepareClosureFrame(funcVal, frame, args);
+            [ funcFrame, _ ] = _prepareClosureFrame(funcVal, frame, args);
         }
 
         try {
@@ -306,13 +306,23 @@ function* genEvalClosure(funcVal, args, frame) {
     yield* funcVal.funcImpl(args);
 }
 
-function evalClosure(funcVal, args, frame) {
+function evalClosure(name, funcVal, args, frame) {
     if (funcVal.type == TYPE_CLOSURE) {
         let funcFrame = null;
+        let traceParam = "";
+
         if (funcVal.frame != null) { // closure with captured variables
-            funcFrame = _prepareClosureFrame(funcVal, funcVal.frame, args);
+            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, funcVal.frame, args);
         } else {
-            funcFrame = _prepareClosureFrame(funcVal, frame, args);
+            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, frame, args);
+        }
+
+        if (traceParam) {
+            let traceName = name;
+            if (name == "") {
+                traceName ="<unnamed-function>";
+            }
+            console.log(traceName + "(" + traceParam + ")");
         }
 
         try {
@@ -332,7 +342,11 @@ function evalClosure(funcVal, args, frame) {
     }
 
     // builtin functions
-    _prepareBuiltinFuncArgs(funcVal, frame, args);
+    let traceParams = _prepareBuiltinFuncArgs(funcVal, frame, args);
+
+    if (traceMode) {
+        console.log(name + "(" + traceParams + ") {");
+    }
 
     // function call
     if (funcVal.numParams != args.length) {
@@ -340,27 +354,55 @@ function evalClosure(funcVal, args, frame) {
             "  parameters are passed in call");
     }
     let retVal = funcVal.funcImpl(args, frame);
+
     if (retVal == undefined) {
-        return VALUE_NONE;
+        retVal = VALUE_NONE;
     }
+
+    if (traceMode && retVal.type != TYPE_NONE) {
+        console.log(rtValueToJson(retVal) + "\n}");
+    }
+
     return retVal;
 }
 
 function _prepareBuiltinFuncArgs(funcVal, frame, args) {
+
+    let traceParams = "";
+
+    if (traceMode) {
+        for(let i=0;i<args.length;++i) {
+            if (traceParams != "") {
+                traceParams += " ,";
+            }
+            traceParams += rtValueToJson(args[i]);
+        }
+    }
+
     if (funcVal.defaultParamValues != null) {
         // try to add omitted params with default values;
         if (args.length < funcVal.defaultParamValues.length) {
             for (let i = args.length; i < funcVal.defaultParamValues.length; ++i) {
-                args.push(funcVal.defaultParamValues[i]);
+                let val = funcVal.defaultParamValues[i];
+                args.push(val);
+
+                if (traceMode && val != null) {
+                    if (traceParams != "") {
+                        traceParams += " ,";
+                    }
+                    traceParams += rtValueToJson(val);
+                }
             }
         }
     }
+    return traceParams;
 }
 
 
 function _prepareClosureFrame(funcVal, frame, args) {
     let functionDef = funcVal.functionDef;
     let funcFrame = new Frame(frame);
+    let traceParam = "";
 
     if (args.length > functionDef.params.length) {
         throw new RuntimeException("function takes " + functionDef.params.length + " params, but " + args.length + " were given", [funcVal.startOffset, funcVal.currentSourceInfo]);
@@ -372,7 +414,14 @@ function _prepareClosureFrame(funcVal, frame, args) {
         let argValue = args[i];
         let paramDef = functionDef.params[i]; // name of parameter
         funcFrame.defineVar(paramDef[0][0], argValue);
-    }
+
+        if (traceMode) {
+            if (traceParam != "") {
+                traceParam += ", ";
+            }
+            traceParam += paramDef[0][0] + "=" + rtValueToJson(argValue);
+        }
+     }
 
     // provide values for arguments with default values
     for (; i < functionDef.params.length; ++i) {
@@ -383,8 +432,13 @@ function _prepareClosureFrame(funcVal, frame, args) {
             throw new RuntimeException(" no value for parameter " + paramDef[0], [funcVal.startOffset, funcVal.currentSourceInfo]);
         }
         funcFrame.defineVar(paramDef[0][0], defaultParamValue);
+
+        if (traceParam != "") {
+            traceParam += ", ";
+        }
+        traceParam += paramDef[0][0] + "=" + rtValueToJson(defaultParamValue);
     }
-    return funcFrame;
+    return [ funcFrame, traceParam];
 
 }
 
@@ -726,7 +780,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
             for(let i=0; i<argList.val.length;++i) {
                 let arg = [ argList.val[i] ];
-                let mapVal = evalClosure(funVal, arg, frame);
+                let mapVal = evalClosure("", funVal, arg, frame);
                 ret.push(mapVal);
             }
         }
@@ -736,7 +790,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
             for(let k in argMap.val) {
                 let amap = [ new Value(TYPE_STR, new String(k)), argMap.val[k] ];
-                let mapVal = evalClosure(funVal, amap, frame);
+                let mapVal = evalClosure("", funVal, amap, frame);
                 ret.push(mapVal);
             }
 
@@ -757,7 +811,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
         for(let i=0; i<argList.val.length;++i) {
             let arg = [ argList.val[i], new Value(TYPE_NUM, i) ];
-            let mapVal = evalClosure(funVal, arg, frame);
+            let mapVal = evalClosure("", funVal, arg, frame);
             ret.push(mapVal)
         }
         return new Value(TYPE_LIST, ret);
@@ -790,7 +844,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
         for(let i=0; i<argList.val.length;++i) {
             let arg = [rVal, argList.val[i]];
-            rVal = evalClosure(funVal, arg, frame);
+            rVal = evalClosure("", funVal, arg, frame);
         }
         return rVal;
     }),
@@ -816,7 +870,7 @@ same as:
 
         for(let i=argList.val.length-1; i>=0; i--) {
             let arg = [rVal, argList.val[i]];
-            rVal = evalClosure(funVal, arg, frame);
+            rVal = evalClosure("", funVal, arg, frame);
         }
         return rVal;
     }),
@@ -894,7 +948,7 @@ same as:
             } else {
                 rt = arg[0].val.sort(function (a, b) {
                     let arg = [ a, b ];
-                    let mapVal = evalClosure(funVal, arg, frame);
+                    let mapVal = evalClosure("", funVal, arg, frame);
                     let nVal = value2Num(mapVal);
                     if (nVal < 0) {
                         return -1;
@@ -1402,6 +1456,11 @@ class AstStmtList extends AstBase {
 
     eval(frame) {
         let val = VALUE_NONE;
+
+        if (traceMode) {
+            console.log("{");
+        }
+
         for(let i=0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
 
@@ -1411,11 +1470,16 @@ class AstStmtList extends AstBase {
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
             if (val.type >= TYPE_FORCE_RETURN) {
                 if (val.type == TYPE_FORCE_CONTINUE) {
-                    return VALUE_NONE;
+                    val = VALUE_NONE;
                 }
-                return val;
+                break;
             }
         }
+
+        if (traceMode) {
+            console.log("}");
+        }
+
         return val;
     }
 
@@ -1441,19 +1505,11 @@ class AstStmtList extends AstBase {
 
     hasYield(frame) {
 
-        if (traceMode) {
-            console.log("{");
-        }
-
         for (let i = 0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
             if (stmt.hasYield(frame)) {
                 return true;
             }
-        }
-
-        if (traceMode) {
-            console.log("}");
         }
 
         return false;
@@ -1930,9 +1986,10 @@ class AstIfStmt extends AstBase {
             let boolVal = value2Bool(val);
             if (traceMode) {
                 if (i == 0) {
-                    console.log("if " + boolVal);
+                    console.log("if " + boolVal + (!boolVal ? " # <pass>" : ""));
+
                 } else {
-                    console.log("elif " + boolVal);
+                    console.log("elif " + boolVal + (!boolVal ? " # <pass>" : ""));
                 }
             }
 
@@ -2396,6 +2453,7 @@ class AstFunctionCall extends AstBase {
         super(offset);
         this.name = name;
         this.expressionList = expressionList;
+            this.funcVal_ = null;
     }
 
     eval(frame) {
@@ -2405,12 +2463,12 @@ class AstFunctionCall extends AstBase {
         try {
             if (!funcVal.hasYield(frame)) {
                 let args = this._evalCallArguments(frame);
-                return evalClosure(funcVal, args, frame);
+                return evalClosure(this.name, funcVal, args, frame);
             } else {
                 let ret = [];
 
                 let args = this._evalCallArguments(frame);
-                for (let val of genEvalClosure(funcVal, args, frame)) {
+                for (let val of genEvalClosure(this.name, funcVal, args, frame)) {
                     ret.push(val);
                 }
                 return new Value(TYPE_LIST, ret);
@@ -2437,6 +2495,9 @@ class AstFunctionCall extends AstBase {
     }
 
     _getFuncVal(frame) {
+        if (this.funcVal_ != null) {
+            return this.funcVal_;
+        }
         let funcVal = frame.lookup(this.name);
         if (funcVal == undefined) {
             throw new RuntimeException("Can't call undefined function " + this.name, this.startOffset);
@@ -2445,6 +2506,7 @@ class AstFunctionCall extends AstBase {
         if (funcVal.type != TYPE_CLOSURE && funcVal.type != TYPE_BUILTIN_FUNCTION) {
             throw new RuntimeException("variable is not a function/closure, it is a " + typeName(funcVal), this.startOffset);
         }
+        this.funcVal_ = funcVal;
         return funcVal;
 
     }

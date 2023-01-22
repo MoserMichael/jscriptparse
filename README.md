@@ -11,19 +11,31 @@ The scripting language and interpreter for the pyx language.
 - see the [design document (pyxdesign)](PYXDESIGN.md)
 - Example tests scripts are [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) - see files with extension .p (.out - expected output of the script)
 
-/don't judge the scripting language too harshly, it is my new tinker toy - very much a work in progress/
-
 ## Running it
 
-- you need to have ```nodejs``` and ```git``` installed on the system
-- run the shell: as follows:
-```
-git clone https://github.com/MoserMichael/jscriptparse.git
-cd jscriptparse
-./pyx
-```
+First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/)
+
+Now, from the command line: Install the pyx shell with the following command 
+
+```npm install pyxlang -g```
+
+Now run the shell 
+
+```pyx```
 
 The shell has command completion (tab tab) and a command history (cursor up, cursor down)
+
+You can also run one-line commands as follows
+
+```
+pyx -e 'println("hello world")'
+```
+
+or run any saved source file with
+
+```
+pyx source.p
+```
 
 ## Source code 
 

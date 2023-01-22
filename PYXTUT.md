@@ -1,5 +1,19 @@
 # PYXTUT - tutorial for the PYX scripting language
 
+## Installation
+
+First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/)
+
+Now, from the command line: Install the pyx shell with the following command 
+
+```
+npm install pyxlang -g
+```
+
+(You can always uninstall it later with the command ```npm uninstall pyxlang -g```)
+
+## First steps
+
 Run the ```pyx``` program, first thing you see is a command prompt
 
 ```

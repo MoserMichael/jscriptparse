@@ -17,9 +17,15 @@ cp PYXTUT.md	tmp-publish/
 cp README.md    tmp-publish/
 cp rt.js        tmp-publish/
 cp scripty.js   tmp-publish/
-cp pyx          tmp-publish/pyxcmd
+cp pyx          tmp-publish/pyx
 cp -rf tests     tmp-publish/
 #cp build/test.sh tmp-publish/tests
+
+pushd tmp-publish
+for file in $(ls *.js pyx); do
+    sed -i -e 's/const prs=require(path.join(__dirname,"prs.js"))/const prs=require("prscombinator")/g' ${file}
+done    
+popd
 
 pushd tmp-publish
 npm publish --access public

@@ -10,14 +10,14 @@
 <a href='#s-24'>exists</a>&nbsp;,&nbsp;<a href='#s-25'>join</a>&nbsp;,&nbsp;<a href='#s-26'>joinl</a>&nbsp;,&nbsp;<a href='#s-3'>len</a>&nbsp;,&nbsp;<a href='#s-28'>map</a>&nbsp;,&nbsp;<a href='#s-29'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-30'>pop</a>&nbsp;,&nbsp;<a href='#s-31'>push</a>&nbsp;,&nbsp;<a href='#s-32'>range</a>&nbsp;,&nbsp;<a href='#s-33'>reduce</a>&nbsp;,&nbsp;<a href='#s-34'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-35'>sort</a>
 ## Functions for maps
 <a href='#s-36'>each</a>&nbsp;,&nbsp;<a href='#s-24'>exists</a>&nbsp;,&nbsp;<a href='#s-38'>keys</a>&nbsp;,&nbsp;<a href='#s-28'>map</a>
-## Function for working with json
-<a href='#s-40'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-41'>toJsonString</a>
+## Function for working with json/yaml
+<a href='#s-40'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-40'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-42'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-43'>toJsonString</a>
 ## functions for working with processes
-<a href='#s-42'>exit</a>&nbsp;,&nbsp;<a href='#s-43'>sleep</a>&nbsp;,&nbsp;<a href='#s-44'>system</a>
+<a href='#s-44'>exit</a>&nbsp;,&nbsp;<a href='#s-45'>sleep</a>&nbsp;,&nbsp;<a href='#s-46'>system</a>
 ## Other functions
-<a href='#s-45'>help</a>&nbsp;,&nbsp;<a href='#s-46'>localtime</a>&nbsp;,&nbsp;<a href='#s-47'>time</a>&nbsp;,&nbsp;<a href='#s-48'>type</a>
+<a href='#s-47'>help</a>&nbsp;,&nbsp;<a href='#s-48'>localtime</a>&nbsp;,&nbsp;<a href='#s-49'>time</a>&nbsp;,&nbsp;<a href='#s-50'>type</a>
 ## Global variables
-<a href='#s-49'>ARGV</a>&nbsp;,&nbsp;<a href='#s-50'>ENV</a>&nbsp;,&nbsp;<a href='#s-51'>mathconst</a>
+<a href='#s-51'>ARGV</a>&nbsp;,&nbsp;<a href='#s-52'>ENV</a>&nbsp;,&nbsp;<a href='#s-53'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>find</b>
@@ -478,7 +478,24 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-41'/>
+<a id='s-40'/>
+<hr>function: <b>parseJsonString</b>
+
+```python
+> parseJsonString('{"name": "Kermit", "surname": "Frog"}')
+{"name":"Kermit","surname":"Frog"}
+> parseJsonString('[1,2,3]')
+[1,2,3]
+
+```
+<a id='s-42'/>
+<hr>function: <b>parseYamlString</b>
+
+```python
+
+
+```
+<a id='s-43'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -488,7 +505,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-42'/>
+<a id='s-44'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -496,7 +513,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-43'/>
+<a id='s-45'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -506,7 +523,7 @@ sleep(3)
 
 
 ```
-<a id='s-44'/>
+<a id='s-46'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -535,7 +552,7 @@ var
 0
 
 ```
-<a id='s-45'/>
+<a id='s-47'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -544,9 +561,13 @@ var
  
 help(sort)
 
+# to get a list of functions with help text:
+help()
+
+
 
 ```
-<a id='s-46'/>
+<a id='s-48'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -557,14 +578,14 @@ help(sort)
 
 
 ```
-<a id='s-47'/>
+<a id='s-49'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-48'/>
+<a id='s-50'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -580,21 +601,21 @@ help(sort)
 "Closure"
 
 ```
-<a id='s-49'/>
+<a id='s-51'/>
 <hr>function: <b>ARGV</b>
 
 ```python
 # command line arguments (array)
 
 ```
-<a id='s-50'/>
+<a id='s-52'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-51'/>
+<a id='s-53'/>
 <hr>function: <b>mathconst</b>
 
 ```python

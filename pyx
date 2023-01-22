@@ -197,6 +197,11 @@ function runEvalLoop() {
     runEvalImp();
 }
 
+function evalExpression(expr) {
+    scr.runParserAndEval(expr, false);
+}
+
+
 function evalFile(file) {
     let result = 0;
 
@@ -223,32 +228,53 @@ pyx -e 'val' : run the string 'val' as a pyx program (one liner)
     process.exit(1);
 }
 
-function cmdLine() {
-    if (process.argv.length == 4) {
-        if (process.argv[2] == '-e') {
-            let result = 0;
-            if (!scr.runParserAndEval(process.argv[3], false)) {
-                result = 1;
+function parseCmdLine() {
+    let ret = {
+        fileName: null,
+        traceMode: false,
+        expression: null
+    };
+
+
+
+    for(let i=2; i<process.argv.length;i++) {
+        if (process.argv[i] == '-h') {
+            printHelp();
+        } else if (process.argv[i] == '-e') {
+
+            i+=1;
+            if (i>=process.argv.length) {
+                printHelp();
             }
-            process.exit(result);
+            if (ret.expression == null) {
+                ret.expression = [];
+            }
+
+            ret.expression.push(process.argv[i]);
+
+        } else if (process.argv[i] == '-x') {
+            ret.traceMode = true;
+        } else {
+            ret.fileName = process.argv[i];
         }
     }
-    printHelp();
+    return ret;
 }
 
 function runMain() {
 
+    let cmd =parseCmdLine();
 
-    if (process.argv.length < 3) {
+    if (cmd.fileName == null && cmd.expression == null) {
         runEvalLoop()
     } else {
-        if (process.argv.length == 3) {
-            if (process.argv[2] == '-h' || process.argv[2] == '--help') {
-                printHelp();
+        if (cmd.fileName != null) {
+            evalFile(cmd.fileName);
+        } else {
+            for(let i=0;i< cmd.expression.length;++i) {
+                evalExpression(cmd.expression[i]);
             }
-            evalFile(process.argv[2]);
         }
-        cmdLine();
     }
 }
 

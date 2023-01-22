@@ -21,7 +21,7 @@ function setCurrentSourceInfo(info) {
 }
 
 // trace mode - trace evaluation of the program.
-let traceMode = true;
+let traceMode = false;
 
 // doesn't seem to make a difference...
 let evalForceStop = false;
@@ -373,7 +373,7 @@ function _prepareBuiltinFuncArgs(funcVal, frame, args) {
     if (traceMode) {
         for(let i=0;i<args.length;++i) {
             if (traceParams != "") {
-                traceParams += " ,";
+                traceParams += ", ";
             }
             traceParams += rtValueToJson(args[i]);
         }
@@ -388,7 +388,7 @@ function _prepareBuiltinFuncArgs(funcVal, frame, args) {
 
                 if (traceMode && val != null) {
                     if (traceParams != "") {
-                        traceParams += " ,";
+                        traceParams += ", ";
                     }
                     traceParams += rtValueToJson(val);
                 }
@@ -1201,21 +1201,14 @@ Names of functions with help text:
         return new Value(TYPE_STR, typeName(arg[0]));
     }),
 
-    "setmode": new BuiltinFunctionValue(`> type(1)
-# set execution mode
-
+    "setTrace": new BuiltinFunctionValue(`
 # trace the running of a program (for debugging)
-setmode("trace=on")
+setTrace(true)
 
 # stop tracing
-setmode("trace=off")
+setTrace(false)
 `, 1,function(arg, frame) {
-        let strArg = value2Str(arg[0]);
-        if (strArg === "trace=on") {
-            traceMode = true;
-        } else if (strArg === "trace=off") {
-            traceMode = true;
-        }
+        traceMode = value2Bool(arg[0]);
     }),
 
 
@@ -2468,7 +2461,7 @@ class AstFunctionCall extends AstBase {
                 let ret = [];
 
                 let args = this._evalCallArguments(frame);
-                for (let val of genEvalClosure(this.name, funcVal, args, frame)) {
+                for (let val of genEvalClosure(funcVal, args, frame)) {
                     ret.push(val);
                 }
                 return new Value(TYPE_LIST, ret);

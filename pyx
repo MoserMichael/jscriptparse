@@ -21,10 +21,11 @@ function skipSpace(data, pos) {
 let isRunning = false;
 
 function onSig() {
-    console.log("onSig");
+    //console.log("onSig");
     if (isRunning) {
         rt.setForceStopEval();
     }
+    process.exit(1);
 }
 
 function completeKeywords(prefix) {
@@ -117,11 +118,11 @@ function runEvalLoop() {
                 isRunning = false;
 
                 try {
-                    if (res != 0) {
+                    if (res != null) {
                         evalPrintMsg += JSON.stringify(rt.rtValueToJsVal(res));
                     }
                 } catch(e) {
-                    console.error("Can't show result value. internal error");
+                    console.error("Can't show result value. internal error",e);
                 }
 
             } catch(e) {

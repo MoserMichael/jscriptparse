@@ -207,7 +207,7 @@ function rtValueToJsVal(value) {
         return ret;
     }
 
-    if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM) {
+    if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM || value.type == TYPE_NONE) {
         return value.val;
     }
     throw new RuntimeException("Can't convert value " + typeName(value) );
@@ -397,6 +397,7 @@ function _system(cmd, frame) {
         out = cp.execSync(cmd,{env: env}).toString();
     } catch(e) {
         status = 1;//e.status;
+        out = e.message;
     }
     let val = [ new Value(TYPE_STR, out), new Value(TYPE_NUM, status) ];
     return new Value(TYPE_LIST, val);

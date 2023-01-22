@@ -102,7 +102,7 @@ toJsonString(     type(             uc(               writeFile(
 
 See more information about the built-in functions in [this reference](PYXFUNC.md)
 
-You also have variables:  A variable is a name that can be assigned a value
+You also have variables:  A variable is a name that can be assigned a value (more exactly: it is a name that stands for a location in computer memory where a value is being stored)
 
 ```
 > two=2
@@ -194,7 +194,7 @@ or get a list of the odd numbers between one and twenty (odd numbers do not divi
 
 Now compute a list of the squares of all numbers between one and 10.
 
-The first step is to define a function ```s``` that computes the square of the number given as argument
+The first step is to define a function ```s``` that computes the square of the number given as argument. note that the last mathematical expression is also computing the value returnd by the function)
 
 ```
 > def sq(x) x * x
@@ -207,17 +207,11 @@ The first step is to define a function ```s``` that computes the square of the n
 16
 ```
 
+You see that ```x``` stands for the parameter of the function - that's the value which is passed to the function when it is called.
+
 The built-in ```map``` function will call the ```sq``` function on all element of the list of numbers from one to 9 - and return a new list with the result. In the returned list each number of the original list is turned into its square!
 
 ```
-> def sq(x) x * x
-
-> sq(3)
-9
-> sq(4)
-16
->
-
 > map( range(1,10), sq)
 [1,4,9,16,25,36,49,64,81]
 ```

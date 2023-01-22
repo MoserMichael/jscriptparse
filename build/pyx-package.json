@@ -22,7 +22,8 @@
     "pyx"  
   ],    
   "dependencies": {
-    "prscombinator": "0.0.2"
+    "prscombinator": "0.0.2",
+    "YAML": "2.2.1"
   },
   "repository": {
     "type": "git",

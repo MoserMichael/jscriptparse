@@ -21,7 +21,11 @@ docs2:
 docs:
 		./build/build-docs.sh
 
+.PHONY: install
+install:
+		./build/install.sh
+
 .PHONY: test
-test:
+test: install
 		./build/test.sh
 

@@ -2,7 +2,7 @@ const path=require("node:path");
 const fs=require("fs");
 const cp=require("node:child_process");
 const prs=require(path.join(__dirname,"prs.js"));
-//const yaml=require("yaml");
+const yaml=require("yaml");
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
@@ -20,6 +20,10 @@ function setCurrentSourceInfo(info) {
     return prevValue;
 }
 
+// trace mode - trace evaluation of the program.
+let traceMode = false;
+
+// doesn't seem to make a difference...
 let evalForceStop = false;
 
 function setForceStopEval() {
@@ -211,7 +215,16 @@ function rtValueToJsVal(value) {
     if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM || value.type == TYPE_NONE) {
         return value.val;
     }
+
+    if (value.type == TYPE_CLOSURE || value.type == TYPE_BUILTIN_FUNCTION) {
+        return "<function>";
+    }
+
     throw new RuntimeException("Can't convert value " + typeName(value) );
+}
+
+function rtValueToJson(val) {
+    return JSON.stringify(rtValueToJsVal(val));
 }
 
 
@@ -942,11 +955,9 @@ same as:
 "[1,2,3]"
 > toJsonString({"name":"Pooh","family":"Bear","likes":["Honey","Songs","Friends"]})
 "{\\"name\\":\\"Pooh\\",\\"family\\":\\"Bear\\",\\"likes\\":[\\"Honey\\",\\"Songs\\",\\"Friends\\"]}"`, 1,function(arg, frame) {
-        let jsVal = rtValueToJsVal(arg[0]);
-        return new Value(TYPE_STR, JSON.stringify(jsVal));
+        return new Value(TYPE_STR, rtValueToJson(arg[0]));
     }),
 
-    /*
     //functions for working with yaml
     "parseYamlString": new BuiltinFunctionValue(``, 1,function(arg, frame) {
         if(arg[0].type != TYPE_STR) {
@@ -960,7 +971,6 @@ same as:
         let jsVal = rtValueToJsVal(arg[0]);
         return new Value(TYPE_STR, yaml.stringify(jsVal));
     }),
-    */
 
     // functions for working with processes
     "system": new BuiltinFunctionValue(`> a=system("ls /")
@@ -1114,6 +1124,24 @@ Names of functions with help text:
 "Closure"`, 1,function(arg, frame) {
         return new Value(TYPE_STR, typeName(arg[0]));
     }),
+
+    "setmode": new BuiltinFunctionValue(`> type(1)
+# set execution mode
+
+# trace the running of a program (for debugging)
+setmode("trace=on")
+
+# stop tracing
+setmode("trace=off")
+`, 1,function(arg, frame) {
+        let strArg = value2Str(arg[0]);
+        if (strArg === "trace=on") {
+            traceMode = true;
+        } else if (strArg === "trace=off") {
+            traceMode = true;
+        }
+    }),
+
 
     // generators
     "range": new BuiltinFunctionValue(`> range(1,4)
@@ -1390,12 +1418,22 @@ class AstStmtList extends AstBase {
     }
 
     hasYield(frame) {
+
+        if (traceMode) {
+            console.log("{");
+        }
+
         for (let i = 0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
             if (stmt.hasYield(frame)) {
                 return true;
             }
         }
+
+        if (traceMode) {
+            console.log("}");
+        }
+
         return false;
     }
 
@@ -1733,9 +1771,16 @@ function makeIdentifierRef(identifierName, refExpr) {
 }
 
 function _assignImp(frame, value, lhs) {
+    let traceLhs=[];
+    let traceRhs=[];
+
     if (lhs.length == 1 ) {
         let singleLhs = lhs[0]
-        _assign(frame, singleLhs, value);
+        let traceVal = _assign(frame, singleLhs, value);
+        if (traceMode) {
+            traceLhs.push(traceVal[0]);
+            traceRhs.push(traceVal[1]);
+        }
     } else {
         if (value.type != TYPE_LIST) {
             throw new RuntimeException("list value expected on right hand side of assignment");
@@ -1749,8 +1794,16 @@ function _assignImp(frame, value, lhs) {
             }
         }
         for(let i=0; i<rhsVal.length; ++i) {
-            _assign(frame, lhs[i], rhsVal[i]);
+            let traceVal = _assign(frame, lhs[i], rhsVal[i]);
+            if (traceMode) {
+                traceLhs.push(traceVal[0]);
+                traceRhs.push(traceVal[1]);
+            }
+
         }
+    }
+    if (traceMode) {
+        console.log(traceLhs.join(", ") + " = " + traceRhs.join(","));
     }
     return VALUE_NONE;
 }
@@ -1762,15 +1815,29 @@ function _assign(frame, singleLhs, value) {
     if (varName != "_") {
         if (indexExpr != null) {
             let lhsValue = frame.lookup(varName);
-            _indexAssign(frame, lhsValue, indexExpr, value)
+            let indexValues = _indexAssign(frame, lhsValue, indexExpr, value)
+            if (traceMode) {
+                let indexExpr = "";
+                for(let i=0; i< indexValues.length; ++i) {
+                    indexExpr += "[" + rtValueToJsVal(indexValues[i]) + "]";
+                }
+                return [ varName + indexExpr, rtValueToJsVal(value) ];
+            }
         } else {
             frame.assign(varName, value);
+            if (traceMode) {
+                return [ varName, rtValueToJsVal(value) ];
+            }
         }
+    }
+    if (traceMode) {
+        return [ "_", rtValueToJsVal(value)];
     }
 }
 
 function _indexAssign(frame, value, refExpr, newValue) {
     let i=0;
+    let traceVals = [];
     for(; i<refExpr.length; ++i) {
         if (value.type != TYPE_LIST && value.type != TYPE_MAP) {
             throw new RuntimeException("Can't index expression of variable " + this.identifierName);
@@ -1778,12 +1845,17 @@ function _indexAssign(frame, value, refExpr, newValue) {
         let expr = refExpr[i];
         let indexValue = expr.eval(frame);
 
+        if (traceMode) {
+            traceVals.push(indexValue);
+        }
+
         if (i != (refExpr.length-1)) {
             value = value.val[indexValue.val];
         } else {
             value.val[indexValue.val] = newValue;
         }
     }
+    return traceVals;
 }
 
 
@@ -1832,11 +1904,25 @@ class AstIfStmt extends AstBase {
         for(let i=0; i< this.ifClauses.length; ++i) {
             let clause = this.ifClauses[i];
             let val = clause[0].eval(frame);
-            if (value2Bool(val)) {
+
+            let boolVal = value2Bool(val);
+            if (traceMode) {
+                if (i == 0) {
+                    console.log("if " + boolVal);
+                } else {
+                    console.log("elif " + boolVal);
+                }
+            }
+
+            if (boolVal) {
                 return clause[1].eval(frame);
             }
         }
         if (this.elseStmtList != null) {
+            if (traceMode) {
+                console.log("else");
+            }
+
             return this.elseStmtList.eval(frame);
         }
         return VALUE_NONE;
@@ -1914,7 +2000,12 @@ class AstWhileStmt extends AstBase {
                 break;
             }
 
+            if (traceMode) {
+                console.log("while " + cond )
+            }
+
             let rt = this.stmtList.eval(frame);
+
             if (rt.type >= TYPE_FORCE_RETURN) {
                 if (rt.type == TYPE_FORCE_BREAK) {
                     break;
@@ -1983,6 +2074,9 @@ class AstForStmt extends AstBase {
     }
 
     eval(frame) {
+        if (traceMode) {
+            console.log("for ");
+        }
         if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
             for (let val of this.expr.genEval(frame)) {
                 _assignImp(frame, val, this.lhs);
@@ -2082,6 +2176,9 @@ class AstReturnStmt extends AstBase {
 
     eval(frame) {
         let retValue = this.expr.eval(frame);
+        if (traceMode) {
+            console.log("return " + rtValueToJson(retValue));
+        }
         return new Value(TYPE_FORCE_RETURN, retValue);
     }
 
@@ -2132,7 +2229,7 @@ class AstUseStatement extends AstBase {
         this.statements = null;
     }
 
-    eval(frame) {
+     eval(frame) {
         if (this.statements == null) {
 
             let fileToInclude = this.expr.eval(frame);
@@ -2161,6 +2258,9 @@ class AstBreakStmt extends AstBase {
     }
 
     eval(frame) {
+        if (traceMode) {
+            console.log("break");
+        }
         return new Value(TYPE_FORCE_BREAK, null);
     }
 
@@ -2179,6 +2279,9 @@ class AstContinueStmt extends AstBase {
     }
 
     eval(frame) {
+        if (traceMode) {
+            console.log("continue");
+        }
         return new Value(TYPE_FORCE_CONTINUE, null);
     }
 

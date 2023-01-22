@@ -25,6 +25,7 @@ pushd tmp-publish
 for file in $(ls *.js pyx); do
     sed -i -e 's/const prs=require(path.join(__dirname,"prs.js"))/const prs=require("prscombinator")/g' ${file}
 done    
+sed -i -e 's/NODE_PATH=\.//g' pyx
 popd
 
 pushd tmp-publish

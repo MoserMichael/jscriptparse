@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env NODE_PATH=. node 
 
 const path=require("node:path");
 const repl=require("node:repl");
@@ -121,7 +121,7 @@ function runEvalLoop() {
                 isRunning = false;
 
                 try {
-                    if (res != null) {
+                    if (res != null && res.type != rt.TYPE_NONE) {
                         evalPrintMsg += JSON.stringify(rt.rtValueToJsVal(res));
                     }
                 } catch(e) {

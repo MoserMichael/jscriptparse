@@ -22,9 +22,11 @@ function setCurrentSourceInfo(info) {
 
 // trace mode - trace evaluation of the program.
 let traceMode = false;
+let tracePrompt = "+ ";
 
 function setTraceMode(on) {
     traceMode = on;
+
 }
 
 // doesn't seem to make a difference...
@@ -161,6 +163,16 @@ function value2Str(val) {
     }
 }
 
+function value2StrDisp(val) {
+    if (val.type == TYPE_STR) {
+        return val.val;
+    } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+        return val.val.toString();
+    } else if (val.type == TYPE_NONE) {
+        return "none";
+    }
+    return rtValueToJson(val);
+}
 function jsValueToRtVal(value) {
     if (Array.isArray(value)) {
         let rt = [];
@@ -349,7 +361,7 @@ function evalClosure(name, funcVal, args, frame) {
     let traceParams = _prepareBuiltinFuncArgs(funcVal, frame, args);
 
     if (traceMode) {
-        console.log(name + "(" + traceParams + ") {");
+        process.stderr.write(tracePrompt + name + "(" + traceParams + ") {\n");
     }
 
     // function call
@@ -364,7 +376,7 @@ function evalClosure(name, funcVal, args, frame) {
     }
 
     if (traceMode && retVal.type != TYPE_NONE) {
-        console.log(rtValueToJson(retVal) + "\n}");
+        process.stderr.write(tracePrompt + rtValueToJson(retVal) + "\n}");
     }
 
     return retVal;
@@ -754,12 +766,17 @@ RTLIB={
         throw new RuntimeException("string or list argument required");
     }),
     "join": new BuiltinFunctionValue(`> join(["a: ",1," b: ", true])
-"a: 1 b: true"`, 1, function(arg) {
-        if (arg[0].type == TYPE_LIST) {
-            return new Value(TYPE_STR, arg[0].val.map(value2Str).join(""));
+"a: 1 b: true"`, 2, function(arg) {
+        if (arg[0].type != TYPE_LIST) {
+            throw new RuntimeException("list argument required. is: " + typeName(arg[0]));
         }
-        throw new RuntimeException("list argument required. is: " + typeName(arg[0]));
-    }),
+
+        let delim ="";
+        if (arg[1] != null) {
+            delim = value2Str(arg[1]);
+        }
+        return new Value(TYPE_STR, arg[0].val.map(value2StrDisp).join(delim));
+    }, [null, null]),
     "map": new BuiltinFunctionValue(`> map([1,2,3], def (x) 1 + x)
 [2,3,4]
 > map([1,2,3], def (x) x * x)
@@ -1456,7 +1473,7 @@ class AstStmtList extends AstBase {
         let val = VALUE_NONE;
 
         if (traceMode && this.skipTrace) {
-            console.log("{");
+            process.stderr.write(tracePrompt + "{\n");
         }
 
         for(let i=0; i < this.statements.length; ++i) {
@@ -1475,7 +1492,7 @@ class AstStmtList extends AstBase {
         }
 
         if (traceMode && !this.skipTrace) {
-            console.log("}");
+            process.stderr.write(tracePrompt + "}\n");
         }
 
         return val;
@@ -1879,7 +1896,7 @@ function _assignImp(frame, value, lhs) {
         }
     }
     if (traceMode) {
-        console.log(traceLhs.join(", ") + " = " + traceRhs.join(","));
+        process.stderr.write(tracePrompt + traceLhs.join(", ") + " = " + traceRhs.join(",") + "\n");
     }
     return VALUE_NONE;
 }
@@ -1984,10 +2001,10 @@ class AstIfStmt extends AstBase {
             let boolVal = value2Bool(val);
             if (traceMode) {
                 if (i == 0) {
-                    console.log("if " + boolVal + (!boolVal ? " # <pass>" : ""));
+                    process.stderr.write(tracePrompt + "if " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
 
                 } else {
-                    console.log("elif " + boolVal + (!boolVal ? " # <pass>" : ""));
+                    process.stderr.write(tracePrompt + "elif " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
                 }
             }
 
@@ -1997,7 +2014,7 @@ class AstIfStmt extends AstBase {
         }
         if (this.elseStmtList != null) {
             if (traceMode) {
-                console.log("else");
+                process.stderr.write(tracePrompt + "else\n");
             }
 
             return this.elseStmtList.eval(frame);
@@ -2078,7 +2095,7 @@ class AstWhileStmt extends AstBase {
             }
 
             if (traceMode) {
-                console.log("while " + cond )
+                process.stderr.write(tracePrompt + "while " + cond + "\n" )
             }
 
             let rt = this.stmtList.eval(frame);
@@ -2152,7 +2169,7 @@ class AstForStmt extends AstBase {
 
     eval(frame) {
         if (traceMode) {
-            console.log("for ");
+            process.stderr.write(tracePrompt + "for ");
         }
         if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
             for (let val of this.expr.genEval(frame)) {
@@ -2254,7 +2271,7 @@ class AstReturnStmt extends AstBase {
     eval(frame) {
         let retValue = this.expr.eval(frame);
         if (traceMode) {
-            console.log("return " + rtValueToJson(retValue));
+            process.stderr.write(tracePrompt + "return " + rtValueToJson(retValue) + "\n");
         }
         return new Value(TYPE_FORCE_RETURN, retValue);
     }
@@ -2336,7 +2353,7 @@ class AstBreakStmt extends AstBase {
 
     eval(frame) {
         if (traceMode) {
-            console.log("break");
+            process.stderr.write(tracePrompt + "break\n");
         }
         return new Value(TYPE_FORCE_BREAK, null);
     }
@@ -2357,7 +2374,7 @@ class AstContinueStmt extends AstBase {
 
     eval(frame) {
         if (traceMode) {
-            console.log("continue");
+            process.stderr.write(tracePrompt + "continue\n");
         }
         return new Value(TYPE_FORCE_CONTINUE, null);
     }

@@ -23,6 +23,10 @@ function setCurrentSourceInfo(info) {
 // trace mode - trace evaluation of the program.
 let traceMode = false;
 
+function setTraceMode(on) {
+    traceMode = on;
+}
+
 // doesn't seem to make a difference...
 let evalForceStop = false;
 
@@ -1445,12 +1449,13 @@ class AstStmtList extends AstBase {
         super(offset)
         this.statements = statements;
         this.hasGen = true;
+        this.skipTrace = false;
     }
 
     eval(frame) {
         let val = VALUE_NONE;
 
-        if (traceMode) {
+        if (traceMode && this.skipTrace) {
             console.log("{");
         }
 
@@ -1469,7 +1474,7 @@ class AstStmtList extends AstBase {
             }
         }
 
-        if (traceMode) {
+        if (traceMode && !this.skipTrace) {
             console.log("}");
         }
 
@@ -2607,6 +2612,7 @@ if (typeof(module) == 'object') {
         setLogHook,
         setCurrentSourceInfo,
         setForceStopEval,
+        setTraceMode,
         rtValueToJsVal,
         isBreakOrContinue,
         isReturnOrYield,

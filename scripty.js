@@ -854,6 +854,8 @@ function makeParserImp() {
         }
     );
 
+    statementListTopLevel.skipTrace = true;
+
     return prs.makeConsumeAll(statementListTopLevel);
 
 }
@@ -897,7 +899,7 @@ function runParse(data, openFile, isRepl) {
         try {
             data = fs.readFileSync(filePath).toString();
         } catch(er) {
-            throw new Error("Can't read used/included file " + filePath);
+            throw new rt.RuntimeException("Can't read used/included file " + filePath);
         }
 
     }

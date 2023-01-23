@@ -215,11 +215,12 @@ function evalFile(file) {
 function printHelp() {
     console.log(`pyx [-h] [-x] <file> [-e 'println("hello world")']
 
-pyx          : Starts shell/repl if run without arguments
+pyx          : Starts shell/repl when run without command line arguments
 
-pyx <file>   : run the provided pyx program
+pyx <file>   : run the pyx program in the file
 
 pyx -e 'val' : run the string 'val' as a pyx program (one liner)
+               You can have several options, they are run one after the other.
 
 -x           : set trace mode (statement evaluation is traced)
 
@@ -234,8 +235,6 @@ function parseCmdLine() {
         traceMode: false,
         expression: null
     };
-
-
 
     for(let i=2; i<process.argv.length;i++) {
         if (process.argv[i] == '-h') {
@@ -263,7 +262,11 @@ function parseCmdLine() {
 
 function runMain() {
 
-    let cmd =parseCmdLine();
+    let cmd = parseCmdLine();
+
+    if (cmd.traceMode) {
+        rt.setTraceMode(true);
+    }
 
     if (cmd.fileName == null && cmd.expression == null) {
         runEvalLoop()

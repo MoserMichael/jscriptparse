@@ -782,7 +782,8 @@ function makeParserImp() {
         returnStmt,
         yieldStmt,
         //useStmt,
-        expression
+        expression,
+        tryCatchBlock
     ], "any statement")
 
 
@@ -793,6 +794,35 @@ function makeParserImp() {
         ),
         function (arg) {
             return rt.makeStatementList(arg);
+        }
+    );
+
+    let tryCatchBlock = prs.makeTransformer(
+        prs.makeSequenceParser([
+            prs.makeTokenParser("try"),
+            statementOrStatementListFwd.forward(),
+            prs.makeOptParser(
+                prs.makeTransformer(
+                    prs.makeSequenceParser([
+                        prs.makeTokenParser("catch"),
+                        statementOrStatementListFwd.forward()
+                    ]), function(arg) {
+                        return arg[1];
+                    }
+                ),
+            ),
+            prs.makeOptParser(
+                prs.makeTransformer(
+                    prs.makeSequenceParser([
+                        prs.makeTokenParser("finally"),
+                        statementOrStatementListFwd.forward()
+                    ]), function(arg) {
+                        return arg[1];
+                    }
+                )
+            )
+        ]), function(arg) {
+
         }
     );
 
@@ -829,7 +859,8 @@ function makeParserImp() {
             returnStmt,
             yieldStmt,
             useStmt,
-            expression
+            expression,
+            tryCatchBlock
         ], "any statement"),
         function(arg, posRange) {
             if (rt.isBreakOrContinue(arg)) {

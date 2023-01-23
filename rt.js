@@ -1539,6 +1539,72 @@ function makeStatementList(stmtList, offset) {
     return new AstStmtList(stmtList, offset);
 }
 
+class AstTryCatchBlock extends AstBase {
+    constructor(statements, optCatchBlock, optFinallyBlock, offset) {
+        super(offset);
+        this.statements = statements;
+        this.catchBlock = optCatchBlock;
+        this.finallyBlock = optFinallyBlock;
+    }
+
+    eval(frame) {
+        let res = null;
+        let throwErr = null;
+
+        try {
+            // run main statement list
+            res = this.statements.eval(frame)
+        } catch(er) {
+            throwErr = er;
+            if (!(er instanceof RuntimeException)) {
+                throw er;
+            }
+        }
+
+        if (throwErr != null && throwErr instanceof RuntimeException && this.catchBlock != null) {
+            try {
+                // run catch block
+                res = this.catchBlock.eval(frame);
+            } catch(er) {
+                if (er instanceof RuntimeException) {
+                    er.addToStack([this.startOffset, this.currentSourceInfo]);
+                } else {
+                    throw er;
+                }
+            }
+        }
+
+        if (this.finallyBlock != null) {
+            try {
+                res = this.finallyBlock.eval(frame);
+            } catch(er) {
+                if (er instanceof RuntimeException) {
+                    er.addToStack([this.startOffset, this.currentSourceInfo]);
+                } else {
+                    throw er;
+                }
+            }
+        }
+        if (throwErr) {
+            throw throwErr;
+        }
+        return res;
+    }
+
+    hasYield(frame) {
+        if (this.statements.hasYield(frame)) {
+            return true;
+        }
+        if (this.catchBlock != null && this.catchBlock.hasYield(frame)) {
+            return true;
+        }
+        if (this.optFinallyBlock != null && this.optFinallyBlock.hasYield(frame)) {
+            return true;
+        }
+        return false;
+    }
+}
+
 class AstConstValue extends AstBase {
     constructor(value, offset) {
         super(offset);
@@ -1552,6 +1618,10 @@ class AstConstValue extends AstBase {
     show() {
         return this.value.show();
     }
+}
+
+function makeTryCatchBlock(statements, optCatchBlock, optFinallyBlock, offset) {
+    return new AstTryCatchBlock(statements, optCatchBlock, optFinallyBlock, offset);
 }
 
 function makeConstValue(type, value) {
@@ -2613,6 +2683,7 @@ if (typeof(module) == 'object') {
         newListCtorExpression,
         newDictListCtorExpression,
         makeStatementList,
+        makeTryCatchBlock,
         makeAstAssignment,
         makeIfStmt,
         makeWhileStmt,

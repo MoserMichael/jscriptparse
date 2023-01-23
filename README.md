@@ -37,7 +37,7 @@ or run any saved source file with
 pyx source.p
 ```
 
-You can also run the program in trace mode, by ading the ```-x``` option. Here each statement is shown, as it is executed.
+You can also run the program in trace mode, by adding the ```-x``` option to the command line. Here each statement is shown, as it is executed.
 
 ```
 ./pyx -x tests/03-func-if.p
@@ -78,4 +78,4 @@ Now I keep noticing quite a lot of details, while writing my little interpreter.
 
 The moral: you can learn a lot with this type of project! (i think the important part is to keep notes, otherwise you tend to forget the details...)
 
-Another moral: writing any of these programming languages is a whole lot of work. Doing a small programming language makes me appreciate the authors of the tools that i am using everyday.
+Another moral: writing any of these programming languages is a whole lot of work. Doing a small programming language makes me appreciate the authors of the tools that i am using everyday. Someone who is implementing a language has to take care of all the detail, a programmer who is using that language is spared this effort, that's something to appreciate!

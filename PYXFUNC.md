@@ -15,9 +15,9 @@
 ## functions for working with processes
 <a href='#s-44'>exit</a>&nbsp;,&nbsp;<a href='#s-45'>sleep</a>&nbsp;,&nbsp;<a href='#s-46'>system</a>
 ## Other functions
-<a href='#s-47'>help</a>&nbsp;,&nbsp;<a href='#s-48'>localtime</a>&nbsp;,&nbsp;<a href='#s-49'>time</a>&nbsp;,&nbsp;<a href='#s-50'>type</a>
+<a href='#s-47'>help</a>&nbsp;,&nbsp;<a href='#s-48'>localtime</a>&nbsp;,&nbsp;<a href='#s-49'>setTrace</a>&nbsp;,&nbsp;<a href='#s-50'>time</a>&nbsp;,&nbsp;<a href='#s-51'>type</a>
 ## Global variables
-<a href='#s-51'>ARGV</a>&nbsp;,&nbsp;<a href='#s-52'>ENV</a>&nbsp;,&nbsp;<a href='#s-53'>mathconst</a>
+<a href='#s-52'>ARGV</a>&nbsp;,&nbsp;<a href='#s-53'>ENV</a>&nbsp;,&nbsp;<a href='#s-54'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>find</b>
@@ -598,13 +598,26 @@ help()
 
 ```
 <a id='s-49'/>
+<hr>function: <b>setTrace</b>
+
+```python
+
+# trace the running of a program (for debugging)
+setTrace(true)
+
+# stop tracing
+setTrace(false)
+
+
+```
+<a id='s-50'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-50'/>
+<a id='s-51'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -620,21 +633,21 @@ help()
 "Closure"
 
 ```
-<a id='s-51'/>
+<a id='s-52'/>
 <hr>function: <b>ARGV</b>
 
 ```python
 # command line arguments (array)
 
 ```
-<a id='s-52'/>
+<a id='s-53'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-53'/>
+<a id='s-54'/>
 <hr>function: <b>mathconst</b>
 
 ```python

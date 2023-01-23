@@ -78,3 +78,4 @@ Now I keep noticing quite a lot of details, while writing my little interpreter.
 
 The moral: you can learn a lot with this type of project! (i think the important part is to keep notes, otherwise you tend to forget the details...)
 
+Another moral: writing any of these programming languages is a whole lot of work. Doing a small programming language makes me appreciate the authors of the tools that i am using everyday.

@@ -373,8 +373,8 @@ number: 3
 
 # same as:
  
-> (((0+1)+2)+3)
-6
+> (((2+1)+2)+3)
+8
 
 
 ```
@@ -399,6 +399,7 @@ same as:
 ```python
 > sort([3,1,4,2,5])
 [1,2,3,4,5]
+
 > def cmp(x, y) {
 ...     if x[1] < y[1] return -1
 ...     if x[1] > y[1] return 1
@@ -548,6 +549,7 @@ sleep(3)
 ```python
 > a=system("ls /")
 ["Applications\nLibrary\nSystem\nUsers\nVolumes\nbin\ncores\ndev\netc\nhome\nopt\nprivate\nsbin\ntmp\nusr\nvar\n",0]
+
 > println(a[0])
 Applications
 Library
@@ -565,7 +567,6 @@ sbin
 tmp
 usr
 var
-
 
 > println(a[1])
 0

@@ -903,8 +903,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 # same as:
  
-> (((0+1)+2)+3)
-6
+> (((2+1)+2)+3)
+8
 `, 3, function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
             throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));

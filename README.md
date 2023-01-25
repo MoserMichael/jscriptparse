@@ -1,6 +1,6 @@
 ## pyx scripting language
 
-![pux](notes/pux.jpg) - the pyx educational programming language / scripting langauge and REPL shell.  With pyx you can write code in functional and procedural style.
+[<img alt="alt_text" width="40px" src="notes/pux.jpg" />](https://www.youtube.com/watch?v=l3yhBEQlH_Y) - the pyx educational programming language / scripting langauge and REPL shell.  With pyx you can write code in functional and procedural style.
 
 This programming language is named after Winnie-the-Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
 

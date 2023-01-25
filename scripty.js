@@ -27,6 +27,10 @@ KEYWORDS = {
     'true': 1,
     'false': 1,
     'none': 1,
+    'try' : 1,
+    'catch' : 1,
+    'throw' : 1,
+    'finally': 1,
 }
 
 function isKeyword(arg) {
@@ -91,18 +95,22 @@ let skipNestedWhitespace = null;
 
 function skipComments(state) {
 
-    skipNestedWhitespace(state);
+    while(true) {
+        skipNestedWhitespace(state);
 
-    if (state.pos < state.data.length) {
+        if (state.pos >= state.data.length) {
+            break;
+        }
+
         let ch = state.data.charAt(state.pos);
-        if (ch == '#') {
-            while (state.pos < state.data.length) {
-                ch = state.data.charAt(state.pos);
-                if (ch == '\r' || ch == '\n')
-                    break
-                state.pos += 1;
-            }
-            skipNestedWhitespace(state);
+        if (ch != '#') {
+            break
+        }
+        while (state.pos < state.data.length) {
+            ch = state.data.charAt(state.pos);
+            if (ch == '\r' || ch == '\n')
+                break
+            state.pos += 1;
         }
     }
 }
@@ -771,6 +779,40 @@ function makeParserImp() {
         }
     );
 
+    let tryCatchBlock = prs.makeTransformer(
+        prs.makeSequenceParser([
+            prs.makeTokenParser("try"),
+            statementOrStatementListFwd.forward(),
+            prs.makeSequenceParser([
+                prs.makeTokenParser("catch"),
+                identifier,
+                statementOrStatementListFwd.forward()
+            ], "catch block"),
+            prs.makeOptParser(
+                prs.makeTransformer(
+                    prs.makeSequenceParser([
+                        prs.makeTokenParser("finally"),
+                        statementOrStatementListFwd.forward()
+                    ], "finally block"), function(arg) {
+                        return arg[1];
+                    }
+                )
+            )
+        ], "try-catch block"), function(arg) {
+            return rt.makeTryCatchBlock(arg[1], arg[2], arg[3])
+        }
+    );
+
+    let throwStmt = prs.makeTransformer(
+        prs.makeSequenceParser([
+            prs.makeTokenParser("throw"),
+            forwardExpr.forward()
+        ], "throw statement"), function( arg ) {
+            return rt.makeThrowStmt(arg[1], arg[0][1]);
+        }
+    );
+
+
     let statement = prs.makeAlternativeParser([
         ifStmt,
         whileStmt,
@@ -782,7 +824,9 @@ function makeParserImp() {
         returnStmt,
         yieldStmt,
         //useStmt,
-        expression
+        expression,
+        tryCatchBlock,
+        throwStmt
     ], "any statement")
 
 
@@ -795,6 +839,7 @@ function makeParserImp() {
             return rt.makeStatementList(arg);
         }
     );
+
 
     let statementOrStatementList = prs.makeAlternativeParser([
         prs.makeTransformer(
@@ -829,7 +874,10 @@ function makeParserImp() {
             returnStmt,
             yieldStmt,
             useStmt,
-            expression
+            expression,
+            tryCatchBlock,
+            throwStmt
+
         ], "any statement"),
         function(arg, posRange) {
             if (rt.isBreakOrContinue(arg)) {

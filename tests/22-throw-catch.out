@@ -1,0 +1,30 @@
+handling exception
+Error: "throw from catch"
+#(tests/22-throw-catch.p:14)       throw "throwing an error string"
+                           |.......^
+#(tests/22-throw-catch.p:13) def rec(num) {
+                           |.^
+#(tests/22-throw-catch.p:12)     return rec(num - 1)
+                           |............^
+#(tests/22-throw-catch.p:11) def rec(num) {
+                           |.^
+#(tests/22-throw-catch.p:10)     return rec(num - 1)
+                           |............^
+#(tests/22-throw-catch.p:9) def rec(num) {
+                          |.^
+#(tests/22-throw-catch.p:8)     return rec(num - 1)
+                          |............^
+#(tests/22-throw-catch.p:7) def rec(num) {
+                          |.^
+#(tests/22-throw-catch.p:6)     return rec(num - 1)
+                          |............^
+#(tests/22-throw-catch.p:5) def rec(num) {
+                          |.^
+#(tests/22-throw-catch.p:4)     return rec(num - 1)
+                          |............^
+#(tests/22-throw-catch.p:3) def rec(num) {
+                          |.^
+#(tests/22-throw-catch.p:2)     rec(5)
+                          |.....^
+#(tests/22-throw-catch.p:1)   throw "throw from catch"
+                          |...^

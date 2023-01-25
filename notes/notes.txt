@@ -1,4 +1,122 @@
 
+Exception handling
+
+    throwing exception inside the catch clause
+
+    Javascript: the node runtime reports only the exception that occured during the catch clause
+
+        /Users/mmoser/mystuff/jscriptparse/notes/t.js:7
+            throw new Error("error during catch");
+            ^
+
+        Error: error during catch
+            at Object.<anonymous> (/Users/mmoser/mystuff/jscriptparse/notes/t.js:7:11)
+            at Module._compile (node:internal/modules/cjs/loader:1218:14)
+            at Module._extensions..js (node:internal/modules/cjs/loader:1272:10)
+            at Module.load (node:internal/modules/cjs/loader:1081:32)
+            at Module._load (node:internal/modules/cjs/loader:922:12)
+            at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:82:12)
+            at node:internal/main/run_main_module:23:47
+
+        Node.js v19.2.0
+
+    
+    raising from catch in python
+
+        def throw_it(msg, n):
+            if n>0:
+                return throw_it(msg, n-1)
+
+            raise Exception(msg)
+
+
+        try:
+
+            throw_it("throw-error",4)
+            print("hi hi")
+            throw_it("raise exception")
+        except:
+            print("got exception")
+            raise
+
+    out:
+
+        Traceback (most recent call last):
+          File "t.py", line 13, in <module>
+            throw_it("throw-error",4)
+          File "t.py", line 6, in throw_it
+            return throw_it(msg, n-1)
+          File "t.py", line 6, in throw_it
+            return throw_it(msg, n-1)
+          File "t.py", line 6, in throw_it
+            return throw_it(msg, n-1)
+          [Previous line repeated 1 more time]
+          File "t.py", line 8, in throw_it
+            raise Exception(msg)
+        Exception: throw-error    
+
+    python: shows both the original exception and the one that occured during the catch clause !!!
+
+    source:
+        def throw_it(msg):
+            raise Exception(msg)
+
+        try:
+            print("hi hi")
+            throw_it("raise exception")
+        except:
+            print("got exception")
+            throw_it("raise inside except")
+
+    output:
+        hi hi
+        got exception
+        Traceback (most recent call last):
+          File "t.py", line 10, in <module>
+            throw_it("raise exception")
+          File "t.py", line 5, in throw_it
+            raise Exception(msg)
+        Exception: raise exception
+
+        During handling of the above exception, another exception occurred:
+
+        Traceback (most recent call last):
+          File "t.py", line 13, in <module>
+            throw_it("raise inside except")
+          File "t.py", line 5, in throw_it
+            raise Exception(msg)
+        Exception: raise inside except
+ 
+    python does not show the exception if it occurred during finally
+    source:
+        def throw_it(msg):
+            raise Exception(msg)
+
+        try:
+            print("hi hi")
+            throw_it("raise exception")
+        except:
+            print("got exception")
+        finally:    
+            throw_it("raise inside finally")
+            output:
+
+    output:
+        python t.py
+        hi hi
+        got exception
+        Traceback (most recent call last):
+          File "t.py", line 14, in <module>
+            throw_it("raise inside finally")
+          File "t.py", line 5, in throw_it
+            raise Exception(msg)
+        Exception: raise inside finally
+
+    The catch with exceptions in python: you can store an exception in a try block, then reraise it from a different point - AND IT SHOWS THE ORIGINAL TRACE AND from where it was    rethrown.
+        https://docs.python.org/3/library/exceptions.html
+        https://nedbatchelder.com/blog/200711/rethrowing_exceptions_in_python.html
+
+
 String concat
 
     python

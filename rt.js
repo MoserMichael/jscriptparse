@@ -127,6 +127,10 @@ class Value {
 let VALUE_NONE=new Value(TYPE_NONE,null);
 
 function typeName(val) {
+    if (val.type == null) {
+        console.trace("Not a runtime value!");
+        return "not a runtime value!";
+    }
     return mapTypeToName[val.type];
 
 }
@@ -246,7 +250,9 @@ function rtValueToJson(val) {
 
 class RuntimeException  extends Error {
     constructor(message, frameInfo = null, forcedStop = false) {
-        super(message);
+        super(typeof(message) == 'string' ? message : "");
+        this.rtValue = message instanceof Object ? message : null;
+        this.originalCause = null;
         this.stackTrace = [];
         if (frameInfo != null) {
             this.addToStack(frameInfo);
@@ -258,8 +264,13 @@ class RuntimeException  extends Error {
         this.stackTrace.push(frameInfo);
     }
 
-    showStackTrace() {
-        let ret = "Error: " + this.message + "\n";
+    // called exception is thrown inside of catch block.
+    setOriginalCause(originalCause) {
+        this.originalCause = originalCause;
+    }
+
+    showStackTrace(reportError = true) {
+        let ret = "Error: " + this.getMessage() + "\n";
 
         for(let i=0; i<this.stackTrace.length; ++i) {
             let stackTraceEntry = this.stackTrace[i];
@@ -277,8 +288,50 @@ class RuntimeException  extends Error {
             ret += prefix + entry[0] + "\n";
             ret += (Array(prefix.length-1).join(' ')) + "|" +  Array(entry[1]+1).join(".") + "^\n";
         }
-        doLogHook(ret);
+        if (this.originalCause != null) {
+            ret += "\nCaused by:\n" + this.originalCause.showStackTrace();
+        }
+        if (reportError) {
+            doLogHook(ret);
+        }
         return ret;
+    }
+
+    toRTValue() {
+        let map = {
+            "message": new Value(TYPE_STR, this.getMessage()),
+            "stack": new Value(TYPE_STR, this.showStackTrace(false))
+        };
+
+        if (this.stackTrace != null) {
+            let stackInfo = this.stackTrace[0];
+            map['offset'] = new Value(TYPE_NUM, stackInfo[0]);
+            if (stackInfo[1] != null) {
+                map['fileName'] = new Value(TYPE_STR, stackInfo[1]);
+            }
+        }
+        return new Value(TYPE_MAP, map)
+    }
+
+    getMessage() {
+
+        if (this.message !="") {
+            return this.message;
+        }
+        /*
+        if (this.rtValue instanceof RuntimeException) {
+
+            let rtValue = this.rtValue;
+            let prevStack = rtValue.stack;
+            delete rtValue.stack;
+            let msg = rtValueToJson(rtValue);
+            rtValue.stack = prevStack;
+            console.log(">getMessage: " + msg)
+            return msg;
+        }
+         */
+        // should be an error
+        return rtValueToJson(this.rtValue);
     }
 }
 
@@ -935,6 +988,7 @@ same as:
     }),
     "sort": new BuiltinFunctionValue(`> sort([3,1,4,2,5])
 [1,2,3,4,5]
+
 > def cmp(x, y) {
 ...     if x[1] < y[1] return -1
 ...     if x[1] > y[1] return 1
@@ -1072,6 +1126,7 @@ c:
     // functions for working with processes
     "system": new BuiltinFunctionValue(`> a=system("ls /")
 ["Applications\\nLibrary\\nSystem\\nUsers\\nVolumes\\nbin\\ncores\\ndev\\netc\\nhome\\nopt\\nprivate\\nsbin\\ntmp\\nusr\\nvar\\n",0]
+
 > println(a[0])
 Applications
 Library
@@ -1089,7 +1144,6 @@ sbin
 tmp
 usr
 var
-
 
 > println(a[1])
 0`, 1,function(arg, frame) {
@@ -1388,6 +1442,10 @@ class Frame {
        this.vars[name] = copyPrimitiveVal(value);
     }
 
+    undefVar(name) {
+        delete this.vars[name];
+    }
+
     complete(prefix, resultList) {
         let keys = Object.keys(this.vars);
         for(let i=0; i<keys.length; ++i) {
@@ -1543,51 +1601,70 @@ class AstTryCatchBlock extends AstBase {
     constructor(statements, optCatchBlock, optFinallyBlock, offset) {
         super(offset);
         this.statements = statements;
+        //console.log("optCatch: " + JSON.stringify(optCatchBlock));
         this.catchBlock = optCatchBlock;
-        this.finallyBlock = optFinallyBlock;
+        this.finallyBlock = optFinallyBlock != null ? optFinallyBlock[0] : null;
     }
 
     eval(frame) {
-        let res = null;
+        let res = VALUE_NONE;
         let throwErr = null;
+        let throwNow = false;
 
         try {
-            // run main statement list
+            // return value is the last statement of the block.
             res = this.statements.eval(frame)
         } catch(er) {
             throwErr = er;
             if (!(er instanceof RuntimeException)) {
-                throw er;
+                throwNow = true;
             }
         }
 
-        if (throwErr != null && throwErr instanceof RuntimeException && this.catchBlock != null) {
-            try {
-                // run catch block
-                res = this.catchBlock.eval(frame);
-            } catch(er) {
-                if (er instanceof RuntimeException) {
-                    er.addToStack([this.startOffset, this.currentSourceInfo]);
-                } else {
-                    throw er;
+        if (throwNow) {
+            throw throwErr;
+        }
+
+        if (throwErr != null) {
+            if (this.catchBlock != null) {
+                frame.defineVar(this.catchBlock[1][0], throwErr.toRTValue())
+                try {
+                    // run catch block
+                    this.catchBlock[2].eval(frame);
+                    throwNow = false;
+
+                } catch (er) {
+                    throwNow = true;
+                    if (er instanceof RuntimeException && throwErr instanceof RuntimeException) {
+                        er.stackTrace = throwErr.stackTrace.concat(er.stackTrace);
+                    }
+                    throwErr = er;
+                    throwNow = true;
+                } finally {
+                    // what if variable redefined existing variables?
+                    //frame.undefVar(this.catchBlock[0][0]);
                 }
+            } else { // no catch block, but error occurred
+                throwNow = true;
             }
         }
 
         if (this.finallyBlock != null) {
             try {
-                res = this.finallyBlock.eval(frame);
+                this.finallyBlock.eval(frame);
             } catch(er) {
                 if (er instanceof RuntimeException) {
-                    er.addToStack([this.startOffset, this.currentSourceInfo]);
-                } else {
-                    throw er;
+                    throwErr = er;
                 }
+                throwNow = true;
             }
         }
-        if (throwErr) {
+
+        if (throwNow) {
             throw throwErr;
         }
+
+
         return res;
     }
 
@@ -1595,14 +1672,34 @@ class AstTryCatchBlock extends AstBase {
         if (this.statements.hasYield(frame)) {
             return true;
         }
-        if (this.catchBlock != null && this.catchBlock.hasYield(frame)) {
+        if (this.catchBlock[2] != null && this.catchBlock[2].hasYield(frame)) {
             return true;
         }
-        if (this.optFinallyBlock != null && this.optFinallyBlock.hasYield(frame)) {
+        if (this.finallyBlock != null && this.finallyBlock.hasYield(frame)) {
             return true;
         }
         return false;
     }
+}
+
+function makeTryCatchBlock(statements, optCatchBlock, optFinallyBlock, offset) {
+    return new AstTryCatchBlock(statements, optCatchBlock, optFinallyBlock, offset);
+}
+
+class AstThrowStmt extends AstBase {
+    constructor(expression, offset) {
+        super(offset);
+        this.expression = expression;
+    }
+
+    eval(frame) {
+        let value = this.expression.eval(frame);
+        throw new RuntimeException(value, [this.startOffset, this.currentSourceInfo]);
+    };
+}
+
+function makeThrowStmt(expression, offset) {
+    return new AstThrowStmt(expression, offset);
 }
 
 class AstConstValue extends AstBase {
@@ -1618,10 +1715,6 @@ class AstConstValue extends AstBase {
     show() {
         return this.value.show();
     }
-}
-
-function makeTryCatchBlock(statements, optCatchBlock, optFinallyBlock, offset) {
-    return new AstTryCatchBlock(statements, optCatchBlock, optFinallyBlock, offset);
 }
 
 function makeConstValue(type, value) {
@@ -2684,6 +2777,7 @@ if (typeof(module) == 'object') {
         newDictListCtorExpression,
         makeStatementList,
         makeTryCatchBlock,
+        makeThrowStmt,
         makeAstAssignment,
         makeIfStmt,
         makeWhileStmt,

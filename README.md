@@ -73,9 +73,11 @@ after youth age
 
 ## what I learned while writing this project
 
+Writing a programming languages is a whole lot of work. Doing a small programming language makes me appreciate the authors of the tools that i am using everyday. Someone who is implementing a language has to take care of all the detail, a programmer who is using that language is spared this effort, that's something to appreciate!
+
 i am learning about interpreted languages (such as python, php, javascript, perl, etc...) 
 Now I keep noticing quite a lot of details, while writing my little interpreter. I am keeping some notes [here](https://github.com/MoserMichael/jscriptparse/blob/main/notes/notes.txt)
 
 The moral: you can learn a lot with this type of project! (i think the important part is to keep notes, otherwise you tend to forget the details...)
 
-Another moral: writing any of these programming languages is a whole lot of work. Doing a small programming language makes me appreciate the authors of the tools that i am using everyday. Someone who is implementing a language has to take care of all the detail, a programmer who is using that language is spared this effort, that's something to appreciate!
+

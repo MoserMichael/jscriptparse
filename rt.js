@@ -1659,7 +1659,10 @@ class AstTryCatchBlock extends AstBase {
 
         if (this.finallyBlock != null) {
             try {
-                this.finallyBlock.eval(frame);
+                let res2 = this.finallyBlock.eval(frame);
+                if (res2.type != TYPE_NONE) {
+                    res = res2;
+                }
             } catch(er) {
                 if (er instanceof RuntimeException) {
                     throwErr = er;
@@ -1671,10 +1674,9 @@ class AstTryCatchBlock extends AstBase {
         if (throwNow) {
             throw throwErr;
         }
-
-
         return res;
     }
+
 
     hasYield(frame) {
         if (this.statements.hasYield(frame)) {

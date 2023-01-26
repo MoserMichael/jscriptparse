@@ -253,7 +253,7 @@ function makeParserImp() {
             prs.makeTokenParser("("),
             prs.makeOptParser(expressionList),
             prs.makeTokenParser(")")
-        ]), function (arg) {
+        ], "function call"), function (arg) {
             return rt.makeFunctionCall(arg[0], arg[2]);
         }
     );
@@ -294,7 +294,7 @@ function makeParserImp() {
             prs.makeTokenParser("{"),
             prs.makeOptParser(dictClause),
             prs.makeTokenParser("}")
-        ]), function (arg) {
+        ], "dictionary definition"), function (arg) {
 
             let innerArg = arg[1];
             let cl = [];
@@ -366,7 +366,7 @@ function makeParserImp() {
                 0
             ),
             backtickStringEndConst
-        ]), function (arg) {
+        ], "backtick - process runner"), function (arg) {
             let rVal = [];
 
             rVal.push(arg[0]);
@@ -388,7 +388,7 @@ function makeParserImp() {
                 backtickStringContinuation
             ]),
             backtickStringConst
-        ]), function (arg) {
+        ], "backtick - process runner"), function (arg) {
 
             //console.log("system-arg: " + JSON.stringify(arg));
 
@@ -865,7 +865,7 @@ function makeParserImp() {
                 prs.makeTokenParser("{"),
                 statementList,
                 prs.makeTokenParser("}")
-            ]), function (arg) {
+            ], "statement list"), function (arg) {
                 return arg[1];
             }
         ),

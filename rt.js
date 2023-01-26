@@ -1612,6 +1612,7 @@ class AstTryCatchBlock extends AstBase {
         //console.log("optCatch: " + JSON.stringify(optCatchBlock));
         this.catchBlock = optCatchBlock;
         this.finallyBlock = optFinallyBlock != null ? optFinallyBlock[0] : null;
+        this.hasGen = true;
     }
 
     eval(frame) {
@@ -1677,6 +1678,84 @@ class AstTryCatchBlock extends AstBase {
         return res;
     }
 
+    *genEval(frame) {
+        let res = VALUE_NONE;
+        let throwErr = null;
+        let throwNow = false;
+
+        try {
+            // return value is the last statement of the block.
+            if (this.statements.hasYield()) {
+                res = yield * this.statements.genEval(frame)
+            } else {
+                res = this.statements.eval(frame)
+            }
+        } catch(er) {
+            throwErr = er;
+            if (!(er instanceof RuntimeException)) {
+                throwNow = true;
+            }
+        }
+
+
+        if (throwNow) {
+            throw throwErr;
+        }
+
+        if (throwErr != null) {
+            if (this.catchBlock != null) {
+                frame.defineVar(this.catchBlock[1][0], throwErr.toRTValue())
+                try {
+                    // run catch block
+                    this.catchBlock[2].eval(frame);
+                    throwNow = false;
+
+                } catch (er) {
+                    throwNow = true;
+                    if (er instanceof RuntimeException && throwErr instanceof RuntimeException) {
+                        er.stackTrace = throwErr.stackTrace.concat(er.stackTrace);
+                    }
+                    throwErr = er;
+                    throwNow = true;
+                } finally {
+                    // what if variable redefined existing variables?
+                    //frame.undefVar(this.catchBlock[0][0]);
+                }
+            } else { // no catch block, but error occurred
+                throwNow = true;
+            }
+        }
+
+        if (this.finallyBlock != null) {
+            try {
+                let res2 = null;
+
+                if (this.finallyBlock.hasYield()) {
+                    res2 = yield* this.finallyBlock.genEval(frame);
+                } else {
+                    res2 = this.finallyBlock.eval(frame);
+                }
+
+                if (res == null || res2.type != TYPE_NONE) {
+                    res = res2;
+                }
+            } catch(er) {
+                if (er instanceof RuntimeException) {
+                    throwErr = er;
+                }
+                throwNow = true;
+            }
+        }
+
+
+        if (throwNow) {
+            throw throwErr;
+        }
+        if (res == null) {
+            res = VALUE_NONE;
+        }
+        return res;
+    }
 
     hasYield(frame) {
         if (this.statements.hasYield(frame)) {

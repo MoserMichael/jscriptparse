@@ -23,3 +23,23 @@ for n mygen2(1,10) {
     println("mygen2 - num: {n}")
 }
 
+
+# test generator from try-catch block
+
+def mygen3(from,to) {
+    try 
+        for n mygen(from, to) {
+            yield n
+        }
+    catch e 
+        console.log("exception {e}")
+
+}
+
+for n mygen3(1,10) {
+    println("mygen3 - num: {n}")
+}
+
+
+
+

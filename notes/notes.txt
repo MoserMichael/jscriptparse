@@ -1,5 +1,32 @@
 
+What's in an object?
+
+
+    node
+    Welcome to Node.js v19.2.0.
+    Type ".help" for more information.
+    > a={"a":1}
+    { a: 1 }
+    > a.a
+    1
+    > a['a']
+    1
+
+    python
+    Python 3.7.13 (default, Sep 29 2022, 10:34:32)
+    [Clang 14.0.0 (clang-1400.0.29.102)] on darwin
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> a={'a':1}
+    >>> a['a']
+    1
+    >>> a.a
+    Traceback (most recent call last):
+      File "<stdin>", line 1, in <module>
+    AttributeError: 'dict' object has no attribute 'a'
+    
+
 Exception handling
+
 
     throwing exception inside the catch clause
 
@@ -506,4 +533,72 @@ You can redefined standard library functions in python3
     ...
     >>> print("hello world")
     ERROR:root:hello world
+
+
+
+------
+async file access
+
+    Javascript:
+
+        node t.js
+        !first call result!
+
+        error - type: Error /*object*/  value: Error: ENOENT: no such file or directory, open './Index.html' . data - type: undefined data: undefined
+
+        !second call result!
+
+        error - type: object value: null . data - type: Buffer /*object*/  data: const fs = require('fs');
+
+        function showType(foo) {
+            try {
+                return foo.constructor.name + " /*object*/ ";
+            } catch(e) {
+
+            }
+            return typeof(foo);
+        }
+
+
+        fs.readFile('./Index.html', function read(err, data) {
+            console.log("!first call result!\n");
+            console.log("error - type: " + showType(err) + " value: " + err + " . data - type: " + showType(data) + " data: " + data);
+        });
+
+
+        fs.readFile('./t.js', function read(err, data) {
+            console.log("\n!second call result!\n");
+            console.log("error - type: " + showType(err) + " value: " + err + " . data - type: " + showType(data) + " data: " + data);
+        });
+
+    Output:
+
+        !first call result!
+
+        error - type: Error /*object*/  value: Error: ENOENT: no such file or directory, open './Index.html' . data - type: undefined data: undefined
+
+        !second call result!
+
+        error - type: object value: null . data - type: Buffer /*object*/  data: const fs = require('fs');
+
+        function showType(foo) {
+            try {
+                return foo.constructor.name + " /*object*/ ";
+            } catch(e) {
+
+            }
+            return typeof(foo);
+        }
+
+
+        fs.readFile('./Index.html', function read(err, data) {
+            console.log("!first call result!\n");
+            console.log("error - type: " + showType(err) + " value: " + err + " . data - type: " + showType(data) + " data: " + data);
+        });
+
+
+        fs.readFile('./t.js', function read(err, data) {
+            console.log("\n!second call result!\n");
+            console.log("error - type: " + showType(err) + " value: " + err + " . data - type: " + showType(data) + " data: " + data);
+        });
 

@@ -30,6 +30,7 @@ function setTraceMode(on) {
 }
 
 // doesn't seem to make a difference...
+/*
 let evalForceStop = false;
 
 function setForceStopEval() {
@@ -43,6 +44,7 @@ function checkEvalForceStop() {
         throw new RuntimeException("_forcedStop_", null, true);
     }
 }
+*/
 
 TYPE_BOOL=0
 TYPE_NUM=1
@@ -247,9 +249,10 @@ function rtValueToJson(val) {
     return JSON.stringify(rtValueToJsVal(val));
 }
 
+const RTE_UNWIND=2
 
 class RuntimeException  extends Error {
-    constructor(message, frameInfo = null, forcedStop = false) {
+    constructor(message, frameInfo = null, flags = 0) {
         super(typeof(message) == 'string' ? message : "");
         this.rtValue = message instanceof Object ? message : null;
         this.originalCause = null;
@@ -257,11 +260,16 @@ class RuntimeException  extends Error {
         if (frameInfo != null) {
             this.addToStack(frameInfo);
         }
-        this.forcedStop = forcedStop;
+        this.flags = flags;
         this.firstChance = true;
     }
+
     addToStack(frameInfo) {
         this.stackTrace.push(frameInfo);
+    }
+
+    isUnwind() {
+        return this.flags & RTE_UNWIND;
     }
 
     // called exception is thrown inside of catch block.
@@ -356,7 +364,7 @@ function* genEvalClosure(funcVal, args, frame) {
             // frame is ready, evaluate the statement list
             yield *funcVal.functionDef.body.genEval(funcFrame);
         } catch(er) {
-            if (er instanceof RuntimeException) {
+            if (er instanceof RuntimeException && !er.isUnwind()) {
                 er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
             }
             throw er;
@@ -403,7 +411,7 @@ function evalClosure(name, funcVal, args, frame) {
             }
             return rVal;
         } catch(er) {
-            if (er instanceof RuntimeException) {
+            if (er instanceof RuntimeException && !er.isUnwind()) {
                 er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
             }
             throw er;
@@ -1537,7 +1545,7 @@ class AstStmtList extends AstBase {
         for(let i=0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
 
-            checkEvalForceStop();
+            //checkEvalForceStop();
 
             val = stmt.eval(frame);
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
@@ -1727,7 +1735,6 @@ function makeConstValue(type, value) {
     }
     return new AstConstValue(new Value(type, value[0]), value[1]);
 }
-
 
 function checkMixedType(op, lhs, rhs) {
     if (lhs.type != rhs.type) {
@@ -2358,7 +2365,7 @@ class AstForStmt extends AstBase {
         for(let val of genValues(rt)) {
             _assignImp(frame, val, this.lhs);
 
-            checkEvalForceStop();
+            //checkEvalForceStop();
 
             let rt = this.stmtList.eval(frame);
 
@@ -2635,7 +2642,7 @@ class AstFunctionCall extends AstBase {
     }
 
     eval(frame) {
-        checkEvalForceStop();
+        //checkEvalForceStop();
 
         let funcVal = this._getFuncVal(frame);
         try {
@@ -2652,7 +2659,7 @@ class AstFunctionCall extends AstBase {
                 return new Value(TYPE_LIST, ret);
             }
         } catch (er) {
-            if (er instanceof RuntimeException) {
+            if (er instanceof RuntimeException && !er.isUnwind()) {
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
             throw er;
@@ -2676,7 +2683,13 @@ class AstFunctionCall extends AstBase {
         if (this.funcVal_ != null) {
             return this.funcVal_;
         }
-        let funcVal = frame.lookup(this.name);
+
+        let funcVal = null;
+        if (this.name instanceof AstIdentifierRef) {
+            funcVal = this.name.eval(frame);
+        } else {
+            funcVal = frame.lookup(this.name);
+        }
         if (funcVal == undefined) {
             throw new RuntimeException("Can't call undefined function " + this.name, this.startOffset);
         }
@@ -2710,6 +2723,10 @@ function makeFunctionCall(name, expressionList) {
     if (expressionList.length != 0) {
         expr = expressionList[0];
     }
+
+    /// name is either a token ([ <token_name>, <token_offset> ]) or AstIdentifierRef
+    if (name instanceof  AstIdentifierRef)
+        return new AstFunctionCall(name, expr, name.startOffset);
     return new AstFunctionCall(name[0], expr, name[1]);
 }
 
@@ -2793,7 +2810,7 @@ if (typeof(module) == 'object') {
         eval,
         setLogHook,
         setCurrentSourceInfo,
-        setForceStopEval,
+        //setForceStopEval,
         setTraceMode,
         rtValueToJsVal,
         isBreakOrContinue,

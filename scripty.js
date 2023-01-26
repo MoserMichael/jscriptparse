@@ -244,9 +244,12 @@ function makeParserImp() {
         "expression list", true
     );
 
+    let forwardIdWithOptIndex = new prs.makeForwarder();
+
     let functionCall = prs.makeTransformer(
         prs.makeSequenceParser([
-            identifier,
+            //identifier,
+            forwardIdWithOptIndex.forward(),
             prs.makeTokenParser("("),
             prs.makeOptParser(expressionList),
             prs.makeTokenParser(")")
@@ -408,21 +411,34 @@ function makeParserImp() {
         }
     );
 
+    let indexExpr = prs.makeRepetitionParser(
+        prs.makeAlternativeParser([
+            prs.makeTransformer(
+                prs.makeSequenceParser([
+                    prs.makeTokenParser("["),
+                    forwardExpr.forward(),
+                    prs.makeTokenParser("]")
+                ]), function (arg) {
+                    return arg[1];
+                }
+            ),
+
+            prs.makeTransformer(
+                prs.makeSequenceParser([
+                    prs.makeTokenParser("."),
+                    identifier
+                ]),
+                function(arg) {
+                    return rt.makeConstValue(rt.TYPE_STR, arg[1]);
+                }
+            )
+        ]),
+    0, -1, "index expression");
 
     let identifierWithOptIndex = prs.makeTransformer(
         prs.makeSequenceParser([
             identifier,
-            prs.makeRepetitionParser(
-                prs.makeTransformer(
-                    prs.makeSequenceParser([
-                        prs.makeTokenParser("["),
-                        forwardExpr.forward(),
-                        prs.makeTokenParser("]")
-                    ]), function (arg) {
-                        return arg[1];
-                    }
-                ), 0
-            )
+            indexExpr
         ]), function (arg) {
             if (arg.length >= 1) {
                 //console.log(JSON.stringify(arg));
@@ -432,6 +448,8 @@ function makeParserImp() {
             }
         }
     );
+
+    forwardIdWithOptIndex.setInner(identifierWithOptIndex);
 
     let signedNumber = prs.makeAlternativeParser([
         prs.makeTransformer(
@@ -997,10 +1015,8 @@ function runParserAndEval(data, openFile,  frame = null, replCommandParsedCallba
 
     } catch(er) {
         if (er instanceof rt.RuntimeException) {
-            if (!er.forcedStop) {
+            if (!er.isUnwind()) {
                 er.showStackTrace();
-            } else {
-                console.log("on break");
             }
         } else if (er instanceof ScriptError) {
             throw er;

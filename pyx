@@ -22,9 +22,11 @@ let isRunning = false;
 
 function onSig() {
     //console.log("onSig");
+    /*
     if (isRunning) {
         rt.setForceStopEval();
     }
+    */
     process.exit(1);
 }
 

@@ -442,6 +442,139 @@ Of you can use the map to organize your data, like having a list of records for 
 
 ## Working with text 
 
+You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
+
+```
+> a='hello world'
+"hello world"
+> println(a)
+hello world
+```
+
+the text is included within the characters ```'``` 
+
+You can have multiple lines of text - every string constant can span multiple lines.
+
+```
+> a='hello
+...    beautiful
+...       world'
+"hello\n   beautiful\n      world"
+> println(a)
+hello
+   beautiful
+      world
+```      
+
+The lines are separated by a newline character - you can either enter a new line or write it as the sequence of characters ```\n```
+
+This here is the same text!
+
+```
+> a='hello\n   beautiful\n      world'
+"hello\n   beautiful\n      world"
+> println(a)
+hello
+   beautiful
+      world
+```      
+
+
+Now there is also a second form of writing text constants: with the ```"``` character. 
+Now this form is very different from the previous form. This one is used for writing reports.
+
+You can have sections within the characters ```{```` and ```}``` - these refer to variables in the program. 
+If this is text is used in a program, then you will see the the following:
+
+```
+> numBottles=10
+10
+> song="{numBottles} of juice on the wall, take one down and you will have {numBottles-1}"
+"10 of juice on the wall, take one down and you will have 9"
+> println(song)
+10 of juice on the wall, take one down and you will have 9
+```
+
+Now you can write a program that tells you the whole story:
+
+```
+> numBottles=5
+5
+> while numBottles>1 {
+... println("{numBottles} of juice standing on the wall, take one down and you will have {numBottles-1}")
+... numBottles = numBottles - 1
+... }
+5 of juice standing on the wall, take one down and you will have 4
+4 of juice standing on the wall, take one down and you will have 3
+3 of juice standing on the wall, take one down and you will have 2
+2 of juice standing on the wall, take one down and you will have 1
+```
+
+The same program can be written with fewer commands, in this form:
+
+```
+> for numBottles range(5,0,-1)
+... println("{numBottles} bottles of juice standing on the wall, take one down and you will have {numBottles-1}")
+5 bottles of juice standing on the wall, take one down and you will have 4
+4 bottles of juice standing on the wall, take one down and you will have 3
+3 bottles of juice standing on the wall, take one down and you will have 2
+2 bottles of juice standing on the wall, take one down and you will have 1
+1 bottles of juice standing on the wall, take one down and you will have 0
+
+```
+
+Or you can have a function that receives the number of bottles to write the song - this has a big advantage: you can just call the function and tell it the number of lines you want to print on the screen
+
+```
+> def showBottleSong(maxBottles)
+... for numBottles range(maxBottles,0,-1)
+... println("{numBottles} of juice standing on the wall, take one down and you will have {numBottles-1}")
+"<function>"
+
+> showBottleSong(5)
+5 of juice standing on the wall, take one down and you will have 4
+4 of juice standing on the wall, take one down and you will have 3
+3 of juice standing on the wall, take one down and you will have 2
+2 of juice standing on the wall, take one down and you will have 1
+1 of juice standing on the wall, take one down and you will have 0
+
+> showBottleSong(3)
+3 of juice standing on the wall, take one down and you will have 2
+2 of juice standing on the wall, take one down and you will have 1
+1 of juice standing on the wall, take one down and you will have 0
+
+```
+
+You can also text values with the ```+``` sign
+
+```
+> title="very big"
+"very big"
+> animal="bear"
+"bear"
+> title+" "+animal
+"very big bear"
+```
+
+But you can't add a text value and a number - that's an error
+
+```
+
+> "cat lives: " + lives
+Error: Can't add String to Number
+#(1) "cat lives: " + lives
+   |...............^
+
+```
+
+You can turn a number into a string with the ```str``` function, now this one is valid:
+
+```
+> "cat lives: " + str(lives)
+"cat lives: 9"
+```
+
+
 
 ## Running processes
 

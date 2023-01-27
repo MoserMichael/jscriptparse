@@ -200,7 +200,7 @@ function runEvalLoop(cmdLine) {
 }
 
 function evalExpression(expr, frame) {
-    scr.runParserAndEval(expr, false, frame, null, cmdLine);
+    scr.runParserAndEval(expr, false, frame, null);
 }
 
 

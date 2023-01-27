@@ -576,6 +576,8 @@ You can also text values with the ```+``` sign
 But you can't add a text value and a number - that's an error
 
 ```
+> lives=9
+9
 
 > "cat lives: " + lives
 Error: Can't add String to Number

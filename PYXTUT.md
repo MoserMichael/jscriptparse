@@ -574,7 +574,35 @@ You can turn a number into a string with the ```str``` function, now this one is
 "cat lives: 9"
 ```
 
-There are also a few built-in [functions with strings](https://github.com/MoserMichael/jscriptparse/blob/HEAD/PYXFUNC.md#functions-for-scalars-or-strings)
+The other way round: you can turn a text string into a floating point number
+
+> num('3.141516')
+3.141516
+> num('.031415e2')
+3.1415
+
+Or you can turn a text string into an integer
+
+```
+> int('12345')
+12345
+```
+A text string that starts with 0x counts as a hexadecimal number (with base 16)
+
+```
+> int('0xFF')
+255
+```
+
+Or you can explicitly set the radix/base like this:
+
+```
+> int('FF', 16)
+255
+```
+
+
+There are also other built-in [functions with strings](https://github.com/MoserMichael/jscriptparse/blob/HEAD/PYXFUNC.md#functions-for-scalars-or-strings)
 
 A function that returns the number of chracters in a text
 
@@ -629,6 +657,7 @@ or change all of the occurances of one string with another one
 ```
 > b=repeat('Oh, bother. ', 3)
 "Oh, bother. Oh, bother. Oh, bother. "
+
 > replace(b,"Oh,", "No", -1)
 "No bother. No bother. No bother. "
 ```

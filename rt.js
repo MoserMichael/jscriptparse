@@ -701,20 +701,59 @@ RTLIB={
 > int(123.5)
 123
 > int(123)
-123`, 2, function(arg) {
+123
+
+# hexadecimal number conversion
+
+> int("0xff")
+255
+
+> int("ff", 16)
+255
+
+# octal number
+
+> int("444", 8)
+292
+
+`, 2, function(arg) {
         if (arg[0].type != TYPE_STR && arg[0].type != TYPE_NUM) {
             throw new RuntimeException("first argument must be a string or number, is " + typeName(arg[0]));
         }
-        if (arg[1].type != TYPE_NUM) {
-            throw new RuntimeException("second argument must be a number, is " + typeName(arg[1]));
+
+        let sval = value2Str(arg[0]);
+        let radix = 10;
+
+        if (arg[1] != null) {
+            radix = parseInt(value2Str(arg[1]));
         }
-        let res = parseInt(arg[0].val, arg[1].val);
+
+        if (sval.startsWith("0x")) {
+            radix = 16;
+        }
+
+        let res = parseInt(sval, radix);
 
         if (res == null) {
             throw new RuntimeException("Can't convert " + arg[0].val + " to integer with base " + parseInt(arg[1].val));
         }
         return new Value(TYPE_NUM, res);
-    }, [0, new Value(TYPE_NUM, 10)]),
+    }, [null, null]),
+
+    "num": new BuiltinFunctionValue(`
+`, 1, function(arg) {
+        if (arg[0].type != TYPE_STR && arg[0].type != TYPE_NUM) {
+            throw new RuntimeException("first argument must be a string or number, is " + typeName(arg[0]));
+        }
+        let sval = value2Str(arg[0]);
+        let res = parseFloat(sval);
+
+        if (res == null) {
+            throw new RuntimeException("Can't convert " + sval + " to floating point number.");
+        }
+        return new Value(TYPE_NUM, res);
+    }),
+
     "max" : new BuiltinFunctionValue(`> max(3,4)
 4
 > max(4,3)

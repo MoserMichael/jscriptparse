@@ -3,21 +3,21 @@
 ## Functions for scalars or strings
 <a href='#s-1'>find</a>&nbsp;,&nbsp;<a href='#s-2'>lc</a>&nbsp;,&nbsp;<a href='#s-3'>len</a>&nbsp;,&nbsp;<a href='#s-4'>mid</a>&nbsp;,&nbsp;<a href='#s-5'>repeat</a>&nbsp;,&nbsp;<a href='#s-6'>replace</a>&nbsp;,&nbsp;<a href='#s-7'>reverse</a>&nbsp;,&nbsp;<a href='#s-8'>str</a>&nbsp;,&nbsp;<a href='#s-9'>uc</a>
 ## Numeric functions
-<a href='#s-10'>abs</a>&nbsp;,&nbsp;<a href='#s-11'>atan</a>&nbsp;,&nbsp;<a href='#s-12'>cos</a>&nbsp;,&nbsp;<a href='#s-13'>int</a>&nbsp;,&nbsp;<a href='#s-14'>max</a>&nbsp;,&nbsp;<a href='#s-15'>min</a>&nbsp;,&nbsp;<a href='#s-16'>pow</a>&nbsp;,&nbsp;<a href='#s-17'>random</a>&nbsp;,&nbsp;<a href='#s-18'>sin</a>&nbsp;,&nbsp;<a href='#s-19'>sqrt</a>&nbsp;,&nbsp;<a href='#s-20'>tan</a>
+<a href='#s-10'>abs</a>&nbsp;,&nbsp;<a href='#s-11'>atan</a>&nbsp;,&nbsp;<a href='#s-12'>cos</a>&nbsp;,&nbsp;<a href='#s-13'>int</a>&nbsp;,&nbsp;<a href='#s-14'>max</a>&nbsp;,&nbsp;<a href='#s-15'>min</a>&nbsp;,&nbsp;<a href='#s-16'>num</a>&nbsp;,&nbsp;<a href='#s-17'>pow</a>&nbsp;,&nbsp;<a href='#s-18'>random</a>&nbsp;,&nbsp;<a href='#s-19'>sin</a>&nbsp;,&nbsp;<a href='#s-20'>sqrt</a>&nbsp;,&nbsp;<a href='#s-21'>tan</a>
 ## Input and output functions
-<a href='#s-21'>print</a>&nbsp;,&nbsp;<a href='#s-22'>println</a>&nbsp;,&nbsp;<a href='#s-23'>readFile</a>&nbsp;,&nbsp;<a href='#s-24'>writeFile</a>
+<a href='#s-22'>print</a>&nbsp;,&nbsp;<a href='#s-23'>println</a>&nbsp;,&nbsp;<a href='#s-24'>readFile</a>&nbsp;,&nbsp;<a href='#s-25'>writeFile</a>
 ## Functions for arrays
-<a href='#s-25'>exists</a>&nbsp;,&nbsp;<a href='#s-26'>join</a>&nbsp;,&nbsp;<a href='#s-27'>joinl</a>&nbsp;,&nbsp;<a href='#s-3'>len</a>&nbsp;,&nbsp;<a href='#s-29'>map</a>&nbsp;,&nbsp;<a href='#s-30'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-31'>pop</a>&nbsp;,&nbsp;<a href='#s-32'>push</a>&nbsp;,&nbsp;<a href='#s-33'>range</a>&nbsp;,&nbsp;<a href='#s-34'>reduce</a>&nbsp;,&nbsp;<a href='#s-35'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-36'>sort</a>
+<a href='#s-26'>exists</a>&nbsp;,&nbsp;<a href='#s-27'>join</a>&nbsp;,&nbsp;<a href='#s-28'>joinl</a>&nbsp;,&nbsp;<a href='#s-3'>len</a>&nbsp;,&nbsp;<a href='#s-30'>map</a>&nbsp;,&nbsp;<a href='#s-31'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-32'>pop</a>&nbsp;,&nbsp;<a href='#s-33'>push</a>&nbsp;,&nbsp;<a href='#s-34'>range</a>&nbsp;,&nbsp;<a href='#s-35'>reduce</a>&nbsp;,&nbsp;<a href='#s-36'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-37'>sort</a>
 ## Functions for maps
-<a href='#s-37'>each</a>&nbsp;,&nbsp;<a href='#s-25'>exists</a>&nbsp;,&nbsp;<a href='#s-39'>keys</a>&nbsp;,&nbsp;<a href='#s-29'>map</a>
+<a href='#s-38'>each</a>&nbsp;,&nbsp;<a href='#s-26'>exists</a>&nbsp;,&nbsp;<a href='#s-40'>keys</a>&nbsp;,&nbsp;<a href='#s-30'>map</a>
 ## Function for working with json/yaml
-<a href='#s-41'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-42'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-43'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-44'>toYamlString</a>
+<a href='#s-42'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-43'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-44'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-45'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-45'>exit</a>&nbsp;,&nbsp;<a href='#s-46'>sleep</a>&nbsp;,&nbsp;<a href='#s-47'>system</a>
+<a href='#s-46'>exit</a>&nbsp;,&nbsp;<a href='#s-47'>sleep</a>&nbsp;,&nbsp;<a href='#s-48'>system</a>
 ## Other functions
-<a href='#s-48'>help</a>&nbsp;,&nbsp;<a href='#s-49'>localtime</a>&nbsp;,&nbsp;<a href='#s-50'>setTrace</a>&nbsp;,&nbsp;<a href='#s-51'>time</a>&nbsp;,&nbsp;<a href='#s-52'>type</a>
+<a href='#s-49'>help</a>&nbsp;,&nbsp;<a href='#s-50'>localtime</a>&nbsp;,&nbsp;<a href='#s-51'>setTrace</a>&nbsp;,&nbsp;<a href='#s-52'>time</a>&nbsp;,&nbsp;<a href='#s-53'>type</a>
 ## Global variables
-<a href='#s-53'>ARGV</a>&nbsp;,&nbsp;<a href='#s-54'>ENV</a>&nbsp;,&nbsp;<a href='#s-55'>mathconst</a>
+<a href='#s-54'>ARGV</a>&nbsp;,&nbsp;<a href='#s-55'>ENV</a>&nbsp;,&nbsp;<a href='#s-56'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>find</b>
@@ -156,6 +156,21 @@ returns the cosine of a number in radians
 > int(123)
 123
 
+# hexadecimal number conversion
+
+> int("0xff")
+255
+
+> int("ff", 16)
+255
+
+# octal number
+
+> int("444", 8)
+292
+
+
+
 ```
 <a id='s-14'/>
 <hr>function: <b>max</b>
@@ -178,6 +193,14 @@ returns the cosine of a number in radians
 
 ```
 <a id='s-16'/>
+<hr>function: <b>num</b>
+
+```python
+
+
+
+```
+<a id='s-17'/>
 <hr>function: <b>pow</b>
 
 ```python
@@ -189,7 +212,7 @@ returns the cosine of a number in radians
 16
 
 ```
-<a id='s-17'/>
+<a id='s-18'/>
 <hr>function: <b>random</b>
 
 ```python
@@ -200,7 +223,7 @@ returns the cosine of a number in radians
 
 
 ```
-<a id='s-18'/>
+<a id='s-19'/>
 <hr>function: <b>sin</b>
 
 ```python
@@ -209,7 +232,7 @@ returns the sine of a number in radians
 1
 
 ```
-<a id='s-19'/>
+<a id='s-20'/>
 <hr>function: <b>sqrt</b>
 
 ```python
@@ -221,28 +244,28 @@ returns the sine of a number in radians
 1.414213562373095
 
 ```
-<a id='s-20'/>
+<a id='s-21'/>
 <hr>function: <b>tan</b>
 
 ```python
 returns the tangent of a number in radians
 
 ```
-<a id='s-21'/>
+<a id='s-22'/>
 <hr>function: <b>print</b>
 
 ```python
 # prints argument value to console
 
 ```
-<a id='s-22'/>
+<a id='s-23'/>
 <hr>function: <b>println</b>
 
 ```python
 # prints argument value to console, followed by newline
 
 ```
-<a id='s-23'/>
+<a id='s-24'/>
 <hr>function: <b>readFile</b>
 
 ```python
@@ -253,7 +276,7 @@ returns the tangent of a number in radians
     
 
 ```
-<a id='s-24'/>
+<a id='s-25'/>
 <hr>function: <b>writeFile</b>
 
 ```python
@@ -269,7 +292,7 @@ returns the tangent of a number in radians
     
 
 ```
-<a id='s-25'/>
+<a id='s-26'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -289,7 +312,7 @@ true
 false
 
 ```
-<a id='s-26'/>
+<a id='s-27'/>
 <hr>function: <b>join</b>
 
 ```python
@@ -297,7 +320,7 @@ false
 "a: 1 b: true"
 
 ```
-<a id='s-27'/>
+<a id='s-28'/>
 <hr>function: <b>joinl</b>
 
 ```python
@@ -315,7 +338,7 @@ false
 3
 
 ```
-<a id='s-29'/>
+<a id='s-30'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -330,7 +353,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-30'/>
+<a id='s-31'/>
 <hr>function: <b>mapIndex</b>
 
 ```python
@@ -338,7 +361,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [[6,0],[8,1],[10,2],[12,3]]
 
 ```
-<a id='s-31'/>
+<a id='s-32'/>
 <hr>function: <b>pop</b>
 
 ```python
@@ -350,7 +373,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2]
 
 ```
-<a id='s-32'/>
+<a id='s-33'/>
 <hr>function: <b>push</b>
 
 ```python
@@ -362,7 +385,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-33'/>
+<a id='s-34'/>
 <hr>function: <b>range</b>
 
 ```python
@@ -374,7 +397,7 @@ number: 2
 number: 3
 
 ```
-<a id='s-34'/>
+<a id='s-35'/>
 <hr>function: <b>reduce</b>
 
 ```python
@@ -396,7 +419,7 @@ number: 3
 
 
 ```
-<a id='s-35'/>
+<a id='s-36'/>
 <hr>function: <b>reduceFromEnd</b>
 
 ```python
@@ -411,7 +434,7 @@ same as:
 1
 
 ```
-<a id='s-36'/>
+<a id='s-37'/>
 <hr>function: <b>sort</b>
 
 ```python
@@ -428,7 +451,7 @@ same as:
 [["b",1],["a",100],["c",1000]]
 
 ```
-<a id='s-37'/>
+<a id='s-38'/>
 <hr>function: <b>each</b>
 
 ```python
@@ -442,7 +465,7 @@ same as:
 
 
 ```
-<a id='s-25'/>
+<a id='s-26'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -462,7 +485,7 @@ true
 false
 
 ```
-<a id='s-39'/>
+<a id='s-40'/>
 <hr>function: <b>keys</b>
 
 ```python
@@ -472,7 +495,7 @@ false
 ["first","second","third"]
 
 ```
-<a id='s-29'/>
+<a id='s-30'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -487,7 +510,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-41'/>
+<a id='s-42'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -497,7 +520,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-42'/>
+<a id='s-43'/>
 <hr>function: <b>parseYamlString</b>
 
 ```python
@@ -517,7 +540,7 @@ c:
     
 
 ```
-<a id='s-43'/>
+<a id='s-44'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -527,7 +550,7 @@ c:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-44'/>
+<a id='s-45'/>
 <hr>function: <b>toYamlString</b>
 
 ```python
@@ -543,7 +566,7 @@ c:
   - 3
 
 ```
-<a id='s-45'/>
+<a id='s-46'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -551,7 +574,7 @@ c:
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-46'/>
+<a id='s-47'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -561,7 +584,7 @@ sleep(3)
 
 
 ```
-<a id='s-47'/>
+<a id='s-48'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -590,7 +613,7 @@ var
 0
 
 ```
-<a id='s-48'/>
+<a id='s-49'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -605,7 +628,7 @@ help()
 
 
 ```
-<a id='s-49'/>
+<a id='s-50'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -616,7 +639,7 @@ help()
 
 
 ```
-<a id='s-50'/>
+<a id='s-51'/>
 <hr>function: <b>setTrace</b>
 
 ```python
@@ -629,14 +652,14 @@ setTrace(false)
 
 
 ```
-<a id='s-51'/>
+<a id='s-52'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-52'/>
+<a id='s-53'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -652,21 +675,21 @@ setTrace(false)
 "Closure"
 
 ```
-<a id='s-53'/>
+<a id='s-54'/>
 <hr>function: <b>ARGV</b>
 
 ```python
 # command line arguments (array)
 
 ```
-<a id='s-54'/>
+<a id='s-55'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-55'/>
+<a id='s-56'/>
 <hr>function: <b>mathconst</b>
 
 ```python

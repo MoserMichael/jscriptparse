@@ -6,7 +6,7 @@ funcCats = [
  }, 
  {
   "name": "Numeric functions",
-  "func": [ "int", "max", "min", "abs", "sqrt", "sin", "cos", "tan", "atan", "pow", "random" ]
+  "func": [ "int", "num", "max", "min", "abs", "sqrt", "sin", "cos", "tan", "atan", "pow", "random" ]
  },
  {
    "name": "Input and output functions",

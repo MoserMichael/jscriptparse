@@ -50,6 +50,7 @@ Now you also have mathematical constants = like pi and the euler constant
 ```
 > mathconst['pi']
 3.141592653589793
+
 > mathconst['e']
 2.718281828459045
 ```
@@ -576,10 +577,12 @@ You can turn a number into a string with the ```str``` function, now this one is
 
 The other way round: you can turn a text string into a floating point number
 
+```
 > num('3.141516')
 3.141516
 > num('.031415e2')
 3.1415
+```
 
 Or you can turn a text string into an integer
 

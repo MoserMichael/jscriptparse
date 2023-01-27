@@ -574,6 +574,78 @@ You can turn a number into a string with the ```str``` function, now this one is
 "cat lives: 9"
 ```
 
+There are also a few built-in [functions with strings](https://github.com/MoserMichael/jscriptparse/blob/HEAD/PYXFUNC.md#functions-for-scalars-or-strings)
+
+A function that returns the number of chracters in a text
+
+```
+> len('Rivers know this: There is no hurry. We shall get there some day.')
+65
+```
+
+Like finding the position of a text within a larger text
+
+```
+> find('Its raining cats and dogs!', 'cats')
+12
+> find('Its raining cats and dogs!', 'dogs')
+21
+```
+
+The function returns -1 when it can't find the text
+
+```
+> find('Its raining cats and dogs!', 'bears')
+-1
+```
+
+
+You can extract the text between the first and the third character of a text - like this
+
+```
+> a='I’m so rumbly in my tumbly.'
+"I’m so rumbly in my tumbly."
+
+> mid(a,0,3)
+"I’m"
+```
+
+Or get all of the text after the fourth character
+
+```
+> mid(a,4)
+"so rumbly in my tumbly."
+```
+
+You can repeat a text three times like this
+
+```
+> repeat('Oh, bother. ', 3)
+"Oh, bother. Oh, bother. Oh, bother. "
+```
+
+or change all of the occurances of one string with another one
+
+```
+> b=repeat('Oh, bother. ', 3)
+"Oh, bother. Oh, bother. Oh, bother. "
+> replace(b,"Oh,", "No", -1)
+"No bother. No bother. No bother. "
+```
+
+Of replace just the first occurance of one string with another one
+
+```
+> replace(b,"Oh,", "No", 1)
+"No bother. Oh, bother. Oh, bother. "
+```
+
+Or replace the first two occurances like this:
+
+```
+> replace(b,"Oh,", "No", 2)
+"No bother. No bother. Oh, bother. "
+```
 
 ## Running processes
 

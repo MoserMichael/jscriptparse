@@ -1459,14 +1459,7 @@ mathconst["log2e"]   # - base 2 logarithm of e
 mathconst["log10e"]  # - base 10 logarithm of e    
     `),
 
-    "ARGV" : new Value(TYPE_LIST,
-        process.argv.map(x => x).reduce(
-            (prev,current)=>{
-                prev.push(new Value(TYPE_STR, current));
-                return prev
-            } , []),
-        "# command line arguments (array)"
-    ),
+    "ARGV" : new Value(TYPE_LIST, []),
 
     "ENV": new Value(TYPE_MAP,
         Object.entries(process.env).reduce(
@@ -2894,15 +2887,25 @@ function isReturnOrYield(arg) {
     return arg instanceof AstReturnStmt || arg instanceof AstYieldStmt;
 }
 
-function makeFrame() {
+function makeFrame(cmdLine) {
     let frame = new Frame();
     frame.vars = RTLIB;
+
+    if (cmdLine != null) {
+        let cmd = frame.lookup("ARGV");
+        cmd.val = listToString(cmdLine);
+    }
+
     return frame;
 
 }
 
+function listToString(lst) {
+    let stringList = lst.map(function (arg) { return new Value(TYPE_STR, arg); });
+    return stringList;
 
-function eval(stmt, globFrame = null) {
+}
+function eval(stmt, globFrame = null, cmdLine = null) {
     if (globFrame == null) {
         globFrame = makeFrame();
     }

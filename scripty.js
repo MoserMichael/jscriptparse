@@ -1000,11 +1000,11 @@ class ScriptError extends Error {
 }
 
 
-function runParserAndEval(data, openFile,  frame = null, replCommandParsedCallback = null) {
+function runParserAndEval(data, openFile,  frame, replCommandParsedCallback = null, cmdLine = null) {
 
     try {
         let ast = runParse(data, openFile, replCommandParsedCallback != null);
-        let evalRet = rt.eval(ast, frame);
+        let evalRet = rt.eval(ast, frame, cmdLine);
         if (replCommandParsedCallback != null) {
             let lst = rt.addSourceToTopLevelStmts(data,ast);
             for(let i=0; i<lst.length; ++i) {

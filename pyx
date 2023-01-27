@@ -96,14 +96,14 @@ function isSyntaxErrorDueToStringNotClosed(pos, data, glob) {
     return false;
 }
 
-function runEvalLoop() {
+function runEvalLoop(cmdLine) {
 
     let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '(', '}' ];
     sym = sym.concat( Object.keys(scr.KEYWORDS) );
 
     let runEvalImp = function() {
 
-        let glob = new rt.makeFrame();
+        let glob = new rt.makeFrame(cmdLine);
 
         let doWrite = function(arg) { return arg };
 
@@ -199,15 +199,16 @@ function runEvalLoop() {
     runEvalImp();
 }
 
-function evalExpression(expr) {
-    scr.runParserAndEval(expr, false);
+function evalExpression(expr, frame) {
+    scr.runParserAndEval(expr, false, frame, null, cmdLine);
 }
 
 
-function evalFile(file) {
+function evalFile(file, cmdLine) {
     let result = 0;
 
-    if (!scr.runParserAndEval(file, true)) {
+    let frame = rt.makeFrame(cmdLine);
+    if (!scr.runParserAndEval(file, true, frame, null, cmdLine)) {
         result = 1;
     }
 
@@ -215,11 +216,11 @@ function evalFile(file) {
 }
 
 function printHelp() {
-    console.log(`pyx [-h] [-x] <file> [-e 'println("hello world")']
+    console.log(`pyx [-h] [-x]  [-e 'println("hello world")'] [<file>]  [[--] <command line parameters>]]
 
 pyx          : Starts shell/repl when run without command line arguments
 
-pyx <file>   : run the pyx program in the file
+pyx <file>   : run the pyx program in the file, following command line parameters are passed to program
 
 pyx -e 'val' : run the string 'val' as a pyx program (one liner)
                You can have several options, they are run one after the other.
@@ -234,15 +235,18 @@ pyx -e 'val' : run the string 'val' as a pyx program (one liner)
 function parseCmdLine() {
     let ret = {
         fileName: null,
+        cmdLine: null,
         traceMode: false,
         expression: null
     };
 
-    for(let i=2; i<process.argv.length;i++) {
+    let i=2;
+    for(;i<process.argv.length;i++) {
         if (process.argv[i] == '-h') {
             printHelp();
+        } else if (process.argv[i] == '--') {
+            break;
         } else if (process.argv[i] == '-e') {
-
             i+=1;
             if (i>=process.argv.length) {
                 printHelp();
@@ -250,15 +254,28 @@ function parseCmdLine() {
             if (ret.expression == null) {
                 ret.expression = [];
             }
-
             ret.expression.push(process.argv[i]);
 
         } else if (process.argv[i] == '-x') {
             ret.traceMode = true;
         } else {
             ret.fileName = process.argv[i];
+            i += 1;
+            break;
+        }    
+    }
+
+    let cmdLine = [];
+    if (i<process.argv.length) {
+        if (process.argv[i] == '--') {
+            i += 1;
+        }
+        for (; i < process.argv.length; i++) {
+            cmdLine.push(process.argv[i]);
         }
     }
+    ret.cmdLine = cmdLine;
+
     return ret;
 }
 
@@ -271,13 +288,14 @@ function runMain() {
     }
 
     if (cmd.fileName == null && cmd.expression == null) {
-        runEvalLoop()
+        runEvalLoop(cmd.cmdLine)
     } else {
         if (cmd.fileName != null) {
-            evalFile(cmd.fileName);
+            evalFile(cmd.fileName, cmd.cmdLine);
         } else {
+            let frame = rt.makeFrame(cmd.cmdLine);
             for(let i=0;i< cmd.expression.length;++i) {
-                evalExpression(cmd.expression[i]);
+                evalExpression(cmd.expression[i], frame);
             }
         }
     }

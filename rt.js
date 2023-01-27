@@ -614,6 +614,17 @@ RTLIB={
         let val = value2Str(arg[0]);
         return new Value(TYPE_STR, val.toUpperCase());
     }),
+    "trim": new BuiltinFunctionValue(`> a= ' honey  '
+" honey  "
+> trim(a)
+"honey"
+> a= '\\t\\n a lot of honey honey \\n '
+"\\t\\n a lot of honey honey \\n "
+> trim(a)
+"a lot of honey honey"`, 1, function(arg) {
+        let val = value2Str(arg[0]);
+        return new Value(TYPE_STR, val.trim());
+    }),
     "reverse": new BuiltinFunctionValue(`> reverse([1,2,3,4])
 [4,3,2,1]
 > reverse("abcd")

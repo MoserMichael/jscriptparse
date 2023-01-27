@@ -452,6 +452,22 @@ You can define variables that refer to text. lets define variable `a` that refer
 hello world
 ```
 
+Working with text is a bit like working with an array - you can access each letter contained within the text like this: (accessing a letter that is outside of the range gives you an error)
+
+```
+> a='123'
+"123"
+> a[0]
+"1"
+> a[1]
+"2"
+> a[2]
+"3"
+> a[3]
+Error: Can't lookup index 3
+```
+
+
 the text is included within the characters ```'``` 
 
 You can have multiple lines of text - every string constant can span multiple lines.

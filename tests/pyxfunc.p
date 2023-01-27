@@ -2,7 +2,7 @@
 funcCats = [
  {
  "name": "Functions for scalars or strings",
- "func": [ "find", "mid", "lc", "uc", "reverse", "str", "repeat", "len" ]
+ "func": [ "find", "mid", "lc", "uc", "reverse", "str", "repeat", "len", "replace" ]
  }, 
  {
   "name": "Numeric functions",

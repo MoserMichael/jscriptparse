@@ -657,6 +657,42 @@ RTLIB={
         return new Value(TYPE_STR, val.repeat(rep));
     }),
 
+    "replace": new BuiltinFunctionValue(`text="a b a c a d"
+> "a b a c a d"
+        
+> replace(text,'a ', 'x ', -1)
+"x b x c x d"        
+
+> replace(text,'a ', 'x ', 1)
+"x b a c a d"
+
+> replace(text,'a ', 'x ', 2)
+"x b x c a d"
+`, 4, function(arg) {
+        let hay = value2Str(arg[0]);
+        let needle = value2Str(arg[1]);
+        let newNeedle = value2Str(arg[2]);
+        let numTimes = 1;
+
+        if (arg[3] != null) {
+            numTimes = parseInt(value2Num(arg[3]));
+        }
+
+
+        let retVal = "";
+        for(let start=0; start < hay.length; numTimes -= 1) {
+            let findPos = hay.indexOf(needle, start);
+            if (findPos == -1 || numTimes == 0) {
+               retVal += hay.substring(start);
+               break;
+            }
+            retVal += hay.substring(start, findPos) + newNeedle;
+            start = findPos + needle.length;
+        }
+        return new Value(TYPE_STR, retVal);
+    }, [null, null, null, null]),
+
+
 // Numeric functions
     "int": new BuiltinFunctionValue(`> int("123")
 123

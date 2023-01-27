@@ -1,4 +1,7 @@
 
+.PHONY: test
+test: install
+		./build/test.sh
 
 .PHONY: publish-prs
 publish-prs:
@@ -7,11 +10,6 @@ publish-prs:
 .PHONY: publish-pyx
 publish-pyx:
 		./build/publish-pyx.sh			
-
-.PHONY: publish-prs
-publish-prs:
-		./build/publish-prs.sh			
-
 
 .PHONY: docs2
 docs2:
@@ -25,7 +23,4 @@ docs:
 install:
 		./build/install.sh
 
-.PHONY: test
-test: install
-		./build/test.sh
 

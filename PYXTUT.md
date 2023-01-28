@@ -1,6 +1,6 @@
-#<a id='s-1' /> PYXTUT - tutorial for the PYX scripting language
+# PYXTUT - tutorial for the PYX scripting language
 
-##<a id='s-1-1' /> Installation
+## Installation
 
 First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/)
 
@@ -12,7 +12,7 @@ npm install pyxlang -g
 
 (You can always uninstall it later with the command ```npm uninstall pyxlang -g```)
 
-##<a id='s-1-2' /> First steps
+## First steps
 
 Run the ```pyx``` program, first thing you see is a command prompt
 
@@ -184,7 +184,7 @@ s(       sin(     sort(    split(   sqrt(    str(     system(
 
 if you type ```si tab tab``` then there is only one function sin(  - so it will just put sin( at the place where you are typing. Believe me, that's a big time saver!
 
-#<a id='s-2' /> functions working on lists of values
+# functions working on lists of values
 
 You can have a list of the numbers between one and five
 
@@ -293,7 +293,7 @@ And now lets get the sum of the power of three for the numbers between one and o
 24502500
 ```
 
-###<a id='s-2-2-1' /> Statements
+### Statements
 
 You can do the same thing differently
 
@@ -389,7 +389,7 @@ Is a for loop better than a while loop? Depends how you look on it,
 
 It's a kind of trade off - the world of programming has many trade offs...
 
-##<a id='s-2-3' /> Maps
+## Maps
 
 There is a type of data called a map. It allows to give names to things.
 
@@ -441,7 +441,7 @@ Of you can use the map to organize your data, like having a list of records for 
 
 ```
 
-##<a id='s-2-4' /> Working with text
+## Working with text 
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -697,10 +697,10 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-##<a id='s-2-5' /> Running processes
+## Running processes
 
 
-##<a id='s-2-6' /> Conclusion
+## Conclusion
 
 Or you can do all kinds of stuff, by putting togather all of this.
 

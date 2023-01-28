@@ -1,7 +1,4 @@
 
-<!-- toc-start -->
-
-
 * [ PYXTUT - tutorial for the PYX scripting language] (#s-1)
  * [ Installation] (#s-1-1)
  * [ First steps] (#s-1-2)
@@ -11,8 +8,6 @@
  * [ Working with text] (#s-2-4)
  * [ Running processes] (#s-2-5)
  * [ Conclusion] (#s-2-6)
-
-<!-- toc-end -->
 
 
 #<a id='s-1' /> PYXTUT - tutorial for the PYX scripting language

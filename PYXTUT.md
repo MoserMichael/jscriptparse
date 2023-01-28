@@ -2,15 +2,15 @@
 <!-- toc-start -->
 
 
- * [ PYXTUT - tutorial for the PYX scripting language] (#s-1)
-  * [ Installation] (#s-1-1)
-  * [ First steps] (#s-1-2)
- * [ functions working on lists of values] (#s-2)
-   * [ Statements] (#s-2-2-1)
-  * [ Maps] (#s-2-3)
-  * [ Working with text] (#s-2-4)
-  * [ Running processes] (#s-2-5)
-  * [ Conclusion] (#s-2-6)
+* [ PYXTUT - tutorial for the PYX scripting language] (#s-1)
+ * [ Installation] (#s-1-1)
+ * [ First steps] (#s-1-2)
+* [ functions working on lists of values] (#s-2)
+  * [ Statements] (#s-2-2-1)
+ * [ Maps] (#s-2-3)
+ * [ Working with text] (#s-2-4)
+ * [ Running processes] (#s-2-5)
+ * [ Conclusion] (#s-2-6)
 
 <!-- toc-end -->
 

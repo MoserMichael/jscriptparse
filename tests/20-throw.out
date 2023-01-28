@@ -1,27 +1,27 @@
 Error: "throwing an error string"
-#(tests/20-throw.p:13)           throw "throwing an error string"
-                     |...........^
-#(tests/20-throw.p:12)     def rec(num) {
-                     |.....^
-#(tests/20-throw.p:11)         return rec(num - 1)
-                     |................^
-#(tests/20-throw.p:10)     def rec(num) {
-                     |.....^
-#(tests/20-throw.p:9)         return rec(num - 1)
-                    |................^
-#(tests/20-throw.p:8)     def rec(num) {
+#(tests/20-throw.p:5)           throw "throwing an error string"
+                    |...........^
+#(tests/20-throw.p:3)     def rec(num) {
                     |.....^
 #(tests/20-throw.p:7)         return rec(num - 1)
                     |................^
-#(tests/20-throw.p:6)     def rec(num) {
+#(tests/20-throw.p:3)     def rec(num) {
                     |.....^
-#(tests/20-throw.p:5)         return rec(num - 1)
+#(tests/20-throw.p:7)         return rec(num - 1)
                     |................^
-#(tests/20-throw.p:4)     def rec(num) {
+#(tests/20-throw.p:3)     def rec(num) {
                     |.....^
-#(tests/20-throw.p:3)         return rec(num - 1)
+#(tests/20-throw.p:7)         return rec(num - 1)
                     |................^
-#(tests/20-throw.p:2)     def rec(num) {
+#(tests/20-throw.p:3)     def rec(num) {
                     |.....^
-#(tests/20-throw.p:1)     rec(5)
+#(tests/20-throw.p:7)         return rec(num - 1)
+                    |................^
+#(tests/20-throw.p:3)     def rec(num) {
                     |.....^
+#(tests/20-throw.p:7)         return rec(num - 1)
+                    |................^
+#(tests/20-throw.p:3)     def rec(num) {
+                    |.....^
+#(tests/20-throw.p:10)     rec(5)
+                     |.....^

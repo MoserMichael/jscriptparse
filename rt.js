@@ -292,7 +292,8 @@ class RuntimeException  extends Error {
 
             let entry = prs.getLineAt(sourceInfo[1], offset);
             let nFrame = this.stackTrace.length - i;
-            let prefix = "#(" + fname + nFrame + ") ";
+            //let prefix = "#(" + fname + nFrame + ") ";
+            let prefix = "#(" + fname + prs.getLineNo(sourceInfo[1], offset) + ") ";
             ret += prefix + entry[0] + "\n";
             ret += (Array(prefix.length-1).join(' ')) + "|" +  Array(entry[1]+1).join(".") + "^\n";
         }
@@ -584,26 +585,33 @@ RTLIB={
         let res = hay.indexOf(needle, index)
         return new Value(TYPE_NUM, res);
     }, [null, null, null]),
-    "mid": new BuiltinFunctionValue(`> mid("I am me", 2)
+    "mid": new BuiltinFunctionValue(`> mid("I am me", 2, 4)
+"am"
+> mid("I am me", 2)
 "am me"
-> mid("I am me", 2, 4)
-"am"`, 3, function(arg) {
+> mid("I am me", 2, -1)
+"am me"
+`, 3, function(arg) {
         let sval = value2Str(arg[0]);
         let from = parseInt(value2Num(arg[1]), 10);
         let to = null;
 
         if (arg[2] != null) {
-            to = parseInt(value2Num(arg[2]), 10);
+            if (arg[2].type == TYPE_NUM) {
+                to = arg[2].val;
+            } else {
+                to = parseInt(value2Num(arg[2]), 10);
+            }
         }
 
-        if (to == null) {
+        if (to == -1) {
             sval = sval.substring(from)
         } else {
             sval = sval.substring(from, to);
         }
 
         return new Value(TYPE_STR, sval);
-    }, [null, null, null]),
+    }, [null, null, new Value(TYPE_NUM, -1) ]),
     "lc": new BuiltinFunctionValue(`> lc("BIG little")
 "big little"`, 1, function(arg) {
         let val = value2Str(arg[0]);

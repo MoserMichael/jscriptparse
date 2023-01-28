@@ -1,8 +1,8 @@
 handling exception
 Error: "throw from finally"
-#(tests/23-throw-from-catch-with-finally.p:3)       throw "throw from finally"
-                                            |.......^
-#(tests/23-throw-from-catch-with-finally.p:2) def tryIt() {
-                                            |.^
-#(tests/23-throw-from-catch-with-finally.p:1) tryIt()
-                                            |.^
+#(tests/23-throw-from-catch-with-finally.p:16)       throw "throw from finally"
+                                             |.......^
+#(tests/23-throw-from-catch-with-finally.p:10) def tryIt() {
+                                             |.^
+#(tests/23-throw-from-catch-with-finally.p:19) tryIt()
+                                             |.^

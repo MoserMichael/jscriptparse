@@ -145,6 +145,16 @@ function makeError2(message, errorPos, lastError, nested = null) {
     throw new ParserError(message, errorPos, nested);
 }
 
+function getLineNo(data, pos) {
+    let count = 1;
+    for(let i=0; i<pos; i++) {
+        if (data.charAt(i)=='\n') {
+            count += 1;
+        }
+    }
+    return count;
+}
+
 function getLineAt(data, pos) {
 
     if (pos >= data.length) {
@@ -206,7 +216,7 @@ function formatParserError(er, data) {
 
         msg += er.message;
         let entry = getLineAt(data, pos);
-        msg += "\n" + entry[0] + "\n" +  Array(entry[1]).join(".") + "^";
+        msg += "\n" + getLineNo(data,pos) + ":" + entry[0] + "\n" +  Array(entry[1]).join(".") + "^";
         if (er.nextException != null) {
             msg += "\n";
             msg += formatParserError(er.nextException, data);
@@ -692,6 +702,7 @@ if (typeof(module) == 'object') {
         makeForwarder,
         parseString,
         getLineAt,
+        getLineNo,
         isSpace,
         setSkipWhitespaceFunction,
         getSkipWhitespaceFunction

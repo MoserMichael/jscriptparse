@@ -1,27 +1,27 @@
 Error: Can't divide by zero
-#(tests/12-error-with-stack.p:13)             return 1 / 0
-                                |......................^
-#(tests/12-error-with-stack.p:12)     def rec(num) {
-                                |.....^
-#(tests/12-error-with-stack.p:11)         return rec(num - 1)
-                                |................^
-#(tests/12-error-with-stack.p:10)     def rec(num) {
-                                |.....^
-#(tests/12-error-with-stack.p:9)         return rec(num - 1)
-                               |................^
-#(tests/12-error-with-stack.p:8)     def rec(num) {
+#(tests/12-error-with-stack.p:5)             return 1 / 0
+                               |......................^
+#(tests/12-error-with-stack.p:3)     def rec(num) {
                                |.....^
 #(tests/12-error-with-stack.p:7)         return rec(num - 1)
                                |................^
-#(tests/12-error-with-stack.p:6)     def rec(num) {
+#(tests/12-error-with-stack.p:3)     def rec(num) {
                                |.....^
-#(tests/12-error-with-stack.p:5)         return rec(num - 1)
+#(tests/12-error-with-stack.p:7)         return rec(num - 1)
                                |................^
-#(tests/12-error-with-stack.p:4)     def rec(num) {
+#(tests/12-error-with-stack.p:3)     def rec(num) {
                                |.....^
-#(tests/12-error-with-stack.p:3)         return rec(num - 1)
+#(tests/12-error-with-stack.p:7)         return rec(num - 1)
                                |................^
-#(tests/12-error-with-stack.p:2)     def rec(num) {
+#(tests/12-error-with-stack.p:3)     def rec(num) {
                                |.....^
-#(tests/12-error-with-stack.p:1)     rec(5)
+#(tests/12-error-with-stack.p:7)         return rec(num - 1)
+                               |................^
+#(tests/12-error-with-stack.p:3)     def rec(num) {
                                |.....^
+#(tests/12-error-with-stack.p:7)         return rec(num - 1)
+                               |................^
+#(tests/12-error-with-stack.p:3)     def rec(num) {
+                               |.....^
+#(tests/12-error-with-stack.p:10)     rec(5)
+                                |.....^

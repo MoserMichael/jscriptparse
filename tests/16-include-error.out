@@ -1,27 +1,27 @@
 Error: Can't divide by zero
-#(tests/throwfromuse.p:13)     return 42 / 0
-                         |...............^
-#(tests/throwfromuse.p:12) def countdownAndError(n) {
-                         |.^
-#(tests/throwfromuse.p:11)         return countdownAndError(n-1)
-                         |................^
-#(tests/throwfromuse.p:10) def countdownAndError(n) {
-                         |.^
-#(tests/throwfromuse.p:9)         return countdownAndError(n-1)
-                        |................^
-#(tests/throwfromuse.p:8) def countdownAndError(n) {
+#(tests/throwfromuse.p:9)     return 42 / 0
+                        |...............^
+#(tests/throwfromuse.p:4) def countdownAndError(n) {
                         |.^
 #(tests/throwfromuse.p:7)         return countdownAndError(n-1)
                         |................^
-#(tests/throwfromuse.p:6) def countdownAndError(n) {
+#(tests/throwfromuse.p:4) def countdownAndError(n) {
                         |.^
-#(tests/throwfromuse.p:5)         return countdownAndError(n-1)
+#(tests/throwfromuse.p:7)         return countdownAndError(n-1)
                         |................^
 #(tests/throwfromuse.p:4) def countdownAndError(n) {
                         |.^
-#(tests/throwfromuse.p:3)         return countdownAndError(n-1)
+#(tests/throwfromuse.p:7)         return countdownAndError(n-1)
                         |................^
-#(tests/throwfromuse.p:2) def countdownAndError(n) {
+#(tests/throwfromuse.p:4) def countdownAndError(n) {
                         |.^
-#(tests/16-include-error.p:1)     countdownAndError(5)
+#(tests/throwfromuse.p:7)         return countdownAndError(n-1)
+                        |................^
+#(tests/throwfromuse.p:4) def countdownAndError(n) {
+                        |.^
+#(tests/throwfromuse.p:7)         return countdownAndError(n-1)
+                        |................^
+#(tests/throwfromuse.p:4) def countdownAndError(n) {
+                        |.^
+#(tests/16-include-error.p:5)     countdownAndError(5)
                             |.....^

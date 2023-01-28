@@ -1674,9 +1674,6 @@ class AstStmtList extends AstBase {
             val = stmt.eval(frame);
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
             if (val.type >= TYPE_FORCE_RETURN) {
-                if (val.type == TYPE_FORCE_CONTINUE) {
-                    val = VALUE_NONE;
-                }
                 break;
             }
         }
@@ -1700,9 +1697,6 @@ class AstStmtList extends AstBase {
             }
 
             if (val.type >= TYPE_FORCE_RETURN) {
-                if (val.type == TYPE_FORCE_CONTINUE) {
-                    return VALUE_NONE;
-                }
                 return val;
             }
         }
@@ -2507,6 +2501,9 @@ class AstWhileStmt extends AstBase {
                 if (rt.type == TYPE_FORCE_RETURN) {
                     return rt;
                 }
+                if (rt.type ==TYPE_FORCE_CONTINUE) {
+                    continue;
+                }
             }
         }
         return VALUE_NONE;
@@ -2583,6 +2580,9 @@ class AstForStmt extends AstBase {
                     if (rt.type == TYPE_FORCE_RETURN) {
                         return rt;
                     }
+                    if (rt.type == TYPE_FORCE_CONTINUE) {
+                        continue;
+                    }
                 }
             }
             return VALUE_NONE;
@@ -2623,6 +2623,9 @@ class AstForStmt extends AstBase {
                     }
                     if (rt.type == TYPE_FORCE_RETURN) {
                         return rt;
+                    }
+                    if (rt.type == TYPE_FORCE_CONTINUE) {
+                        continue;
                     }
                 }
             }

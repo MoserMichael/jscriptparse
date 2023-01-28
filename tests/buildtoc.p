@@ -1,8 +1,8 @@
 
 fileName = ARGV[0]
 
-tocStart = "<span hidden>toc-start</span>"
-tocEnd = "<span hidden>toc-end</span>"
+tocStart = "<!-- toc-start -->\n"
+tocEnd = "\n<!-- toc-end -->"
 
 println("fileName: {fileName}")
 
@@ -26,41 +26,62 @@ def makeLabel(tocHdr, depth) {
     return lbl
 }
 
-def makeToc(text,fileName) {
+def removeOldLink(title) {
+    pos = find(title,"<a id=")
+    if pos != -1 {
+        posEnd = find(title,'/>', pos+1)
+        if posEnd != -1
+            return mid(title, 0, pos) + mid(title, posEnd+2)
+    }
+    return title
+}
+
+def makeToc(fileName, textTokenList) {
     mode = 0
     tocHdr={}
     tocText=""
     noTocText = ""
 
-    for line split(text) {
-        line = trim(line)
-
-        if line != "" and line[0]=='#' {
-            depth, title = countDepth(line)
-            title = trim(title)
-
-            println("depth: {depth} line: {line} title: {title}")
-
-            if not exists(depth,tocHdr) {
-                tocHdr[depth]=1
-            } else {
-                tocHdr[depth] = tocHdr[depth] + 1
-            }
-
-            label = makeLabel(tocHdr,depth)
-            line = repeat('#', depth) + "<a id='{label}' />{title}"
-
-            tocText = tocText + "\n" + repeat(" ", depth) + "* [{title}] (#{ label })"
+    for token textTokenList {
+        if mid(token,0,3) == "```" {
+            noTocText = noTocText + token
+            continue
         }
-        noTocText = noTocText + "\n" + line
+        first = true
+        for line split(token) {
+            if not first
+                noTocText = noTocText + "\n"
+            first = false
+
+            trimLine = trim(line)
+
+            if trimLine != "" and trimLine[0]=='#' {
+                trimLine = removeOldLink(trimLine)
+                depth, title = countDepth(trimLine)
+
+                #println("depth: {depth} line: {line} title: {title}")
+
+                if not exists(depth,tocHdr) {
+                    tocHdr[depth]=1
+                } else {
+                    tocHdr[depth] = tocHdr[depth] + 1
+                }
+
+                label = makeLabel(tocHdr,depth)
+                line = repeat('#', depth) + "<a id='{label}' />{title}"
+
+                tocText = tocText + "\n" + repeat(" ", depth) + "* [{title}] (#{ label })"
+            }
+            noTocText = noTocText + line
+        }
+
     }
 
     allText = "
 {tocStart}
 {tocText}
 {tocEnd}
-{noTocText}
-"
+{noTocText}"
     fileNameTemp=fileName+".tmp"
 
     writeFile(fileNameTemp, allText)
@@ -76,7 +97,6 @@ def removeBetween(text, from, to) {
     next_pos = find(text, to , pos + len(from) )
 
     if next_pos != -1 {
-        next_pos = next_pos + 3
         text = mid(text, 0, pos) + mid(text, next_pos + len(to))
     } else
         text = mid(text, 0, pos)
@@ -84,25 +104,47 @@ def removeBetween(text, from, to) {
     return [true, text]
 }
 
-def removeNoFormat(text) {
+def removeBetween2(text, from, to) {
+    posFrom = find(text, from)
+    if posFrom == -1
+        return [[text], ""]
+
+    posTo = find(text, to , posFrom + len(from) )
+
+    if posTo != -1 {
+        posTo = posTo + len(to)
+        return [ [ mid(text,0, posFrom), mid(text, posFrom, posTo) ], mid(text, posTo) ]
+    }     
+
+    return  [[ mid(text, 0, posFrom), mid(text, posFrom) ], "" ]
+}
+
+def splitTokens(text) {
+    tokens = []
 
     while true {
-        status, text = removeBetween(text, "```", "```")
-        if not status
+
+        nextTokens, text = removeBetween2(text,  "```", "```")
+        tokens = joinl(tokens, nextTokens)
+        if text == ''
             break
     }
 
-    return text
+    return tokens
 }
 
 def processFile(fileName) {
 
     text = readFile(fileName)
 
+    # remove old table of contents
     _, text = removeBetween(text, tocStart, tocEnd)
-    text = removeNoFormat(text)
-    makeToc(text, fileName)
 
+    # split into text and no-format sections
+    textTokenList = splitTokens(text)
+
+    # make table of contents
+    makeToc(fileName, textTokenList)
 }
 
 processFile(fileName)

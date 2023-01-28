@@ -910,6 +910,43 @@ RTLIB={
         };
         return VALUE_NONE;
     }, [ null, null, null]),
+
+    "unlink" : new BuiltinFunctionValue(`
+# unlink a number of files, returns number of deleted files
+unlink([ "file1.txt", "file2.txt", "file3.txt" ])
+
+# unlink a single file, returns number of deleted files
+unlink([ "file1.txt")    
+    `, 1, function(arg) {
+        let numUnlinked = 0;
+
+        if (arg[0].type == TYPE_LIST) {
+            // delete multiple files
+            for(let i=0; i< arg[0].value.length;++i) {
+                fs.unlink( value2Str(arg[0].value[i]), function(arg) { numUnlinked -=1; } );
+                numUnlinked += 1;
+            }
+        } else {
+            fs.unlink( value2Str(arg[0]), function(arg) { numUnlinked -=1; } );
+            numUnlinked += 1;
+        }
+        return new Value(TYPE_NUM, numUnlinked);
+    }),
+
+    "rename" : new BuiltinFunctionValue(`
+# rename files
+    
+rename("oldFileName","newFileName")    
+`, 2, function(arg) {
+        let oldFileName = value2Str(arg[0]);
+        let newFileName = value2Str(arg[1]);
+        fs.rename(oldFileName, newFileName, function(err) {
+            throw new RuntimeException("failed to rename " + oldFileName + " to " + newFileName + " error: " + err);
+        });
+        return VALUE_NONE;
+
+    }),
+
     // function for arrays
     "len" : new BuiltinFunctionValue(`> len("abc")
 3

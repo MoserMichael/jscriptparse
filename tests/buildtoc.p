@@ -12,7 +12,7 @@ def countDepth(line) {
         if line[i] == '#'
             depth = depth + 1
         else 
-            return [ depth, mid(line,i) ]
+            return [ depth, trim(mid(line,i)) ]
 
     return [0, ""]
 }
@@ -70,7 +70,7 @@ def makeToc(fileName, textTokenList) {
                 label = makeLabel(tocHdr,depth)
                 line = repeat('#', depth) + "<a id='{label}' />{title}"
 
-                tocText = tocText + "\n" + repeat(" ", depth) + "* [{title}] (#{ label })"
+                tocText = tocText + "\n" + repeat("  ", depth-1) + "* [{title}] (#{ label })"
             }
             noTocText = noTocText + line
         }
@@ -78,9 +78,7 @@ def makeToc(fileName, textTokenList) {
     }
 
     allText = "
-{tocStart}
-{tocText}
-{tocEnd}
+{tocStart}{tocText}{tocEnd}
 {noTocText}"
     fileNameTemp=fileName+".tmp"
 

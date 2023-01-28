@@ -572,7 +572,7 @@ function makeParserImp() {
             prs.makeSequenceParser([
                 prs.makeTokenParser("and"),
                 logicInversion
-            ], "andExpr", true)), rt.makeExpression);
+            ]), "and expression", true), rt.makeExpression);
 
     let logicalDisjunction = prs.makeTransformer(
         prs.makeRepetitionRecClause(

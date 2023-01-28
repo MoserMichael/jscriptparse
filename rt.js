@@ -1903,52 +1903,72 @@ function checkMixedType(op, lhs, rhs) {
 }
 
 MAP_OP_TO_FUNC={
-    "and" : function(lhs,rhs) {
-        return new Value(TYPE_BOOL, value2Bool(lhs) && value2Bool(rhs));
+    "and" : function(lhs,rhs, frame) {
+        return new Value(TYPE_BOOL, value2Bool(lhs.eval(frame)) && value2Bool(rhs.eval(frame)));
     },
-    "or" : function(lhs,rhs) {
-        return new Value(TYPE_BOOL, value2Bool(lhs) || value2Bool(rhs));
+    "or" : function(lhs,rhs, frame) {
+        return new Value(TYPE_BOOL, value2Bool(lhs.eval(frame)) || value2Bool(rhs.eval(frame)));
     },
-    "<" : function(lhs,rhs) {
+    "<" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         checkMixedType("<", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val < rhs.val); // javascript takes care of it, does it?
     },
-    ">" : function(lhs,rhs) {
+    ">" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         checkMixedType(">", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val > rhs.val);
     },
-    "<=" : function(lhs,rhs) {
+    "<=" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         checkMixedType("<=", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val <= rhs.val);
     },
-    ">=" : function(lhs,rhs) {
+    ">=" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         checkMixedType(">=", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val >= rhs.val);
     },
-    "==" : function(lhs,rhs) {
+    "==" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         checkMixedType("==", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val == rhs.val);
     },
-    "!=" : function(lhs,rhs) {
+    "!=" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         checkMixedType("!=", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val != rhs.val);
     },
-    "+" : function(lhs,rhs) {
+    "+" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         if (lhs.type != rhs.type) {
             throw new RuntimeException("Can't add " + typeName(lhs) + " to " + typeName(rhs));
         }
         return new Value(lhs.type, lhs.val + rhs.val);
     },
-    "-" : function(lhs,rhs) {
+    "-" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         if (lhs.type != rhs.type) {
             throw new RuntimeException("Can't subtract " + typeName(lhs) + " to " + typeName(rhs) );
         }
         return new Value(lhs.type, lhs.val - rhs.val);
     },
-    "*" : function(lhs,rhs) {
+    "*" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         return new Value(TYPE_NUM, value2Num(lhs) * value2Num(rhs));
     },
-    "/" : function(lhs,rhs) {
+    "/" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         let rhsVal = value2Num(rhs);
         if (rhsVal == 0) {
             // javascript allows to divide by zero, amazing.
@@ -1956,7 +1976,9 @@ MAP_OP_TO_FUNC={
         }
         return new Value(TYPE_NUM,value2Num(lhs) / rhsVal);
     },
-    "%" : function(lhs,rhs) {
+    "%" : function(lhs,rhs, frame) {
+        lhs = lhs.eval(frame);
+        rhs = rhs.eval(frame);
         let rhsVal = value2Num(rhs);
         if (rhsVal == 0) {
             // javascript allows to divide by zero, amazing.
@@ -1981,9 +2003,10 @@ class AstBinaryExpression extends AstBase {
     
     eval(frame) {
         try {
-            let lhsVal = this.lhs.eval(frame);
-            let rhsVal = this.rhs.eval(frame);
-            return this.fun(lhsVal, rhsVal);
+            //let lhsVal = this.lhs.eval(frame);
+            //let rhsVal = this.rhs.eval(frame);
+            //return this.fun(lhsVal, rhsVal);
+            return this.fun(this.lhs, this.rhs, frame);
         } catch(er) {
             if (er instanceof RuntimeException && er.firstChance) {
                 er.firstChance = false;
@@ -2006,6 +2029,7 @@ function makeExpression(exprList) {
     let prevExpression = null;
     let pos = exprList.length -1;
 
+    //console.log("enter makeExpression");
     while(pos > 0) {
         if (prevExpression == null) {
             //console.log("## " + JSON.stringify(exprList[pos-2]) + " # " +   JSON.stringify(exprList[pos-1]) + " # " + JSON.stringify(exprList[pos]));
@@ -2017,6 +2041,7 @@ function makeExpression(exprList) {
             pos -= 2;
         }
     }
+    //console.log("exit makeExpression: " + JSON.stringify(prevExpression));
     return prevExpression;
 }
 

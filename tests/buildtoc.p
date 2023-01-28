@@ -68,7 +68,7 @@ def makeToc(fileName, textTokenList) {
                 }
 
                 label = makeLabel(tocHdr,depth)
-                line = repeat('#', depth) + "<a id='{label}' />{title}"
+                line = repeat('#', depth) + " <a id='{label}' />{title}"
 
                 tocText = tocText + "\n" + repeat("  ", depth-1) + "* [{title}] (#{ label })"
             }

@@ -70,7 +70,7 @@ def makeToc(fileName, textTokenList) {
                 label = makeLabel(tocHdr,depth)
                 line = repeat('#', depth) + " <a id='{label}' />{title}"
 
-                tocText = tocText + "\n" + repeat("  ", depth-1) + "* [{title}] (#{ label })"
+                tocText = tocText + "\n" + repeat("  ", depth-1) + "* [{title}](#{ label })"
             }
             noTocText = noTocText + line
         }

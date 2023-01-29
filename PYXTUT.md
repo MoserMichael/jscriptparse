@@ -6,14 +6,16 @@
   * [First steps](#s-1-2)
 * [An overview](#s-2)
   * [functions and lists of values](#s-2-3)
-    * [Statements](#s-2-3-1)
-  * [Maps](#s-2-4)
-  * [object based programming](#s-2-5)
+  * [Statements](#s-2-4)
+  * [Maps](#s-2-5)
+  * [object based programming](#s-2-6)
 * [Features for specific tasks](#s-3)
-  * [Working with text](#s-3-6)
-  * [Running processes](#s-3-7)
-  * [Conclusion](#s-3-8)
+  * [Working with text](#s-3-7)
+  * [Running processes](#s-3-8)
+  * [Conclusion](#s-3-9)
 <!-- toc-end -->
+
+
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
 ## <a id='s-1-1' />Installation
@@ -311,7 +313,7 @@ And now lets get the sum of the power of three for the numbers between one and o
 24502500
 ```
 
-### <a id='s-2-3-1' />Statements
+## <a id='s-2-4' />Statements
 
 You can do the same thing differently
 
@@ -407,7 +409,7 @@ Is a for loop better than a while loop? Depends how you look on it,
 
 It's a kind of trade off - the world of programming has many trade offs...
 
-## <a id='s-2-4' />Maps
+## <a id='s-2-5' />Maps
 
 There is a type of data called a map. It allows to give names to things.
 
@@ -459,7 +461,7 @@ Of you can use the map to organize your data, like having a list of records for 
 
 ```
 
-## <a id='s-2-5' />object based programming
+## <a id='s-2-6' />object based programming
 
 Lets say we have a map like this:
 
@@ -541,7 +543,7 @@ re: 6 im: 8
 
 # <a id='s-3' />Features for specific tasks
 
-## <a id='s-3-6' />Working with text
+## <a id='s-3-7' />Working with text
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -797,10 +799,10 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-## <a id='s-3-7' />Running processes
+## <a id='s-3-8' />Running processes
 
 
-## <a id='s-3-8' />Conclusion
+## <a id='s-3-9' />Conclusion
 
 Or you can do all kinds of stuff, by putting togather all of this.
 

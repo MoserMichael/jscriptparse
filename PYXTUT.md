@@ -1,19 +1,6 @@
+# PYXTUT - tutorial for the PYX scripting language
 
-<!-- toc-start -->
-
-* [PYXTUT - tutorial for the PYX scripting language](#s-1)
-  * [Installation](#s-1-1)
-  * [First steps](#s-1-2)
-* [functions working on lists of values](#s-2)
-    * [Statements](#s-2-2-1)
-  * [Maps](#s-2-3)
-  * [Working with text](#s-2-4)
-  * [Running processes](#s-2-5)
-  * [Conclusion](#s-2-6)
-<!-- toc-end -->
-# <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
-
-## <a id='s-1-1' />Installation
+## Installation
 
 First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/)
 
@@ -25,7 +12,7 @@ npm install pyxlang -g
 
 (You can always uninstall it later with the command ```npm uninstall pyxlang -g```)
 
-## <a id='s-1-2' />First steps
+## First steps
 
 Run the ```pyx``` program, first thing you see is a command prompt
 
@@ -197,7 +184,9 @@ s(       sin(     sort(    split(   sqrt(    str(     system(
 
 if you type ```si tab tab``` then there is only one function sin(  - so it will just put sin( at the place where you are typing. Believe me, that's a big time saver!
 
-# <a id='s-2' />functions working on lists of values
+# An overview
+
+## functions and lists of values
 
 You can have a list of the numbers between one and five
 
@@ -306,7 +295,7 @@ And now lets get the sum of the power of three for the numbers between one and o
 24502500
 ```
 
-### <a id='s-2-2-1' />Statements
+### Statements
 
 You can do the same thing differently
 
@@ -402,7 +391,7 @@ Is a for loop better than a while loop? Depends how you look on it,
 
 It's a kind of trade off - the world of programming has many trade offs...
 
-## <a id='s-2-3' />Maps
+## Maps
 
 There is a type of data called a map. It allows to give names to things.
 
@@ -454,7 +443,89 @@ Of you can use the map to organize your data, like having a list of records for 
 
 ```
 
-## <a id='s-2-4' />Working with text
+## object based programming
+
+Lets say we have a map like this:
+
+```
+> a={"Name": "Pooh", "Surname": "Bear", "Likes": "Friends and Songs and lots of stuff"}
+{"Name":"Pooh","Surname":"Bear","Likes":"Friends and Songs and lots of stuff"}
+```
+
+Now you can access an element of the map by the name of a key - just like this:
+
+```
+> a['Name']
+"Pooh"
+```
+
+However there is also a shorter way - if the key of the entry looks like an identifier (it means that it doesn't have spaces and only consists of letters digits and underscore characters)
+
+```
+> a.Name
+"Pooh"
+```
+
+That has a been added for a reason - to make it easier to use the map in a program.
+
+```
+> def makePoint(posX, posY)
+... return { "x": posX, "y": posY }
+"<function>"
+
+> p=makePoint(12,20)
+{"x":12,"y":20}
+
+> p.x
+12
+
+> p.y
+20
+
+> p.x+p.y
+32
+```
+
+This is a shorter form of using the map, you can now access the fields of the map, as if they were properties of a record or an object.
+
+Now some fields of the map can also be function values
+
+
+```
+> def makeComplex(re, im) {
+...     t = {
+...              "re": re,
+...              "im": im,
+...              "add": def(c) {
+...                 return makeComplex(t.re + c.re, t.im + c.im)
+...               },
+...               "show": def() {
+...                 println("re: {t.re} im: {t.im}")
+...               }
+...         }
+...     return t
+... }
+"<function>"
+>
+
+Here the ```makeComplex``` function is returning a map with the propertes ```re``` and ```im``` - these are numbers. But the properties ```add``` and ```show``` can work on the properties of the same map - by accessing the captured variable ```t```. This way we just made an object that acts like a complex number, see here:
+
+> a=makeComplex(2,3)
+{"re":2,"im":3,"add":"<function>","show":"<function>"}
+
+> b=makeComplex(4,5)
+{"re":4,"im":5,"add":"<function>","show":"<function>"}
+
+> c=a.add(b)
+{"re":6,"im":8,"add":"<function>","show":"<function>"}
+
+> c.show()
+re: 6 im: 8
+```
+
+# Features for specific tasks
+
+## Working with text 
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -710,10 +781,10 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-## <a id='s-2-5' />Running processes
+## Running processes
 
 
-## <a id='s-2-6' />Conclusion
+## Conclusion
 
 Or you can do all kinds of stuff, by putting togather all of this.
 

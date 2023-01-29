@@ -1,154 +1,27 @@
 # pyxfunc - PYX functions reference by category
 
-## Functions for scalars or strings
-<a href='#s-1'>find</a>&nbsp;,&nbsp;<a href='#s-2'>lc</a>&nbsp;,&nbsp;<a href='#s-3'>len</a>&nbsp;,&nbsp;<a href='#s-4'>mid</a>&nbsp;,&nbsp;<a href='#s-5'>repeat</a>&nbsp;,&nbsp;<a href='#s-6'>replace</a>&nbsp;,&nbsp;<a href='#s-7'>reverse</a>&nbsp;,&nbsp;<a href='#s-8'>split</a>&nbsp;,&nbsp;<a href='#s-9'>str</a>&nbsp;,&nbsp;<a href='#s-10'>trim</a>&nbsp;,&nbsp;<a href='#s-11'>uc</a>
 ## Numeric functions
-<a href='#s-12'>abs</a>&nbsp;,&nbsp;<a href='#s-13'>atan</a>&nbsp;,&nbsp;<a href='#s-14'>cos</a>&nbsp;,&nbsp;<a href='#s-15'>int</a>&nbsp;,&nbsp;<a href='#s-16'>max</a>&nbsp;,&nbsp;<a href='#s-17'>min</a>&nbsp;,&nbsp;<a href='#s-18'>num</a>&nbsp;,&nbsp;<a href='#s-19'>pow</a>&nbsp;,&nbsp;<a href='#s-20'>random</a>&nbsp;,&nbsp;<a href='#s-21'>sin</a>&nbsp;,&nbsp;<a href='#s-22'>sqrt</a>&nbsp;,&nbsp;<a href='#s-23'>tan</a>
+<a href='#s-1'>abs</a>&nbsp;,&nbsp;<a href='#s-2'>atan</a>&nbsp;,&nbsp;<a href='#s-3'>cos</a>&nbsp;,&nbsp;<a href='#s-4'>int</a>&nbsp;,&nbsp;<a href='#s-5'>max</a>&nbsp;,&nbsp;<a href='#s-6'>min</a>&nbsp;,&nbsp;<a href='#s-7'>num</a>&nbsp;,&nbsp;<a href='#s-8'>pow</a>&nbsp;,&nbsp;<a href='#s-9'>random</a>&nbsp;,&nbsp;<a href='#s-10'>sin</a>&nbsp;,&nbsp;<a href='#s-11'>sqrt</a>&nbsp;,&nbsp;<a href='#s-12'>tan</a>
+## Functions for scalars or strings
+<a href='#s-13'>find</a>&nbsp;,&nbsp;<a href='#s-14'>lc</a>&nbsp;,&nbsp;<a href='#s-15'>len</a>&nbsp;,&nbsp;<a href='#s-16'>mid</a>&nbsp;,&nbsp;<a href='#s-17'>repeat</a>&nbsp;,&nbsp;<a href='#s-18'>replace</a>&nbsp;,&nbsp;<a href='#s-19'>reverse</a>&nbsp;,&nbsp;<a href='#s-20'>split</a>&nbsp;,&nbsp;<a href='#s-21'>str</a>&nbsp;,&nbsp;<a href='#s-22'>trim</a>&nbsp;,&nbsp;<a href='#s-23'>uc</a>
+## Functions for regular expressions
+<a href='#s-13'>find</a>&nbsp;,&nbsp;<a href='#s-20'>split</a>
 ## Input and output functions
-<a href='#s-24'>print</a>&nbsp;,&nbsp;<a href='#s-25'>println</a>&nbsp;,&nbsp;<a href='#s-26'>readFile</a>&nbsp;,&nbsp;<a href='#s-27'>rename</a>&nbsp;,&nbsp;<a href='#s-28'>unlink</a>&nbsp;,&nbsp;<a href='#s-29'>writeFile</a>
+<a href='#s-26'>print</a>&nbsp;,&nbsp;<a href='#s-27'>println</a>&nbsp;,&nbsp;<a href='#s-28'>readFile</a>&nbsp;,&nbsp;<a href='#s-29'>rename</a>&nbsp;,&nbsp;<a href='#s-30'>unlink</a>&nbsp;,&nbsp;<a href='#s-31'>writeFile</a>
 ## Functions for arrays
-<a href='#s-30'>exists</a>&nbsp;,&nbsp;<a href='#s-31'>join</a>&nbsp;,&nbsp;<a href='#s-32'>joinl</a>&nbsp;,&nbsp;<a href='#s-3'>len</a>&nbsp;,&nbsp;<a href='#s-34'>map</a>&nbsp;,&nbsp;<a href='#s-35'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-36'>pop</a>&nbsp;,&nbsp;<a href='#s-37'>push</a>&nbsp;,&nbsp;<a href='#s-38'>range</a>&nbsp;,&nbsp;<a href='#s-39'>reduce</a>&nbsp;,&nbsp;<a href='#s-40'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-41'>sort</a>
+<a href='#s-32'>exists</a>&nbsp;,&nbsp;<a href='#s-33'>join</a>&nbsp;,&nbsp;<a href='#s-34'>joinl</a>&nbsp;,&nbsp;<a href='#s-15'>len</a>&nbsp;,&nbsp;<a href='#s-36'>map</a>&nbsp;,&nbsp;<a href='#s-37'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-38'>pop</a>&nbsp;,&nbsp;<a href='#s-39'>push</a>&nbsp;,&nbsp;<a href='#s-40'>range</a>&nbsp;,&nbsp;<a href='#s-41'>reduce</a>&nbsp;,&nbsp;<a href='#s-42'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-43'>sort</a>
 ## Functions for maps
-<a href='#s-42'>each</a>&nbsp;,&nbsp;<a href='#s-30'>exists</a>&nbsp;,&nbsp;<a href='#s-44'>keys</a>&nbsp;,&nbsp;<a href='#s-34'>map</a>
+<a href='#s-44'>each</a>&nbsp;,&nbsp;<a href='#s-32'>exists</a>&nbsp;,&nbsp;<a href='#s-46'>keys</a>&nbsp;,&nbsp;<a href='#s-36'>map</a>
 ## Function for working with json/yaml
-<a href='#s-46'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-47'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-48'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-49'>toYamlString</a>
+<a href='#s-48'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-49'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-50'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-51'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-50'>exit</a>&nbsp;,&nbsp;<a href='#s-51'>sleep</a>&nbsp;,&nbsp;<a href='#s-52'>system</a>
+<a href='#s-52'>exit</a>&nbsp;,&nbsp;<a href='#s-53'>sleep</a>&nbsp;,&nbsp;<a href='#s-54'>system</a>
 ## Other functions
-<a href='#s-53'>help</a>&nbsp;,&nbsp;<a href='#s-54'>localtime</a>&nbsp;,&nbsp;<a href='#s-55'>setTrace</a>&nbsp;,&nbsp;<a href='#s-56'>time</a>&nbsp;,&nbsp;<a href='#s-57'>type</a>
+<a href='#s-55'>help</a>&nbsp;,&nbsp;<a href='#s-56'>localtime</a>&nbsp;,&nbsp;<a href='#s-57'>setTrace</a>&nbsp;,&nbsp;<a href='#s-58'>time</a>&nbsp;,&nbsp;<a href='#s-59'>type</a>
 ## Global variables
-<a href='#s-58'>ARGV</a>&nbsp;,&nbsp;<a href='#s-59'>ENV</a>&nbsp;,&nbsp;<a href='#s-60'>mathconst</a>
+<a href='#s-60'>ARGV</a>&nbsp;,&nbsp;<a href='#s-61'>ENV</a>&nbsp;,&nbsp;<a href='#s-62'>mathconst</a>
 
 <a id='s-1'/>
-<hr>function: <b>find</b>
-
-```python
-> find("big cat", "big")
-0
-> find("big cat", "cat")
-4
-> find("big cat", "bear")
--1
-
-
-
-```
-<a id='s-2'/>
-<hr>function: <b>lc</b>
-
-```python
-> lc("BIG little")
-"big little"
-
-```
-<a id='s-3'/>
-<hr>function: <b>len</b>
-
-```python
-> len("abc")
-3
-> len([1,2,3])
-3
-
-```
-<a id='s-4'/>
-<hr>function: <b>mid</b>
-
-```python
-> mid("I am me", 2, 4)
-"am"
-> mid("I am me", 2)
-"am me"
-> mid("I am me", 2, -1)
-"am me"
-
-
-```
-<a id='s-5'/>
-<hr>function: <b>repeat</b>
-
-```python
-> repeat("a",3)
-"aaa"
-> repeat("ab",3)
-"ababab"
-
-```
-<a id='s-6'/>
-<hr>function: <b>replace</b>
-
-```python
-text="a b a c a d"
-> "a b a c a d"
-        
-> replace(text,'a ', 'x ', -1)
-"x b x c x d"        
-
-> replace(text,'a ', 'x ', 1)
-"x b a c a d"
-
-> replace(text,'a ', 'x ', 2)
-"x b x c a d"
-
-
-```
-<a id='s-7'/>
-<hr>function: <b>reverse</b>
-
-```python
-> reverse([1,2,3,4])
-[4,3,2,1]
-> reverse("abcd")
-"dcba"
-
-```
-<a id='s-8'/>
-<hr>function: <b>split</b>
-
-```python
-> split("first line\nsecond line")
-["first line","second line"]
-> split("a,b,c", ",")
-["a","b","c"]
-> split("a:b:c", ":")
-["a","b","c"]
-> split("a:b:c", "")
-["a",":","b",":","c"]
-
-```
-<a id='s-9'/>
-<hr>function: <b>str</b>
-
-```python
-> str(123)
-"123"
-> str("abc")
-"abc"
-
-```
-<a id='s-10'/>
-<hr>function: <b>trim</b>
-
-```python
-> a= ' honey  '
-" honey  "
-> trim(a)
-"honey"
-> a= '\t\n a lot of honey honey \n '
-"\t\n a lot of honey honey \n "
-> trim(a)
-"a lot of honey honey"
-
-```
-<a id='s-11'/>
-<hr>function: <b>uc</b>
-
-```python
-> uc("BIG little")
-"BIG LITTLE"
-
-```
-<a id='s-12'/>
 <hr>function: <b>abs</b>
 
 ```python
@@ -158,14 +31,14 @@ text="a b a c a d"
 3
 
 ```
-<a id='s-13'/>
+<a id='s-2'/>
 <hr>function: <b>atan</b>
 
 ```python
 returns the inverse tangent (in radians) of a number
 
 ```
-<a id='s-14'/>
+<a id='s-3'/>
 <hr>function: <b>cos</b>
 
 ```python
@@ -174,7 +47,7 @@ returns the cosine of a number in radians
 -1
 
 ```
-<a id='s-15'/>
+<a id='s-4'/>
 <hr>function: <b>int</b>
 
 ```python
@@ -203,7 +76,7 @@ returns the cosine of a number in radians
 
 
 ```
-<a id='s-16'/>
+<a id='s-5'/>
 <hr>function: <b>max</b>
 
 ```python
@@ -213,7 +86,7 @@ returns the cosine of a number in radians
 4
 
 ```
-<a id='s-17'/>
+<a id='s-6'/>
 <hr>function: <b>min</b>
 
 ```python
@@ -223,7 +96,7 @@ returns the cosine of a number in radians
 3
 
 ```
-<a id='s-18'/>
+<a id='s-7'/>
 <hr>function: <b>num</b>
 
 ```python
@@ -231,7 +104,7 @@ returns the cosine of a number in radians
 
 
 ```
-<a id='s-19'/>
+<a id='s-8'/>
 <hr>function: <b>pow</b>
 
 ```python
@@ -243,7 +116,7 @@ returns the cosine of a number in radians
 16
 
 ```
-<a id='s-20'/>
+<a id='s-9'/>
 <hr>function: <b>random</b>
 
 ```python
@@ -254,7 +127,7 @@ returns the cosine of a number in radians
 
 
 ```
-<a id='s-21'/>
+<a id='s-10'/>
 <hr>function: <b>sin</b>
 
 ```python
@@ -263,7 +136,7 @@ returns the sine of a number in radians
 1
 
 ```
-<a id='s-22'/>
+<a id='s-11'/>
 <hr>function: <b>sqrt</b>
 
 ```python
@@ -275,28 +148,233 @@ returns the sine of a number in radians
 1.414213562373095
 
 ```
-<a id='s-23'/>
+<a id='s-12'/>
 <hr>function: <b>tan</b>
 
 ```python
 returns the tangent of a number in radians
 
 ```
-<a id='s-24'/>
+<a id='s-13'/>
+<hr>function: <b>find</b>
+
+```python
+> find("big cat", "big")
+0
+> find("big cat", "cat")
+4
+> find("big cat", "bear")
+-1
+
+#using regular expressions
+
+> a='123412342 piglet $%#@#$#@%'
+"123412342 piglet $%#@#$#@%"
+
+> r=/[a-z]+/
+"/[a-z]+/"
+
+> find(a,r)
+10
+
+
+
+```
+<a id='s-14'/>
+<hr>function: <b>lc</b>
+
+```python
+> lc("BIG little")
+"big little"
+
+```
+<a id='s-15'/>
+<hr>function: <b>len</b>
+
+```python
+> len("abc")
+3
+> len([1,2,3])
+3
+
+```
+<a id='s-16'/>
+<hr>function: <b>mid</b>
+
+```python
+> mid("I am me", 2, 4)
+"am"
+> mid("I am me", 2)
+"am me"
+> mid("I am me", 2, -1)
+"am me"
+
+
+```
+<a id='s-17'/>
+<hr>function: <b>repeat</b>
+
+```python
+> repeat("a",3)
+"aaa"
+> repeat("ab",3)
+"ababab"
+
+```
+<a id='s-18'/>
+<hr>function: <b>replace</b>
+
+```python
+text="a b a c a d"
+> "a b a c a d"
+        
+> replace(text,'a ', 'x ', -1)
+"x b x c x d"        
+
+> replace(text,'a ', 'x ', 1)
+"x b a c a d"
+
+> replace(text,'a ', 'x ', 2)
+"x b x c a d"
+
+
+```
+<a id='s-19'/>
+<hr>function: <b>reverse</b>
+
+```python
+> reverse([1,2,3,4])
+[4,3,2,1]
+> reverse("abcd")
+"dcba"
+
+```
+<a id='s-20'/>
+<hr>function: <b>split</b>
+
+```python
+> split("first line\nsecond line")
+["first line","second line"]
+> split("a,b,c", ",")
+["a","b","c"]
+
+> split("a:b:c", ":")
+["a","b","c"]
+
+> split("a:b:c", "")
+["a",":","b",":","c"]
+
+# Regular expressions
+
+> a="Rooh : Kanga :: Piglet ::: Pooh"
+"Rooh : Kanga :: Piglet ::: Pooh"
+> z=/:+/
+"/:+/"
+> split(a,z)
+["Rooh "," Kanga "," Piglet "," Pooh"]
+
+
+
+```
+<a id='s-21'/>
+<hr>function: <b>str</b>
+
+```python
+> str(123)
+"123"
+> str("abc")
+"abc"
+
+```
+<a id='s-22'/>
+<hr>function: <b>trim</b>
+
+```python
+> a= ' honey  '
+" honey  "
+> trim(a)
+"honey"
+> a= '\t\n a lot of honey honey \n '
+"\t\n a lot of honey honey \n "
+> trim(a)
+"a lot of honey honey"
+
+```
+<a id='s-23'/>
+<hr>function: <b>uc</b>
+
+```python
+> uc("BIG little")
+"BIG LITTLE"
+
+```
+<a id='s-13'/>
+<hr>function: <b>find</b>
+
+```python
+> find("big cat", "big")
+0
+> find("big cat", "cat")
+4
+> find("big cat", "bear")
+-1
+
+#using regular expressions
+
+> a='123412342 piglet $%#@#$#@%'
+"123412342 piglet $%#@#$#@%"
+
+> r=/[a-z]+/
+"/[a-z]+/"
+
+> find(a,r)
+10
+
+
+
+```
+<a id='s-20'/>
+<hr>function: <b>split</b>
+
+```python
+> split("first line\nsecond line")
+["first line","second line"]
+> split("a,b,c", ",")
+["a","b","c"]
+
+> split("a:b:c", ":")
+["a","b","c"]
+
+> split("a:b:c", "")
+["a",":","b",":","c"]
+
+# Regular expressions
+
+> a="Rooh : Kanga :: Piglet ::: Pooh"
+"Rooh : Kanga :: Piglet ::: Pooh"
+> z=/:+/
+"/:+/"
+> split(a,z)
+["Rooh "," Kanga "," Piglet "," Pooh"]
+
+
+
+```
+<a id='s-26'/>
 <hr>function: <b>print</b>
 
 ```python
 # prints argument value to console
 
 ```
-<a id='s-25'/>
+<a id='s-27'/>
 <hr>function: <b>println</b>
 
 ```python
 # prints argument value to console, followed by newline
 
 ```
-<a id='s-26'/>
+<a id='s-28'/>
 <hr>function: <b>readFile</b>
 
 ```python
@@ -307,7 +385,7 @@ returns the tangent of a number in radians
     
 
 ```
-<a id='s-27'/>
+<a id='s-29'/>
 <hr>function: <b>rename</b>
 
 ```python
@@ -318,7 +396,7 @@ rename("oldFileName","newFileName")
 
 
 ```
-<a id='s-28'/>
+<a id='s-30'/>
 <hr>function: <b>unlink</b>
 
 ```python
@@ -331,7 +409,7 @@ unlink([ "file1.txt")
     
 
 ```
-<a id='s-29'/>
+<a id='s-31'/>
 <hr>function: <b>writeFile</b>
 
 ```python
@@ -347,7 +425,7 @@ unlink([ "file1.txt")
     
 
 ```
-<a id='s-30'/>
+<a id='s-32'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -367,7 +445,7 @@ true
 false
 
 ```
-<a id='s-31'/>
+<a id='s-33'/>
 <hr>function: <b>join</b>
 
 ```python
@@ -375,7 +453,7 @@ false
 "a: 1 b: true"
 
 ```
-<a id='s-32'/>
+<a id='s-34'/>
 <hr>function: <b>joinl</b>
 
 ```python
@@ -383,7 +461,7 @@ false
 [1,2,3,4]
 
 ```
-<a id='s-3'/>
+<a id='s-15'/>
 <hr>function: <b>len</b>
 
 ```python
@@ -393,7 +471,7 @@ false
 3
 
 ```
-<a id='s-34'/>
+<a id='s-36'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -408,7 +486,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-35'/>
+<a id='s-37'/>
 <hr>function: <b>mapIndex</b>
 
 ```python
@@ -416,7 +494,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [[6,0],[8,1],[10,2],[12,3]]
 
 ```
-<a id='s-36'/>
+<a id='s-38'/>
 <hr>function: <b>pop</b>
 
 ```python
@@ -428,7 +506,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2]
 
 ```
-<a id='s-37'/>
+<a id='s-39'/>
 <hr>function: <b>push</b>
 
 ```python
@@ -440,7 +518,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-38'/>
+<a id='s-40'/>
 <hr>function: <b>range</b>
 
 ```python
@@ -452,7 +530,7 @@ number: 2
 number: 3
 
 ```
-<a id='s-39'/>
+<a id='s-41'/>
 <hr>function: <b>reduce</b>
 
 ```python
@@ -474,7 +552,7 @@ number: 3
 
 
 ```
-<a id='s-40'/>
+<a id='s-42'/>
 <hr>function: <b>reduceFromEnd</b>
 
 ```python
@@ -489,7 +567,7 @@ same as:
 1
 
 ```
-<a id='s-41'/>
+<a id='s-43'/>
 <hr>function: <b>sort</b>
 
 ```python
@@ -506,7 +584,7 @@ same as:
 [["b",1],["a",100],["c",1000]]
 
 ```
-<a id='s-42'/>
+<a id='s-44'/>
 <hr>function: <b>each</b>
 
 ```python
@@ -520,7 +598,7 @@ same as:
 
 
 ```
-<a id='s-30'/>
+<a id='s-32'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -540,7 +618,7 @@ true
 false
 
 ```
-<a id='s-44'/>
+<a id='s-46'/>
 <hr>function: <b>keys</b>
 
 ```python
@@ -550,7 +628,7 @@ false
 ["first","second","third"]
 
 ```
-<a id='s-34'/>
+<a id='s-36'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -565,7 +643,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-46'/>
+<a id='s-48'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -575,7 +653,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-47'/>
+<a id='s-49'/>
 <hr>function: <b>parseYamlString</b>
 
 ```python
@@ -595,7 +673,7 @@ c:
     
 
 ```
-<a id='s-48'/>
+<a id='s-50'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -605,7 +683,7 @@ c:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-49'/>
+<a id='s-51'/>
 <hr>function: <b>toYamlString</b>
 
 ```python
@@ -621,7 +699,7 @@ c:
   - 3
 
 ```
-<a id='s-50'/>
+<a id='s-52'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -629,7 +707,7 @@ c:
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-51'/>
+<a id='s-53'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -639,7 +717,7 @@ sleep(3)
 
 
 ```
-<a id='s-52'/>
+<a id='s-54'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -668,7 +746,7 @@ var
 0
 
 ```
-<a id='s-53'/>
+<a id='s-55'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -683,7 +761,7 @@ help()
 
 
 ```
-<a id='s-54'/>
+<a id='s-56'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -694,7 +772,7 @@ help()
 
 
 ```
-<a id='s-55'/>
+<a id='s-57'/>
 <hr>function: <b>setTrace</b>
 
 ```python
@@ -707,14 +785,14 @@ setTrace(false)
 
 
 ```
-<a id='s-56'/>
+<a id='s-58'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-57'/>
+<a id='s-59'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -730,21 +808,22 @@ setTrace(false)
 "Closure"
 
 ```
-<a id='s-58'/>
+<a id='s-60'/>
 <hr>function: <b>ARGV</b>
 
 ```python
+{"type":4,"val":[]}
 List
 
 ```
-<a id='s-59'/>
+<a id='s-61'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-60'/>
+<a id='s-62'/>
 <hr>function: <b>mathconst</b>
 
 ```python

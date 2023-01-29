@@ -1,12 +1,16 @@
 
 funcCats = [
  {
- "name": "Functions for scalars or strings",
- "func": [ "find", "mid", "lc", "uc", "reverse", "str", "repeat", "len", "replace", "split", "trim" ]
- }, 
- {
   "name": "Numeric functions",
   "func": [ "int", "num", "max", "min", "abs", "sqrt", "sin", "cos", "tan", "atan", "pow", "random" ]
+ },
+ {
+ "name": "Functions for scalars or strings",
+ "func": [ "find", "mid", "lc", "uc", "reverse", "str", "repeat", "len", "replace", "split", "trim" ]
+ },
+ {
+  "name": "Functions for regular expressions",
+  "func": [ "find", "split" ]
  },
  {
    "name": "Input and output functions",

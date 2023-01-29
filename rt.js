@@ -46,30 +46,32 @@ function checkEvalForceStop() {
 }
 */
 
-TYPE_BOOL=0
-TYPE_NUM=1
-TYPE_STR=2
-TYPE_LIST=3
-TYPE_MAP=4
-TYPE_NONE=5
-TYPE_CLOSURE=6
-TYPE_BUILTIN_FUNCTION=7
+const TYPE_BOOL=0
+const TYPE_NUM=1
+const TYPE_STR=2
+const TYPE_REGEX=3
+const TYPE_LIST=4
+const TYPE_MAP=5
+const TYPE_NONE=6
+const TYPE_CLOSURE=7
+const TYPE_BUILTIN_FUNCTION=8
 
-TYPE_FORCE_RETURN=8
-TYPE_FORCE_BREAK=10
-TYPE_FORCE_CONTINUE=11
+const TYPE_FORCE_RETURN=9
+const TYPE_FORCE_BREAK=10
+const TYPE_FORCE_CONTINUE=11
 
 
 mapTypeToName = {
     0 : "Boolean",
-    1 : "Number",
-    2 : "String",
-    3 : "List",
-    4 : "Map",
-    5 : "None",
-    6 : "Closure",
-    7 : "BuiltinFunction",
-    8 : "Return",
+    1  : "Number",
+    2  : "String",
+    3 : "Regular expression",
+    4 : "List",
+    5 : "Map",
+    6 : "None",
+    7 : "Closure",
+    8 : "BuiltinFunction",
+    9 : "Return",
     10 : "Break",
     11 : "Continue",
 }
@@ -126,11 +128,34 @@ class Value {
     }
 }
 
+class RegexValue {
+    constructor(value) {
+        this.type = TYPE_REGEX;
+
+        this.isGlobal = value.endsWith('g');
+
+        let firstPos = value.indexOf('/');
+        let lastPos = value.lastIndexOf('/');
+        let flags = null;
+        if (!value.endsWith('//')) {
+            flags = value.substring(lastPos+1);
+        }
+        let rawRegex = value.substring(firstPos+1, lastPos);
+        this.regex = new RegExp(rawRegex, flags);
+        this.val = this.regex.toString();
+    }
+
+    show() {
+        return this.val;
+    }
+}
+
 let VALUE_NONE=new Value(TYPE_NONE,null);
 
 function typeName(val) {
+    console.log(JSON.stringify(val));
     if (val.type == null) {
-        console.trace("Not a runtime value!");
+        console.trace("Not a runtime value!" + JSON.stringify(val));
         return "not a runtime value!";
     }
     return mapTypeToName[val.type];
@@ -158,7 +183,7 @@ function value2Num(val) {
 
 
 function value2Str(val) {
-    if (val.type == TYPE_STR) {
+    if (val.type == TYPE_STR || val.type == TYPE_REGEX) {
         return val.val;
     } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
         return val.val.toString();
@@ -234,7 +259,7 @@ function rtValueToJsVal(value) {
         return ret;
     }
 
-    if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM || value.type == TYPE_NONE) {
+    if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM || value.type == TYPE_NONE || value.type == TYPE_REGEX) {
         return value.val;
     }
 
@@ -575,8 +600,25 @@ RTLIB={
 > find("big cat", "bear")
 -1
 
+#using regular expressions
+
+> a='123412342 piglet $%#@#$#@%'
+"123412342 piglet $%#@#$#@%"
+
+> r=/[a-z]+/
+"/[a-z]+/"
+
+> find(a,r)
+10
+
 `, 3, function(arg) {
         let hay = value2Str(arg[0]);
+
+        if (arg[1].type == TYPE_REGEX) {
+            let matches = hay.search(arg[1].regex);
+            return new Value(TYPE_NUM, matches);
+        }
+
         let needle = value2Str(arg[1]);
         let index = 0;
 
@@ -648,14 +690,32 @@ RTLIB={
 ["first line","second line"]
 > split("a,b,c", ",")
 ["a","b","c"]
+
 > split("a:b:c", ":")
 ["a","b","c"]
+
 > split("a:b:c", "")
-["a",":","b",":","c"]`, 2,function *(arg, frame) {
+["a",":","b",":","c"]
+
+# Regular expressions
+
+> a="Rooh : Kanga :: Piglet ::: Pooh"
+"Rooh : Kanga :: Piglet ::: Pooh"
+> z=/:+/
+"/:+/"
+> split(a,z)
+["Rooh "," Kanga "," Piglet "," Pooh"]
+
+`, 2,function *(arg, frame) {
         let hay = value2Str(arg[0]);
         let delim = "\n";
+
         if (arg[1] != null) {
-            delim = value2Str(arg[1]);
+            if (arg[1].type == TYPE_REGEX) {
+                delim = arg[1].regex;
+            } else {
+                delim = value2Str(arg[1]);
+            }
         }
         for(let n of hay.split(delim)) {
             yield new Value(TYPE_STR, n);
@@ -1910,6 +1970,30 @@ function makeThrowStmt(expression, offset) {
     return new AstThrowStmt(expression, offset);
 }
 
+/*
+class RegexConstValue extends AstBase {
+    constructor(value, offset) {
+        super(offset);
+
+        this.isGlobal = value.endsWith('g');
+        try {
+            this.regex = new RegExp(value);
+        } catch(ex) {
+            throw new ParserError(ex, offset);
+        }
+    }
+
+    eval(frame) {
+        console.log("haha");
+        return new Value(TYPE_STR, this.regex.toString());
+    }
+
+    show() {
+        return this.regex.toString();
+    }
+}
+*/
+
 class AstConstValue extends AstBase {
     constructor(value, offset) {
         super(offset);
@@ -1927,6 +2011,10 @@ class AstConstValue extends AstBase {
 
 function makeConstValue(type, value) {
     let val = value[0];
+
+    if (type == TYPE_REGEX) {
+        return new AstConstValue(new RegexValue(value[0]), value[1]);
+    }
     if (type == TYPE_BOOL) {
         value[0] = val == "true";
     }
@@ -3025,6 +3113,7 @@ if (typeof(module) == 'object') {
         TYPE_BOOL,
         TYPE_NUM,
         TYPE_STR,
+        TYPE_REGEX,
         TYPE_LIST,
         TYPE_MAP,
         TYPE_NONE,

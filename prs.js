@@ -216,7 +216,8 @@ function formatParserError(er, data) {
 
         msg += er.message;
         let entry = getLineAt(data, pos);
-        msg += "\n" + getLineNo(data,pos) + ":" + entry[0] + "\n" +  Array(entry[1]).join(".") + "^";
+        let prefix = getLineNo(data,pos) + ": ";
+        msg += "\n" + prefix + entry[0] + "\n" +  Array(entry[1]+prefix.length).join(".") + "^";
         if (er.nextException != null) {
             msg += "\n";
             msg += formatParserError(er.nextException, data);

@@ -143,6 +143,18 @@ function makeParserImp() {
         }
     );
 
+    let regexConst = prs.makeTransformer(
+        prs.makeRegexParser(/^\/(\\\\.|[^\/])*\/[igm]?/, "regular expression-const"),
+        function (arg) {
+            try {
+                return rt.makeConstValue(rt.TYPE_REGEX, arg);
+            } catch(ex) {
+                throw new prs.ParserError(ex, arg[1]+1);
+            }
+        }
+    );
+
+
     let formatStringConst = prs.makeTransformer(
         prs.makeRegexParser(/^"(\\\\.|[^"{])*"/, "string-const"),
         function (arg) {
@@ -473,6 +485,7 @@ function makeParserImp() {
             trueConst,
             falseConst,
             noneConst,
+            regexConst,
             functionCall,
             identifierWithOptIndex,
             signedNumber,

@@ -56,7 +56,7 @@ function readHistory() {
         let hist = fs.readFileSync(history_file_name);
         let histLines = hist.toString().split("\n");
         for (let i = 0; i < histLines.length; ++i) {
-            nodejsRepl.history.push(histLines[i]);
+            nodejsRepl.history.unshift(histLines[i]);
         }
     } catch(ex) {
     }

@@ -24,6 +24,8 @@
 
 
 
+
+
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
 ## <a id='s-1-1' />First steps
@@ -926,6 +928,6 @@ var
 
 Or you can do all kinds of stuff, by putting togather all of this.
 
-Now I am wiwhing you lots of fun with the PYX programming language, may it be of use to you!
+Now I am wishing you lots of fun with the PYX programming language, may it be of use to you!
 
 

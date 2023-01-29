@@ -12,8 +12,10 @@
 * [Features for specific tasks](#s-3)
   * [Working with text](#s-3-7)
   * [Running processes](#s-3-8)
-  * [Conclusion](#s-3-9)
+* [Conclusion](#s-4)
 <!-- toc-end -->
+
+
 
 
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
@@ -525,9 +527,11 @@ Now some fields of the map can also be function values
 ... }
 "<function>"
 >
+```
 
 Here the ```makeComplex``` function is returning a map with the propertes ```re``` and ```im``` - these are numbers. But the properties ```add``` and ```show``` can work on the properties of the same map - by accessing the captured variable ```t```. This way we just made an object that acts like a complex number, see here:
 
+```
 > a=makeComplex(2,3)
 {"re":2,"im":3,"add":"<function>","show":"<function>"}
 
@@ -802,22 +806,10 @@ Or replace the first two occurances like this:
 ## <a id='s-3-8' />Running processes
 
 
-## <a id='s-3-9' />Conclusion
+# <a id='s-4' />Conclusion
 
 Or you can do all kinds of stuff, by putting togather all of this.
 
-
-
-
-
-
-
-
-
-
-```
-
-
-
+Now I am wiwhing you lots of fun with the PYX programming language, may it be of use to you!
 
 

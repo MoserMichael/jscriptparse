@@ -1,6 +1,22 @@
-# PYXTUT - tutorial for the PYX scripting language
 
-## Installation
+<!-- toc-start -->
+
+* [PYXTUT - tutorial for the PYX scripting language](#s-1)
+  * [Installation](#s-1-1)
+  * [First steps](#s-1-2)
+* [An overview](#s-2)
+  * [functions and lists of values](#s-2-3)
+    * [Statements](#s-2-3-1)
+  * [Maps](#s-2-4)
+  * [object based programming](#s-2-5)
+* [Features for specific tasks](#s-3)
+  * [Working with text](#s-3-6)
+  * [Running processes](#s-3-7)
+  * [Conclusion](#s-3-8)
+<!-- toc-end -->
+# <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
+
+## <a id='s-1-1' />Installation
 
 First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/)
 
@@ -12,7 +28,7 @@ npm install pyxlang -g
 
 (You can always uninstall it later with the command ```npm uninstall pyxlang -g```)
 
-## First steps
+## <a id='s-1-2' />First steps
 
 Run the ```pyx``` program, first thing you see is a command prompt
 
@@ -184,9 +200,9 @@ s(       sin(     sort(    split(   sqrt(    str(     system(
 
 if you type ```si tab tab``` then there is only one function sin(  - so it will just put sin( at the place where you are typing. Believe me, that's a big time saver!
 
-# An overview
+# <a id='s-2' />An overview
 
-## functions and lists of values
+## <a id='s-2-3' />functions and lists of values
 
 You can have a list of the numbers between one and five
 
@@ -295,7 +311,7 @@ And now lets get the sum of the power of three for the numbers between one and o
 24502500
 ```
 
-### Statements
+### <a id='s-2-3-1' />Statements
 
 You can do the same thing differently
 
@@ -391,7 +407,7 @@ Is a for loop better than a while loop? Depends how you look on it,
 
 It's a kind of trade off - the world of programming has many trade offs...
 
-## Maps
+## <a id='s-2-4' />Maps
 
 There is a type of data called a map. It allows to give names to things.
 
@@ -443,7 +459,7 @@ Of you can use the map to organize your data, like having a list of records for 
 
 ```
 
-## object based programming
+## <a id='s-2-5' />object based programming
 
 Lets say we have a map like this:
 
@@ -523,9 +539,9 @@ Here the ```makeComplex``` function is returning a map with the propertes ```re`
 re: 6 im: 8
 ```
 
-# Features for specific tasks
+# <a id='s-3' />Features for specific tasks
 
-## Working with text 
+## <a id='s-3-6' />Working with text
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -781,10 +797,10 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-## Running processes
+## <a id='s-3-7' />Running processes
 
 
-## Conclusion
+## <a id='s-3-8' />Conclusion
 
 Or you can do all kinds of stuff, by putting togather all of this.
 

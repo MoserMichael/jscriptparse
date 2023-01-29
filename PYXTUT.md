@@ -8,14 +8,16 @@
     * [Running programs](#s-1-1-3)
   * [An overview](#s-1-2)
     * [functions and lists of values](#s-1-2-4)
-  * [Statements](#s-1-3)
-  * [Maps](#s-1-4)
-    * [object based programming](#s-1-4-5)
-  * [Features for specific tasks](#s-1-5)
-    * [Working with text](#s-1-5-6)
-    * [Running processes](#s-1-5-7)
-  * [Conclusion](#s-1-6)
+    * [Statements](#s-1-2-5)
+    * [Maps](#s-1-2-6)
+    * [object based programming](#s-1-2-7)
+  * [Features for specific tasks](#s-1-3)
+    * [Working with text](#s-1-3-8)
+    * [Running processes](#s-1-3-9)
+  * [Conclusion](#s-1-4)
 <!-- toc-end -->
+
+
 
 
 
@@ -365,7 +367,7 @@ And now lets get the sum of the power of three for the numbers between one and o
 24502500
 ```
 
-## <a id='s-1-3' />Statements
+### <a id='s-1-2-5' />Statements
 
 You can do the same thing differently
 
@@ -461,7 +463,7 @@ Is a for loop better than a while loop? Depends how you look on it,
 
 It's a kind of trade off - the world of programming has many trade offs...
 
-## <a id='s-1-4' />Maps
+### <a id='s-1-2-6' />Maps
 
 There is a type of data called a map. It allows to give names to things.
 
@@ -513,7 +515,7 @@ Of you can use the map to organize your data, like having a list of records for 
 
 ```
 
-### <a id='s-1-4-5' />object based programming
+### <a id='s-1-2-7' />object based programming
 
 Lets say we have a map like this:
 
@@ -595,9 +597,9 @@ Here the ```makeComplex``` function is returning a map with the propertes ```re`
 re: 6 im: 8
 ```
 
-## <a id='s-1-5' />Features for specific tasks
+## <a id='s-1-3' />Features for specific tasks
 
-### <a id='s-1-5-6' />Working with text
+### <a id='s-1-3-8' />Working with text
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -853,10 +855,74 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-### <a id='s-1-5-7' />Running processes
+### <a id='s-1-3-9' />Running processes
+
+You can run other command line programs, just like this:
+
+```
+> res = system("ls /")
+["Applications\nLibrary\nSystem\nUsers\nVolumes\nbin\ncores\ndev\netc\nhome\nopt\nprivate\nsbin\ntmp\nusr\nvar\n",0]
+```
+
+The ```system``` function runs the given command, it returns a list of two values - the output of the program is the first value of the list and the status of the command is the second value
+
+```
+> println(res[0])
+Applications
+Library
+System
+Users
+Volumes
+bin
+cores
+dev
+etc
+home
+opt
+private
+sbin
+tmp
+usr
+var
 
 
-## <a id='s-1-6' />Conclusion
+> println(res[1])
+0
+```
+
+A function that returns multiple values can also be called like this - here each element of the returned list is assigned a different variable.
+This is called 'multiple assignment'. Note that you need to have exactly the same number of variables as there are elements in the returned list
+
+```
+> output, status = system('ls /')
+["Applications\nLibrary\nSystem\nUsers\nVolumes\nbin\ncores\ndev\netc\nhome\nopt\nprivate\nsbin\ntmp\nusr\nvar\n",0]
+>
+
+> println(output)
+Applications
+Library
+System
+Users
+Volumes
+bin
+cores
+dev
+etc
+home
+opt
+private
+sbin
+tmp
+usr
+var
+
+
+> println(status)
+0
+```
+
+
+## <a id='s-1-4' />Conclusion
 
 Or you can do all kinds of stuff, by putting togather all of this.
 

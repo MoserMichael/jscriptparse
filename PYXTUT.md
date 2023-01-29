@@ -2,25 +2,31 @@
 <!-- toc-start -->
 
 * [PYXTUT - tutorial for the PYX scripting language](#s-1)
-  * [Installation](#s-1-1)
-  * [First steps](#s-1-2)
-* [An overview](#s-2)
-  * [functions and lists of values](#s-2-3)
-  * [Statements](#s-2-4)
-  * [Maps](#s-2-5)
-  * [object based programming](#s-2-6)
-* [Features for specific tasks](#s-3)
-  * [Working with text](#s-3-7)
-  * [Running processes](#s-3-8)
-* [Conclusion](#s-4)
+  * [First steps](#s-1-1)
+    * [Installation](#s-1-1-1)
+    * [Using the interactive shell](#s-1-1-2)
+    * [Running programs](#s-1-1-3)
+  * [An overview](#s-1-2)
+    * [functions and lists of values](#s-1-2-4)
+  * [Statements](#s-1-3)
+  * [Maps](#s-1-4)
+    * [object based programming](#s-1-4-5)
+  * [Features for specific tasks](#s-1-5)
+    * [Working with text](#s-1-5-6)
+    * [Running processes](#s-1-5-7)
+  * [Conclusion](#s-1-6)
 <!-- toc-end -->
+
+
 
 
 
 
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
-## <a id='s-1-1' />Installation
+## <a id='s-1-1' />First steps
+
+### <a id='s-1-1-1' />Installation
 
 First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/)
 
@@ -32,7 +38,7 @@ npm install pyxlang -g
 
 (You can always uninstall it later with the command ```npm uninstall pyxlang -g```)
 
-## <a id='s-1-2' />First steps
+### <a id='s-1-1-2' />Using the interactive shell
 
 Run the ```pyx``` program, first thing you see is a command prompt
 
@@ -204,9 +210,53 @@ s(       sin(     sort(    split(   sqrt(    str(     system(
 
 if you type ```si tab tab``` then there is only one function sin(  - so it will just put sin( at the place where you are typing. Believe me, that's a big time saver!
 
-# <a id='s-2' />An overview
+### <a id='s-1-1-3' />Running programs
 
-## <a id='s-2-3' />functions and lists of values
+You can store a sequence of commands in a file lets save the following text in the file named ```p.p```
+
+```
+def pythagoras(sideA, sideB) sqrt( pow(sideA,2) + pow(sideB,2) )
+
+a=3
+b=4
+
+println( pythagoras(a, b) )
+```
+
+The statements here are computing the length of the hypothenuse of a right triangle, where the two legs are of length 3 and 4.
+
+To run the program write the following command ```pyx p.p```
+
+```
+pyx p.p
+
+5
+```
+
+You can add the ```-x``` command line option, this traces each statement of the program, while the program is running:
+
+```
+pyx -x p.p
+
++ a = 3
++ b = 4
+pythagoras(sideA=3, sideB=4)
++ pow(3, 2) {
++ 9
+}+ pow(4, 2) {
++ 16
+}+ sqrt(25) {
++ 5
+}+ }
++ println(5) {
+5
++ }
+```
+
+
+## <a id='s-1-2' />An overview
+
+### <a id='s-1-2-4' />functions and lists of values
 
 You can have a list of the numbers between one and five
 
@@ -315,7 +365,7 @@ And now lets get the sum of the power of three for the numbers between one and o
 24502500
 ```
 
-## <a id='s-2-4' />Statements
+## <a id='s-1-3' />Statements
 
 You can do the same thing differently
 
@@ -411,7 +461,7 @@ Is a for loop better than a while loop? Depends how you look on it,
 
 It's a kind of trade off - the world of programming has many trade offs...
 
-## <a id='s-2-5' />Maps
+## <a id='s-1-4' />Maps
 
 There is a type of data called a map. It allows to give names to things.
 
@@ -463,7 +513,7 @@ Of you can use the map to organize your data, like having a list of records for 
 
 ```
 
-## <a id='s-2-6' />object based programming
+### <a id='s-1-4-5' />object based programming
 
 Lets say we have a map like this:
 
@@ -545,9 +595,9 @@ Here the ```makeComplex``` function is returning a map with the propertes ```re`
 re: 6 im: 8
 ```
 
-# <a id='s-3' />Features for specific tasks
+## <a id='s-1-5' />Features for specific tasks
 
-## <a id='s-3-7' />Working with text
+### <a id='s-1-5-6' />Working with text
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -803,10 +853,10 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-## <a id='s-3-8' />Running processes
+### <a id='s-1-5-7' />Running processes
 
 
-# <a id='s-4' />Conclusion
+## <a id='s-1-6' />Conclusion
 
 Or you can do all kinds of stuff, by putting togather all of this.
 

@@ -397,6 +397,7 @@ function evalClosure(name, funcVal, args, frame) {
 
         if (traceParam) {
             let traceName = name;
+
             if (name == "") {
                 traceName ="<unnamed-function>";
             }
@@ -2881,7 +2882,7 @@ class AstFunctionCall extends AstBase {
         try {
             if (!funcVal.hasYield(frame)) {
                 let args = this._evalCallArguments(frame);
-                return evalClosure(this.name, funcVal, args, frame);
+                return evalClosure(funcVal.name, funcVal, args, frame);
             } else {
                 let ret = [];
 
@@ -2920,8 +2921,11 @@ class AstFunctionCall extends AstBase {
         let funcVal = null;
         if (this.name instanceof AstIdentifierRef) {
             funcVal = this.name.eval(frame);
+            funcVal.name = this.name.identifierName;
+            //what if identifier name comes from lookup of values?
         } else {
             funcVal = frame.lookup(this.name);
+            funcVal.name = this.name;
         }
         if (funcVal == undefined) {
             throw new RuntimeException("Can't call undefined function " + this.name, this.startOffset);

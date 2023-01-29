@@ -6,6 +6,15 @@ const yaml=require("yaml");
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
+
+// callback for running evaluator
+let evalCallback = null;
+
+function setEvalCallback(cb) {
+    evalCallback = cb;
+}
+
+
 // the file that is being parsed right now. Can't pass that around.
 // Should be thread local, or something like this.
 let currentSourceInfo = null;
@@ -1484,6 +1493,19 @@ setTrace(true)
 setTrace(false)
 `, 1,function(arg, frame) {
         traceMode = value2Bool(arg[0]);
+        return VALUE_NONE;
+    }),
+
+    "eval": new BuiltinFunctionValue(`
+`, 1,function(arg, frame) {
+        let script = value2Str(arg[0]);
+        if (evalCallback != null) {
+            let rt = evalCallback(script, frame);
+            if (rt != null) {
+                return rt;
+            }
+        }
+        return VALUE_NONE;
     }),
 
 
@@ -3145,6 +3167,7 @@ if (typeof(module) == 'object') {
         makeFrame,
         eval,
         setLogHook,
+        setEvalCallback,
         setCurrentSourceInfo,
         //setForceStopEval,
         setTraceMode,

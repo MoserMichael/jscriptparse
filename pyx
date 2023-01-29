@@ -200,7 +200,7 @@ function runEvalLoop(cmdLine) {
 }
 
 function evalExpression(expr, frame) {
-    scr.runParserAndEval(expr, false, frame, null);
+    return scr.runParserAndEval(expr, false, frame, null);
 }
 
 
@@ -280,6 +280,8 @@ function parseCmdLine() {
 }
 
 function runMain() {
+
+    rt.setEvalCallback(evalExpression);
 
     let cmd = parseCmdLine();
 

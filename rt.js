@@ -1497,6 +1497,15 @@ setTrace(false)
     }),
 
     "eval": new BuiltinFunctionValue(`
+
+# evaluate the string as a pyx program - in the current scope
+
+> eval("2*2")
+4
+
+> eval("sqrt(2)")
+1.4142135623730951
+    
 `, 1,function(arg, frame) {
         let script = value2Str(arg[0]);
         if (evalCallback != null) {

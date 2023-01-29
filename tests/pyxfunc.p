@@ -29,7 +29,7 @@ funcCats = [
    "func": [ "system", "exit", "sleep" ]
  },
  { "name": "Other functions",
-   "func": [ "help", "type", "time", "localtime", "setTrace" ]
+   "func": [ "help", "type", "time", "localtime", "setTrace", "eval" ]
  },
  { "name": "Global variables",
     "func": [ "mathconst", "ARGV", "ENV" ]

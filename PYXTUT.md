@@ -25,6 +25,8 @@
 
 
 
+
+
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
 ## <a id='s-1-1' />First steps
@@ -912,7 +914,7 @@ Or replace the first two occurances like this:
 
 Sometimes you don't want to find an exact string, instead it is possible to specify a pattern that can match a multitude of possible text values.
 
-TBD
+TBD /lots of words to explain the concept. have to think about that/
 
 ### <a id='s-1-3-11' />Running processes
 
@@ -1201,7 +1203,70 @@ There is a third possible clause in a try/catch block - the ```finally``` statem
 
 ### <a id='s-1-4-14' />Generators and the yield statement
 
-tbd
+The ```for``` statement is a bit special.
+
+You can loop over the elements of an existing list
+
+```
+> for a [1,2,3]
+... println(a)
+1
+2
+3
+```
+
+You can loop over all entries of a map
+
+```
+> for key,value {'Pooh': 'Bear', 'Piglet': 'Piggy', 'Rooh': 'Kangaroo'}
+... println("key: {key} value: {value}")
+key: Pooh value: Bear
+key: Piglet value: Piggy
+key: Rooh value: Kangaroo
+```
+
+However in many cases you don't want to create a whole list or map of entries, just in order to pass over all the elements in that structure.
+You always want to create the next element, just when you want to visit it with the ```for``` loop.
+
+Now that's when you need a generator.
+
+Let's look at the followin special function: ```myrange``` in the next example:
+
+
+```
+> def mygen(from,to) {
+...     while from < to {
+...         yield from
+...         from = from + 1
+...     }
+... }
+"<function>"
+>
+
+> for a myrange(1,10)
+... println("the number is {a}")
+Error: undefined variable: myrange
+
+> for n mygen(1,10)
+... println("The number is {n}")
+The number is 1
+The number is 2
+The number is 3
+The number is 4
+The number is 5
+The number is 6
+The number is 7
+The number is 8
+The number is 9
+
+```
+
+The function ```mygen``` is called, it produces the numbers between the argument values ```from``` to ```to``` (not including the value of ```to```).
+
+Now ```mygen``` is passing a number the ```for``` loop via the ```yield n``` statement. At this moment the ```mygen``` function stops and the statments of the ```for``` loop work with the number they got from the ```yield``` statement. Once the loop has finished, we return from the ```yield``` statement right into the ```mygen``` function and here we are ready to produce hte next value that will be used by the next iteration/pass of the loop.
+
+The ```mygen``` function is called a generator function, because it has a ```yield``` statement. Note that ```mygen``` can't call another function that does the ```yield``` statement, this statement has to be in the generator function itself, in the top level of the generator function.
+
 
 ## <a id='s-1-5' />Conclusion
 

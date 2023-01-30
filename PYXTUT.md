@@ -598,6 +598,8 @@ Here the ```makeComplex``` function is returning a map with the propertes ```re`
 re: 6 im: 8
 ```
 
+Some say that [Objects and Closures are equivalent](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent), however this is the subject of a lively debate (see the [link](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent) ).
+
 ### <a id='s-1-2-8' />Splitting up a program into multiple source files
 
 You can divide your program into multiple files. That's can be very convenient if the file grows too large, or if you have a function that you want to use in more than one program, without having to copy the text of the function.

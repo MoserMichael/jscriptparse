@@ -1621,7 +1621,7 @@ number: 3`, 3,function *(arg, frame) {
         log2e: new Value(TYPE_NUM, Math.LOG2E),
         sqrt1_2: new Value(TYPE_NUM, Math.SQRT1_2),
         sqrt2: new Value(TYPE_NUM, Math.SQRT2),
-    }, `# map of mathematical constant
+    }, `# map of mathematical constants.
 
 # the number PI
     

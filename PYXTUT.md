@@ -76,7 +76,27 @@ You can always return to the previous expression with arrow up and to the next e
 
 (the ```pyx``` program is also writing the ```pyx_history``` file, each time that you run a statement successfully it is written onto the end of this file)
 
-Now you also have mathematical constants = like pi and the euler constant
+
+One important detail: In the shell it is possible to write a statements in more than one line. This looks as follows
+
+```
+> 2 *
+... 3
+6
+```
+
+However in the ```pyx_history``` file this will look as follows:
+
+```
+2 *
+3
+```
+
+The ```...``` symbol is only displayed in the interactive shell, it is a sign that the previous line has been continued and that the shell is waiting for more input.
+A real program will not have the ```...``` symbol, it is not part of the text that you are typing.
+
+
+Now you also have mathematical constants = like pi and the euler constant (it looks a bit strange right now, we will learn about maps in a later chapter)
 
 ```
 > mathconst['pi']
@@ -93,19 +113,19 @@ You can ask about stuff, typing  ```help(mathconst)``` will explain all about ``
 
 How to use in shell:
 
-map of mathematical constant
+# map of mathematical constant
 
-the number PI
+# the number PI
 
 > mathconst['pi']
 3.141592653589793
 
-the Euler constant
+# the Euler constant
 
 > mathconst['e']
 2.718281828459045
 
-The square root of two
+# The square root of two
 
 > mathconst["sqrt2"]
 1.4142135623730951

@@ -648,7 +648,7 @@ You can now include the text of file ```testuse.p``` and use all the functions t
 "-7+i22"
 ```
 
-An important detail: if you have the ```PATH``` environment variable set, then the statement ```use "testuse.p"``` will search for the file name "testuse.p" in all directories specified by the ````PATH``` environment variable.
+An important detail: if you have the ```PATH``` environment variable set, then the statement ```use "testuse.p"``` will search for the file name "testuse.p" in all directories specified by the ```PATH``` environment variable.
 
 ## <a id='s-1-3' />Features for specific tasks
 

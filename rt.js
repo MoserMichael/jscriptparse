@@ -637,6 +637,69 @@ RTLIB={
         let res = hay.indexOf(needle, index)
         return new Value(TYPE_NUM, res);
     }, [null, null, null]),
+
+
+    "match": new BuiltinFunctionValue(`
+> text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
+"a 1232 blablalba 34234 ;aksdf;laksdf 3423"
+
+> match(text,/[0-9]+/)
+[2,"1232"]    
+
+`, 3, function(arg) {
+        let hay = value2Str(arg[0]);
+
+        if (arg[1].type != TYPE_REGEX) {
+            throw new RuntimeException("Second parameter must be a regular expression")
+        }
+
+        let ret = hay.match(arg[1].regex);
+
+        if (ret == null) {
+            return [ -1, "" ];
+        }
+        return new Value(TYPE_LIST, [ new Value(TYPE_NUM, ret['index']), new Value(TYPE_STR, ret[0]) ]);
+    }, [null, null, null]),
+
+    "matchAll": new BuiltinFunctionValue(`
+> text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
+"a 1232 blablalba 34234 ;aksdf;laksdf 3423"
+
+> matchAll(text,/[0-9]+/)
+[[2,"1232"],[17,"34234"],[37,"3423"]]
+
+`, 3, function(arg) {
+        let hay = value2Str(arg[0]);
+        let ret = []
+
+        if (arg[1].type != TYPE_REGEX) {
+            throw new RuntimeException("Second parameter must be a regular expression")
+        }
+
+        let lenConsumed = 0;
+
+        while(true) {
+            let mval = hay.match(arg[1].regex);
+            if (mval == null) {
+                break;
+            }
+            let index = mval['index'];
+
+            let r = [ new Value(TYPE_NUM, lenConsumed + index), new Value(TYPE_STR, mval[0]) ];
+            ret.push( new Value(TYPE_LIST, r ) );
+
+            let toAdd = mval[0].length;
+            if (toAdd == 0) {
+                toAdd = 1;
+            }
+            hay = hay.substring( index + toAdd );
+            lenConsumed += index + mval[0].length;
+
+        }
+        return new Value(TYPE_LIST, ret );
+    }, [null, null, null]),
+
+
     "mid": new BuiltinFunctionValue(`> mid("I am me", 2, 4)
 "am"
 > mid("I am me", 2)

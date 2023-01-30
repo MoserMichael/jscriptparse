@@ -10,7 +10,7 @@ funcCats = [
  },
  {
   "name": "Functions for regular expressions",
-  "func": [ "find", "split" ]
+  "func": [ "find", "split", "match", "matchAll" ]
  },
  {
    "name": "Input and output functions",

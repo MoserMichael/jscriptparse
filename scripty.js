@@ -144,7 +144,7 @@ function makeParserImp() {
     );
 
     let regexConst = prs.makeTransformer(
-        prs.makeRegexParser(/^\/(\\\\.|[^\/])*\/[igm]?/, "regular expression-const"),
+        prs.makeRegexParser(/^\/(\\\\.|[^\/])*\/[im]?/, "regular expression-const"),
         function (arg) {
             try {
                 return rt.makeConstValue(rt.TYPE_REGEX, arg);

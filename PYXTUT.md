@@ -10,19 +10,18 @@
     * [functions and lists of values](#s-1-2-4)
     * [Statements](#s-1-2-5)
     * [Maps](#s-1-2-6)
-    * [object based programming](#s-1-2-7)
+    * [Object based programming](#s-1-2-7)
+    * [Splitting up a program into multiple source files](#s-1-2-8)
   * [Features for specific tasks](#s-1-3)
-    * [Working with text](#s-1-3-8)
-    * [Running processes](#s-1-3-9)
-  * [Conclusion](#s-1-4)
+    * [Working with text](#s-1-3-9)
+    * [Regular expressions](#s-1-3-10)
+    * [Running processes](#s-1-3-11)
+    * [working with structured data (json and yaml)](#s-1-3-12)
+  * [Even more language features](#s-1-4)
+    * [Error handling with exceptions](#s-1-4-13)
+    * [Generators and the yield statement](#s-1-4-14)
+  * [Conclusion](#s-1-5)
 <!-- toc-end -->
-
-
-
-
-
-
-
 
 
 
@@ -517,7 +516,7 @@ Of you can use the map to organize your data, like having a list of records for 
 
 ```
 
-### <a id='s-1-2-7' />object based programming
+### <a id='s-1-2-7' />Object based programming
 
 Lets say we have a map like this:
 
@@ -599,9 +598,59 @@ Here the ```makeComplex``` function is returning a map with the propertes ```re`
 re: 6 im: 8
 ```
 
+### <a id='s-1-2-8' />Splitting up a program into multiple source files
+
+You can divide your program into multiple files. That's can be very convenient if the file grows too large, or if you have a function that you want to use in more than one program, without having to copy the text of the function.
+
+Let's write down the following text info file ```testuse.p```
+
+```
+
+def newComplex(x,y) {
+    return [x, y]
+}
+
+def cadd(a, b) {
+    return [ a[0] + b[0], a[1] + b[1] ]
+}
+
+def cmul(a, b) {
+    return [ a[0] * b[0] - a[1] * b[1], a[1] * b[0] + a[0] * b[1] ]
+}    
+
+def cshow(a) {
+    return "{a[0]}+i{a[1]}"
+}
+
+```
+
+You can now include the text of file ```testuse.p``` and use all the functions that were declared in that file:
+
+```
+> use "testuse.p"
+"<function>"
+
+> use "tests/testuse.p"
+"<function>"
+
+> a=newComplex(2,3)
+[2,3]
+
+> b=newComplex(4,5)
+[4,5]
+
+> c=cmul(a,b)
+[-7,22]
+
+> cshow(c)
+"-7+i22"
+```
+
+An important detail: if you have the ```PATH``` environment variable set, then the statement ```use "testuse.p"``` will search for the file name "testuse.p" in all directories specified by the ````PATH``` environment variable.
+
 ## <a id='s-1-3' />Features for specific tasks
 
-### <a id='s-1-3-8' />Working with text
+### <a id='s-1-3-9' />Working with text
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -857,7 +906,13 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-### <a id='s-1-3-9' />Running processes
+### <a id='s-1-3-10' />Regular expressions
+
+Sometimes you don't want to find an exact string, instead it is possible to specify a pattern that can match a multitude of possible text values.
+
+TBD
+
+### <a id='s-1-3-11' />Running processes
 
 You can run other command line programs, just like this:
 
@@ -923,8 +978,230 @@ var
 0
 ```
 
+You also have a second form of writing & running commands - the backtick operator
 
-## <a id='s-1-4' />Conclusion
+```
+> out,status = `ls /`
+["Applications\nLibrary\nSystem\nUsers\nVolumes\nbin\ncores\ndev\netc\nhome\nopt\nprivate\nsbin\ntmp\nusr\nvar\n",0]
+> println(out)
+Applications
+Library
+System
+Users
+Volumes
+bin
+cores
+dev
+etc
+home
+opt
+private
+sbin
+tmp
+usr
+var
+
+
+> print(status)
+0
+```
+
+You can combine expression values to form just the command that is needed, very similar to strings with the " delimitor.
+An expression within { } brackets is evaluated, and the result is inserted into the string that is run in the shell.
+An expression with backticks can span several lines.
+
+```
+> directory='/'
+"/"
+
+> out, status = `ls {directory}`
+["Applications\nLibrary\nSystem\nUsers\nVolumes\nbin\ncores\ndev\netc\nhome\nopt\nprivate\nsbin\ntmp\nusr\nvar\n",0]
+
+> println(out)
+Applications
+Library
+System
+Users
+Volumes
+bin
+cores
+dev
+etc
+home
+opt
+private
+sbin
+tmp
+usr
+var
+
+
+> print(status)
+0
+
+```
+
+### <a id='s-1-3-12' />working with structured data (json and yaml)
+
+let's say you have some structured string encoded as text in the [json](https://en.wikipedia.org/wiki/JSON) format.
+You can make a variable out of it - with the ```parseJsonString``` function
+
+```
+
+> text='{"persons":[{"id":"323412343123","name":"Michael","surname":"Moser","age":52,"stuff":[3,2,1]}]}'
+"{\"persons\":[{\"id\":\"323412343123\",\"name\":\"Michael\",\"surname\":\"Moser\",\"age\":52,\"stuff\":[3,2,1]}]}"
+
+> data=parseJsonString(text)
+{"persons":[{"id":"323412343123","name":"Michael","surname":"Moser","age":52,"stuff":[3,2,1]}]}
+
+```
+
+Now it is much easier to manipulate the data
+
+```
+> data.persons[0].id=123
+123
+
+> data.persons[0].age=18
+18
+
+> unshift(data.persons[0].stuff,4)
+[4,3,2,1]
+```
+
+This is the same as writing (see more in "object based programming")
+
+```
+> data['persons'][0]['id']=123
+123
+
+> data['persons'][0]['age']=18
+18
+
+> unshift(data['persons'][0]['stuff'],4)
+[4,3,2,1]
+```
+
+Now you use the can convert the data back into a [json](https://en.wikipedia.org/wiki/JSON) formatted string 
+
+```
+> text=toJsonString(data)
+"{\"persons\":[{\"id\":123,\"name\":\"Michael\",\"surname\":\"Moser\",\"age\":18,\"stuff\":[4,3,2,1]}]}"
+
+```
+
+You can do the same with [YAML](https://en.wikipedia.org/wiki/YAML) - this is another way of encoding structured data as text (the text as YAML is supposed to be more readable, compared to JSON)
+
+```
+> text=toYamlString(data)
+"persons:\n  - id: 123\n    name: Michael\n    surname: Moser\n    age: 18\n    stuff:\n      - 4\n      - 3\n      - 2\n      - 1\n"
+
+> println(text)
+persons:
+  - id: 123
+    name: Michael
+    surname: Moser
+    age: 18
+    stuff:
+      - 4
+      - 3
+      - 2
+      - 1
+```
+
+the ```parseYamlString``` function converts the YAML text back into a value of nested maps and arrays 
+
+```
+> data = parseYamlString(text)
+{"persons":[{"id":123,"name":"Michael","surname":"Moser","age":18,"stuff":[4,3,2,1]}]}
+
+> data
+{"persons":[{"id":123,"name":"Michael","surname":"Moser","age":18,"stuff":[4,3,2,1]}]}
+
+```
+
+## <a id='s-1-4' />Even more language features
+
+### <a id='s-1-4-13' />Error handling with exceptions
+
+Runtime errors can happen in a program, like dividing by zero
+
+```
+ ./pyx
+> value = 42
+42
+> value / 0
+Error: Can't divide by zero
+#(1) value / 0
+   |.......^
+```
+
+Or tring to read a file that does not exist
+
+```
+> textInFile = readFile("noSuchFileExists.txt")
+Error: Can't read file: noSuchFileExists.txt error: Error: ENOENT: no such file or directory, open 'noSuchFileExists.txt'
+#(1) textInFile = readFile("noSuchFileExists.txt")
+   |..............^
+```
+
+
+Still you would like to have the program deal with such errors, somehow. The way to do this is by adding a ```try / catch``` block.
+
+```
+> try {
+... a=readFile("noSuchFile.txt")
+... println(a)
+... } catch ex {
+... println( toJsonString(ex) )
+... }
+
+try {
+ a=readFile("noSuchFile.txt")
+ println(a)
+} catch ex {
+ println( ex.stack )
+ println( "Fields of the exception map: " + toJsonString(ex) )
+}
+
+{"message":"Can't read file: noSuchFile.txt error: Error: ENOENT: no such file or directory, open 'noSuchFile.txt'","stack":"Error: Can't read file: noSuchFile.txt error: Error: ENOENT: no such file or directory, open 'noSuchFile.txt'\n#(2) a=readFile(\"noSuchFile.txt\")\n   |...^\n","offset":8,"fileName":[null,"try {\na=readFile(\"noSuchFile.txt\")\nprintln(a)\n} catch
+```
+
+The instructions in the statement between the ```try``` and ```catch``` keywords can throw errors. Now only when an error occurs we get into the statement in the block after the ```catch``` statement.
+
+This block now has a special variable ```ex``` - the exception map. This value holds some more information about the error that just occured.
+
+```
+> try {
+...  a=readFile("noSuchFile.txt")
+...  println(a)
+... } catch ex {
+...  println( ex.stack )
+...  println( "Fields of the exception map: " + toJsonString(ex) )
+... }
+Error: Can't read file: noSuchFile.txt error: Error: ENOENT: no such file or directory, open 'noSuchFile.txt'
+#(2)  a=readFile("noSuchFile.txt")
+   |....^
+
+Fields of the exception map: {"message":"Can't read file: noSuchFile.txt error: Error: ENOENT: no such file or directory, open 'noSuchFile.txt'","stack":"Error: Can't read file: noSuchFile.txt error: Error: ENOENT: no such file or directory, open 'noSuchFile.txt'\n#(2)  a=readFile(\"noSuchFile.txt\")\n   |....^\n","offset":9,"fileName":[null,"try {\n a=readFile(\"noSuchFile.txt\")\n println(a)\n} catch ex {\n println( ex.stack )\n println( \"Fields of the exception map: \" + toJsonString(ex) )\n}\n"]}
+
+```
+
+The fields of this variable
+
+- ex['message']   This field holds a message that describes the reason for the error
+- ex['stack']     This field is a string, it holds a message that describes the location in the program, where the error occured. If you got to that point by calling a sequence of functions, then it describes each of functions that have been called.
+- ex['offset']    The offset in the source file/text expression, where the error occured.
+- ex['fileName']  An array with two elements. First comes the file name where the error occured, then the text of that file.
+
+There is a third possible clause in a try/catch block - the ```finally``` statement - this block of statements is run in both the event of an error or if no error occured within the try block!
+
+
+### <a id='s-1-4-14' />Generators and the yield statement
+
+tbd
+
+## <a id='s-1-5' />Conclusion
 
 Or you can do all kinds of stuff, by putting togather all of this.
 

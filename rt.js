@@ -1184,6 +1184,40 @@ same as:
         arg[0].val.push(arg[1]);
         return arg[0];
     }),
+    "shift": new BuiltinFunctionValue(`
+> a=[1,2,3]
+[1,2,3]
+
+> shift(a)
+1
+
+> a
+[2,3]    
+`, 1,function(arg, frame) {
+        if (arg[0].type != TYPE_LIST) {
+            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
+        }
+        if (arg[0].val.length == 0) {
+            throw new RuntimeException("Can't pop from an empty list");
+        }
+        return arg[0].val.shift(arg[1]);
+    }),
+    "unshift": new BuiltinFunctionValue(`
+> a=[2,3]
+[2,3]
+
+> unshift(a,1)
+[1,2,3]
+
+> a
+[1,2,3]    
+`, 2, function(arg, frame) {
+        if (arg[0].type != TYPE_LIST) {
+            throw new RuntimeException("first argument: list argument required. is: " + typeName(arg[0]));
+        }
+        arg[0].val.unshift(arg[1]);
+        return arg[0];
+    }),
     "joinl": new BuiltinFunctionValue(`> joinl([1,2],[3,4])
 [1,2,3,4]`, 2,function(arg, frame) {
         if (arg[0].type != TYPE_LIST) {
@@ -1505,7 +1539,12 @@ setTrace(false)
 
 > eval("sqrt(2)")
 1.4142135623730951
-    
+
+> value=2
+2
+> eval("sqrt(value)")
+1.4142135623730951
+
 `, 1,function(arg, frame) {
         let script = value2Str(arg[0]);
         if (evalCallback != null) {
@@ -1607,7 +1646,24 @@ mathconst["log2e"]   # - base 2 logarithm of e
 mathconst["log10e"]  # - base 10 logarithm of e    
     `),
 
-    "ARGV" : new Value(TYPE_LIST, []),
+    "ARGV" : new Value(TYPE_LIST, [], `
+# array of command line parameters passed to the program.
+# you can pass command line parameter to the shell like this:
+
+pyx -- 1 2 3 4
+
+> ARGV
+["1","2","3","4"]
+
+# just the same if running a program
+
+pyx programFile.p -- 1 2 3 4
+
+# or just pass them after the file that contains a program
+
+pyx programFile.p 1 2 3 4
+    
+`),
 
     "ENV": new Value(TYPE_MAP,
         Object.entries(process.env).reduce(

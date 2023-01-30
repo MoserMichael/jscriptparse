@@ -9,17 +9,17 @@
 ## Input and output functions
 <a href='#s-26'>print</a>&nbsp;,&nbsp;<a href='#s-27'>println</a>&nbsp;,&nbsp;<a href='#s-28'>readFile</a>&nbsp;,&nbsp;<a href='#s-29'>rename</a>&nbsp;,&nbsp;<a href='#s-30'>unlink</a>&nbsp;,&nbsp;<a href='#s-31'>writeFile</a>
 ## Functions for arrays
-<a href='#s-32'>exists</a>&nbsp;,&nbsp;<a href='#s-33'>join</a>&nbsp;,&nbsp;<a href='#s-34'>joinl</a>&nbsp;,&nbsp;<a href='#s-15'>len</a>&nbsp;,&nbsp;<a href='#s-36'>map</a>&nbsp;,&nbsp;<a href='#s-37'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-38'>pop</a>&nbsp;,&nbsp;<a href='#s-39'>push</a>&nbsp;,&nbsp;<a href='#s-40'>range</a>&nbsp;,&nbsp;<a href='#s-41'>reduce</a>&nbsp;,&nbsp;<a href='#s-42'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-43'>sort</a>
+<a href='#s-32'>exists</a>&nbsp;,&nbsp;<a href='#s-33'>join</a>&nbsp;,&nbsp;<a href='#s-34'>joinl</a>&nbsp;,&nbsp;<a href='#s-15'>len</a>&nbsp;,&nbsp;<a href='#s-36'>map</a>&nbsp;,&nbsp;<a href='#s-37'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-38'>pop</a>&nbsp;,&nbsp;<a href='#s-39'>push</a>&nbsp;,&nbsp;<a href='#s-40'>range</a>&nbsp;,&nbsp;<a href='#s-41'>reduce</a>&nbsp;,&nbsp;<a href='#s-42'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-43'>shift</a>&nbsp;,&nbsp;<a href='#s-44'>sort</a>&nbsp;,&nbsp;<a href='#s-45'>unshift</a>
 ## Functions for maps
-<a href='#s-44'>each</a>&nbsp;,&nbsp;<a href='#s-32'>exists</a>&nbsp;,&nbsp;<a href='#s-46'>keys</a>&nbsp;,&nbsp;<a href='#s-36'>map</a>
+<a href='#s-46'>each</a>&nbsp;,&nbsp;<a href='#s-32'>exists</a>&nbsp;,&nbsp;<a href='#s-48'>keys</a>&nbsp;,&nbsp;<a href='#s-36'>map</a>
 ## Function for working with json/yaml
-<a href='#s-48'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-49'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-50'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-51'>toYamlString</a>
+<a href='#s-50'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-51'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-52'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-53'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-52'>exit</a>&nbsp;,&nbsp;<a href='#s-53'>sleep</a>&nbsp;,&nbsp;<a href='#s-54'>system</a>
+<a href='#s-54'>exit</a>&nbsp;,&nbsp;<a href='#s-55'>sleep</a>&nbsp;,&nbsp;<a href='#s-56'>system</a>
 ## Other functions
-<a href='#s-55'>help</a>&nbsp;,&nbsp;<a href='#s-56'>localtime</a>&nbsp;,&nbsp;<a href='#s-57'>setTrace</a>&nbsp;,&nbsp;<a href='#s-58'>time</a>&nbsp;,&nbsp;<a href='#s-59'>type</a>
+<a href='#s-57'>eval</a>&nbsp;,&nbsp;<a href='#s-58'>help</a>&nbsp;,&nbsp;<a href='#s-59'>localtime</a>&nbsp;,&nbsp;<a href='#s-60'>setTrace</a>&nbsp;,&nbsp;<a href='#s-61'>time</a>&nbsp;,&nbsp;<a href='#s-62'>type</a>
 ## Global variables
-<a href='#s-60'>ARGV</a>&nbsp;,&nbsp;<a href='#s-61'>ENV</a>&nbsp;,&nbsp;<a href='#s-62'>mathconst</a>
+<a href='#s-63'>ARGV</a>&nbsp;,&nbsp;<a href='#s-64'>ENV</a>&nbsp;,&nbsp;<a href='#s-65'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -568,6 +568,22 @@ same as:
 
 ```
 <a id='s-43'/>
+<hr>function: <b>shift</b>
+
+```python
+
+> a=[1,2,3]
+[1,2,3]
+
+> shift(a)
+1
+
+> a
+[2,3]    
+
+
+```
+<a id='s-44'/>
 <hr>function: <b>sort</b>
 
 ```python
@@ -584,7 +600,23 @@ same as:
 [["b",1],["a",100],["c",1000]]
 
 ```
-<a id='s-44'/>
+<a id='s-45'/>
+<hr>function: <b>unshift</b>
+
+```python
+
+> a=[2,3]
+[2,3]
+
+> unshift(a,1)
+[1,2,3]
+
+> a
+[1,2,3]    
+
+
+```
+<a id='s-46'/>
 <hr>function: <b>each</b>
 
 ```python
@@ -618,7 +650,7 @@ true
 false
 
 ```
-<a id='s-46'/>
+<a id='s-48'/>
 <hr>function: <b>keys</b>
 
 ```python
@@ -643,7 +675,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-48'/>
+<a id='s-50'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -653,7 +685,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-49'/>
+<a id='s-51'/>
 <hr>function: <b>parseYamlString</b>
 
 ```python
@@ -673,7 +705,7 @@ c:
     
 
 ```
-<a id='s-50'/>
+<a id='s-52'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -683,7 +715,7 @@ c:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-51'/>
+<a id='s-53'/>
 <hr>function: <b>toYamlString</b>
 
 ```python
@@ -699,7 +731,7 @@ c:
   - 3
 
 ```
-<a id='s-52'/>
+<a id='s-54'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -707,7 +739,7 @@ c:
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-53'/>
+<a id='s-55'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -717,7 +749,7 @@ sleep(3)
 
 
 ```
-<a id='s-54'/>
+<a id='s-56'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -746,7 +778,29 @@ var
 0
 
 ```
-<a id='s-55'/>
+<a id='s-57'/>
+<hr>function: <b>eval</b>
+
+```python
+
+
+# evaluate the string as a pyx program - in the current scope
+
+> eval("2*2")
+4
+
+> eval("sqrt(2)")
+1.4142135623730951
+
+> value=2
+2
+> eval("sqrt(value)")
+1.4142135623730951
+
+
+
+```
+<a id='s-58'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -761,7 +815,7 @@ help()
 
 
 ```
-<a id='s-56'/>
+<a id='s-59'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -772,7 +826,7 @@ help()
 
 
 ```
-<a id='s-57'/>
+<a id='s-60'/>
 <hr>function: <b>setTrace</b>
 
 ```python
@@ -785,14 +839,14 @@ setTrace(false)
 
 
 ```
-<a id='s-58'/>
+<a id='s-61'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-59'/>
+<a id='s-62'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -808,22 +862,38 @@ setTrace(false)
 "Closure"
 
 ```
-<a id='s-60'/>
+<a id='s-63'/>
 <hr>function: <b>ARGV</b>
 
 ```python
-{"type":4,"val":[]}
-List
+
+# array of command line parameters passed to the program.
+# you can pass command line parameter to the shell like this:
+
+pyx -- 1 2 3 4
+
+> ARGV
+["1","2","3","4"]
+
+# just the same if running a program
+
+pyx programFile.p -- 1 2 3 4
+
+# or just pass them after the file that contains a program
+
+pyx programFile.p 1 2 3 4
+    
+
 
 ```
-<a id='s-61'/>
+<a id='s-64'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-62'/>
+<a id='s-65'/>
 <hr>function: <b>mathconst</b>
 
 ```python

@@ -619,26 +619,37 @@ RTLIB={
 > a='123412342 piglet $%#@#$#@%'
 "123412342 piglet $%#@#$#@%"
 
-> r=/[a-z]+/
-"/[a-z]+/"
-
-> find(a,r)
+> find(a,/[a-z]+/)
 10
+
+# the third parameter is an optional offset to start search from.
+
+> find("a1 !! a1", "a1", 2)
+6
+
+> find("a1 !! a1", /[a-z0-9]+/, 2)
+6
 
 `, 3, function(arg) {
         let hay = value2Str(arg[0]);
-
-        if (arg[1].type == TYPE_REGEX) {
-            let matches = hay.search(arg[1].regex);
-            return new Value(TYPE_NUM, matches);
-        }
-
-        let needle = value2Str(arg[1]);
         let index = 0;
 
         if (arg[2] != null) {
             index = parseInt(value2Num(arg[2]));
         }
+
+        if (arg[1].type == TYPE_REGEX) {
+            if (index != 0) {
+                hay = hay.substring(index);
+            }
+            let matches = hay.search(arg[1].regex);
+            if (matches != -1) {
+                matches += index;
+            }
+            return new Value(TYPE_NUM, matches);
+        }
+
+        let needle = value2Str(arg[1]);
         let res = hay.indexOf(needle, index)
         return new Value(TYPE_NUM, res);
     }, [null, null, null]),

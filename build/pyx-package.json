@@ -3,7 +3,7 @@
   },
   "name": "pyxlang",
   "description": "educational scripting language / shell with read-eval-print loop",
-  "version": "0.0.9",
+  "version": "0.1.1",
   "devDependencies": {},
   "scripts": {
     "test": 
@@ -23,7 +23,7 @@
   ],    
   "dependencies": {
     "prscombinator": "0.0.2",
-    "YAML": "2.2.1"
+    "yaml": "^2.2.0"
   },
   "repository": {
     "type": "git",

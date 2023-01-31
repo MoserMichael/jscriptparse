@@ -1140,6 +1140,9 @@ var
 
 ```
 
+Both ```system``` and the backtick operator run the process in the default shell ( '/bin/sh' on Unix, process.env.ComSpec on Windows )
+Now the built-in variable ```ENV``` is a map, it stands for the environment variables. If you add or remove an entry in ```ENV``` then the changed environment variables will be passed to the processes that are run via ```system``` or the backtick operator.
+
 ### <a id='s-1-3-12' />working with structured data (json and yaml)
 
 let's say you have some structured string encoded as text in the [json](https://en.wikipedia.org/wiki/JSON) format.

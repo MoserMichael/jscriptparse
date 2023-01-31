@@ -982,7 +982,7 @@ You can also use regular expressions to modify text
 "Bear;Pooh ## Kanga;Roo ## Robin;Christopher "
 ```
 
-The regular expression  ```/([a-zA-Z]+),([a-zA-Z]+)/``` is matching any sequence of letters followed by a ```,```` and then followed by another sequence of letters.
+The regular expression  ```/([a-zA-Z]+),([a-zA-Z]+)/``` is matching any sequence of letters followed by a ```,``` and then followed by another sequence of letters.
 
 The third parameter to ```replacere``` is telling the function how to substitute a match, here we have ```$2:$1``` what does that mean?
 
@@ -1365,8 +1365,8 @@ The ```mygen``` function is called a generator function, because it has a ```yie
 
 ## <a id='s-1-5' />Conclusion
 
-Or you can do all kinds of stuff, by putting togather all of this.
+Now you can do all kinds of stuff, by putting togather all of this.
 
-Now I am wishing you lots of fun with the PYX programming language, may it be of use to you!
+We have reached the end of our story, now I am wishing you lots of fun with the PYX programming language, may it be of use to you!
 
 

@@ -215,6 +215,13 @@ function makeParserImp() {
             return [rt.makeConstValue(rt.TYPE_STR, arg)];
         }
     );
+    let backtickStringMidConst = prs.makeTransformer(
+        prs.makeRegexParser(/^}(\\\\.|[^`{])*{/, "string-const"),
+        function (arg) {
+            arg[0] = arg[0].slice(1, -1);
+            arg[0] = unquote( arg[0], arg[1]+1);
+            return rt.makeConstValue(rt.TYPE_STR, arg);
+        });
 
     let backtickStringStartConst = prs.makeTransformer(
         prs.makeRegexParser(/^`(\\\\.|[^`{])*{/, "backtick-string-const"),
@@ -372,7 +379,7 @@ function makeParserImp() {
             forwardExpr.forward(),
             prs.makeRepetitionParser(
                 prs.makeSequenceParser([
-                    formatStringMidConst,
+                    backtickStringMidConst,
                     forwardExpr.forward()
                 ]),
                 0
@@ -444,8 +451,8 @@ function makeParserImp() {
                     return rt.makeConstValue(rt.TYPE_STR, arg[1]);
                 }
             )
-        ]),
-    0, -1, "index expression");
+        ], "index expression"),
+    0, -1, "index expression list");
 
     let identifierWithOptIndex = prs.makeTransformer(
         prs.makeSequenceParser([
@@ -477,7 +484,7 @@ function makeParserImp() {
             arg[0] = Number(arg[0]);
             return rt.makeConstValue(rt.TYPE_NUM, arg);
         })
-    ]);
+    ], "signed number");
 
 
     let primaryExpr = prs.makeAlternativeParser(
@@ -537,7 +544,7 @@ function makeParserImp() {
         prs.makeTokenParser("<="),
         prs.makeTokenParser("<"),
         prs.makeTokenParser(">")
-    ])
+    ], "comparsion operator")
 
     let relationalExpression = prs.makeTransformer(
         prs.makeRepetitionRecClause(
@@ -553,7 +560,7 @@ function makeParserImp() {
     let equalityOperator = prs.makeAlternativeParser([
         prs.makeTokenParser("=="),
         prs.makeTokenParser("!=")
-    ])
+    ], "equality operator")
 
     let equalityExpression = prs.makeTransformer(
         prs.makeRepetitionRecClause(
@@ -571,7 +578,7 @@ function makeParserImp() {
             prs.makeSequenceParser([
                 prs.makeTokenParser("not"),
                 equalityExpression
-            ]),
+            ], "logical inversion"),
             function (arg) {
                 return rt.makeUnaryExpression(arg[1], arg[0]);
             }
@@ -598,7 +605,7 @@ function makeParserImp() {
     let expression = prs.makeAlternativeParser([
         logicalDisjunction,
         forwardLambdaFunctionDef.forward()
-    ])
+    ], "expression")
 
     forwardExpr.setInner(expression);
 
@@ -610,7 +617,7 @@ function makeParserImp() {
                 return rt.makeIdentifierRef(arg, null);
             }
         )
-    ]);
+    ], "left hand side of assignment");
 
     let assignLhs = prs.makeRepetitionRecClause(
         assignLhsSingle,

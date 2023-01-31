@@ -4,7 +4,7 @@ def getVersion( packageJsonFile ) {
     jsonFile = readFile( packageJsonFile ) 
     json = parseJsonString(jsonFile)
     ver = json['version']
-    println("version: {ver} specified in {jsonFile}")
+    println("version: {ver}")
 
     return ver
 }
@@ -22,9 +22,9 @@ def copyAndReplace(oldName, newName) {
 
     pyxFile = readFile(oldName)
 
-    pyxFile = replace(pyxFile, "VERSION_TAG", version);
+    pyxFile = replace(pyxFile, "VERSION_TAG", version)
     pyxFile = replace(pyxFile, 'const prs=require(path.join(__dirname,"prs.js"))','const prs=require("prscombinator")')
-    pyxFile = replace(pyxFile, "NODE_PATH=.", "");
+    pyxFile = replace(pyxFile, "NODE_PATH=.", "")
 
     writeFile(newName, pyxFile)
 }
@@ -37,11 +37,11 @@ def prepareAndPublish(version) {
     system("mkdir tmp-publish")
     
 
-    copyAndReplace("rt.js", "./tmp_publish/rt.js")
-    copyAndReplace("scripty.js", "./tmp_publish/scripty.js")
-    copyAndReplace("pyx", "./tmp_publish/pyx")
+    copyAndReplace("rt.js", "./tmp-publish/rt.js")
+    copyAndReplace("scripty.js", "./tmp-publish/scripty.js")
+    copyAndReplace("pyx", "./tmp-publish/pyx")
 
-    system("chmod +x ./tmp_publish/pyx")
+    system("chmod +x ./tmp-publish/pyx")
     system("cp PYXDESIGN.md	tmp-publish/")
     system("cp PYXFUNC.md	tmp-publish/") 
     system("cp PYXTUT.md	tmp-publish/")
@@ -56,8 +56,8 @@ def prepareAndPublish(version) {
  
 def publish() {
     version = getVersion("build/pyx-package.json")
-    makeTag(version)
     prepareAndPublish(version)
+    makeTag(version)
     println("version: {version} has been published to npm")
 }
 

@@ -35,8 +35,10 @@ let tracePrompt = "+ ";
 
 function setTraceMode(on) {
     traceMode = on;
-
 }
+
+// if set - throw exception if executing a process fails / returns error status
+let errorOnExecFail = false;
 
 // doesn't seem to make a difference...
 /*
@@ -580,6 +582,9 @@ function _system(cmd, frame) {
         status = 1;//e.status;
         out = e.message;
     }
+    if (status && errorOnExecFail) {
+        throw new RuntimeException("failed to run `" + cmd + "` : " + out );
+    }
     let val = [ new Value(TYPE_STR, out), new Value(TYPE_NUM, status) ];
     return new Value(TYPE_LIST, val);
 }
@@ -771,12 +776,11 @@ RTLIB={
 
 # Regular expressions
 
-> a="Rooh : Kanga :: Piglet ::: Pooh"
-"Rooh : Kanga :: Piglet ::: Pooh"
-> z=/:+/
-"/:+/"
-> split(a,z)
-["Rooh "," Kanga "," Piglet "," Pooh"]
+> a="Roo : Kanga :: Piglet ::: Pooh"
+"Roo : Kanga :: Piglet ::: Pooh"
+
+> split(a, /:+/)
+["Roo "," Kanga "," Piglet "," Pooh"]
 
 `, 2,function *(arg, frame) {
         let hay = value2Str(arg[0]);
@@ -822,9 +826,11 @@ RTLIB={
 "x b x c a d"
 `, 4, function(arg) {
         let hay = value2Str(arg[0]);
+
         let needle = value2Str(arg[1]);
         let newNeedle = value2Str(arg[2]);
         let numTimes = 1;
+
 
         if (arg[3] != null) {
             numTimes = parseInt(value2Num(arg[3]));
@@ -844,6 +850,57 @@ RTLIB={
         return new Value(TYPE_STR, retVal);
     }, [null, null, null, null]),
 
+
+    "replacere": new BuiltinFunctionValue(`
+    
+> text="Pooh,Bear ## Roo,Kanga ## Christopher,Robin "
+"Pooh,Bear ## Roo,Kanga ## Christopher,Robin "
+
+> replacere(text, /([a-zA-Z]+),([a-zA-Z]+)/, "$2,$1")
+"Bear,Pooh ## Roo,Kanga ## Christopher,Robin "
+
+> replacere(text, /([a-zA-Z]+),([a-zA-Z]+)/, "$2,$1", 1)
+"Bear,Pooh ## Roo,Kanga ## Christopher,Robin "
+
+> replacere(text, /([a-zA-Z]+),([a-zA-Z]+)/, "$2,$1", -1)
+"Bear,Pooh ## Kanga,Roo ## Robin,Christopher "
+
+> replacere(text, /([a-zA-Z]+),([a-zA-Z]+)/, "$2,$1", 2)
+"Bear,Pooh ## Kanga,Roo ## Christopher,Robin "
+    
+`, 4, function(arg) {
+        let hay = value2Str(arg[0]);
+
+        if (arg[1].type != TYPE_REGEX) {
+            throw new RuntimeException("Second argument must be a regular expression");
+        }
+
+        let needle = arg[1].regex;
+        let newNeedle = value2Str(arg[2]);
+        let numTimes = 1;
+
+        if (arg[3] != null) {
+            numTimes = parseInt(value2Num(arg[3]));
+        }
+
+        let retVal = "";
+        for(;;numTimes -= 1) {
+
+            let ret = hay.match(needle)
+            if (ret == null || numTimes == 0) {
+                retVal += hay;
+                break;
+            }
+
+            retVal += hay.substring(0, ret['index']);
+            retVal += ret[0].replace(needle, newNeedle )
+
+            // prepare next iteration
+            let posAfterMatch = ret['index'] + ret[0].length;
+            hay = hay.substring(posAfterMatch);
+        }
+        return new Value(TYPE_STR, retVal);
+    }, [null, null, null, null]),
 
 // Numeric functions
     "int": new BuiltinFunctionValue(`> int("123")
@@ -1593,6 +1650,25 @@ setTrace(false)
         return VALUE_NONE;
     }),
 
+    "setErrorOnExecFail": new BuiltinFunctionValue(`
+# when set: throw exception if running a process failed 
+setErrorOnExecFail(true)
+> setErrorOnExecFail(true)
+
+> system("false")
+Error: failed to run \`false\` : Command failed: false
+#(1) system("false")
+   |.^
+
+> \`false\`
+Error: failed to run \`false\` : Command failed: false
+#(1) \`false\`
+   |.^
+`, 1,function(arg, frame) {
+        errorOnExecFail = value2Bool(arg[0]);
+        return VALUE_NONE;
+    }),
+
     "eval": new BuiltinFunctionValue(`
 
 # evaluate the string as a pyx program - in the current scope
@@ -1607,6 +1683,12 @@ setTrace(false)
 2
 > eval("sqrt(value)")
 1.4142135623730951
+
+> def pythagoras(x,y) sqrt(pow(x,2)+pow(y,2))
+"<function>"
+
+> eval("pythagoras(3,4)")
+5
 
 `, 1,function(arg, frame) {
         let script = value2Str(arg[0]);

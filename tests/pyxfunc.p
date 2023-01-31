@@ -10,7 +10,7 @@ funcCats = [
  },
  {
   "name": "Functions for regular expressions",
-  "func": [ "find", "split", "match", "matchAll" ]
+  "func": [ "find", "split", "match", "matchAll", "replacere" ]
  },
  {
    "name": "Input and output functions",
@@ -29,7 +29,7 @@ funcCats = [
    "func": [ "system", "exit", "sleep" ]
  },
  { "name": "Other functions",
-   "func": [ "help", "type", "time", "localtime", "setTrace", "eval" ]
+   "func": [ "help", "type", "time", "localtime", "setTrace", "setErrorOnExecFail", "eval" ]
  },
  { "name": "Global variables",
     "func": [ "mathconst", "ARGV", "ENV" ]

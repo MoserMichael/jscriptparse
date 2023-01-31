@@ -29,6 +29,8 @@
 
 
 
+
+
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
 ## <a id='s-1-1' />First steps
@@ -935,8 +937,79 @@ Or replace the first two occurances like this:
 ### <a id='s-1-3-10' />Regular expressions
 
 Sometimes you don't want to find an exact string, instead it is possible to specify a pattern that can match a multitude of possible text values.
+A regular expression describes a text pattern, you can do some neat tricks with these patterns.
 
-TBD /lots of words to explain the concept. have to think about that/
+The most simple kind of pattern looks like this ```/Pooh/``` - it matches the string ```Pooh```
+
+```
+> text="So Winnie-the-Pooh went round to his friend Christopher Robin, who lived behind a green door in another part of the forest."
+"So Winnie-the-Pooh went round to his friend Christopher Robin, who lived behind a green door in another part of the forest."
+
+> match(text,/Pooh/)
+[14,"Pooh"]
+```
+
+The function ```match``` is searching for the regular expression /Pooh/ - and returns the first match, which is at position 14 within the text.
+
+Now You can also search for Either Pooh or Christopher like this:
+
+```
+> matchAll(text,/Pooh|Christopher/)
+[[14,"Pooh"],[44,"Christopher"]]
+
+```
+The regular expression  ```/Pooh|Christopher/``` matches either the string ```Pooh``` or the string ```Christopher```, the function ```matchAll``` returns all matches of the regular expression, for each match you get an array with the position of the entry and the text of the match.
+
+
+```
+> text="asdasd pooh12 aa pooh3423 eee"
+"asdasd pooh12 aa pooh3423 eee"
+
+> matchAll(text,/pooh[0-9]+/)
+[[7,"pooh12"],[17,"pooh3423"]]
+
+```
+
+The regular expression ```/pooh[0-9]+/``` is matching the string ```pooh``` that must be followed by one or more digits. ```[0-9]``` matches any digit (any character in the range of 0123456789) and ```[0-9]+``` means that one or more digits are matched.
+
+You can also use regular expressions to modify text
+
+```
+ text="Pooh,Bear ## Roo,Kanga ## Christopher,Robin "
+"Pooh,Bear ## Roo,Kanga ## Christopher,Robin "
+
+> replacere(text, /([a-zA-Z]+),([a-zA-Z]+)/, "$2;$1", -1)
+"Bear;Pooh ## Kanga;Roo ## Robin;Christopher "
+```
+
+The regular expression  ```/([a-zA-Z]+),([a-zA-Z]+)/``` is matching any sequence of letters followed by a ```,```` and then followed by another sequence of letters.
+
+The third parameter to ```replacere``` is telling the function how to substitute a match, here we have ```$2:$1``` what does that mean?
+
+Now look at the group ```([a-zA-Z]+)``` - the parenthesis mean that this is a group, a sub-expression. The first occurence is referred to as ```$1``` in the replacement string, while the second group is ```$2``` - the replacement string swaps the first and the second group, and places a ```:``` character between them! 
+
+
+You can use regular expression to split up a text into pieces
+
+```
+> text="Roo : Kanga :: Piglet ::: Pooh"
+"Roo : Kanga :: Piglet ::: Pooh"
+
+> split(text, /:+/)
+["Roo "," Kanga "," Piglet "," Pooh"]
+````
+
+Here the function ```split``` is taken the  input text, and splitting it up. The delimiter between the pieces is ```/:+/``` - any sequence of ```:``` characters
+
+```
+> split(text, /\s*:+\s*/)
+["Roo","Kanga","Piglet","Pooh"]
+```
+
+Now here the delimiter is a bit more complicated: ```/\s*:+\s*/``` - it is a sequence of zero or more whitespace characters.
+Let's look at ```\s*``` , here ```\s``` is standing for a whitespace character and the ```*``` suffix means zero or more of these
+```:+``` means one or more ```:``` characters.
+
 
 ### <a id='s-1-3-11' />Running processes
 

@@ -9,6 +9,7 @@ const scr=require(path.join(__dirname,"scripty.js"));
 const prs=require(path.join(__dirname,"prs.js"));
 const fs=require("fs");
 
+const PYX_VERSION = "VERSION_TAG";
 
 let history_file_name = "pyx_history";
 let nodejsRepl = null;
@@ -215,6 +216,18 @@ function evalFile(file, cmdLine) {
     process.exit(result);
 }
 
+function showVersion() {
+    console.log("This is pyx version " + PYX_VERSION + `
+
+Copyright 2023 by Michael Moser
+Published under the MIT license
+
+For more information see: https://github.com/MoserMichael/jscriptparse
+
+`);
+    process.exit(1);
+}
+
 function printHelp() {
     console.log(`pyx [-h] [-x]  [-e 'println("hello world")'] [<file>]  [[--] <command line parameters>]]
 
@@ -244,6 +257,8 @@ function parseCmdLine() {
     for(;i<process.argv.length;i++) {
         if (process.argv[i] == '-h') {
             printHelp();
+        } else if (process.argv[i] == '-v') { 
+            showVersion(); 
         } else if (process.argv[i] == '--') {
             break;
         } else if (process.argv[i] == '-e') {

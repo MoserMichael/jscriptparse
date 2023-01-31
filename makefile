@@ -9,7 +9,7 @@ publish-prs:
 
 .PHONY: publish-pyx
 publish-pyx:
-		./build/publish-pyx.sh			
+		./pyx ./build/publish-pyx.p			
 
 .PHONY: docs2
 docs2:

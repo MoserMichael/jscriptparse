@@ -56,8 +56,8 @@ def prepareAndPublish(version) {
  
 def publish() {
     version = getVersion("build/pyx-package.json")
-    prepareAndPublish(version)
     makeTag(version)
+    prepareAndPublish(version)
     println("version: {version} has been published to npm")
 }
 

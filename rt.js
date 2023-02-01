@@ -169,7 +169,6 @@ class RegexValue {
 let VALUE_NONE=new Value(TYPE_NONE,null);
 
 function typeName(val) {
-    console.log(JSON.stringify(val));
     if (val.type == null) {
         console.trace("Not a runtime value!" + JSON.stringify(val));
         return "not a runtime value!";
@@ -2327,24 +2326,53 @@ MAP_OP_TO_FUNC={
         if (lhs.type != rhs.type) {
             throw new RuntimeException("Can't add " + typeName(lhs) + " to " + typeName(rhs));
         }
-        return new Value(lhs.type, lhs.val + rhs.val);
+        if (lhs.type == TYPE_STR || lhs.type == TYPE_NUM) {
+            /* allow add for strings - this concats the string values */
+            return new Value(lhs.type, lhs.val + rhs.val);
+        }
+        if (lhs.type == TYPE_LIST) {
+            // concat lists
+            return new Value(TYPE_LIST, lhs.val.concat(rhs.val));
+        }
+
+        throw new RuntimeException("Can't add " + typeName(lhs) + " to " + typeName(rhs));
     },
     "-" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't subtract " + typeName(lhs) + " to " + typeName(rhs) );
+            throw new RuntimeException("Can't subtract " + typeName(rhs) + " from " + typeName(lhs) );
+        }
+        if (lhs.type != TYPE_NUM) {
+            throw new RuntimeException("need number types for substraction" );
+
         }
         return new Value(lhs.type, lhs.val - rhs.val);
     },
     "*" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
+
+        if (lhs.type != rhs.type) {
+            throw new RuntimeException("Can't multiply " + typeName(lhs) + " with " + typeName(rhs));
+        }
+        if (lhs.type != TYPE_NUM) {
+            throw new RuntimeException("need number types for multiplication" );
+        }
+
         return new Value(TYPE_NUM, value2Num(lhs) * value2Num(rhs));
     },
     "/" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
+
+        if (lhs.type != rhs.type) {
+            throw new RuntimeException("Can't divide " + typeName(lhs) + " by " + typeName(rhs) );
+        }
+        if (lhs.type != TYPE_NUM) {
+            throw new RuntimeException("need number types for division" );
+        }
+
         let rhsVal = value2Num(rhs);
         if (rhsVal == 0) {
             // javascript allows to divide by zero, amazing.
@@ -2355,6 +2383,15 @@ MAP_OP_TO_FUNC={
     "%" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
+
+        if (lhs.type != rhs.type) {
+            throw new RuntimeException("Can't divide modulo " + typeName(lhs) + " by " + typeName(rhs) );
+        }
+
+        if (lhs.type != TYPE_NUM) {
+            throw new RuntimeException("need number types for modulo division" );
+        }
+
         let rhsVal = value2Num(rhs);
         if (rhsVal == 0) {
             // javascript allows to divide by zero, amazing.

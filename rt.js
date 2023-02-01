@@ -40,6 +40,11 @@ function setTraceMode(on) {
 // if set - throw exception if executing a process fails / returns error status
 let errorOnExecFail = false;
 
+function setErrorOnExecFail(on) {
+    errorOnExecFail = on;
+}
+
+
 // doesn't seem to make a difference...
 /*
 let evalForceStop = false;
@@ -1966,7 +1971,7 @@ class AstStmtList extends AstBase {
     eval(frame) {
         let val = VALUE_NONE;
 
-        if (traceMode && this.skipTrace) {
+        if (traceMode && !this.skipTrace && this.statements.length > 1) {
             process.stderr.write(tracePrompt + "{\n");
         }
 
@@ -1982,7 +1987,7 @@ class AstStmtList extends AstBase {
             }
         }
 
-        if (traceMode && !this.skipTrace) {
+        if (traceMode && !this.skipTrace && this.statements.length > 1) {
             process.stderr.write(tracePrompt + "}\n");
         }
 
@@ -3392,6 +3397,7 @@ if (typeof(module) == 'object') {
         setCurrentSourceInfo,
         //setForceStopEval,
         setTraceMode,
+        setErrorOnExecFail,
         rtValueToJsVal,
         isBreakOrContinue,
         isReturnOrYield,

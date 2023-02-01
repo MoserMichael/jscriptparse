@@ -99,7 +99,7 @@ function isSyntaxErrorDueToStringNotClosed(pos, data, glob) {
 
 function runEvalLoop(cmdLine) {
 
-    let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '(', '}' ];
+    let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '(', '}', '.' ];
     sym = sym.concat( Object.keys(scr.KEYWORDS) );
 
     let runEvalImp = function() {
@@ -149,6 +149,71 @@ function runEvalLoop(cmdLine) {
             callback(null,evalPrintMsg);
         }
 
+        let tryToCompleteMapKey = function(line, dotIndex) {
+            let lastToken = "";
+            let lastDot = line.lastIndexOf(".");
+            if (lastDot != -1)
+                lastToken = line.substring(lastDot+1).trim()
+
+            // search back to the first term - the name of the map.
+            let index = -1;
+            for(let i=0; i<sym.length; ++i) {
+                if (sym[i] != ".") {
+                    let lastIndex = line.lastIndexOf(sym[i]) ;
+                    if (lastIndex != -1) {
+                        lastIndex += sym[i].length;
+
+                        if (lastIndex > index) {
+                            index = lastIndex;
+                        }
+                    }
+                }
+            }
+
+            // find start of map variable
+            if (index == -1) {
+                index = 0;
+            } else {
+                for(;prs.isSpace(line[index]); index += 1);
+            }
+
+            // now evaluate the map (tricky part)
+            let val = null;
+            let isFirst = true;
+
+            while(index != lastDot) {
+                let nextIndex = line.indexOf(".", index)
+                if (nextIndex == -1) {
+                    return null;
+                }
+                let sval = line.substring(index, nextIndex).trim();
+
+                if (isFirst) {
+                    val = glob.lookup(sval);
+                } else {
+                    val = val.val[ sval ];
+                }
+
+                if (val == null || val.type != rt.TYPE_MAP) {
+                    return null;
+                }
+                if (nextIndex == dotIndex) {
+                    break;
+                }
+                index = nextIndex + 1;
+            }
+
+            // now try to complete it.
+            let keys = Object.keys(val.val)
+            let comp = [];
+            for(let i=0; i< keys.length;++i) {
+                if (lastToken == "" || keys[i].startsWith(lastToken)) {
+                    comp.push(keys[i]);
+                }
+            }
+            return comp;
+        }
+
         let doComplete = function(line) {
 
             let index = -1;
@@ -165,6 +230,13 @@ function runEvalLoop(cmdLine) {
             let lastToken = "";
             if (index != -1) {
                 lastToken = line.substring(index);
+                if (line[index-1] == '.') {
+                    // try to complete map keysddddDD
+                    let mapCompletion = tryToCompleteMapKey(line, index-1 )
+                    if (mapCompletion != null) {
+                        return [ mapCompletion, lastToken.trim() ]
+                    }
+                }
             } else {
                 lastToken = line;
             }
@@ -229,7 +301,7 @@ For more information see: https://github.com/MoserMichael/jscriptparse
 }
 
 function printHelp() {
-    console.log(`pyx [-h] [-x]  [-e 'println("hello world")'] [<file>]  [[--] <command line parameters>]]
+    console.log(`pyx [-x] [-f] [-e 'println("hello world")'] [<file>]  [[--] <command line parameters>]] [-h] [-v]
 
 pyx          : Starts shell/repl when run without command line arguments
 
@@ -239,6 +311,10 @@ pyx -e 'val' : run the string 'val' as a pyx program (one liner)
                You can have several options, they are run one after the other.
 
 -x           : set trace mode (statement evaluation is traced)
+
+-f           : throw and exception, if shelling out to command via system or backtick fails 
+
+-v           : show version
 
 -h           : show this help text   
     `);
@@ -250,6 +326,7 @@ function parseCmdLine() {
         fileName: null,
         cmdLine: null,
         traceMode: false,
+        errorOnExecFail: false,
         expression: null
     };
 
@@ -273,6 +350,8 @@ function parseCmdLine() {
 
         } else if (process.argv[i] == '-x') {
             ret.traceMode = true;
+        } else if (process.argv[i] == '-f') {
+            ret.errorOnExecFail = true
         } else {
             ret.fileName = process.argv[i];
             i += 1;
@@ -302,6 +381,9 @@ function runMain() {
 
     if (cmd.traceMode) {
         rt.setTraceMode(true);
+    }
+    if (cmd.errorOnExecFail) {
+        rt.setErrorOnExecFail( true);
     }
 
     if (cmd.fileName == null && cmd.expression == null) {

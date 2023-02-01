@@ -31,6 +31,8 @@
 
 
 
+
+
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
 ## <a id='s-1-1' />First steps
@@ -737,7 +739,7 @@ hello
 Now there is also a second form of writing text constants: with the ```"``` character. 
 Now this form is very different from the previous form. This one is used for writing reports.
 
-You can have sections within the characters ```{```` and ```}``` - these refer to variables in the program. 
+You can have sections within the characters ```{``` and ```}``` - these refer to variables in the program. 
 If this is text is used in a program, then you will see the the following:
 
 ```
@@ -845,6 +847,16 @@ Or you can turn a text string into an integer
 > int('12345')
 12345
 ```
+
+Thie can also be used to round floating point values to integers
+
+```
+> int(3.1415)
+3
+> int("3.1415")
+3
+```
+
 A text string that starts with 0x counts as a hexadecimal number (with base 16)
 
 ```
@@ -1010,6 +1022,7 @@ Now here the delimiter is a bit more complicated: ```/\s*:+\s*/``` - it is a seq
 Let's look at ```\s*``` , here ```\s``` is standing for a whitespace character and the ```*``` suffix means zero or more of these
 ```:+``` means one or more ```:``` characters.
 
+There are a few more options for regular expression, Please see this [Regualar expression cheatsheet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet) (The explanation in the link is relevant for javascript as well as the PYX language)
 
 ### <a id='s-1-3-11' />Running processes
 

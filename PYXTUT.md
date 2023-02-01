@@ -39,7 +39,7 @@
 
 ### <a id='s-1-1-1' />Installation
 
-First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/)
+First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/) (also see Instruction for installing [node.js on Linux](https://nodejs.org/en/download/package-manager/#centos-fedora-and-red-hat-enterprise-linux) )
 
 Now, from the command line: Install the pyx shell with the following command 
 

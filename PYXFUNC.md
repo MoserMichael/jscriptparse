@@ -171,11 +171,16 @@ returns the tangent of a number in radians
 > a='123412342 piglet $%#@#$#@%'
 "123412342 piglet $%#@#$#@%"
 
-> r=/[a-z]+/
-"/[a-z]+/"
-
-> find(a,r)
+> find(a,/[a-z]+/)
 10
+
+# the third parameter is an optional offset to start search from.
+
+> find("a1 !! a1", "a1", 2)
+6
+
+> find("a1 !! a1", /[a-z0-9]+/, 2)
+6
 
 
 
@@ -323,11 +328,16 @@ text="a b a c a d"
 > a='123412342 piglet $%#@#$#@%'
 "123412342 piglet $%#@#$#@%"
 
-> r=/[a-z]+/
-"/[a-z]+/"
-
-> find(a,r)
+> find(a,/[a-z]+/)
 10
+
+# the third parameter is an optional offset to start search from.
+
+> find("a1 !! a1", "a1", 2)
+6
+
+> find("a1 !! a1", /[a-z0-9]+/, 2)
+6
 
 
 

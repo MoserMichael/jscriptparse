@@ -34,11 +34,13 @@ def isMatchingParenthesis(input) {
     return len(stack) == 0
 }
 
-def check(input, expected)
+def check(input, expected) {
     if isMatchingParenthesis(input) != expected {
         println("Error: input: {input} expected: {expected}")
         exit(1)
     }
+    println("Passed: {input} expected: {expected}")
+}
 
 check('()', true)
 check('()[]{}', true)
@@ -46,6 +48,7 @@ check('(]', false)
 check('{[(]',false)
 check('{[()]', false)
 check('{[()]}', true)
+check('{[()]}(', false)
 
 println("all tests passed")
  

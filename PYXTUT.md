@@ -20,8 +20,14 @@
   * [Even more language features](#s-1-4)
     * [Error handling with exceptions](#s-1-4-13)
     * [Generators and the yield statement](#s-1-4-14)
-  * [Conclusion](#s-1-5)
+  * [Input and output](#s-1-5)
+    * [reading/writing files](#s-1-5-15)
+    * [HTTP clients](#s-1-5-16)
+    * [HTTP servers](#s-1-5-17)
+  * [Conclusion](#s-1-6)
 <!-- toc-end -->
+
+
 
 
 
@@ -1398,8 +1404,21 @@ Now ```mygen``` is passing a number the ```for``` loop via the ```yield n``` sta
 
 The ```mygen``` function is called a generator function, because it has a ```yield``` statement. Note that ```mygen``` can't call another function that does the ```yield``` statement, this statement has to be in the generator function itself, in the top level of the generator function.
 
+## <a id='s-1-5' />Input and output
 
-## <a id='s-1-5' />Conclusion
+### <a id='s-1-5-15' />reading/writing files
+
+tbd
+
+### <a id='s-1-5-16' />HTTP clients
+
+tbd
+
+### <a id='s-1-5-17' />HTTP servers
+
+tbd
+
+## <a id='s-1-6' />Conclusion
 
 Now you can do all kinds of stuff, by putting togather all of this.
 

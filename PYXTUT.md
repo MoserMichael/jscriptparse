@@ -269,6 +269,43 @@ s(       sin(     sort(    split(   sqrt(    str(     system(
 
 if you type ```si tab tab``` then there is only one function sin(  - so it will just put sin( at the place where you are typing. Believe me, that's a big time saver!
 
+There are other shortcuts in the shell:
+
+<table width='100%'>
+<tr>
+    <th>
+        Shortcut 
+    </th>
+    <th>
+         What it does 
+    </th>
+<tr>
+<tr>
+    <td>
+         Ctrl-a
+    </td>
+    <td>
+         Jump to the beginning of the current line 
+    </td>
+</tr>
+<tr>
+    <td>
+         Ctrl-e
+    </td>
+    <td>
+         Jump to the end of the current line 
+    </td>
+</tr>
+<tr>
+    <td>
+         Ctrl-r
+    </td>
+    <td>
+        Search backwords through the command history
+    </td>
+</tr>
+</table>
+
 ### <a id='s-1-1-3' />Running programs
 
 You can store a sequence of commands in a file lets save the following text in the file named ```p.p```

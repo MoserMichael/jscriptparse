@@ -59,6 +59,8 @@
 
 
 
+
+
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
 ## <a id='s-1-1' />First steps
@@ -1408,15 +1410,23 @@ The ```mygen``` function is called a generator function, because it has a ```yie
 
 ### <a id='s-1-5-15' />reading/writing files
 
-tbd
+tbd 
+
+Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
 
 ### <a id='s-1-5-16' />HTTP clients
 
 tbd
 
+Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
+
+
 ### <a id='s-1-5-17' />HTTP servers
 
 tbd
+
+Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
+
 
 ## <a id='s-1-6' />Conclusion
 

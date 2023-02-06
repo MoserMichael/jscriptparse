@@ -1,6 +1,8 @@
 
-What's in an object?
+python can  tell you the id of an object  - builtin id(any_value); with javascript had that...
+    
 
+What's in an object?
 
     node
     Welcome to Node.js v19.2.0.

@@ -1,8 +1,10 @@
 const path=require("node:path");
-const fs=require("fs");
+const fs=require("node:fs");
 const cp=require("node:child_process");
-const prs=require(path.join(__dirname,"prs.js"));
+const http = require('node:http');
+const url = require('node:url');
 const yaml=require("yaml");
+const prs=require(path.join(__dirname,"prs.js"));
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
@@ -13,7 +15,6 @@ let evalCallback = null;
 function setEvalCallback(cb) {
     evalCallback = cb;
 }
-
 
 // the file that is being parsed right now. Can't pass that around.
 // Should be thread local, or something like this.
@@ -220,6 +221,10 @@ function value2StrDisp(val) {
     return rtValueToJson(val);
 }
 function jsValueToRtVal(value) {
+    if (value == null) {
+        return VALUE_NONE;
+    }
+
     if (Array.isArray(value)) {
         let rt = [];
         for(let i=0; i<value.length; ++i) {
@@ -605,6 +610,100 @@ function * genValues(val) {
             yield new Value(TYPE_LIST, yval);
         }
     }
+}
+
+let fooId =1;
+
+function makeHttpCallbackInvocationParams(httpReq, httpRes) {
+
+    let req_ = new Value(TYPE_MAP, {
+
+        'url_' : new Value(TYPE_STR, httpReq.url),
+
+        'url' : new BuiltinFunctionValue(``, 0, function() {
+            return new Value(TYPE_STR,  httpReq.url );
+        }),
+
+        'method' : new BuiltinFunctionValue(``, 0, function() {
+            return new Value(TYPE_STR, httpReq.method );
+        }),
+        'query' : new BuiltinFunctionValue(``, 0, function() {
+            return jsValueToRtVal(httpReq.query);
+        }),
+        'headers' : new BuiltinFunctionValue(``, 0, function() {
+            return new jsValueToRtVal(httpReq.headers);
+        }),
+        'header' : new BuiltinFunctionValue(``, 1, function(arg) {
+            let name = value2Str(arg[0]);
+            let val = httpReq.headers[name.toLowerCase()];
+            return new jsValueToRtVal(val);
+        }),
+    });
+
+    let res_ = new Value(TYPE_MAP, {
+
+        'setHeader': new BuiltinFunctionValue(``, 2, function(arg) {
+            let name = arg[0];
+            let value = arg[1];
+
+            httpRes.setHeader(value2Str(name), rtValueToJsVal(value.val));
+            return VALUE_NONE;
+        }),
+
+        'send': new BuiltinFunctionValue(``,3, function(arg) {
+
+            let code = arg[0];
+            let textResponse = value2Str(arg[1]);
+            let contentType = "text/plain"
+
+            if (code.type != TYPE_NUM) {
+                throw new RuntimeException("first argument: expected number")
+            }
+
+            if (arg[2] != null) {
+                contentType = value2Str(arg[2]);
+            }
+
+            let respHeader = {};
+
+            if (httpRes.getHeader("Content-Length") == null) {
+                respHeader['Content-length'] = textResponse.length.toString();
+            }
+            if (httpRes.getHeader("Content-Type") == null) {
+                respHeader['Content-Type'] = contentType;
+            }
+
+            //console.log("status: " + code.val + " resp-hdr: " + JSON.stringify(respHeader));
+
+            httpRes.writeHead(parseInt(code.val), respHeader);
+            httpRes.write(textResponse);
+            httpRes.end();
+            //httpRes.end(textResponse);
+
+            //console.log("eof send: " + textResponse);
+            return VALUE_NONE;
+        }, [null, null, null])
+    });
+
+
+    return [ req_, res_ ];
+}
+
+function makeHttpServerListener(callback, frame) {
+    return function (req, res) {
+
+        // this one is evaluated from another task. runtime exceptions need to be handled here
+        try {
+            let vargs =  makeHttpCallbackInvocationParams(req,res);
+            evalClosure("", callback, vargs, frame);
+        } catch(er) {
+            if (er instanceof RuntimeException) {
+                er.showStackTrace(true);
+            } else {
+                throw er;
+            }
+        }
+    };
 }
 
 // the runtime library is defined here
@@ -1052,7 +1151,6 @@ RTLIB={
         return new Value(TYPE_NUM, Math.pow(pow,exp));
     }),
     "random" : new BuiltinFunctionValue(`# returns random number with value between 0 and 1
-
 > random()
 0.8424952895811049
 `, 0, function(arg) {
@@ -1081,6 +1179,7 @@ RTLIB={
             throw new RuntimeException("Can't read file: " + fname + " error: " + err);
         };
     }),
+    
     "writeFile" : new BuiltinFunctionValue(`
 # write string parameter into text file
 
@@ -1771,6 +1870,100 @@ number: 3`, 3,function *(arg, frame) {
         return new Value(TYPE_MAP, retMap);
     }, [null]),
 
+    "httpSend": new BuiltinFunctionValue(``, 3, function(arg, frame) {
+        let options  = null
+        let httpMethod = 'GET';
+        let httpHeaders = {};
+        let httpRequestData = null;
+        let callback = null;
+        let surl = value2Str(arg[0]);
+
+        if (arg[1] != null && arg[1].type != TYPE_NONE) {
+            if (arg[1].type != TYPE_MAP) {
+                throw new RuntimeException("Second argument must be a map");
+            }
+            options = rtValueToJsVal(arg[1]);
+
+            if ('method' in options) {
+                httpMethod = options['method'];
+            }
+            if ('headers' in options) {
+                httpHeaders = options['headers'];
+            }
+            if ('data' in options) {
+                httpRequestData = options['data'];
+            }
+        }
+
+        if (arg[2] == null || arg[2].type != TYPE_CLOSURE) {
+            throw new RuntimeException("Third argument must be a function");
+        }
+        callback = arg[2];
+
+        let urlObj = new url.URL(surl);
+
+        let requestOptions = {
+            protocol: urlObj.protocol,
+            hostname: urlObj.hostname,
+            port: parseInt(urlObj.port),
+            path: urlObj.pathname,
+            method: httpMethod
+        };
+
+        let callUserFunction = function(data, error) {
+            // this one is evaluated from another task. runtime exceptions need to be handled here
+            let varg = [ new Value(TYPE_STR,data), error ];
+
+            try {
+                evalClosure("", callback, varg, frame);
+            } catch(er) {
+                if (er instanceof RuntimeException) {
+                    er.showStackTrace(true);
+                } else {
+                    throw er;
+                }
+            }
+        }
+
+        //console.log("request: " + JSON.stringify(requestOptions));
+
+        let reqObj = http.request(requestOptions,function (resp) {
+            resp.setEncoding('utf8');
+
+            let data = "";
+            resp.on('data', (chunk) => {
+                data += chunk.toString();
+            });
+            resp.on('end', () => {
+                callUserFunction(data, VALUE_NONE);
+            });
+        });
+
+        reqObj.on('error', (e) => {
+            callUserFunction(VALUE_NONE, new Value(TYPE_STR, e.message));
+        });
+
+
+        if (httpRequestData != null) {
+            reqObj.write(httpRequestData);
+        }
+        reqObj.end();
+        return VALUE_NONE;
+    }, [null, null, null]),
+
+    "httpServer": new BuiltinFunctionValue(`    
+`, 2,function(arg, frame) {
+        let  listenPort = value2Num(arg[0]);
+
+        if (arg[1].type != TYPE_CLOSURE) {
+            throw new RuntimeException("Callback function expected as second parameter")
+        }
+
+        http.createServer(makeHttpServerListener(arg[1], frame)).listen(listenPort);
+
+        return VALUE_NONE;
+
+    }, [null]),
 
     "mathconst" : new Value(TYPE_MAP, {
         pi: new Value(TYPE_NUM, Math.PI),
@@ -1785,25 +1978,25 @@ number: 3`, 3,function *(arg, frame) {
 
 # the number PI
     
-> mathconst['pi']
+> mathconst.pi
 3.141592653589793
 
 # the Euler constant 
 
-> mathconst['e']
+> mathconst.e
 2.718281828459045
 
 # The square root of two
 
-> mathconst["sqrt2"]
+> mathconst.sqrt2
 1.4142135623730951
 
 # Other values: 
-mathconst["sqrt1_2"] # - square root of one half.
-mathconst["log2e"]   # - base e logarithm of 2 
-mathconst["log10e"]  # - base e logarithm of 10
-mathconst["log2e"]   # - base 2 logarithm of e
-mathconst["log10e"]  # - base 10 logarithm of e    
+mathconst.sqrt1_2 # - square root of one half.
+mathconst.log2e   # - base e logarithm of 2 
+mathconst.log10e  # - base e logarithm of 10
+mathconst.log2e   # - base 2 logarithm of e
+mathconst.log10e  # - base 10 logarithm of e    
     `),
 
     "ARGV" : new Value(TYPE_LIST, [], `
@@ -3245,7 +3438,7 @@ class AstFunctionCall extends AstBase {
         super(offset);
         this.name = name;
         this.expressionList = expressionList;
-            this.funcVal_ = null;
+        this.funcVal_ = null;
     }
 
     eval(frame) {
@@ -3287,9 +3480,12 @@ class AstFunctionCall extends AstBase {
     }
 
     _getFuncVal(frame) {
-        if (this.funcVal_ != null) {
-            return this.funcVal_;
-        }
+
+        // can't cache the value - it kills calls to callback values passed to functions. shit.
+        //
+        //if (this.funcVal_ != null) {
+        //    return this.funcVal_;
+        //}
 
         let funcVal = null;
         if (this.name instanceof AstIdentifierRef) {

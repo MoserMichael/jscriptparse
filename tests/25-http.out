@@ -1,0 +1,16 @@
+response: Pooh says hello. 1
+=====    
+request url: /abcd  
+method: GET    
+headers {"host":"127.0.0.1:9010","connection":"keep-alive"}
+user-agent: none
+ error: none
+
+response: Pooh says hello. 2
+=====    
+request url: /cdef  
+method: GET    
+headers {"host":"127.0.0.1:9010","connection":"keep-alive"}
+user-agent: none
+ error: none
+

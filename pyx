@@ -65,7 +65,11 @@ function readHistory() {
 
 function replCommandParsedCallback(parsedSource) {
     fs.appendFileSync(history_file_name, parsedSource + "\n");
-    nodejsRepl.history.push(parsedSource);
+
+    let lastItem = nodejsRepl.history.at(-1);
+    if (lastItem != null && lastItem != parsedSource) {
+        nodejsRepl.history.push(parsedSource);
+    }
 }
 
 // syntax error due to string not closed is a lexical error. try to recover from it - so to know if repl is in 'continuation mode'
@@ -260,11 +264,11 @@ function runEvalLoop(cmdLine) {
 
         readHistory();
 
-        // doesn't workd... :-(
-        nodejsRepl.on('SIGINT', function() {
+
+        nodejsRepl.addListener('SIGINT', function() {
             onSig();
         });
-        nodejsRepl.on('SIGTERM', function() {
+        nodejsRepl.addListener('SIGTERM', function() {
             onSig()
         });
 
@@ -282,10 +286,8 @@ function evalFile(file, cmdLine) {
 
     let frame = rt.makeFrame(cmdLine);
     if (!scr.runParserAndEval(file, true, frame, null, cmdLine)) {
-        result = 1;
+        process.exit(1);
     }
-
-    process.exit(result);
 }
 
 function showVersion() {

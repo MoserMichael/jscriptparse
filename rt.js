@@ -588,11 +588,13 @@ function _system(cmd, frame) {
     try {
         out = cp.execSync(cmd,{env: env}).toString();
     } catch(e) {
+        console.log("failed to run: cmd" + e.message);
         status = 1;//e.status;
         out = e.message;
+        throw e;
     }
-    if (status && errorOnExecFail) {
-        throw new RuntimeException("failed to run `" + cmd + "` : " + out );
+    if (status !=0 && errorOnExecFail) {
+        throw new RuntimeException("failed to run `" + cmd + "` : " + out);
     }
     let val = [ new Value(TYPE_STR, out), new Value(TYPE_NUM, status) ];
     return new Value(TYPE_LIST, val);
@@ -1244,9 +1246,11 @@ rename("oldFileName","newFileName")
 `, 2, function(arg) {
         let oldFileName = value2Str(arg[0]);
         let newFileName = value2Str(arg[1]);
-        fs.rename(oldFileName, newFileName, function(err) {
-            throw new RuntimeException("failed to rename " + oldFileName + " to " + newFileName + " error: " + err);
-        });
+        try {
+            fs.renameSync(oldFileName, newFileName);
+        } catch(er){
+            throw new RuntimeException("failed to rename " + oldFileName + " to " + newFileName + " error: " + er.message);
+        }
         return VALUE_NONE;
 
     }),
@@ -1870,7 +1874,18 @@ number: 3`, 3,function *(arg, frame) {
         return new Value(TYPE_MAP, retMap);
     }, [null]),
 
-    "httpSend": new BuiltinFunctionValue(``, 3, function(arg, frame) {
+    "httpSend": new BuiltinFunctionValue(`
+
+# send htp request
+# - first argument - the request url
+# - second argument - http method (null means GET)
+# - third argument - called upon reponse (called on both success and error)
+
+httpSend('http://127.0.0.1:9010/abcd', 'POST', def(resp,error) {
+    println("response: {resp} error: {error}\n") 
+})
+
+`, 3, function(arg, frame) {
         let options  = null
         let httpMethod = 'GET';
         let httpHeaders = {};
@@ -1951,7 +1966,34 @@ number: 3`, 3,function *(arg, frame) {
         return VALUE_NONE;
     }, [null, null, null]),
 
-    "httpServer": new BuiltinFunctionValue(`    
+    "httpServer": new BuiltinFunctionValue(` 
+
+# listen for incoming http requests on port 9010.     
+httpServer(9010, def (req,resp) {
+ 
+    # function is called on each request  
+    # req  - access request properties
+    # resp - send response via send method
+
+    println("url: {req.url()}")
+    if req.url() == "/time" {
+
+        # show request properties
+        println("=====
+request url: {req.url()}
+method: {req.method()}
+headers {req.headers()}
+")
+
+        tm = localtime()
+        js = toJsonString(tm)
+
+        # send the response, first comes the http status, then the data, then the mime type.
+        resp.send(200, js, "text/json")
+    } else
+        resp.send(501, "no one here")
+})
+
 `, 2,function(arg, frame) {
         let  listenPort = value2Num(arg[0]);
 

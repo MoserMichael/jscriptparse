@@ -7,19 +7,19 @@
 ## Functions for regular expressions
 <a href='#s-13'>find</a>&nbsp;,&nbsp;<a href='#s-25'>match</a>&nbsp;,&nbsp;<a href='#s-26'>matchAll</a>&nbsp;,&nbsp;<a href='#s-27'>replacere</a>&nbsp;,&nbsp;<a href='#s-20'>split</a>
 ## Input and output functions
-<a href='#s-29'>print</a>&nbsp;,&nbsp;<a href='#s-30'>println</a>&nbsp;,&nbsp;<a href='#s-31'>readFile</a>&nbsp;,&nbsp;<a href='#s-32'>rename</a>&nbsp;,&nbsp;<a href='#s-33'>unlink</a>&nbsp;,&nbsp;<a href='#s-34'>writeFile</a>
+<a href='#s-29'>httpSend</a>&nbsp;,&nbsp;<a href='#s-30'>httpServer</a>&nbsp;,&nbsp;<a href='#s-31'>print</a>&nbsp;,&nbsp;<a href='#s-32'>println</a>&nbsp;,&nbsp;<a href='#s-33'>readFile</a>&nbsp;,&nbsp;<a href='#s-34'>rename</a>&nbsp;,&nbsp;<a href='#s-35'>unlink</a>&nbsp;,&nbsp;<a href='#s-36'>writeFile</a>
 ## Functions for arrays
-<a href='#s-35'>exists</a>&nbsp;,&nbsp;<a href='#s-36'>join</a>&nbsp;,&nbsp;<a href='#s-37'>joinl</a>&nbsp;,&nbsp;<a href='#s-15'>len</a>&nbsp;,&nbsp;<a href='#s-39'>map</a>&nbsp;,&nbsp;<a href='#s-40'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-41'>pop</a>&nbsp;,&nbsp;<a href='#s-42'>push</a>&nbsp;,&nbsp;<a href='#s-43'>range</a>&nbsp;,&nbsp;<a href='#s-44'>reduce</a>&nbsp;,&nbsp;<a href='#s-45'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-46'>shift</a>&nbsp;,&nbsp;<a href='#s-47'>sort</a>&nbsp;,&nbsp;<a href='#s-48'>unshift</a>
+<a href='#s-37'>exists</a>&nbsp;,&nbsp;<a href='#s-38'>join</a>&nbsp;,&nbsp;<a href='#s-39'>joinl</a>&nbsp;,&nbsp;<a href='#s-15'>len</a>&nbsp;,&nbsp;<a href='#s-41'>map</a>&nbsp;,&nbsp;<a href='#s-42'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-43'>pop</a>&nbsp;,&nbsp;<a href='#s-44'>push</a>&nbsp;,&nbsp;<a href='#s-45'>range</a>&nbsp;,&nbsp;<a href='#s-46'>reduce</a>&nbsp;,&nbsp;<a href='#s-47'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-48'>shift</a>&nbsp;,&nbsp;<a href='#s-49'>sort</a>&nbsp;,&nbsp;<a href='#s-50'>unshift</a>
 ## Functions for maps
-<a href='#s-49'>each</a>&nbsp;,&nbsp;<a href='#s-35'>exists</a>&nbsp;,&nbsp;<a href='#s-51'>keys</a>&nbsp;,&nbsp;<a href='#s-39'>map</a>
+<a href='#s-51'>each</a>&nbsp;,&nbsp;<a href='#s-37'>exists</a>&nbsp;,&nbsp;<a href='#s-53'>keys</a>&nbsp;,&nbsp;<a href='#s-41'>map</a>
 ## Function for working with json/yaml
-<a href='#s-53'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-54'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-55'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-56'>toYamlString</a>
+<a href='#s-55'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-56'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-57'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-58'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-57'>exit</a>&nbsp;,&nbsp;<a href='#s-58'>sleep</a>&nbsp;,&nbsp;<a href='#s-59'>system</a>
+<a href='#s-59'>exit</a>&nbsp;,&nbsp;<a href='#s-60'>sleep</a>&nbsp;,&nbsp;<a href='#s-61'>system</a>
 ## Other functions
-<a href='#s-60'>eval</a>&nbsp;,&nbsp;<a href='#s-61'>help</a>&nbsp;,&nbsp;<a href='#s-62'>localtime</a>&nbsp;,&nbsp;<a href='#s-63'>setErrorOnExecFail</a>&nbsp;,&nbsp;<a href='#s-64'>setTrace</a>&nbsp;,&nbsp;<a href='#s-65'>time</a>&nbsp;,&nbsp;<a href='#s-66'>type</a>
+<a href='#s-62'>eval</a>&nbsp;,&nbsp;<a href='#s-63'>help</a>&nbsp;,&nbsp;<a href='#s-64'>localtime</a>&nbsp;,&nbsp;<a href='#s-65'>setErrorOnExecFail</a>&nbsp;,&nbsp;<a href='#s-66'>setTrace</a>&nbsp;,&nbsp;<a href='#s-67'>time</a>&nbsp;,&nbsp;<a href='#s-68'>type</a>
 ## Global variables
-<a href='#s-67'>ARGV</a>&nbsp;,&nbsp;<a href='#s-68'>ENV</a>&nbsp;,&nbsp;<a href='#s-69'>mathconst</a>
+<a href='#s-69'>ARGV</a>&nbsp;,&nbsp;<a href='#s-70'>ENV</a>&nbsp;,&nbsp;<a href='#s-71'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -121,7 +121,6 @@ returns the cosine of a number in radians
 
 ```python
 # returns random number with value between 0 and 1
-
 > random()
 0.8424952895811049
 
@@ -421,20 +420,74 @@ text="a b a c a d"
 
 ```
 <a id='s-29'/>
+<hr>function: <b>httpSend</b>
+
+```python
+
+
+# send htp request
+# - first argument - the request url
+# - second argument - http method (null means GET)
+# - third argument - called upon reponse (called on both success and error)
+
+httpSend('http://127.0.0.1:9010/abcd', 'POST', def(resp,error) {
+    println("response: {resp} error: {error}
+") 
+})
+
+
+
+```
+<a id='s-30'/>
+<hr>function: <b>httpServer</b>
+
+```python
+ 
+
+# listen for incoming http requests on port 9010.     
+httpServer(9010, def (req,resp) {
+ 
+    # function is called on each request  
+    # req  - access request properties
+    # resp - send response via send method
+
+    println("url: {req.url()}")
+    if req.url() == "/time" {
+
+        # show request properties
+        println("=====
+request url: {req.url()}
+method: {req.method()}
+headers {req.headers()}
+")
+
+        tm = localtime()
+        js = toJsonString(tm)
+
+        # send the response, first comes the http status, then the data, then the mime type.
+        resp.send(200, js, "text/json")
+    } else
+        resp.send(501, "no one here")
+})
+
+
+
+```
+<a id='s-31'/>
 <hr>function: <b>print</b>
 
 ```python
 # prints argument value to console
 
 ```
-<a id='s-30'/>
+<a id='s-32'/>
 <hr>function: <b>println</b>
 
 ```python
 # prints argument value to console, followed by newline
 
 ```
-<a id='s-31'/>
+<a id='s-33'/>
 <hr>function: <b>readFile</b>
 
 ```python
@@ -445,7 +498,7 @@ text="a b a c a d"
     
 
 ```
-<a id='s-32'/>
+<a id='s-34'/>
 <hr>function: <b>rename</b>
 
 ```python
@@ -456,7 +509,7 @@ rename("oldFileName","newFileName")
 
 
 ```
-<a id='s-33'/>
+<a id='s-35'/>
 <hr>function: <b>unlink</b>
 
 ```python
@@ -469,7 +522,7 @@ unlink([ "file1.txt")
     
 
 ```
-<a id='s-34'/>
+<a id='s-36'/>
 <hr>function: <b>writeFile</b>
 
 ```python
@@ -485,7 +538,7 @@ unlink([ "file1.txt")
     
 
 ```
-<a id='s-35'/>
+<a id='s-37'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -505,7 +558,7 @@ true
 false
 
 ```
-<a id='s-36'/>
+<a id='s-38'/>
 <hr>function: <b>join</b>
 
 ```python
@@ -513,7 +566,7 @@ false
 "a: 1 b: true"
 
 ```
-<a id='s-37'/>
+<a id='s-39'/>
 <hr>function: <b>joinl</b>
 
 ```python
@@ -531,7 +584,7 @@ false
 3
 
 ```
-<a id='s-39'/>
+<a id='s-41'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -546,7 +599,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-40'/>
+<a id='s-42'/>
 <hr>function: <b>mapIndex</b>
 
 ```python
@@ -554,7 +607,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [[6,0],[8,1],[10,2],[12,3]]
 
 ```
-<a id='s-41'/>
+<a id='s-43'/>
 <hr>function: <b>pop</b>
 
 ```python
@@ -566,7 +619,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2]
 
 ```
-<a id='s-42'/>
+<a id='s-44'/>
 <hr>function: <b>push</b>
 
 ```python
@@ -578,7 +631,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-43'/>
+<a id='s-45'/>
 <hr>function: <b>range</b>
 
 ```python
@@ -590,7 +643,7 @@ number: 2
 number: 3
 
 ```
-<a id='s-44'/>
+<a id='s-46'/>
 <hr>function: <b>reduce</b>
 
 ```python
@@ -612,7 +665,7 @@ number: 3
 
 
 ```
-<a id='s-45'/>
+<a id='s-47'/>
 <hr>function: <b>reduceFromEnd</b>
 
 ```python
@@ -627,7 +680,7 @@ same as:
 1
 
 ```
-<a id='s-46'/>
+<a id='s-48'/>
 <hr>function: <b>shift</b>
 
 ```python
@@ -643,7 +696,7 @@ same as:
 
 
 ```
-<a id='s-47'/>
+<a id='s-49'/>
 <hr>function: <b>sort</b>
 
 ```python
@@ -660,7 +713,7 @@ same as:
 [["b",1],["a",100],["c",1000]]
 
 ```
-<a id='s-48'/>
+<a id='s-50'/>
 <hr>function: <b>unshift</b>
 
 ```python
@@ -676,7 +729,7 @@ same as:
 
 
 ```
-<a id='s-49'/>
+<a id='s-51'/>
 <hr>function: <b>each</b>
 
 ```python
@@ -690,7 +743,7 @@ same as:
 
 
 ```
-<a id='s-35'/>
+<a id='s-37'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -710,7 +763,7 @@ true
 false
 
 ```
-<a id='s-51'/>
+<a id='s-53'/>
 <hr>function: <b>keys</b>
 
 ```python
@@ -720,7 +773,7 @@ false
 ["first","second","third"]
 
 ```
-<a id='s-39'/>
+<a id='s-41'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -735,7 +788,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-53'/>
+<a id='s-55'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -745,7 +798,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-54'/>
+<a id='s-56'/>
 <hr>function: <b>parseYamlString</b>
 
 ```python
@@ -765,7 +818,7 @@ c:
     
 
 ```
-<a id='s-55'/>
+<a id='s-57'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -775,7 +828,7 @@ c:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-56'/>
+<a id='s-58'/>
 <hr>function: <b>toYamlString</b>
 
 ```python
@@ -791,7 +844,7 @@ c:
   - 3
 
 ```
-<a id='s-57'/>
+<a id='s-59'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -799,7 +852,7 @@ c:
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-58'/>
+<a id='s-60'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -809,7 +862,7 @@ sleep(3)
 
 
 ```
-<a id='s-59'/>
+<a id='s-61'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -838,7 +891,7 @@ var
 0
 
 ```
-<a id='s-60'/>
+<a id='s-62'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -866,7 +919,7 @@ var
 
 
 ```
-<a id='s-61'/>
+<a id='s-63'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -881,7 +934,7 @@ help()
 
 
 ```
-<a id='s-62'/>
+<a id='s-64'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -892,7 +945,7 @@ help()
 
 
 ```
-<a id='s-63'/>
+<a id='s-65'/>
 <hr>function: <b>setErrorOnExecFail</b>
 
 ```python
@@ -913,7 +966,7 @@ Error: failed to run `false` : Command failed: false
 
 
 ```
-<a id='s-64'/>
+<a id='s-66'/>
 <hr>function: <b>setTrace</b>
 
 ```python
@@ -926,14 +979,14 @@ setTrace(false)
 
 
 ```
-<a id='s-65'/>
+<a id='s-67'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-66'/>
+<a id='s-68'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -949,7 +1002,7 @@ setTrace(false)
 "Closure"
 
 ```
-<a id='s-67'/>
+<a id='s-69'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -973,14 +1026,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-68'/>
+<a id='s-70'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-69'/>
+<a id='s-71'/>
 <hr>function: <b>mathconst</b>
 
 ```python
@@ -988,25 +1041,25 @@ pyx programFile.p 1 2 3 4
 
 # the number PI
     
-> mathconst['pi']
+> mathconst.pi
 3.141592653589793
 
 # the Euler constant 
 
-> mathconst['e']
+> mathconst.e
 2.718281828459045
 
 # The square root of two
 
-> mathconst["sqrt2"]
+> mathconst.sqrt2
 1.4142135623730951
 
 # Other values: 
-mathconst["sqrt1_2"] # - square root of one half.
-mathconst["log2e"]   # - base e logarithm of 2 
-mathconst["log10e"]  # - base e logarithm of 10
-mathconst["log2e"]   # - base 2 logarithm of e
-mathconst["log10e"]  # - base 10 logarithm of e    
+mathconst.sqrt1_2 # - square root of one half.
+mathconst.log2e   # - base e logarithm of 2 
+mathconst.log10e  # - base e logarithm of 10
+mathconst.log2e   # - base 2 logarithm of e
+mathconst.log10e  # - base 10 logarithm of e    
     
 
 ```

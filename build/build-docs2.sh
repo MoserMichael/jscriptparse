@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 # build PYXFUNC.md
 ./pyx tests/pyxfunc.p > PYXFUNC.md
 

@@ -1878,17 +1878,35 @@ number: 3`, 3,function *(arg, frame) {
 
 # send htp request
 # - first argument - the request url
-# - second argument - http method (null means GET)
+# - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
-
-httpSend('http://127.0.0.1:9010/abcd', 'POST', def(resp,error) {
+#    resp - not none on success, error - not none on error (error message)
+httpSend('http://127.0.0.1:9010/abcd', none, def(resp,error) {
     println("response: {resp} error: {error}\n") 
 })
+
+# send http POST request with data and headers
+
+postData = '{ "name": "Pooh", "family": "Bear" }'
+
+options = {
+  'method': 'POST',
+  'headers': {
+     'Content-Type': 'text/json',
+     'Content-Length' : len(postData)
+  },
+  'data' : postData
+}
+
+httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
+    println("response: {resp} error: {error}") 
+})
+
 
 `, 3, function(arg, frame) {
         let options  = null
         let httpMethod = 'GET';
-        let httpHeaders = {};
+        let httpHeaders = null;
         let httpRequestData = null;
         let callback = null;
         let surl = value2Str(arg[0]);
@@ -1924,6 +1942,9 @@ httpSend('http://127.0.0.1:9010/abcd', 'POST', def(resp,error) {
             path: urlObj.pathname,
             method: httpMethod
         };
+        if (httpHeaders != null) {
+            requestOptions['headers'] = httpHeaders;
+        }
 
         let callUserFunction = function(data, error) {
             // this one is evaluated from another task. runtime exceptions need to be handled here

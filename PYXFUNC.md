@@ -427,13 +427,31 @@ text="a b a c a d"
 
 # send htp request
 # - first argument - the request url
-# - second argument - http method (null means GET)
+# - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
-
-httpSend('http://127.0.0.1:9010/abcd', 'POST', def(resp,error) {
+#    resp - not none on success, error - not none on error (error message)
+httpSend('http://127.0.0.1:9010/abcd', none, def(resp,error) {
     println("response: {resp} error: {error}
 ") 
 })
+
+# send http POST request with data and headers
+
+postData = '{ "name": "Pooh", "family": "Bear" }'
+
+options = {
+  'method': 'POST',
+  'headers': {
+     'Content-Type': 'text/json',
+     'Content-Length' : len(postData)
+  },
+  'data' : postData
+}
+
+httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
+    println("response: {resp} error: {error}") 
+})
+
 
 
 

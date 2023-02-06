@@ -9,6 +9,7 @@ request url: {req.url()}
 method: {req.method()}    
 headers {req.headers()}
 user-agent: {req.header('User-Agent')}
+requestData: {req.requestData()}
 "
 
         resp.send(200, "Pooh says hello. {cnt}" + text)
@@ -33,7 +34,18 @@ def startTimeSrv() {
 
 startTxtSrv()
 
-httpSend('http://127.0.0.1:9010/abcd', none, def(resp,error) {
+postData = '{ "name": "Pooh", "family": "Bear" }'
+
+options = {
+  'method': 'POST',
+  'headers': {
+     'Content-Type': 'text/json',
+     'Content-Length' : len(postData)
+  },
+  'data' : postData
+}
+
+httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
     println("response: {resp} error: {error}\n") 
 
     httpSend('http://127.0.0.1:9010/cdef', none, def(resp,error) {

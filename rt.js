@@ -2016,6 +2016,7 @@ httpServer(9010, def (req,resp) {
 request url: {req.url()}
 method: {req.method()}
 headers {req.headers()}
+requestData: {req.requestData()}
 ")
 
         tm = localtime()

@@ -1,19 +1,20 @@
 #!/bin/bash
 
+
 FAILED_TESTS=0
 DIR="$1"
 
-if [[ $DIR=="" ]]; then
+if [[ $DIR == "" ]]; then
     DIR="tests"
 fi
 
 for  f in $(ls ${DIR}/[0-9]*.p); do
     echo "testing: $f"
-    RESULT_F="tests/"$(basename "$f" .p)".result"
+    RESULT_F="${DIR}/"$(basename "$f" .p)".result"
     ./pyx "$f" >${RESULT_F}
 
     OUT=$(cat ${RESULT_F})
-    EXPECTED_F="tests/"$(basename "$f" .p)".out"
+    EXPECTED_F="${DIR}/"$(basename "$f" .p)".out"
     EXPECTED=$(cat "${EXPECTED_F}")
     if [[ "$OUT" != "$EXPECTED" ]]; then
         cat <<EOF

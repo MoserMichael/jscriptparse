@@ -1,7 +1,8 @@
 
 .PHONY: test
 test: install
-		./build/test.sh
+		./build/test.sh tests
+		./build/test.sh leetcode
 
 .PHONY: publish-prs
 publish-prs:

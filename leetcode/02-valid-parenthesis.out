@@ -1,0 +1,8 @@
+Passed: () expected: true
+Passed: ()[]{} expected: true
+Passed: (] expected: false
+Passed: {[(] expected: false
+Passed: {[()] expected: false
+Passed: {[()]} expected: true
+Passed: {[()]}( expected: false
+all tests passed

@@ -616,16 +616,14 @@ function * genValues(val) {
 
 let fooId =1;
 
-function makeHttpCallbackInvocationParams(httpReq, httpRes) {
+function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
 
     let req_ = new Value(TYPE_MAP, {
-
         'url_' : new Value(TYPE_STR, httpReq.url),
 
         'url' : new BuiltinFunctionValue(``, 0, function() {
             return new Value(TYPE_STR,  httpReq.url );
         }),
-
         'method' : new BuiltinFunctionValue(``, 0, function() {
             return new Value(TYPE_STR, httpReq.method );
         }),
@@ -639,6 +637,9 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes) {
             let name = value2Str(arg[0]);
             let val = httpReq.headers[name.toLowerCase()];
             return new jsValueToRtVal(val);
+        }),
+        'requestData' : new BuiltinFunctionValue(``, 0, function(arg) {
+            return new Value(TYPE_STR, requestData );
         }),
     });
 
@@ -694,17 +695,28 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes) {
 function makeHttpServerListener(callback, frame) {
     return function (req, res) {
 
-        // this one is evaluated from another task. runtime exceptions need to be handled here
-        try {
-            let vargs =  makeHttpCallbackInvocationParams(req,res);
-            evalClosure("", callback, vargs, frame);
-        } catch(er) {
-            if (er instanceof RuntimeException) {
-                er.showStackTrace(true);
-            } else {
-                throw er;
+        const chunks = [];
+        req.on('data', chunk => chunks.push(chunk));
+        req.on('end', () => {
+            const data = Buffer.concat(chunks);
+
+            // got the request data as well!
+
+            // this one is evaluated from another task. runtime exceptions need to be handled here
+            try {
+                let vargs =  makeHttpCallbackInvocationParams(req,res, data);
+                evalClosure("", callback, vargs, frame);
+            } catch(er) {
+                if (er instanceof RuntimeException) {
+                    er.showStackTrace(true);
+                } else {
+                    throw er;
+                }
             }
-        }
+
+        })
+
+
     };
 }
 

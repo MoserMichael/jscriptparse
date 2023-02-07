@@ -638,12 +638,16 @@ const makeTransformer = function(nestedParser, transformResult) {
     requireFunction(nestedParser);
     requireFunction(transformResult);
 
-    return function(state) {
+    let ret = function(state) {
         let posStart = state.pos;
         res = nestedParser(state);
         let posRange = [ posStart, state.pos ];
         return transformResult(res, posRange);
     }
+
+    ret.prototype.title = nestedParser.prototype.title;
+
+    return ret;
 }
 
 /**

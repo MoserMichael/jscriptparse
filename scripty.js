@@ -270,7 +270,7 @@ function makeParserImp() {
             //identifier,
             forwardIdWithOptIndex.forward(),
             prs.makeTokenParser("("),
-            prs.makeOptParser(expressionList),
+            prs.makeOptParser(expressionList, "optional expression list"),
             prs.makeTokenParser(")")
         ], "function call"), function (arg) {
             return rt.makeFunctionCall(arg[0], arg[2]);
@@ -280,9 +280,9 @@ function makeParserImp() {
     let listExpr = prs.makeTransformer(
         prs.makeSequenceParser([
             prs.makeTokenParser("["),
-            prs.makeOptParser(expressionList),
+            prs.makeOptParser(expressionList, "optional expression list"),
             prs.makeTokenParser("]"),
-        ]), function (arg) {
+        ], "list builder"), function (arg) {
             return rt.newListCtorExpression(arg[1]);
         });
 
@@ -291,7 +291,7 @@ function makeParserImp() {
             forwardExpr.forward(),
             prs.makeTokenParser(":"),
             forwardExpr.forward()
-        ]), function (arg) {
+        ], "name-value pair in map"), function (arg) {
             return [arg[0], arg[2]];
         }
     );
@@ -305,13 +305,13 @@ function makeParserImp() {
             ]), function (arg) {
                 return arg[1];
             }
-        ), "dictionary clause"
+        ), "dictionary builder"
     );
 
     let dictExpr = prs.makeTransformer(
         prs.makeSequenceParser([
             prs.makeTokenParser("{"),
-            prs.makeOptParser(dictClause),
+            prs.makeOptParser(dictClause, "optional dictionary builder"),
             prs.makeTokenParser("}")
         ], "dictionary definition"), function (arg) {
 
@@ -336,7 +336,7 @@ function makeParserImp() {
                 0
             ),
             formatStringEndConst
-        ]), function (arg) {
+        ], "format string"), function (arg) {
             let rVal = [];
 
             rVal.push(arg[0]);
@@ -355,7 +355,7 @@ function makeParserImp() {
         prs.makeSequenceParser([
             formatStringStartConst,
             formatStringContinuation
-        ]), function (arg) {
+        ], "format string"), function (arg) {
 
             let argExpr = [arg[0]];
 
@@ -385,7 +385,7 @@ function makeParserImp() {
                 0
             ),
             backtickStringEndConst
-        ], "backtick - process runner"), function (arg) {
+        ], "backtick string - process runner"), function (arg) {
             let rVal = [];
 
             rVal.push(arg[0]);
@@ -407,7 +407,7 @@ function makeParserImp() {
                 backtickStringContinuation
             ]),
             backtickStringConst
-        ], "backtick - process runner"), function (arg) {
+        ], "backtick string - process runner"), function (arg) {
 
             //console.log("system-arg: " + JSON.stringify(arg));
 
@@ -437,7 +437,7 @@ function makeParserImp() {
                     prs.makeTokenParser("["),
                     forwardExpr.forward(),
                     prs.makeTokenParser("]")
-                ]), function (arg) {
+                ], "index expression"), function (arg) {
                     return arg[1];
                 }
             ),
@@ -446,7 +446,7 @@ function makeParserImp() {
                 prs.makeSequenceParser([
                     prs.makeTokenParser("."),
                     identifier
-                ]),
+                ], "dot index expression"),
                 function(arg) {
                     return rt.makeConstValue(rt.TYPE_STR, arg[1]);
                 }
@@ -458,7 +458,7 @@ function makeParserImp() {
         prs.makeSequenceParser([
             identifier,
             indexExpr
-        ]), function (arg) {
+        ], "index lookup"), function (arg) {
             if (arg.length >= 1) {
                 //console.log(JSON.stringify(arg));
                 return rt.makeIdentifierRef(arg[0], arg[1]);
@@ -475,7 +475,7 @@ function makeParserImp() {
             prs.makeSequenceParser([
                 prs.makeTokenParser("-"),
                 number
-            ]), function (arg) {
+            ], "negative number"), function (arg) {
                 arg[1][0] = -1 * Number(arg[1][0]);
                 return rt.makeConstValue(rt.TYPE_NUM, arg[1]);
             }
@@ -544,7 +544,7 @@ function makeParserImp() {
         prs.makeTokenParser("<="),
         prs.makeTokenParser("<"),
         prs.makeTokenParser(">")
-    ], "comparsion operator")
+    ], "comparison operator")
 
     let relationalExpression = prs.makeTransformer(
         prs.makeRepetitionRecClause(
@@ -657,7 +657,7 @@ function makeParserImp() {
                     prs.makeTokenParser("elif"),
                     expression,
                     statementOrStatementListFwd.forward(),
-                ], "elif"),
+                ], "elif clause"),
                 0,
             ),
             prs.makeOptParser(
@@ -665,6 +665,7 @@ function makeParserImp() {
                     prs.makeTokenParser("else"),
                     statementOrStatementListFwd.forward()
                 ], "else clause")
+                , "optional else clause"
             )
         ], "if statement"),
         function (arg) {
@@ -692,7 +693,7 @@ function makeParserImp() {
             prs.makeTokenParser("while"),
             expression,
             statementOrStatementListFwd.forward(),
-        ]),
+        ], "while statement"),
         function (arg) {
             return rt.makeWhileStmt(arg[1], arg[2], arg[0][1]);
         }
@@ -704,7 +705,7 @@ function makeParserImp() {
             assignLhs,
             expression,
             statementOrStatementListFwd.forward(),
-        ]),
+        ], "for statement"),
         function (arg) {
             return rt.makeForStmt(arg[1], arg[2], arg[3], arg[0][1]);
         }
@@ -736,7 +737,7 @@ function makeParserImp() {
         prs.makeSequenceParser([
             prs.makeTokenParser("use"),
             expression
-        ], "use statement"),
+        ], "use statement / include"),
         function (arg) {
             return rt.makeUseStmt(runParse, arg[1], arg[0][1])
         }
@@ -764,6 +765,7 @@ function makeParserImp() {
                 prs.makeTokenParser("="),
                 expression
             ], "function parameter")
+            , "optional function parameter"
         )
     ], "function parameter list");
 
@@ -773,17 +775,18 @@ function makeParserImp() {
             prs.makeSequenceParser([
                 prs.makeTokenParser(","),
                 paramDef
-            ]), function (arg) {
+            ], "oarameter list"), function (arg) {
                 return arg[1];
             }
-        )
+        ),
+        "parameter list"
     );
 
     let lambdaFunctionDef = prs.makeTransformer(
         prs.makeSequenceParser([
             prs.makeTokenParser("def"),
             prs.makeTokenParser("("),
-            prs.makeOptParser(paramList),
+            prs.makeOptParser(paramList, "optional parameter list"),
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
         ], "function without name"), function (arg) {
@@ -804,10 +807,10 @@ function makeParserImp() {
             prs.makeTokenParser("def"),
             identifier,
             prs.makeTokenParser("("),
-            prs.makeOptParser(paramList),
+            prs.makeOptParser(paramList, "optional parameter list"),
             prs.makeTokenParser(")"),
             statementOrStatementListFwd.forward(),
-        ]), function (arg) {
+        ], "function definition"), function (arg) {
             //console.log("function-def stmt: " + JSON.stringify((arg[5])));
             let param = [];
             if (arg[3].length != 0) {
@@ -834,7 +837,8 @@ function makeParserImp() {
                     ], "finally block"), function(arg) {
                         return arg[1];
                     }
-                )
+                ),
+                "optional finally block"
             )
         ], "try-catch block"), function(arg) {
             return rt.makeTryCatchBlock(arg[1], arg[2], arg[3])
@@ -933,7 +937,7 @@ function makeParserImp() {
     let statementListTopLevel = prs.makeTransformer(
         prs.makeRepetitionParser(
             statementTopLevel,
-            0, -1, "statementsRep"
+            0, -1, "sequence of statements"
         ),
         function (arg) {
             return rt.makeStatementList(arg);

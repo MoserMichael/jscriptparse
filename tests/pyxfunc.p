@@ -26,7 +26,7 @@ funcCats = [
    "func": [ "parseJsonString", "toJsonString", "parseYamlString", "toYamlString" ]
  },
  { "name": "functions for working with processes",
-   "func": [ "system", "exit", "sleep" ]
+   "func": [ "system", "exit", "sleep", "exec", "kill", "chdir", "getcwd" ]
  },
  { "name": "Other functions",
    "func": [ "help", "type", "time", "localtime", "setTrace", "setErrorOnExecFail", "eval" ]

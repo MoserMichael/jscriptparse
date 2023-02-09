@@ -15,11 +15,11 @@
 ## Function for working with json/yaml
 <a href='#s-55'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-56'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-57'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-58'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-59'>exit</a>&nbsp;,&nbsp;<a href='#s-60'>sleep</a>&nbsp;,&nbsp;<a href='#s-61'>system</a>
+<a href='#s-59'>chdir</a>&nbsp;,&nbsp;<a href='#s-60'>exec</a>&nbsp;,&nbsp;<a href='#s-61'>exit</a>&nbsp;,&nbsp;<a href='#s-62'>getcwd</a>&nbsp;,&nbsp;<a href='#s-63'>kill</a>&nbsp;,&nbsp;<a href='#s-64'>sleep</a>&nbsp;,&nbsp;<a href='#s-65'>system</a>
 ## Other functions
-<a href='#s-62'>eval</a>&nbsp;,&nbsp;<a href='#s-63'>help</a>&nbsp;,&nbsp;<a href='#s-64'>localtime</a>&nbsp;,&nbsp;<a href='#s-65'>setErrorOnExecFail</a>&nbsp;,&nbsp;<a href='#s-66'>setTrace</a>&nbsp;,&nbsp;<a href='#s-67'>time</a>&nbsp;,&nbsp;<a href='#s-68'>type</a>
+<a href='#s-66'>eval</a>&nbsp;,&nbsp;<a href='#s-67'>help</a>&nbsp;,&nbsp;<a href='#s-68'>localtime</a>&nbsp;,&nbsp;<a href='#s-69'>setErrorOnExecFail</a>&nbsp;,&nbsp;<a href='#s-70'>setTrace</a>&nbsp;,&nbsp;<a href='#s-71'>time</a>&nbsp;,&nbsp;<a href='#s-72'>type</a>
 ## Global variables
-<a href='#s-69'>ARGV</a>&nbsp;,&nbsp;<a href='#s-70'>ENV</a>&nbsp;,&nbsp;<a href='#s-71'>mathconst</a>
+<a href='#s-73'>ARGV</a>&nbsp;,&nbsp;<a href='#s-74'>ENV</a>&nbsp;,&nbsp;<a href='#s-75'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -864,6 +864,34 @@ c:
 
 ```
 <a id='s-59'/>
+<hr>function: <b>chdir</b>
+
+```python
+
+# change the current directory. That's the current directory of processes created with system, exec or via backick operator
+ 
+
+
+```
+<a id='s-60'/>
+<hr>function: <b>exec</b>
+
+```python
+
+# run a process and receive the input output in a callback. Returns the process id as return value 
+
+# callback is called 
+# - when standard output or error has been read (second or third parameter is set)
+# - an error occurred (first parameter is set)
+
+# returns the process id of the new process
+
+pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out} standard error: {err}") })
+
+    
+
+```
+<a id='s-61'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -871,7 +899,26 @@ c:
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-60'/>
+<a id='s-62'/>
+<hr>function: <b>getcwd</b>
+
+```python
+
+# the function returns the current directory of processes created with system, exec or via backick operator `
+
+
+
+```
+<a id='s-63'/>
+<hr>function: <b>kill</b>
+
+```python
+
+# gets process id returned by exec. kills the process.    
+
+
+```
+<a id='s-64'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -881,7 +928,7 @@ sleep(3)
 
 
 ```
-<a id='s-61'/>
+<a id='s-65'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -910,7 +957,7 @@ var
 0
 
 ```
-<a id='s-62'/>
+<a id='s-66'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -938,7 +985,7 @@ var
 
 
 ```
-<a id='s-63'/>
+<a id='s-67'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -953,7 +1000,7 @@ help()
 
 
 ```
-<a id='s-64'/>
+<a id='s-68'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -964,7 +1011,7 @@ help()
 
 
 ```
-<a id='s-65'/>
+<a id='s-69'/>
 <hr>function: <b>setErrorOnExecFail</b>
 
 ```python
@@ -985,7 +1032,7 @@ Error: failed to run `false` : Command failed: false
 
 
 ```
-<a id='s-66'/>
+<a id='s-70'/>
 <hr>function: <b>setTrace</b>
 
 ```python
@@ -998,14 +1045,14 @@ setTrace(false)
 
 
 ```
-<a id='s-67'/>
+<a id='s-71'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-68'/>
+<a id='s-72'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1021,7 +1068,7 @@ setTrace(false)
 "Closure"
 
 ```
-<a id='s-69'/>
+<a id='s-73'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1045,14 +1092,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-70'/>
+<a id='s-74'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-71'/>
+<a id='s-75'/>
 <hr>function: <b>mathconst</b>
 
 ```python

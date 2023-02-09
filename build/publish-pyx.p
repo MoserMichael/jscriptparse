@@ -10,7 +10,7 @@ def getVersion( packageJsonFile ) {
 }
 
 def makeTag(version) {
-
+   version = "pyx_{version}"
    out, status =  `git tag {version} -m "publish pyx package {version}" 2>&1`
    if status != 0 {
         println("Error tag {version} already exists. {out}")

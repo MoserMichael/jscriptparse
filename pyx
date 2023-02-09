@@ -1,5 +1,7 @@
 #!/usr/bin/env NODE_PATH=. node 
 
+const os=require("os");
+const fs=require("fs");
 const path=require("node:path");
 const repl=require("node:repl");
 const rl=require("node:readline");
@@ -7,19 +9,24 @@ const rl=require("node:readline");
 const rt=require(path.join(__dirname,"rt.js"));
 const scr=require(path.join(__dirname,"scripty.js"));
 const prs=require(path.join(__dirname,"prs.js"));
-const fs=require("fs");
 
 const PYX_VERSION = "VERSION_TAG";
 
-let history_file_name = "pyx_history";
+let history_file_name = null;
 let nodejsRepl = null;
-
-function skipSpace(data, pos) {
-    for(;pos < data.length && prs.isSpace(data.charAt(pos));++pos);
-    return pos;
-}
-
 let isRunning = false;
+
+function setHistoryFileName() {
+    let dir_name = process.cwd()
+
+    // check if the current directory is writable, if not then put the history file in the home directory
+    try {
+        fs.accessSync(dir_name, fs.constants.W_OK);
+    } catch(er) {
+        dir_name = os.homedir();
+    }
+    history_file_name = path.join(dir_name, "pyx_history");
+}
 
 function onSig() {
     //console.log("onSig");
@@ -376,6 +383,8 @@ function parseCmdLine() {
 }
 
 function runMain() {
+
+    setHistoryFileName();
 
     rt.setEvalCallback(evalExpression);
 

@@ -720,6 +720,9 @@ function makeHttpServerListener(callback, frame) {
     };
 }
 
+// maps between process id and node childprocess object.
+let spawnedProcesses = {};
+
 // the runtime library is defined here
 RTLIB={
 
@@ -1652,6 +1655,103 @@ var
         }
         return _system(cmd, frame);
     }),
+
+    "getcwd": new BuiltinFunctionValue(`
+# the function returns the current directory of processes created with system, exec or via backick operator \`
+
+`, 0, function(arg, frame) {
+        let value = process.cwd();
+        return new Value(TYPE_STR, value);
+    }),
+
+    "chdir": new BuiltinFunctionValue(`
+# change the current directory. That's the current directory of processes created with system, exec or via backick operator
+ 
+`, 1, function(arg, frame) {
+            let dir = value2Str(arg[0])
+            try {
+                process.chdir(dir);
+            } catch(er) {
+                throw new RuntimeException("Can't change directory to " + dir + " error: " +  er.message);
+            }
+            return VALUE_NONE;
+        }),
+
+    "exec": new BuiltinFunctionValue(`
+# run a process and receive the input output in a callback. Returns the process id as return value 
+
+# callback is called 
+# - when standard output or error has been read (second or third parameter is set)
+# - an error occurred (first parameter is set)
+
+# returns the process id of the new process
+
+pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out} standard error: {err}") })
+
+    `, 2,function(arg, frame) {
+        let cmd = value2Str(arg[0]);
+        if (arg[1].type != TYPE_CLOSURE) {
+            throw new RuntimeException("Callback function expected as second parameter")
+        }
+        let callback = arg[1];
+
+        let env = _getEnv(frame);
+        try {
+            let childProcess = cp.exec(cmd, {env: env}, function(error, stdout, stderr){
+
+                // call the callback
+                try {
+                    let argErr = VALUE_NONE;
+                    if (error != null) {
+                        argErr = new Value(TYPE_STR,error.message);
+                    }
+                    let argStdout = VALUE_NONE;
+                    if (stdout != null) {
+                        argStdout = new Value(TYPE_STR, stdout.toString());
+                    }
+                    let argStderr = VALUE_NONE;
+                    if (stdout != null) {
+                        argStderr = new Value(TYPE_STR, stderr.toString());
+                    }
+                    let vargs =  [ argErr, argStdout, argStderr ];
+                    evalClosure("", callback, vargs, frame);
+                } catch(er) {3
+                    if (er instanceof RuntimeException) {
+                        er.showStackTrace(true);
+                    } else {
+                        throw er;
+                    }
+                }
+            });
+
+            let onExit = function() {
+                delete spawnedProcesses[childProcess.pid];
+            }
+
+            childProcess.addListener('close', onExit)
+            childProcess.addListener('error', onExit)
+
+            spawnedProcesses[childProcess.pid] = childProcess;
+            return new Value(TYPE_NUM, childProcess.pid);
+
+        } catch(e) {
+            console.log("failed to run: cmd" + e.message);
+            throw RuntimeException("failed to run " + cmd + " error: " + e.message);
+        }
+    }),
+
+    "kill": new BuiltinFunctionValue(`
+# gets process id returned by exec. kills the process.    
+`, 1,function(arg, frame) {
+        let pid = value2Num(arg[0]);
+
+        let processEntry = spawnedProcesses[pid];
+        if (processEntry != null) {
+            processEntry.kill();
+        }
+        return VALUE_NONE;
+    }),
+
     "sleep": new BuiltinFunctionValue(`    
 # sleep for three seconds    
 sleep(3)

@@ -3,7 +3,7 @@
   },
   "name": "prscombinator",
   "description": "parser combinator library, produces recursive descent PEG parser. returns an abstract syntax tree as return value. Usable from both nodejs and browser",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "prs.js",
   "devDependencies": {},
   "scripts": {

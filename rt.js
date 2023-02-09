@@ -176,8 +176,22 @@ function typeName(val) {
         return "not a runtime value!";
     }
     return mapTypeToName[val.type];
-
 }
+
+let NumberNames={ 1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth"};
+
+function getParamName(index) {
+    let paramName = "";
+    if (index != null) {
+        if (NumberNames[index+1] != undefined) {
+            paramName = "In " + NumberNames[index+1] + " parameter ";
+        } else {
+            paramName = "In parameter " + (index + 1);
+        }
+    }
+    return paramName;
+}
+
 function value2Bool(arg, index) {
     let val;
 
@@ -195,8 +209,8 @@ function value2Bool(arg, index) {
         return val.val;
     }
     let paramName = "";
-    if (paramName != null) {
-        paramName = "In parameter " + (index + 1);
+    if (index != null) {
+        paramName = getParamName(index);
     }
     throw new RuntimeException("can't convert " + typeName(val) + " to boolean. " + paramName);
 }
@@ -212,8 +226,8 @@ function checkType(arg, index, expectedType) {
 
     if (val.type != expectedType) {
         let paramName = "";
-        if (paramName != null) {
-            paramName = "In parameter " + (index + 1);
+        if (index != null) {
+            paramName = getParamName(index);
         }
         throw new RuntimeException("expected " + typeName(expectedType)  + " as argument. " + paramName + " Instead got value of " + typeName(val.type) );
     }
@@ -235,8 +249,8 @@ function checkTypeList(arg, index, expectedTypeList) {
         }
     }
     let paramName = "";
-    if (paramName != null) {
-        paramName = "In parameter " + (index + 1);
+    if (index != null) {
+        paramName = getParamName(index);
     }
     let typeNames = expectedTypeList.map(typeName).join(", ");
     console.log("typeName: " + typeNames);
@@ -259,16 +273,14 @@ function value2Num(arg, index) {
         return parseFloat(val.val);
     }
     let paramName = "";
-    if (paramName != null) {
-        paramName = "In parameter " + (index + 1);
+    if (index != null) {
+        paramName = getParamName(index);
     }
     throw new RuntimeException("can't convert " + typeName(val) + " to number. " + paramName);
 }
 
 function value2Str(arg, index) {
     let val;
-
-    //console.log("index: " + index + " : " + typeof(index));
 
     if (index !== undefined) {
         val = arg[index];

@@ -43,11 +43,9 @@ class State {
         this.lastError = this.lastError == null || newError.pos >= this.lastError.pos ? newError : this.lastError;
     }
 
-    //? show is going to clear that one?
     clearLastError() {
         this.lastError = null;
     }
-
 }
 
 class ParserError extends Error {
@@ -150,10 +148,18 @@ let skipWhitespace = function(state) {
     }
 }
 
+/**
+ * set function that is called in order to skip whitespaces
+ * this can be used to skip comments as well
+ * @param argFunction - function that skips whitespaces. The function gets a State object as parameter and advances the pos member)
+ */
 function setSkipWhitespaceFunction(argFunction) {
     skipWhitespace = argFunction;
 }
 
+/**
+ * @returns  function that skips whitespaces
+ */
 function getSkipWhitespaceFunction() {
     return skipWhitespace;
 }
@@ -321,8 +327,9 @@ function requireArrayOfFunctions(a) {
 /**
  * returns parser that applies all argument parsers sequentially. The parser succeeds if all argument parsers succeeded to parse their input.
  * @param arrayOfParsers - array of argument parsers, each one applied after the previous one.
- * @param name - optional name of the parser (for more readable error messages)
+ * @param title - optional name of the parser (for more readable error messages)
  * @param concat - if not true: result of each parser is pushed to result array. (default value). if set: result of each parser is concatenated to the result array
+ * @param clearError - set to true if the last term is an optional sequence.
  * @returns an array with the results returned by each of the sequence parser.
  */
 const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", concat = false, clearError = true) {

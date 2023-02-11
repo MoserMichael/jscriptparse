@@ -1,0 +1,3 @@
+} expected
+5:                     $ # this error is reported incorrectly
+.......................^

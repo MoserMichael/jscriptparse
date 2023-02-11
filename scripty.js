@@ -667,7 +667,7 @@ function makeParserImp() {
                 ], "else clause")
                 , "optional else clause"
             )
-        ], "if statement"),
+        ], "if statement", false, false),
         function (arg) {
 
             let ret = rt.makeIfStmt(arg[1], arg[2], arg[4], arg[0][1]);

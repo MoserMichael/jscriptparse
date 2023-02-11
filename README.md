@@ -75,6 +75,8 @@ after youth age
 
 Writing a programming languages is a whole lot of work. Doing a small programming language makes me appreciate the authors of the tools that i am using everyday. Someone who is implementing a language has to take care of all the detail, a programmer who is using that language is spared this effort, that's something to appreciate!
 
+For example there is great deal of effort that goes into having half way readable error messages during parsing...
+
 There is an awfull amount of detail hidden within a programming languages. Now this reminds me of the movies of [Stanley Kubrick](https://en.wikipedia.org/wiki/Stanley_Kubrick). Kubrick was obsessed with putting meaning into detail, i guess he would have liked the exercise of writing a programming language... (more info in [this documentary](https://www.youtube.com/watch?v=h8t5JFeoesk) )
 
 Another thing: i am learning about interpreted languages (such as python, php, javascript, perl, etc...) 

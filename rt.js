@@ -517,9 +517,9 @@ function* genEvalClosure(funcVal, args, frame) {
     _prepareBuiltinFuncArgs(funcVal, frame, args);
 
     // function call
-    if (funcVal.numParams != args.length) {
+    if (funcVal.numParams != -1 && funcVal.numParams != args.length) {
         throw new RuntimeException("generator takes " + funcVal.numParams + " parameters, whereas " + args.length +
-            "  parameters are passed in call");
+            " parameters are passed in call");
     }
     yield* funcVal.funcImpl(args);
 }
@@ -568,7 +568,7 @@ function evalClosure(name, funcVal, args, frame) {
     }
 
     // function call
-    if (funcVal.numParams != args.length) {
+    if (funcVal.numParams != -1 && funcVal.numParams != args.length) {
         throw new RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
             "  parameters are passed in call");
     }
@@ -693,6 +693,22 @@ function _system(cmd, frame) {
     }
     let val = [ new Value(TYPE_STR, out), new Value(TYPE_NUM, status) ];
     return new Value(TYPE_LIST, val);
+}
+
+function isBascType(ty) {
+    return ty==TYPE_BOOL || ty == TYPE_NUM || ty == TYPE_STR || ty == TYPE_REGEX || ty ==  TYPE_NONE;
+}
+
+function printImpl(arg) {
+    let ret = "";
+    for(let i=0; i<arg.length; ++i) {
+        let val=arg[i];
+        if (isBascType(val.type))
+            ret += value2Str2(val);
+        else
+            ret += rtValueToJson(val);
+    }
+    return ret;
 }
 
 function * genValues(val) {
@@ -1259,12 +1275,12 @@ RTLIB={
     }),
 
     // Input and output functions
-    "print" : new BuiltinFunctionValue("# prints argument value to console", 1, function(arg) {
-        let msg = value2Str(arg, 0);
+    "print" : new BuiltinFunctionValue("# prints argument values to console", -1, function(arg) {
+        let msg = printImpl(arg); //value2Str(arg, 0);
         doLogHook(msg)
     }),
-    "println" : new BuiltinFunctionValue("# prints argument value to console, followed by newline", 1, function(arg) {
-        let msg = value2Str(arg, 0);
+    "println" : new BuiltinFunctionValue("# prints argument values to console, followed by newline", -1, function(arg) {
+        let msg = printImpl(arg); //value2Str(arg, 0);
         doLogHook(msg + "\n")
     }),
     "readFile" : new BuiltinFunctionValue(`

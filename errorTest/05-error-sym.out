@@ -1,0 +1,3 @@
+error in any statement expected one of: if statement, while statement, for statement, break, continue, assignment, function definition, return statement, yield statement, use statement / include, expression, try-catch block, throw statement
+2: $
+...^

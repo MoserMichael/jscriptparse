@@ -73,13 +73,12 @@ class ParserError extends Error {
             return lastError;
         }
         if (lastError.pos == this.pos) {
-            lastError.lastError = this.lastError;
-            return lastError;
+            this.lastError = lastError.lastError;
+            return this;
         }
         if (this.lastError == null) {
             return lastError;
         }
-
         this.lastError = this.lastError.setLastError_(lastError);
         return this;
     }

@@ -458,7 +458,7 @@ function makeParserImp() {
         prs.makeSequenceParser([
             identifier,
             indexExpr
-        ], "index lookup"), function (arg) {
+        ], "index lookup", false, false), function (arg) {
             if (arg.length >= 1) {
                 //console.log(JSON.stringify(arg));
                 return rt.makeIdentifierRef(arg[0], arg[1]);
@@ -869,7 +869,7 @@ function makeParserImp() {
         expression,
         tryCatchBlock,
         throwStmt
-    ], "any statement")
+    ], "statement")
 
 
     let statementList = prs.makeTransformer(
@@ -919,8 +919,7 @@ function makeParserImp() {
             expression,
             tryCatchBlock,
             throwStmt
-
-        ], "any statement"),
+        ], "statement"),
         function(arg, posRange) {
             if (rt.isBreakOrContinue(arg)) {
                 throw new prs.ParserError("statement must be in a loop", arg.startOffset, null, true);

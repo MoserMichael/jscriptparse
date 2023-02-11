@@ -36,3 +36,4 @@ if [[ $FAILED_TESTS != 0 ]]; then
 else
     echo "* all tests passed. have some honey! *"
 fi
+echo ""

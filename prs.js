@@ -101,7 +101,9 @@ function getMostMatchingError(errors) {
 
 
 function throwError(error, lastError) {
-    throw error.setLastError(lastError);
+    let rt = error.setLastError(lastError);
+    //console.log("throw: " + rt.pos + " : " + rt.message);
+    throw rt;
 }
 
 function getLineNo(data, pos) {
@@ -323,7 +325,7 @@ function requireArrayOfFunctions(a) {
  * @param concat - if not true: result of each parser is pushed to result array. (default value). if set: result of each parser is concatenated to the result array
  * @returns an array with the results returned by each of the sequence parser.
  */
-const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", concat = false) {
+const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", concat = false, clearError = true) {
 
     requireArrayOfFunctions(arrayOfParsers);
 
@@ -363,7 +365,10 @@ const makeSequenceParser = function(arrayOfParsers, title ="SequenceParser", con
             }
         }
 
-        state.clearLastError();
+        if (clearError) {
+            //console.log("clearLastError: " + title);
+            state.clearLastError();
+        }
 
         // todo: i don't like that (get rid of that)
         // Achtung! if last element is an empty array then chop it off

@@ -17,12 +17,13 @@
     "PYXTUT.md",
     "PYXFUNC.md",
     "PYXDESIGN.md",
+    "PYXHSTORY.md",
     "rt.js",
     "scripty.js",
     "pyx"  
   ],    
   "dependencies": {
-    "prscombinator": "0.0.3",
+    "prscombinator": "0.0.4",
     "yaml": "^2.2.0"
   },
   "repository": {

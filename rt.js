@@ -711,6 +711,21 @@ function printImpl(arg) {
     return ret;
 }
 
+function dimArray(currentDim, dims) {
+    let n = dims[currentDim];
+    let val = [];
+    if (currentDim != dims.length-1) {
+        for (let i = 0; i < n; ++i) {
+            val[i] = dimArray( currentDim + 1, dims);
+        }
+    } else {
+        for (let i = 0; i < n; ++i) {
+            val[i] = new Value(TYPE_NUM, 0);
+        }
+    }
+    return new Value(TYPE_LIST, val);
+}
+
 function * genValues(val) {
     if (val.type == TYPE_LIST) {
         for(let i=0; i <val.val.length; ++i) {
@@ -1371,6 +1386,29 @@ rename("oldFileName","newFileName")
     }),
 
     // function for arrays
+    "dim" : new BuiltinFunctionValue(`
+# defines n-dimensional array, all elements are set to zero.
+    
+> a=dim(4)
+[0,0,0,0]
+> a=dim(2,3)
+[[0,0,0],[0,0,0]]
+> a=dim(2,3,4)
+[[[0,0,0,0],[0,0,0,0],[0,0,0,0]],[[0,0,0,0],[0,0,0,0],[0,0,0,0]]]    
+`, -1, function(arg) {
+        let dims = [];
+        for(let i =0; i<arg.length;++i) {
+            dims[i] = parseInt(value2Num(arg,i));
+            if (dims[i]<=0) {
+                throw new RuntimeException("parameter " + (i+1) + " must be a positive number");
+            }
+        }
+        if (dims.length == 0) {
+            throw new RuntimeException("at least one dimension must be defined");
+        }
+        return dimArray( 0, dims);
+    }),
+
     "len" : new BuiltinFunctionValue(`> len("abc")
 3
 > len([1,2,3])

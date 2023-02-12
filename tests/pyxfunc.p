@@ -17,7 +17,7 @@ funcCats = [
    "func": [ "print", "println", "readFile", "writeFile", "rename", "unlink", "httpSend", "httpServer" ]
  },
  { "name": "Functions for arrays",
-    "func": [ "len", "join", "map", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex", "shift", "unshift" ]
+    "func": [ "dim", "len", "join", "map", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex", "shift", "unshift" ]
  },
  { "name": "Functions for maps",
     "func": [ "each", "keys", "exists", "map" ]

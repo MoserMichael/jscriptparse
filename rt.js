@@ -3667,6 +3667,19 @@ class AstFunctionDef extends AstBase {
         }
         let closureValue = new ClosureValue(this, defaultParamValues, argFrame);
         if (this.name != null) {
+
+            let prevValue = null
+            try {
+                prevValue = frame.lookup(this.name);
+            } catch(er) {
+                // can throw runtime exception - when value is not defined.:w
+            }
+            if (prevValue != null && prevValue.type == TYPE_BUILTIN_FUNCTION) {
+                throw new RuntimeException("Can't redefine built-in function " + this.name);
+            }
+
+
+
             frame.assign(this.name, closureValue);
         }
         return closureValue;

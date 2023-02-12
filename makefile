@@ -1,9 +1,7 @@
 
 .PHONY: test
 test: install
-		./build/test.sh tests
-		./build/test.sh leetcode
-		./build/test.sh errorTest
+		bash -exc "./build/test.sh tests; ./build/test.sh leetcode; ./build/test.sh errorTest"
 
 .PHONY: publish-prs
 publish-prs:

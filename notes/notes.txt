@@ -536,6 +536,7 @@ You can redefined standard library functions in python3
     >>> print("hello world")
     ERROR:root:hello world
 
+    I think the right balance is to allow redefinition of use functions, but to check for redefinition of built-in functions. 
 
 
 ------

@@ -1,0 +1,3 @@
+value of variable a: 42
+value of function call: 43
+Error: Can't redefine built-in function len

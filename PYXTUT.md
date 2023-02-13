@@ -134,46 +134,46 @@ The ```...``` symbol is only displayed in the interactive shell, it is a sign th
 A real program will not have the ```...``` symbol, it is not part of the text that you are typing.
 
 
-Now you also have mathematical constants = like pi and the euler constant (it looks a bit strange right now, we will learn about maps in a later chapter)
+Now you also have mathematical constants, these are numbers that should never change, like the number Pi and the Euler constant (it looks a bit strange right now, we will learn about maps in a later chapter)
 
 ```
-> mathconst['pi']
+> mathconst.pi
 3.141592653589793
 
-> mathconst['e']
+> mathconst.e
 2.718281828459045
 ```
 
 You can ask about stuff, typing  ```help(mathconst)``` will explain all about ```mathconst```
 
+In the shell: 
+
 ```
 > help(mathconst)
 
-How to use in shell:
-
-# map of mathematical constant
+# map of mathematical constants.
 
 # the number PI
 
-> mathconst['pi']
+> mathconst.pi
 3.141592653589793
 
 # the Euler constant
 
-> mathconst['e']
+> mathconst.e
 2.718281828459045
 
 # The square root of two
 
-> mathconst["sqrt2"]
+> mathconst.sqrt2
 1.4142135623730951
 
-Other values:
-mathconst["sqrt1_2"] - square root of one half.
-mathconst["log2e"] - base e logarithm of 2
-mathconst["log10e"] - base e logarithm of 10
-mathconst["log2e"] - base 2 logarithm of e
-mathconst["log10e"] - base 10 logarithm of e
+# Other values:
+mathconst.sqrt1_2 # - square root of one half.
+mathconst.log2e   # - base e logarithm of 2
+mathconst.log10e  # - base e logarithm of 10
+mathconst.log2e   # - base 2 logarithm of e
+mathconst.log10e  # - base 10 logarithm of e
 ```
 
 You can compute the sinus of pi as follows: ```cos``` is a function, you can ask ```cos``` to compute the cosine on any number ```cos(3)``` returns the cosine of 3.
@@ -218,7 +218,7 @@ You also have variables:  A variable is a name that can be assigned a value (mor
 If you use ```two``` in a mathematical expression, then the value ```2``` will be used - that's the value that we just assigned to the variable!
 
 ```
-> two*three
+> two * three
 6
 ```
 
@@ -226,35 +226,57 @@ If you use ```two``` in a mathematical expression, then the value ```2``` will b
 You can make your own function that computes the sum of the square and the cube of a number
 
 ```
-> def s(x) x * x + x * x * x
+> def twoSquarePlusOne(x) x * x + 1
 ```
 
-and then call use that function to compute the sum of the square and the cube of any number!
+* Here ```def``` means that we are defining a function
+* ```twoSquarePlusOne(x)``` mean that we are defining the function called ```twoSquarePlusOne``` and that the function needs to get a parameter called ```x```
+* when you use the function, then it retuns the following expression, computed with the value of the parameter : ```x * x + 1 ``` that means the argument value raised to the power of two and add one to it/
+
+Let's use that function! 
+
+Look at ```twoSquarePlusOne(2)``` - here the argument x is set to the parameter variable ```2```, and that is used to compute the expression ```x * x  + 1``` - meaning ```2 * 2  + 1``` meaning 5.
 
 ```
-> s(2)
-12
-> s(3)
-36
+> twoSquarePlusOne(2)
+5
+
+> twoSquarePlusOne(3)
+10
+
+> twoSquarePlusOne(4)
+17
+
 ```
 
-The same function can be written as follows: now it uses the built-in function ```pow``` - this one computes the power of a number
+
+The built-in function ```pow``` computes two raised to the power of three, (that means: two multiplied by two multplied by two)
+```
+pow(2,3)
+8
+```
+
+The same function ```twoSquarePlusOne``` can be written as follows: now it uses the built-in function ```pow``` - this one computes the power of a number
 
 ```
-> def s(x) pow(x,2) + pow(x,3)
 
-> s(2)
-12
-> s(3)
-36
+> def twoSquarePlusOne(x) pow(x,2) + 1
+
+
+> twoSquarePlusOne(2)
+9
+
+> twoSquarePlusOne(3)
+10
+
 ```
 
 You can get some explanation on the built-in function pow, or look at the [PYX function reference - pyxfunc](PYXFUNC.md)
 
+Or you can use the built-in function ```help``` to tell us about the built-in function ```pow```
+
 ```
 > help(pow)
-
-How to use in shell:
 
 > pow(2,2)
 4
@@ -262,18 +284,20 @@ How to use in shell:
 8
 > pow(2,4)
 16
+
 ```
 
-Autocompletion: a big trick - you can write the beginning of a function or variale name and then press tab tab - it will show you the name of all functions that start with wht you just typed. ```s tab tab``` will show you the list of functions that start with the letter s.
+Autocompletion: a big trick - you can write the beginning of a function or variale name and then press the TAB key twice - it will show you the name of all functions that start with wht you just typed. ```s tab tab``` will show you the list of functions that start with the letter s.
+(The TAB key has the following label on the keyboard  ```->|```)
 
 ```
 > s
 s(       sin(     sort(    split(   sqrt(    str(     system(
 ```
 
-if you type ```si tab tab``` then there is only one function sin(  - so it will just put sin( at the place where you are typing. Believe me, that's a big time saver!
+if you type ```si TAB TAB``` then there is only one function sin(  - so it will just put sin( at the place where you are typing. Believe me, that's a big time saver
 
-There are other shortcuts in the shell:
+There are other keyboard shortcuts in the shell:
 
 <table width='100%'>
 <tr>
@@ -358,12 +382,16 @@ pythagoras(sideA=3, sideB=4)
 
 ### <a id='s-1-2-4' />functions and lists of values
 
-You can have a list of the numbers between one and five
+You can have a list of the numbers between one and five. 
 
 ```
 > a=[1,2,3,4,5]
 [1,2,3,4,5]
 ```
+
+A list is defined by putting ```[``` followed by the values contained in the list, at the end of the list you put in a ```]``` character.
+The values in the list are all separated by a comma.
+
 
 or get such a list with the ```range``` function
 
@@ -373,33 +401,43 @@ or get such a list with the ```range``` function
 ```
 
 or get a list of the odd numbers between one and twenty (odd numbers do not divide by two)
+The third parameter to range is the value that is used as an increment. The value of one is used, if we have only pass two parameter to the ```range``` function.
 
 ```
 > a=range(1,20,2)
 [1,3,5,7,9,11,13,15,17,19]
 ```
 
-Now compute a list of the squares of all numbers between one and 10.
-
-The first step is to define a function ```s``` that computes the square of the number given as argument. note that the last mathematical expression is also computing the value returnd by the function)
+One thing you can do is access the first, second and third elements of the list, like this
 
 ```
-> def sq(x) x * x
+> a[0]
+1
+> a[1]
+3
+> a[2]
+5
+```
 
-> sq(2)
+Now compute a list of the squares of all numbers between one and 10.
+
+The first step is to define a function ```square``` that computes the square of the number given as argument. note that the last mathematical expression is also computing the value returnd by the function)
+
+```
+> def square(x) x * x
+
+> square(2)
 4
-> sq(3)
+> square(3)
 9
-> sq(4)
+> square(4)
 16
 ```
 
-You see that ```x``` stands for the parameter of the function - that's the value which is passed to the function when it is called.
-
-The built-in ```map``` function will call the ```sq``` function on all element of the list of numbers from one to 9 - and return a new list with the result. In the returned list each number of the original list is turned into its square!
+The built-in ```map``` function will call the ```square``` function on all element of the list of numbers from one to 9 - and return a new list with the result. In the returned list each number of the original list is turned into its square!
 
 ```
-> map( range(1,10), sq)
+> map( range(1,10), square)
 [1,4,9,16,25,36,49,64,81]
 ```
 
@@ -408,7 +446,7 @@ Now lets the compute the sum of all the squares between one and ten
 First put that list of squares in a variable - squares
 
 ```
-> squares=map( range(1,10), sq)
+> squares=map( range(1,10), square)
 [1,4,9,16,25,36,49,64,81]
 ```
 
@@ -420,6 +458,12 @@ now let's get the sum of the squares between one and ten with the built-in ```re
 > reduce(squares, sum, 0)
 285
 ```
+
+The reduce function calls ```sum``` on the initial value 0 and the first value of the list. Next it calls ```sum``` on the result of the previous step and the second value of the list, and so on.
+
+It would be the same as calling ``` sum( squares[2], sum( squares[1]. sum( squares[0], 0)))) ``` and so on, up until the last element.
+
+
 
 You can also have functions that return other functions. now that's a bit tricky:
 
@@ -445,6 +489,13 @@ Now calling ```anypower(3)``` will return another function that will always comp
 
 ```
 
+There are a number of almost magical tricks here: 
+
+- ```def(x) pow(x,n)``` is using the variable ```n``` that is defined outside of that same function - that's because it is nested within the ```anypower``` function, so that the value of ```n``` becomes part of the environment of the returned function
+-  also see that the function ```def(x) pow(x,n)``` does not have a name, that's on purpose - it's an anonymous function that is used only as a return value
+-   ```powOfThree=anyposer(3)``` - the returned function is stored in variable ```powOfThree```. that means that a function is a kind of value, that can hold some captured state in i (this is referring to the value n, that is defined outside of the returned function).
+- ```powOfThree(3) - the function stored in the variable ```powOfThree``` is used as a function.
+
 An now you can use that to compute the table of squares for any number
 
 ```
@@ -464,6 +515,8 @@ And now lets get the sum of the power of three for the numbers between one and o
 > reduce( map( range(1,100), anypower(3) ), sum, 0)
 24502500
 ```
+
+It takes a while to learn all these conceptt. It blew my mind, when I somehow learned all this, believe me!
 
 ### <a id='s-1-2-5' />Statements
 

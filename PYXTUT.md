@@ -520,7 +520,7 @@ It takes a while to learn all these conceptt. It blew my mind, when I somehow le
 
 ### <a id='s-1-2-5' />Statements
 
-You can do the same thing differently
+You can do the same thing differently, this time less magic is involved:
 
 lets print out all numbers between one and one hundred in a differnt way
 
@@ -539,10 +539,12 @@ lets print out all numbers between one and one hundred in a differnt way
 100
 ```
 
-First the number 0 is put into variable i
-now we have a while statement: this one continues to do the stuff within the brackets, while the variable i is smaller than 100
-Now the stuff in the brackets does two things - it prints out the value of i with ```println(i)``` and then sets i to the value of i plus one.
-Now if you want to group togather more then one statement then you need to put these within the brackets { and }
+- First the number 0 is put into variable i
+- now we have a ```while``` statement: this one continues to do the stuff within the brackets { and }, while the variable i is smaller than 100.  
+    - Now the stuff in the brackets does two things - it prints out the value of i with ```println(i)``` and then sets i to the value of i plus one.
+    - lets look at ```i=i+1``` the right hand side ```i+1``` takes the old value of i and adds one to it. Now we got a new value, this new value is then stored back into the memory location referred to by variable ```i```
+      So we take the old value and add one to it, and then put that value back into variable ```i```.
+- if you want to group togather more then one statement then you need to put these within the brackets { and }
 
 Now lets get the sum of all squares between one and one hundred
 
@@ -559,6 +561,9 @@ Now lets get the sum of all squares between one and one hundred
 > println(sum)
 328350
 ```
+
+Again: ```sum=sum+i*i``` , first take and compute the square of ```i*i``` and add that result to the old value of ```sum```, then put the computed value back into variable ```sum```
+
 
 Or you can make a function that computes the sum of all the squares of numbers for a given range numbers
 
@@ -613,6 +618,7 @@ Is a for loop better than a while loop? Depends how you look on it,
 - on the other hand a for loop means less code, less code means fewer opportunities to do something wrong.
 
 It's a kind of trade off - the world of programming has many trade offs...
+
 
 ### <a id='s-1-2-6' />Maps
 

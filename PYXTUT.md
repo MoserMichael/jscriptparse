@@ -80,7 +80,7 @@
 
 First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/) (also see Instruction for installing [node.js on Linux](https://nodejs.org/en/download/package-manager/#centos-fedora-and-red-hat-enterprise-linux) )
 
-Now, from the command line: Install the pyx shell with the following command 
+Now open a shell, from the command line: Install the pyx shell with the following command  
 
 ```
 npm install pyxlang -g
@@ -103,7 +103,7 @@ You can enter arithmetic expression, and see the result
 4
 ```
 
-Or more complicated ones: the sum of the square of three with the square of two
+Or more complicated ones: the sum of the square of three with the square of two (the * sign means multiplication)
 
 ```
 > 3*3+2*2
@@ -193,7 +193,7 @@ You can compute the sinus of pi as follows: ```cos``` is a function, you can ask
 Of the cosine of pi:
 
 ```
-> cos(mathconst['pi'])
+> cos(mathconst.pi)
 -1
 ```
 
@@ -210,7 +210,6 @@ parseJsonString(  pop(              pow(              print(            println(
 repeat(           reverse(          sin(              sort(             split(            sqrt(             str(              system(           tan(              time(
 toJsonString(     type(             uc(               writeFile(
 ```
-
 See more information about the built-in functions in [this reference](PYXFUNC.md)
 
 You also have variables:  A variable is a name that can be assigned a value (more exactly: it is a name that stands for a location in computer memory where a value is being stored)
@@ -222,7 +221,7 @@ You also have variables:  A variable is a name that can be assigned a value (mor
 3
 ```
 
-If you use ```two``` in a mathematical expression, then the value ```2``` will be used - that's the value that we just assigned to the variable!
+If you use ```two``` in a mathematical expression, then it's stored value ```2``` will be used - that's the value that we just assigned to the variable!
 
 ```
 > two * three
@@ -230,7 +229,7 @@ If you use ```two``` in a mathematical expression, then the value ```2``` will b
 ```
 
 
-You can make your own function that computes the sum of the square and the cube of a number
+You can make your own function that computes the square of a given number and adds a one to it
 
 ```
 > def twoSquarePlusOne(x) x * x + 1
@@ -238,7 +237,7 @@ You can make your own function that computes the sum of the square and the cube 
 
 * Here ```def``` means that we are defining a function
 * ```twoSquarePlusOne(x)``` mean that we are defining the function called ```twoSquarePlusOne``` and that the function needs to get a parameter called ```x```
-* when you use the function, then it retuns the following expression, computed with the value of the parameter : ```x * x + 1 ``` that means the argument value raised to the power of two and add one to it/
+* when you use the function, then it retuns the following expression, computed with the value of the parameter : ```x * x + 1 ``` that means the argument value raised to the power of two and add one to it.
 
 Let's use that function! 
 
@@ -256,12 +255,31 @@ Look at ```twoSquarePlusOne(2)``` - here the argument x is set to the parameter 
 
 ```
 
+You can also use the function call in any arithmetic expression
 
-The built-in function ```pow``` computes two raised to the power of three, (that means: two multiplied by two multplied by two)
+
+```
+> num = 2 * twoSquarePlusOne(3)
+20
+> num - 1
+19
+```
+
+First the function is called ```twoSquarePlusOne(3)``` and the result, which is 10, is multiplied by two. The result is 20, that value is stored in variable ```num```.
+
+The next line takes the value of variable ```num``` and substracts one from it, we get 19.
+
+
+
+There are also built-in functions, that come with the language. For examople the built-in function takes the first argument and raises it to the power defined by the second argument.
+
 ```
 pow(2,3)
 8
 ```
+
+Here ```pow``` computes two to the power of three, (that means: two multiplied by two multplied by two)
+
 
 The same function ```twoSquarePlusOne``` can be written as follows: now it uses the built-in function ```pow``` - this one computes the power of a number
 
@@ -633,6 +651,38 @@ now things become much easier when you only view the progam in terms of function
 
 
 i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
+
+### Multi dimensional lists
+
+You can get a list of ten numbers, where all of the numbers are zero. You can use the ```dim``` function:
+
+```
+> lst = dim(10)
+[0,0,0,0,0,0,0,0,0,0]
+```
+
+You can also get a list of lists like this:
+
+```
+> lst = dim(3,3)
+[[0,0,0],[0,0,0],[0,0,0]]
+````
+
+Each element of the list is another list. Now you can access that as a board for a three in a row game:
+
+```
+> lst[0][0]=1
+1
+> lst[1][1]=1
+1
+> lst[2][2]=1
+1
+
+> lst
+[[1,0,0],[0,1,0],[0,0,1]]
+```
+
+if you want to check what is on the board: ```lst[0][0]``` - first we get the first row ```lst[0]``` then we get the first element of the first row ```lst[0][0]```
 
 
 ### <a id='s-1-2-7' />Maps

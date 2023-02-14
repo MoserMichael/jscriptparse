@@ -428,9 +428,7 @@ One thing you can do is access the first, second and third elements of the list,
 
 ### <a id='s-1-2-5' />Statements
 
-You can do the same thing differently, this time less magic is involved:
-
-lets print out all numbers between one and one hundred in a differnt way
+lets print out all numbers between one and one hundred 
 
 ```
 > i=0

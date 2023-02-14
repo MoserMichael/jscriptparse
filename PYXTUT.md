@@ -9,9 +9,9 @@
   * [An overview](#s-1-2)
     * [functions and lists of values](#s-1-2-4)
     * [Statements](#s-1-2-5)
-    * [Maps](#s-1-2-6)
-    * [Object based programming](#s-1-2-7)
-    * [Functional programming](#s-1-2-8)
+    * [Functional programming](#s-1-2-6)
+    * [Maps](#s-1-2-7)
+    * [Object based programming](#s-1-2-8)
     * [Splitting up a program into multiple source files](#s-1-2-9)
   * [Features for specific tasks](#s-1-3)
     * [Working with text](#s-1-3-10)
@@ -27,6 +27,8 @@
     * [HTTP servers](#s-1-5-18)
   * [Conclusion](#s-1-6)
 <!-- toc-end -->
+
+
 
 
 
@@ -525,7 +527,7 @@ Is a for loop better than a while loop? Depends how you look on it,
 
 It's a kind of trade off - the world of programming has many trade offs...
 
-### <a id='s-1-2-8' />Functional programming
+### <a id='s-1-2-6' />Functional programming
 
 Now compute a list of the squares of all numbers between one and 10.
 
@@ -635,7 +637,7 @@ now things become much easier when you only view the progam in terms of function
 i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
 
 
-### <a id='s-1-2-6' />Maps
+### <a id='s-1-2-7' />Maps
 
 There is a type of data called a map. It allows to give names to things.
 
@@ -687,7 +689,7 @@ Of you can use the map to organize your data, like having a list of records for 
 
 ```
 
-### <a id='s-1-2-7' />Object based programming
+### <a id='s-1-2-8' />Object based programming
 
 Lets say we have a map like this:
 

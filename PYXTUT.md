@@ -765,6 +765,7 @@ now things become much easier when you only view the progam in terms of function
 
 (However you may ignore all of this, just get your program going with statemnts that doe assighments, like in the previous chapter - i would dare to say this ;-)
 
+i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
 
 ### <a id='s-1-2-8' />Splitting up a program into multiple source files
 

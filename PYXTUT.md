@@ -11,21 +11,26 @@
     * [Statements](#s-1-2-5)
     * [Maps](#s-1-2-6)
     * [Object based programming](#s-1-2-7)
-    * [Splitting up a program into multiple source files](#s-1-2-8)
+    * [Functional programming](#s-1-2-8)
+    * [Splitting up a program into multiple source files](#s-1-2-9)
   * [Features for specific tasks](#s-1-3)
-    * [Working with text](#s-1-3-9)
-    * [Regular expressions](#s-1-3-10)
-    * [Running processes](#s-1-3-11)
-    * [working with structured data (json and yaml)](#s-1-3-12)
+    * [Working with text](#s-1-3-10)
+    * [Regular expressions](#s-1-3-11)
+    * [Running processes](#s-1-3-12)
+    * [working with structured data (json and yaml)](#s-1-3-13)
   * [Even more language features](#s-1-4)
-    * [Error handling with exceptions](#s-1-4-13)
-    * [Generators and the yield statement](#s-1-4-14)
+    * [Error handling with exceptions](#s-1-4-14)
+    * [Generators and the yield statement](#s-1-4-15)
   * [Input and output](#s-1-5)
-    * [reading/writing files](#s-1-5-15)
-    * [HTTP clients](#s-1-5-16)
-    * [HTTP servers](#s-1-5-17)
+    * [reading/writing files](#s-1-5-16)
+    * [HTTP clients](#s-1-5-17)
+    * [HTTP servers](#s-1-5-18)
   * [Conclusion](#s-1-6)
 <!-- toc-end -->
+
+
+
+
 
 
 
@@ -657,7 +662,7 @@ re: 6 im: 8
 
 Some say that [Objects and Closures are equivalent](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent), however this is the subject of a lively debate (see the [link](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent) ).
 
-## Functional programming 
+### <a id='s-1-2-8' />Functional programming
 
 Now compute a list of the squares of all numbers between one and 10.
 
@@ -767,7 +772,7 @@ now things become much easier when you only view the progam in terms of function
 
 i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
 
-### <a id='s-1-2-8' />Splitting up a program into multiple source files
+### <a id='s-1-2-9' />Splitting up a program into multiple source files
 
 You can divide your program into multiple files. That's can be very convenient if the file grows too large, or if you have a function that you want to use in more than one program, without having to copy the text of the function.
 
@@ -819,7 +824,7 @@ An important detail: if you have the ```PATH``` environment variable set, then t
 
 ## <a id='s-1-3' />Features for specific tasks
 
-### <a id='s-1-3-9' />Working with text
+### <a id='s-1-3-10' />Working with text
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -1085,7 +1090,7 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-### <a id='s-1-3-10' />Regular expressions
+### <a id='s-1-3-11' />Regular expressions
 
 Sometimes you don't want to find an exact string, instead it is possible to specify a pattern that can match a multitude of possible text values.
 A regular expression describes a text pattern, you can do some neat tricks with these patterns.
@@ -1163,7 +1168,7 @@ Let's look at ```\s*``` , here ```\s``` is standing for a whitespace character a
 
 There are a few more options for regular expression, Please see this [Regualar expression cheatsheet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet) (The explanation in the link is relevant for javascript as well as the PYX language)
 
-### <a id='s-1-3-11' />Running processes
+### <a id='s-1-3-12' />Running processes
 
 You can run other command line programs, just like this:
 
@@ -1295,7 +1300,7 @@ var
 Both ```system``` and the backtick operator run the process in the default shell ( '/bin/sh' on Unix, process.env.ComSpec on Windows )
 Now the built-in variable ```ENV``` is a map, it stands for the environment variables. If you add or remove an entry in ```ENV``` then the changed environment variables will be passed to the processes that are run via ```system``` or the backtick operator.
 
-### <a id='s-1-3-12' />working with structured data (json and yaml)
+### <a id='s-1-3-13' />working with structured data (json and yaml)
 
 let's say you have some structured string encoded as text in the [json](https://en.wikipedia.org/wiki/JSON) format.
 You can make a variable out of it - with the ```parseJsonString``` function
@@ -1376,7 +1381,7 @@ the ```parseYamlString``` function converts the YAML text back into a value of n
 
 ## <a id='s-1-4' />Even more language features
 
-### <a id='s-1-4-13' />Error handling with exceptions
+### <a id='s-1-4-14' />Error handling with exceptions
 
 Runtime errors can happen in a program, like dividing by zero
 
@@ -1451,7 +1456,7 @@ The fields of this variable
 There is a third possible clause in a try/catch block - the ```finally``` statement - this block of statements is run in both the event of an error or if no error occured within the try block!
 
 
-### <a id='s-1-4-14' />Generators and the yield statement
+### <a id='s-1-4-15' />Generators and the yield statement
 
 The ```for``` statement is a bit special.
 
@@ -1519,20 +1524,20 @@ The ```mygen``` function is called a generator function, because it has a ```yie
 
 ## <a id='s-1-5' />Input and output
 
-### <a id='s-1-5-15' />reading/writing files
+### <a id='s-1-5-16' />reading/writing files
 
 tbd 
 
 Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
 
-### <a id='s-1-5-16' />HTTP clients
+### <a id='s-1-5-17' />HTTP clients
 
 tbd
 
 Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
 
 
-### <a id='s-1-5-17' />HTTP servers
+### <a id='s-1-5-18' />HTTP servers
 
 tbd
 

@@ -1,6 +1,6 @@
 ## PYX releases
 
-* NEXT RELEASE
+* PYX 0.16 / PRS 0.0.4  
     * Throw error on redefinition of built-in functions.
     * Add dim function - definition of multi-dimensional array.
     * make PYXTUT.md more accessible. 

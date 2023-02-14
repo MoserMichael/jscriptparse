@@ -734,7 +734,7 @@ There are a number of almost magical tricks here:
 - ```def(x) pow(x,n)``` is using the variable ```n``` that is defined outside of that same function - that's because it is nested within the ```anypower``` function, so that the value of ```n``` becomes part of the environment of the returned function
 -  also see that the function ```def(x) pow(x,n)``` does not have a name, that's on purpose - it's an anonymous function that is used only as a return value
 -   ```powOfThree=anyposer(3)``` - the returned function is stored in variable ```powOfThree```. that means that a function is a kind of value, that can hold some captured state in i (this is referring to the value n, that is defined outside of the returned function).
-- ```powOfThree(3) - the function stored in the variable ```powOfThree``` is used as a function.
+- ```powOfThree(3)``` - the function stored in the variable ```powOfThree``` is used as a function.
 
 An now you can use that to compute the table of squares for any number
 

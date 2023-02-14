@@ -525,6 +525,115 @@ Is a for loop better than a while loop? Depends how you look on it,
 
 It's a kind of trade off - the world of programming has many trade offs...
 
+### <a id='s-1-2-8' />Functional programming
+
+Now compute a list of the squares of all numbers between one and 10.
+
+The first step is to define a function ```square``` that computes the square of the number given as argument. note that the last mathematical expression is also computing the value returnd by the function)
+
+```
+> def square(x) x * x
+
+> square(2)
+4
+> square(3)
+9
+> square(4)
+16
+```
+
+The built-in ```map``` function will call the ```square``` function on all element of the list of numbers from one to 9 - and return a new list with the result. In the returned list each number of the original list is turned into its square!
+
+```
+> map( range(1,10), square)
+[1,4,9,16,25,36,49,64,81]
+```
+
+Now lets the compute the sum of all the squares between one and ten
+
+First put that list of squares in a variable - squares
+
+```
+> squares=map( range(1,10), square)
+[1,4,9,16,25,36,49,64,81]
+```
+
+now let's get the sum of the squares between one and ten with the built-in ```reduce``` function.
+
+```
+> def sum(x,y) x+y
+
+> reduce(squares, sum, 0)
+285
+```
+
+The reduce function calls ```sum``` on the initial value 0 and the first value of the list. Next it calls ```sum``` on the result of the previous step and the second value of the list, and so on.
+
+It would be the same as calling ``` sum( squares[2], sum( squares[1]. sum( squares[0], 0)))) ``` and so on, up until the last element.
+
+
+
+You can also have functions that return other functions. now that's a bit tricky:
+
+function ```anypower``` gets the argument variable n.
+all it does is to return an unnamed function as return value ```def(x) pow(x,y)``` this function can always use the outer variable n - as it was passed when ```anypower``` was called.
+
+```
+> def anypower(n)
+... return def(x) pow(x,n)
+```
+
+Now calling ```anypower(3)``` will return another function that will always compute the power of three.
+
+```
+> powOfThree=anypower(3)
+
+> powOfThree(2)
+8
+> powOfThree(3)
+27
+> powOfThree(4)
+64
+
+```
+
+There are a number of almost magical tricks here:
+
+- ```def(x) pow(x,n)``` is using the variable ```n``` that is defined outside of that same function - that's because it is nested within the ```anypower``` function, so that the value of ```n``` becomes part of the environment of the returned function
+-  also see that the function ```def(x) pow(x,n)``` does not have a name, that's on purpose - it's an anonymous function that is used only as a return value
+-   ```powOfThree=anyposer(3)``` - the returned function is stored in variable ```powOfThree```. that means that a function is a kind of value, that can hold some captured state in i (this is referring to the value n, that is defined outside of the returned function).
+- ```powOfThree(3)``` - the function stored in the variable ```powOfThree``` is used as a function.
+
+An now you can use that to compute the table of squares for any number
+
+```
+> map( range(1,10), anypower(2) )
+[1,4,9,16,25,36,49,64,81]
+
+> map( range(1,10), anypower(3) )
+[1,8,27,64,125,216,343,512,729]
+
+> map( range(1,10), anypower(4) )
+[1,16,81,256,625,1296,2401,4096,6561]
+```
+
+And now lets get the sum of the power of three for the numbers between one and one hundred
+
+```
+> reduce( map( range(1,100), anypower(3) ), sum, 0)
+24502500
+```
+
+It takes a while to learn all these conceptt. It blew my mind, when I somehow learned all this, believe me!
+
+All this has a big advantage - when dealing with a big program it is easier to think of it in terms of functions,
+
+Assign statements can change all sorts of variables, you can't know which variables have been changed at any given moment,
+now things become much easier when you only view the progam in terms of functions.
+
+
+i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
+
 
 ### <a id='s-1-2-6' />Maps
 
@@ -661,116 +770,6 @@ re: 6 im: 8
 ```
 
 Some say that [Objects and Closures are equivalent](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent), however this is the subject of a lively debate (see the [link](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent) ).
-
-### <a id='s-1-2-8' />Functional programming
-
-Now compute a list of the squares of all numbers between one and 10.
-
-The first step is to define a function ```square``` that computes the square of the number given as argument. note that the last mathematical expression is also computing the value returnd by the function)
-
-```
-> def square(x) x * x
-
-> square(2)
-4
-> square(3)
-9
-> square(4)
-16
-```
-
-The built-in ```map``` function will call the ```square``` function on all element of the list of numbers from one to 9 - and return a new list with the result. In the returned list each number of the original list is turned into its square!
-
-```
-> map( range(1,10), square)
-[1,4,9,16,25,36,49,64,81]
-```
-
-Now lets the compute the sum of all the squares between one and ten
-
-First put that list of squares in a variable - squares
-
-```
-> squares=map( range(1,10), square)
-[1,4,9,16,25,36,49,64,81]
-```
-
-now let's get the sum of the squares between one and ten with the built-in ```reduce``` function.
-
-```
-> def sum(x,y) x+y
-
-> reduce(squares, sum, 0)
-285
-```
-
-The reduce function calls ```sum``` on the initial value 0 and the first value of the list. Next it calls ```sum``` on the result of the previous step and the second value of the list, and so on.
-
-It would be the same as calling ``` sum( squares[2], sum( squares[1]. sum( squares[0], 0)))) ``` and so on, up until the last element.
-
-
-
-You can also have functions that return other functions. now that's a bit tricky:
-
-function ```anypower``` gets the argument variable n.
-all it does is to return an unnamed function as return value ```def(x) pow(x,y)``` this function can always use the outer variable n - as it was passed when ```anypower``` was called.
-
-```
-> def anypower(n)
-... return def(x) pow(x,n)
-```
-
-Now calling ```anypower(3)``` will return another function that will always compute the power of three.
-
-```
-> powOfThree=anypower(3)
-
-> powOfThree(2)
-8
-> powOfThree(3)
-27
-> powOfThree(4)
-64
-
-```
-
-There are a number of almost magical tricks here:
-
-- ```def(x) pow(x,n)``` is using the variable ```n``` that is defined outside of that same function - that's because it is nested within the ```anypower``` function, so that the value of ```n``` becomes part of the environment of the returned function
--  also see that the function ```def(x) pow(x,n)``` does not have a name, that's on purpose - it's an anonymous function that is used only as a return value
--   ```powOfThree=anyposer(3)``` - the returned function is stored in variable ```powOfThree```. that means that a function is a kind of value, that can hold some captured state in i (this is referring to the value n, that is defined outside of the returned function).
-- ```powOfThree(3)``` - the function stored in the variable ```powOfThree``` is used as a function.
-
-An now you can use that to compute the table of squares for any number
-
-```
-> map( range(1,10), anypower(2) )
-[1,4,9,16,25,36,49,64,81]
-
-> map( range(1,10), anypower(3) )
-[1,8,27,64,125,216,343,512,729]
-
-> map( range(1,10), anypower(4) )
-[1,16,81,256,625,1296,2401,4096,6561]
-```
-
-And now lets get the sum of the power of three for the numbers between one and one hundred
-
-```
-> reduce( map( range(1,100), anypower(3) ), sum, 0)
-24502500
-```
-
-It takes a while to learn all these conceptt. It blew my mind, when I somehow learned all this, believe me!
-
-All this has a big advantage - when dealing with a big program it is easier to think of it in terms of functions,
-
-Assign statements can change all sorts of variables, you can't know which variables have been changed at any given moment,
-now things become much easier when you only view the progam in terms of functions.
-
-(However you may ignore all of this, just get your program going with statemnts that doe assighments, like in the previous chapter - i would dare to say this ;-)
-
-i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
 
 ### <a id='s-1-2-9' />Splitting up a program into multiple source files
 

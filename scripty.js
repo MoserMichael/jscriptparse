@@ -761,10 +761,14 @@ function makeParserImp() {
     let paramDef = prs.makeSequenceParser([
         identifier,
         prs.makeOptParser(
-            prs.makeSequenceParser([
-                prs.makeTokenParser("="),
-                expression
-            ], "function parameter")
+            prs.makeTransformer(
+                prs.makeSequenceParser([
+                    prs.makeTokenParser("="),
+                    expression
+                ], "function parameter")
+                , function(arg) {
+                    return arg[1];
+                })
             , "optional function parameter"
         )
     ], "function parameter list");

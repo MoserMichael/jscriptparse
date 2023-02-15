@@ -526,6 +526,7 @@ function* genEvalClosure(funcVal, args, frame) {
 
 function evalClosure(name, funcVal, args, frame) {
     if (funcVal.type == TYPE_CLOSURE) {
+
         let funcFrame = null;
         let traceParam = "";
 
@@ -652,8 +653,10 @@ function _prepareClosureFrame(funcVal, frame, args) {
         }
         funcFrame.defineVar(paramDef[0][0], defaultParamValue);
 
-        if (traceParam != "") {
-            traceParam += ", ";
+        if (traceMode) {
+            if (traceParam != "") {
+                traceParam += ", ";
+            }
         }
         traceParam += paramDef[0][0] + "=" + rtValueToJson(defaultParamValue);
     }
@@ -3640,7 +3643,7 @@ function _evalDefaultParams(frame, params) {
     for(let i = 0;i < params.length; ++i) {
         let param = params[i];
         if (param.length > 1) {
-            let defValue = param[2].eval(frame);
+            let defValue = param[1][0].eval(frame);
             ret.push(defValue);
         } else {
             ret.push(null);
@@ -3669,19 +3672,15 @@ class AstFunctionDef extends AstBase {
         }
         let closureValue = new ClosureValue(this, defaultParamValues, argFrame);
         if (this.name != null) {
-
             let prevValue = null
             try {
                 prevValue = frame.lookup(this.name);
             } catch(er) {
-                // can throw runtime exception - when value is not defined.:w
+                // can throw runtime exception - when value is not defined
             }
             if (prevValue != null && prevValue.type == TYPE_BUILTIN_FUNCTION) {
                 throw new RuntimeException("Can't redefine built-in function " + this.name);
             }
-
-
-
             frame.assign(this.name, closureValue);
         }
         return closureValue;

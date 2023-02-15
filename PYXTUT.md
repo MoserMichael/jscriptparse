@@ -9,25 +9,30 @@
   * [An overview](#s-1-2)
     * [functions and lists of values](#s-1-2-4)
     * [Statements](#s-1-2-5)
-    * [Functional programming](#s-1-2-6)
-    * [Multi dimensional lists](#s-1-2-7)
+    * [Multi dimensional lists](#s-1-2-6)
+    * [Recursion - a function calling itself](#s-1-2-7)
     * [Maps](#s-1-2-8)
-    * [Object based programming](#s-1-2-9)
-    * [Splitting up a program into multiple source files](#s-1-2-10)
+    * [Splitting up a program into multiple source files](#s-1-2-9)
   * [Features for specific tasks](#s-1-3)
-    * [Working with text](#s-1-3-11)
-    * [Regular expressions](#s-1-3-12)
-    * [Running processes](#s-1-3-13)
-    * [working with structured data (json and yaml)](#s-1-3-14)
-  * [Even more language features](#s-1-4)
-    * [Error handling with exceptions](#s-1-4-15)
-    * [Generators and the yield statement](#s-1-4-16)
+    * [Working with text](#s-1-3-10)
+    * [Regular expressions](#s-1-3-11)
+    * [Running processes](#s-1-3-12)
+    * [working with structured data (json and yaml)](#s-1-3-13)
+  * [Even more language features / advanced stuff](#s-1-4)
+    * [Functional programming](#s-1-4-14)
+    * [Object based programming](#s-1-4-15)
+    * [Error handling with exceptions](#s-1-4-16)
+    * [Generators and the yield statement](#s-1-4-17)
   * [Input and output](#s-1-5)
-    * [reading/writing files](#s-1-5-17)
-    * [HTTP clients](#s-1-5-18)
-    * [HTTP servers](#s-1-5-19)
+    * [reading/writing files](#s-1-5-18)
+    * [HTTP clients](#s-1-5-19)
+    * [HTTP servers](#s-1-5-20)
   * [Conclusion](#s-1-6)
 <!-- toc-end -->
+
+
+
+
 
 
 
@@ -546,116 +551,7 @@ Is a for loop better than a while loop? Depends how you look on it,
 
 It's a kind of trade off - the world of programming has many trade offs...
 
-### <a id='s-1-2-6' />Functional programming
-
-Now compute a list of the squares of all numbers between one and 10.
-
-The first step is to define a function ```square``` that computes the square of the number given as argument. note that the last mathematical expression is also computing the value returnd by the function)
-
-```
-> def square(x) x * x
-
-> square(2)
-4
-> square(3)
-9
-> square(4)
-16
-```
-
-The built-in ```map``` function will call the ```square``` function on all element of the list of numbers from one to 9 - and return a new list with the result. In the returned list each number of the original list is turned into its square!
-
-```
-> map( range(1,10), square)
-[1,4,9,16,25,36,49,64,81]
-```
-
-Now lets the compute the sum of all the squares between one and ten
-
-First put that list of squares in a variable - squares
-
-```
-> squares=map( range(1,10), square)
-[1,4,9,16,25,36,49,64,81]
-```
-
-now let's get the sum of the squares between one and ten with the built-in ```reduce``` function.
-
-```
-> def sum(x,y) x+y
-
-> reduce(squares, sum, 0)
-285
-```
-
-The reduce function calls ```sum``` on the initial value 0 and the first value of the list. Next it calls ```sum``` on the result of the previous step and the second value of the list, and so on.
-
-It would be the same as calling ``` sum( squares[2], sum( squares[1]. sum( squares[0], 0)))) ``` and so on, up until the last element.
-
-
-
-You can also have functions that return other functions. now that's a bit tricky:
-
-function ```anypower``` gets the argument variable n.
-all it does is to return an unnamed function as return value ```def(x) pow(x,y)``` this function can always use the outer variable n - as it was passed when ```anypower``` was called.
-
-```
-> def anypower(n)
-... return def(x) pow(x,n)
-```
-
-Now calling ```anypower(3)``` will return another function that will always compute the power of three.
-
-```
-> powOfThree=anypower(3)
-
-> powOfThree(2)
-8
-> powOfThree(3)
-27
-> powOfThree(4)
-64
-
-```
-
-There are a number of almost magical tricks here:
-
-- ```def(x) pow(x,n)``` is using the variable ```n``` that is defined outside of that same function - that's because it is nested within the ```anypower``` function, so that the value of ```n``` becomes part of the environment of the returned function
--  also see that the function ```def(x) pow(x,n)``` does not have a name, that's on purpose - it's an anonymous function that is used only as a return value
--   ```powOfThree=anyposer(3)``` - the returned function is stored in variable ```powOfThree```. that means that a function is a kind of value, that can hold some captured state in i (this is referring to the value n, that is defined outside of the returned function).
-- ```powOfThree(3)``` - the function stored in the variable ```powOfThree``` is used as a function.
-
-An now you can use that to compute the table of squares for any number
-
-```
-> map( range(1,10), anypower(2) )
-[1,4,9,16,25,36,49,64,81]
-
-> map( range(1,10), anypower(3) )
-[1,8,27,64,125,216,343,512,729]
-
-> map( range(1,10), anypower(4) )
-[1,16,81,256,625,1296,2401,4096,6561]
-```
-
-And now lets get the sum of the power of three for the numbers between one and one hundred
-
-```
-> reduce( map( range(1,100), anypower(3) ), sum, 0)
-24502500
-```
-
-It takes a while to learn all these conceptt. It blew my mind, when I somehow learned all this, believe me!
-
-All this has a big advantage - when dealing with a big program it is easier to think of it in terms of functions,
-
-Assign statements can change all sorts of variables, you can't know which variables have been changed at any given moment,
-now things become much easier when you only view the progam in terms of functions.
-
-
-i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
-
-### <a id='s-1-2-7' />Multi dimensional lists
+### <a id='s-1-2-6' />Multi dimensional lists
 
 You can get a list of ten numbers, where all of the numbers are zero. You can use the ```dim``` function:
 
@@ -687,6 +583,144 @@ Each element of the list is another list. Now you can access that as a board for
 
 if you want to check what is on the board: ```lst[0][0]``` - first we get the first row ```lst[0]``` then we get the first element of the first row ```lst[0][0]```
 
+### <a id='s-1-2-7' />Recursion - a function calling itself
+
+Sometimes a big problem can be divided into smaller pieces, now the small pieces may also look like the big problem, like here:
+
+[<img alt="Sierpinsky Triangle" src="notes/Sierpinski_triangle.svg" />]
+
+Or it's an action that repeats itself again and again, like this picture by M. C. Escher, the left hand is drawing the right one, which is drawing the left one...
+
+[<img alt="Hands by E.C. Escher" src="notes/Escher_hands.jpg" />]  You can see more of his paintings in this [online gallery](https://mcescher.com/gallery/) 
+
+
+Now in programming you can get the same effect, by a function that calls itself.
+
+
+Let's say you want to compute the product of all numbers from 1 to any given number.
+
+
+```
+> def factorial(n)
+... if n == 1
+...  1 else n * factorial(n-1)
+"<function>"
+
+> factorial(3)
+6
+> factorial(4)
+24
+> factorial(5)
+120
+```  
+The function ```factorial``` takes the argument ```n``` , if it is one, then it returns one, if it is not one then it takes that number and multiplies it with ```factorial(n-1)```
+
+The function ```factorial``` is calling itself, that is called recursion.
+
+Let's say you want to get the factorial of four
+
+```
+factorial(4) == ( 4 * factorial(3)) == (4 * (3 * factorial(2)))  === (4 * (3 * (2 * 1)))
+```
+
+You can write down the same thing without recursion.
+
+```
+> def factorial(n) {
+... result = 1
+... for i range(1,n+1)
+...   result = result * i
+... return result
+... }
+"<function>"
+
+> factorial(3)
+6
+> factorial(4)
+24
+> factorial(5)
+120
+```
+
+A second example: lets say you have a list of numbers that are ordered - each element of the list is bigger than the previous one.
+
+```
+> tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17, 20]
+[2,4,5,7,9,10,12,14,15,17]
+```
+
+We want to search this array, and check if the number 12 is part of this list or not.
+
+The approach is to take check if the number in them middle of the list - that's the sixth element tosearch[5] is 10.
+Now 10 is smaller than 12, that means that we need to look at the list between the sixth and the eleventh element and search that part.
+Now we are looking at the list toSearch=[10, 12, 14, 15, 17, 20], again take the middle element, with the value 15 - this one is bigger than 12 - so look at the first half.
+
+
+Let's do the search without recursion.
+
+```
+tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
+
+println("searching:", tosearch)
+
+def search(tosearch, findme) {
+  low=0
+  high=len(tosearch)-1
+
+  while low <= high {
+    middle = int( (high + low)/2 )
+
+    if tosearch[ middle ] == findme 
+        return true
+    elif tosearch[ middle ] > findme 
+        high = middle-1
+     else 
+        low = middle+1
+    
+  }
+  return false
+}
+
+println("10 ", search(tosearch,10))
+println("11 ", search(tosearch,11))
+println("12 ", search(tosearch,12))
+println("13 ", search(tosearch,13))
+println("14 ", search(tosearch,14))
+
+```
+
+Now the same with recursion
+
+```
+tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
+
+println("searching:", tosearch)
+
+def search(tosearch, findme) {
+  low=0
+  high=len(tosearch)-1
+
+  while low <= high {
+    middle = int( (high + low)/2 )
+
+    if tosearch[ middle ] == findme 
+        return true
+    elif tosearch[ middle ] > findme 
+        high = middle-1
+     else 
+        low = middle+1
+    
+  }
+  return false
+}
+
+println("10 ", search(tosearch,10))
+println("11 ", search(tosearch,11))
+println("12 ", search(tosearch,12))
+println("13 ", search(tosearch,13))
+println("14 ", search(tosearch,14))
+
+```
 
 ### <a id='s-1-2-8' />Maps
 
@@ -739,92 +773,7 @@ Of you can use the map to organize your data, like having a list of records for 
 "Bear"
 
 ```
-
-### <a id='s-1-2-9' />Object based programming
-
-Lets say we have a map like this:
-
-```
-> a={"Name": "Pooh", "Surname": "Bear", "Likes": "Friends and Songs and lots of stuff"}
-{"Name":"Pooh","Surname":"Bear","Likes":"Friends and Songs and lots of stuff"}
-```
-
-Now you can access an element of the map by the name of a key - just like this:
-
-```
-> a['Name']
-"Pooh"
-```
-
-However there is also a shorter way - if the key of the entry looks like an identifier (it means that it doesn't have spaces and only consists of letters digits and underscore characters)
-
-```
-> a.Name
-"Pooh"
-```
-
-That has a been added for a reason - to make it easier to use the map in a program.
-
-```
-> def makePoint(posX, posY)
-... return { "x": posX, "y": posY }
-"<function>"
-
-> p=makePoint(12,20)
-{"x":12,"y":20}
-
-> p.x
-12
-
-> p.y
-20
-
-> p.x+p.y
-32
-```
-
-This is a shorter form of using the map, you can now access the fields of the map, as if they were properties of a record or an object.
-
-Now some fields of the map can also be function values
-
-
-```
-> def makeComplex(re, im) {
-...     t = {
-...              "re": re,
-...              "im": im,
-...              "add": def(c) {
-...                 return makeComplex(t.re + c.re, t.im + c.im)
-...               },
-...               "show": def() {
-...                 println("re: {t.re} im: {t.im}")
-...               }
-...         }
-...     return t
-... }
-"<function>"
->
-```
-
-Here the ```makeComplex``` function is returning a map with the propertes ```re``` and ```im``` - these are numbers. But the properties ```add``` and ```show``` can work on the properties of the same map - by accessing the captured variable ```t```. This way we just made an object that acts like a complex number, see here:
-
-```
-> a=makeComplex(2,3)
-{"re":2,"im":3,"add":"<function>","show":"<function>"}
-
-> b=makeComplex(4,5)
-{"re":4,"im":5,"add":"<function>","show":"<function>"}
-
-> c=a.add(b)
-{"re":6,"im":8,"add":"<function>","show":"<function>"}
-
-> c.show()
-re: 6 im: 8
-```
-
-Some say that [Objects and Closures are equivalent](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent), however this is the subject of a lively debate (see the [link](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent) ).
-
-### <a id='s-1-2-10' />Splitting up a program into multiple source files
+### <a id='s-1-2-9' />Splitting up a program into multiple source files
 
 You can divide your program into multiple files. That's can be very convenient if the file grows too large, or if you have a function that you want to use in more than one program, without having to copy the text of the function.
 
@@ -876,7 +825,7 @@ An important detail: if you have the ```PATH``` environment variable set, then t
 
 ## <a id='s-1-3' />Features for specific tasks
 
-### <a id='s-1-3-11' />Working with text
+### <a id='s-1-3-10' />Working with text
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -1142,7 +1091,7 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-### <a id='s-1-3-12' />Regular expressions
+### <a id='s-1-3-11' />Regular expressions
 
 Sometimes you don't want to find an exact string, instead it is possible to specify a pattern that can match a multitude of possible text values.
 A regular expression describes a text pattern, you can do some neat tricks with these patterns.
@@ -1220,7 +1169,7 @@ Let's look at ```\s*``` , here ```\s``` is standing for a whitespace character a
 
 There are a few more options for regular expression, Please see this [Regualar expression cheatsheet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet) (The explanation in the link is relevant for javascript as well as the PYX language)
 
-### <a id='s-1-3-13' />Running processes
+### <a id='s-1-3-12' />Running processes
 
 You can run other command line programs, just like this:
 
@@ -1352,7 +1301,7 @@ var
 Both ```system``` and the backtick operator run the process in the default shell ( '/bin/sh' on Unix, process.env.ComSpec on Windows )
 Now the built-in variable ```ENV``` is a map, it stands for the environment variables. If you add or remove an entry in ```ENV``` then the changed environment variables will be passed to the processes that are run via ```system``` or the backtick operator.
 
-### <a id='s-1-3-14' />working with structured data (json and yaml)
+### <a id='s-1-3-13' />working with structured data (json and yaml)
 
 let's say you have some structured string encoded as text in the [json](https://en.wikipedia.org/wiki/JSON) format.
 You can make a variable out of it - with the ```parseJsonString``` function
@@ -1431,9 +1380,204 @@ the ```parseYamlString``` function converts the YAML text back into a value of n
 
 ```
 
-## <a id='s-1-4' />Even more language features
+## <a id='s-1-4' />Even more language features / advanced stuff
 
-### <a id='s-1-4-15' />Error handling with exceptions
+### <a id='s-1-4-14' />Functional programming
+
+Now compute a list of the squares of all numbers between one and 10.
+
+The first step is to define a function ```square``` that computes the square of the number given as argument. note that the last mathematical expression is also computing the value returnd by the function)
+
+```
+> def square(x) x * x
+
+> square(2)
+4
+> square(3)
+9
+> square(4)
+16
+```
+
+The built-in ```map``` function will call the ```square``` function on all element of the list of numbers from one to 9 - and return a new list with the result. In the returned list each number of the original list is turned into its square!
+
+```
+> map( range(1,10), square)
+[1,4,9,16,25,36,49,64,81]
+```
+
+Now lets the compute the sum of all the squares between one and ten
+
+First put that list of squares in a variable - squares
+
+```
+> squares=map( range(1,10), square)
+[1,4,9,16,25,36,49,64,81]
+```
+
+now let's get the sum of the squares between one and ten with the built-in ```reduce``` function.
+
+```
+> def sum(x,y) x+y
+
+> reduce(squares, sum, 0)
+285
+```
+
+The reduce function calls ```sum``` on the initial value 0 and the first value of the list. Next it calls ```sum``` on the result of the previous step and the second value of the list, and so on.
+
+It would be the same as calling ``` sum( squares[2], sum( squares[1]. sum( squares[0], 0)))) ``` and so on, up until the last element.
+
+
+
+You can also have functions that return other functions. now that's a bit tricky:
+
+function ```anypower``` gets the argument variable n.
+all it does is to return an unnamed function as return value ```def(x) pow(x,y)``` this function can always use the outer variable n - as it was passed when ```anypower``` was called.
+
+```
+> def anypower(n)
+... return def(x) pow(x,n)
+```
+
+Now calling ```anypower(3)``` will return another function that will always compute the power of three.
+
+```
+> powOfThree=anypower(3)
+
+> powOfThree(2)
+8
+> powOfThree(3)
+27
+> powOfThree(4)
+64
+
+```
+
+There are a number of almost magical tricks here:
+
+- ```def(x) pow(x,n)``` is using the variable ```n``` that is defined outside of that same function - that's because it is nested within the ```anypower``` function, so that the value of ```n``` becomes part of the environment of the returned function
+-  also see that the function ```def(x) pow(x,n)``` does not have a name, that's on purpose - it's an anonymous function that is used only as a return value
+-   ```powOfThree=anyposer(3)``` - the returned function is stored in variable ```powOfThree```. that means that a function is a kind of value, that can hold some captured state in i (this is referring to the value n, that is defined outside of the returned function).
+- ```powOfThree(3)``` - the function stored in the variable ```powOfThree``` is used as a function.
+
+An now you can use that to compute the table of squares for any number
+
+```
+> map( range(1,10), anypower(2) )
+[1,4,9,16,25,36,49,64,81]
+
+> map( range(1,10), anypower(3) )
+[1,8,27,64,125,216,343,512,729]
+
+> map( range(1,10), anypower(4) )
+[1,16,81,256,625,1296,2401,4096,6561]
+```
+
+And now lets get the sum of the power of three for the numbers between one and one hundred
+
+```
+> reduce( map( range(1,100), anypower(3) ), sum, 0)
+24502500
+```
+
+It takes a while to learn all these conceptt. It blew my mind, when I somehow learned all this, believe me!
+
+All this has a big advantage - when dealing with a big program it is easier to think of it in terms of functions,
+
+Assign statements can change all sorts of variables, you can't know which variables have been changed at any given moment,
+now things become much easier when you only view the progam in terms of functions.
+
+
+i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
+
+
+### <a id='s-1-4-15' />Object based programming
+
+Lets say we have a map like this:
+
+```
+> a={"Name": "Pooh", "Surname": "Bear", "Likes": "Friends and Songs and lots of stuff"}
+{"Name":"Pooh","Surname":"Bear","Likes":"Friends and Songs and lots of stuff"}
+```
+
+Now you can access an element of the map by the name of a key - just like this:
+
+```
+> a['Name']
+"Pooh"
+```
+
+However there is also a shorter way - if the key of the entry looks like an identifier (it means that it doesn't have spaces and only consists of letters digits and underscore characters)
+
+```
+> a.Name
+"Pooh"
+```
+
+That has a been added for a reason - to make it easier to use the map in a program.
+
+```
+> def makePoint(posX, posY)
+... return { "x": posX, "y": posY }
+"<function>"
+
+> p=makePoint(12,20)
+{"x":12,"y":20}
+
+> p.x
+12
+
+> p.y
+20
+
+> p.x+p.y
+32
+```
+
+This is a shorter form of using the map, you can now access the fields of the map, as if they were properties of a record or an object.
+
+Now some fields of the map can also be function values
+
+
+```
+> def makeComplex(re, im) {
+...     t = {
+...              "re": re,
+...              "im": im,
+...              "add": def(c) {
+...                 return makeComplex(t.re + c.re, t.im + c.im)
+...               },
+...               "show": def() {
+...                 println("re: {t.re} im: {t.im}")
+...               }
+...         }
+...     return t
+... }
+"<function>"
+>
+```
+
+Here the ```makeComplex``` function is returning a map with the propertes ```re``` and ```im``` - these are numbers. But the properties ```add``` and ```show``` can work on the properties of the same map - by accessing the captured variable ```t```. This way we just made an object that acts like a complex number, see here:
+
+```
+> a=makeComplex(2,3)
+{"re":2,"im":3,"add":"<function>","show":"<function>"}
+
+> b=makeComplex(4,5)
+{"re":4,"im":5,"add":"<function>","show":"<function>"}
+
+> c=a.add(b)
+{"re":6,"im":8,"add":"<function>","show":"<function>"}
+
+> c.show()
+re: 6 im: 8
+```
+
+Some say that [Objects and Closures are equivalent](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent), however this is the subject of a lively debate (see the [link](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent) ).
+
+
+### <a id='s-1-4-16' />Error handling with exceptions
 
 Runtime errors can happen in a program, like dividing by zero
 
@@ -1508,7 +1652,7 @@ The fields of this variable
 There is a third possible clause in a try/catch block - the ```finally``` statement - this block of statements is run in both the event of an error or if no error occured within the try block!
 
 
-### <a id='s-1-4-16' />Generators and the yield statement
+### <a id='s-1-4-17' />Generators and the yield statement
 
 The ```for``` statement is a bit special.
 
@@ -1576,20 +1720,20 @@ The ```mygen``` function is called a generator function, because it has a ```yie
 
 ## <a id='s-1-5' />Input and output
 
-### <a id='s-1-5-17' />reading/writing files
+### <a id='s-1-5-18' />reading/writing files
 
 tbd 
 
 Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
 
-### <a id='s-1-5-18' />HTTP clients
+### <a id='s-1-5-19' />HTTP clients
 
 tbd
 
 Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
 
 
-### <a id='s-1-5-19' />HTTP servers
+### <a id='s-1-5-20' />HTTP servers
 
 tbd
 

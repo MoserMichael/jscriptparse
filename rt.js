@@ -648,7 +648,7 @@ function _prepareClosureFrame(funcVal, frame, args) {
 
         let defaultParamValue = funcVal.defaultParamValues[i];
         if (defaultParamValue == null) {
-            throw new RuntimeException(" no value for parameter " + paramDef[0], [funcVal.startOffset, funcVal.currentSourceInfo]);
+            throw new RuntimeException(" no value for parameter " + paramDef[0][0], [funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
         }
         funcFrame.defineVar(paramDef[0][0], defaultParamValue);
 
@@ -702,6 +702,9 @@ function isBascType(ty) {
 function printImpl(arg) {
     let ret = "";
     for(let i=0; i<arg.length; ++i) {
+        if (i != 0) {
+            ret += " ";
+        }    
         let val=arg[i];
         if (isBascType(val.type))
             ret += value2Str2(val);
@@ -1174,8 +1177,7 @@ RTLIB={
 292
 
 `, 2, function(arg) {
-        checkTypeList(arg, 1, [TYPE_STR, TYPE_REGEX]);
-
+        checkTypeList(arg, 0, [TYPE_STR, TYPE_REGEX, TYPE_NUM]);
 
         let sval = value2Str(arg, 0);
         let radix = 10;
@@ -1413,7 +1415,7 @@ rename("oldFileName","newFileName")
 3
 > len([1,2,3])
 3`, 1, function(arg) {
-        checkTypeList(arg,0, [TYPE_STR, TYPE_LIST]);
+        checkTypeList(arg, 0, [TYPE_STR, TYPE_LIST]);
         return new Value(TYPE_NUM, arg[0].val.length);
     }),
     "join": new BuiltinFunctionValue(`> join(["a: ",1," b: ", true])

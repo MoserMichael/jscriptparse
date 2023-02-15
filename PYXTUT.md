@@ -10,15 +10,15 @@
     * [functions and lists of values](#s-1-2-4)
     * [Statements](#s-1-2-5)
     * [Multi dimensional lists](#s-1-2-6)
-    * [Recursion - a function calling itself](#s-1-2-7)
-    * [Maps](#s-1-2-8)
-    * [Splitting up a program into multiple source files](#s-1-2-9)
+    * [Maps](#s-1-2-7)
+    * [Splitting up a program into multiple source files](#s-1-2-8)
   * [Features for specific tasks](#s-1-3)
-    * [Working with text](#s-1-3-10)
-    * [Regular expressions](#s-1-3-11)
-    * [Running processes](#s-1-3-12)
-    * [working with structured data (json and yaml)](#s-1-3-13)
+    * [Working with text](#s-1-3-9)
+    * [Regular expressions](#s-1-3-10)
+    * [Running processes](#s-1-3-11)
+    * [working with structured data (json and yaml)](#s-1-3-12)
   * [Even more language features / advanced stuff](#s-1-4)
+    * [Recursion - a function calling itself](#s-1-4-13)
     * [Functional programming](#s-1-4-14)
     * [Object based programming](#s-1-4-15)
     * [Error handling with exceptions](#s-1-4-16)
@@ -29,6 +29,8 @@
     * [HTTP servers](#s-1-5-20)
   * [Conclusion](#s-1-6)
 <!-- toc-end -->
+
+
 
 
 
@@ -583,146 +585,7 @@ Each element of the list is another list. Now you can access that as a board for
 
 if you want to check what is on the board: ```lst[0][0]``` - first we get the first row ```lst[0]``` then we get the first element of the first row ```lst[0][0]```
 
-### <a id='s-1-2-7' />Recursion - a function calling itself
-
-Sometimes a big problem can be divided into smaller pieces, now the small pieces may also look like the big problem, like here:
-
-[<img alt="Sierpinsky Triangle" src="notes/Sierpinski_triangle.svg" />]
-
-Or it's an action that repeats itself again and again, like this picture by M. C. Escher, the left hand is drawing the right one, which is drawing the left one...
-
-[<img alt="Hands by E.C. Escher" src="notes/Escher_hands.jpg" />]  You can see more of his paintings in this [online gallery](https://mcescher.com/gallery/) 
-
-
-Now in programming you can get the same effect, by a function that calls itself.
-
-
-Let's say you want to compute the product of all numbers from 1 to any given number.
-
-
-```
-> def factorial(n)
-... if n == 1
-...  1 else n * factorial(n-1)
-"<function>"
-
-> factorial(3)
-6
-> factorial(4)
-24
-> factorial(5)
-120
-```  
-The function ```factorial``` takes the argument ```n``` , if it is one, then it returns one, if it is not one then it takes that number and multiplies it with ```factorial(n-1)```
-
-The function ```factorial``` is calling itself, that is called recursion.
-
-Let's say you want to get the factorial of four
-
-```
-factorial(4) == ( 4 * factorial(3)) == (4 * (3 * factorial(2)))  === (4 * (3 * (2 * 1)))
-```
-
-You can write down the same thing without recursion.
-
-```
-> def factorial(n) {
-... result = 1
-... for i range(1,n+1)
-...   result = result * i
-... return result
-... }
-"<function>"
-
-> factorial(3)
-6
-> factorial(4)
-24
-> factorial(5)
-120
-```
-
-A second example: lets say you have a list of numbers that are ordered - each element of the list is bigger than the previous one.
-
-```
-> tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17, 20]
-[2,4,5,7,9,10,12,14,15,17]
-```
-
-We want to search this array, and check if the number 12 is part of this list or not.
-
-The approach is to take check if the number in them middle of the list - that's the sixth element tosearch[5] is 10.
-Now 10 is smaller than 12, that means that we need to look at the list between the sixth and the eleventh element and search that part.
-Now we are looking at the list toSearch=[10, 12, 14, 15, 17, 20], again take the middle element, with the value 15 - this one is bigger than 12 - so look at the first half.
-
-
-Let's do the search without recursion.
-
-```
-tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
-
-println("searching:", tosearch)
-
-def search(tosearch, findme) {
-  low=0
-  high=len(tosearch)-1
-
-  while low <= high {
-    middle = int( (high + low)/2 )
-
-    if tosearch[ middle ] == findme 
-        return true
-    elif tosearch[ middle ] > findme 
-        high = middle-1
-     else 
-        low = middle+1
-    
-  }
-  return false
-}
-
-println("10 ", search(tosearch,10))
-println("11 ", search(tosearch,11))
-println("12 ", search(tosearch,12))
-println("13 ", search(tosearch,13))
-println("14 ", search(tosearch,14))
-
-```
-
-Now the same with recursion
-
-```
-tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
-
-println("searching:", tosearch)
-
-def search(tosearch, findme) {
-  low=0
-  high=len(tosearch)-1
-
-  while low <= high {
-    middle = int( (high + low)/2 )
-
-    if tosearch[ middle ] == findme 
-        return true
-    elif tosearch[ middle ] > findme 
-        high = middle-1
-     else 
-        low = middle+1
-    
-  }
-  return false
-}
-
-println("10 ", search(tosearch,10))
-println("11 ", search(tosearch,11))
-println("12 ", search(tosearch,12))
-println("13 ", search(tosearch,13))
-println("14 ", search(tosearch,14))
-
-```
-
-### <a id='s-1-2-8' />Maps
+### <a id='s-1-2-7' />Maps
 
 There is a type of data called a map. It allows to give names to things.
 
@@ -773,7 +636,7 @@ Of you can use the map to organize your data, like having a list of records for 
 "Bear"
 
 ```
-### <a id='s-1-2-9' />Splitting up a program into multiple source files
+### <a id='s-1-2-8' />Splitting up a program into multiple source files
 
 You can divide your program into multiple files. That's can be very convenient if the file grows too large, or if you have a function that you want to use in more than one program, without having to copy the text of the function.
 
@@ -825,7 +688,7 @@ An important detail: if you have the ```PATH``` environment variable set, then t
 
 ## <a id='s-1-3' />Features for specific tasks
 
-### <a id='s-1-3-10' />Working with text
+### <a id='s-1-3-9' />Working with text
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -1091,7 +954,7 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-### <a id='s-1-3-11' />Regular expressions
+### <a id='s-1-3-10' />Regular expressions
 
 Sometimes you don't want to find an exact string, instead it is possible to specify a pattern that can match a multitude of possible text values.
 A regular expression describes a text pattern, you can do some neat tricks with these patterns.
@@ -1169,7 +1032,7 @@ Let's look at ```\s*``` , here ```\s``` is standing for a whitespace character a
 
 There are a few more options for regular expression, Please see this [Regualar expression cheatsheet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet) (The explanation in the link is relevant for javascript as well as the PYX language)
 
-### <a id='s-1-3-12' />Running processes
+### <a id='s-1-3-11' />Running processes
 
 You can run other command line programs, just like this:
 
@@ -1301,7 +1164,7 @@ var
 Both ```system``` and the backtick operator run the process in the default shell ( '/bin/sh' on Unix, process.env.ComSpec on Windows )
 Now the built-in variable ```ENV``` is a map, it stands for the environment variables. If you add or remove an entry in ```ENV``` then the changed environment variables will be passed to the processes that are run via ```system``` or the backtick operator.
 
-### <a id='s-1-3-13' />working with structured data (json and yaml)
+### <a id='s-1-3-12' />working with structured data (json and yaml)
 
 let's say you have some structured string encoded as text in the [json](https://en.wikipedia.org/wiki/JSON) format.
 You can make a variable out of it - with the ```parseJsonString``` function
@@ -1381,6 +1244,145 @@ the ```parseYamlString``` function converts the YAML text back into a value of n
 ```
 
 ## <a id='s-1-4' />Even more language features / advanced stuff
+
+### <a id='s-1-4-13' />Recursion - a function calling itself
+
+Sometimes a big problem can be divided into smaller pieces, now the small pieces may also look like the big problem, like here:
+
+<img alt="Sierpinsky Triangle" src="notes/Sierpinski_triangle.svg" />
+
+Or it's an action that repeats itself again and again, like this picture by M. C. Escher, the left hand is drawing the right one, which is drawing the left one...
+
+<img alt="Hands by E.C. Escher" src="notes/Escher_hands.jpg" />  You can see more of his paintings of M. C. Escher in this [online gallery](https://mcescher.com/gallery/)
+
+
+Now in programming you can get the same effect, by a function that calls itself.
+
+
+Let's say you want to compute the product of all numbers from 1 to any given number.
+
+
+```
+> def factorial(n)
+... if n == 1
+...  1 else n * factorial(n-1)
+"<function>"
+
+> factorial(3)
+6
+> factorial(4)
+24
+> factorial(5)
+120
+```
+The function ```factorial``` takes the argument ```n``` , if it is one, then it returns one, if it is not one then it takes that number and multiplies it with ```factorial(n-1)```
+
+The function ```factorial``` is calling itself, that is called recursion.
+
+Let's say you want to get the factorial of four
+
+```
+factorial(4) == ( 4 * factorial(3)) == (4 * (3 * factorial(2)))  === (4 * (3 * (2 * 1)))
+```
+
+You can write down the same thing without recursion.
+
+```
+> def factorial(n) {
+... result = 1
+... for i range(1,n+1)
+...   result = result * i
+... return result
+... }
+"<function>"
+
+> factorial(3)
+6
+> factorial(4)
+24
+> factorial(5)
+120
+```
+
+A second example: lets say you have a list of numbers that are ordered - each element of the list is bigger than the previous one.
+
+```
+> tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17, 20]
+[2,4,5,7,9,10,12,14,15,17]
+```
+
+We want to search this array, and check if the number 12 is part of this list or not.
+
+The approach is to take check if the number in them middle of the list - that's the sixth element tosearch[5] is 10.
+Now 10 is smaller than 12, that means that we need to look at the list between the sixth and the eleventh element and search that part.
+Now we are looking at the list toSearch=[10, 12, 14, 15, 17, 20], again take the middle element, with the value 15 - this one is bigger than 12 - so look at the first half.
+
+
+Let's do the search without recursion.
+
+```
+tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
+
+println("searching:", tosearch)
+
+def search(tosearch, findme) {
+  low=0
+  high=len(tosearch)-1
+
+  while low <= high {
+    middle = int( (high + low)/2 )
+
+    if tosearch[ middle ] == findme
+        return true
+    elif tosearch[ middle ] > findme
+        high = middle-1
+     else
+        low = middle+1
+
+  }
+  return false
+}
+
+println("10 ", search(tosearch,10))
+println("11 ", search(tosearch,11))
+println("12 ", search(tosearch,12))
+println("13 ", search(tosearch,13))
+println("14 ", search(tosearch,14))
+
+```
+
+Now the same with recursion
+
+```
+tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
+
+println("searching:", tosearch)
+
+def search(tosearch, findme) {
+  low=0
+  high=len(tosearch)-1
+
+  while low <= high {
+    middle = int( (high + low)/2 )
+
+    if tosearch[ middle ] == findme
+        return true
+    elif tosearch[ middle ] > findme
+        high = middle-1
+     else
+        low = middle+1
+
+  }
+  return false
+}
+
+println("10 ", search(tosearch,10))
+println("11 ", search(tosearch,11))
+println("12 ", search(tosearch,12))
+println("13 ", search(tosearch,13))
+println("14 ", search(tosearch,14))
+
+```
 
 ### <a id='s-1-4-14' />Functional programming
 

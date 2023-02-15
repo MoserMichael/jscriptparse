@@ -657,8 +657,8 @@ function _prepareClosureFrame(funcVal, frame, args) {
             if (traceParam != "") {
                 traceParam += ", ";
             }
+            traceParam += paramDef[0][0] + "=" + rtValueToJson(defaultParamValue);
         }
-        traceParam += paramDef[0][0] + "=" + rtValueToJson(defaultParamValue);
     }
     return [ funcFrame, traceParam];
 

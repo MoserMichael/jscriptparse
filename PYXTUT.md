@@ -18,17 +18,20 @@
     * [Running processes](#s-1-3-11)
     * [working with structured data (json and yaml)](#s-1-3-12)
   * [Even more language features / advanced stuff](#s-1-4)
-    * [Recursion - a function calling itself](#s-1-4-13)
-    * [Functional programming](#s-1-4-14)
-    * [Object based programming](#s-1-4-15)
-    * [Error handling with exceptions](#s-1-4-16)
-    * [Generators and the yield statement](#s-1-4-17)
+    * [functions with default parameters](#s-1-4-13)
+    * [Recursion - a function calling itself](#s-1-4-14)
+    * [Functional programming](#s-1-4-15)
+    * [Object based programming](#s-1-4-16)
+    * [Error handling with exceptions](#s-1-4-17)
+    * [Generators and the yield statement](#s-1-4-18)
   * [Input and output](#s-1-5)
-    * [reading/writing files](#s-1-5-18)
-    * [HTTP clients](#s-1-5-19)
-    * [HTTP servers](#s-1-5-20)
+    * [reading/writing files](#s-1-5-19)
+    * [HTTP clients](#s-1-5-20)
+    * [HTTP servers](#s-1-5-21)
   * [Conclusion](#s-1-6)
 <!-- toc-end -->
+
+
 
 
 
@@ -1245,7 +1248,32 @@ the ```parseYamlString``` function converts the YAML text back into a value of n
 
 ## <a id='s-1-4' />Even more language features / advanced stuff
 
-### <a id='s-1-4-13' />Recursion - a function calling itself
+### <a id='s-1-4-13' />functions with default parameters
+
+Sometimes you don't want to define all parameter values. You can assign a default value to a parameter, and that value will be used if the function call does not pass a variable for that parameter.
+
+```
+> def add(num, inc=1)
+...     num + inc
+"<function>"
+```
+
+the parameter ```inc``` has the default value ```1```
+
+```
+> add(42)
+43
+```
+The function is called with only one parameter, the second parameter is ```inc``` and it receives the default value - that value is one.
+
+```
+> add(200,200)
+400
+```
+
+Now a second parameer is present in the function call, in this situation the default value is not used.
+
+### <a id='s-1-4-14' />Recursion - a function calling itself
 
 Sometimes a big problem can be divided into smaller pieces, now the small pieces may also look like the big problem, like here:
 
@@ -1384,7 +1412,7 @@ println("14 ", search(tosearch,14))
 
 ```
 
-### <a id='s-1-4-14' />Functional programming
+### <a id='s-1-4-15' />Functional programming
 
 Now compute a list of the squares of all numbers between one and 10.
 
@@ -1494,7 +1522,7 @@ now things become much easier when you only view the progam in terms of function
 i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
 
 
-### <a id='s-1-4-15' />Object based programming
+### <a id='s-1-4-16' />Object based programming
 
 Lets say we have a map like this:
 
@@ -1579,7 +1607,7 @@ re: 6 im: 8
 Some say that [Objects and Closures are equivalent](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent), however this is the subject of a lively debate (see the [link](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent) ).
 
 
-### <a id='s-1-4-16' />Error handling with exceptions
+### <a id='s-1-4-17' />Error handling with exceptions
 
 Runtime errors can happen in a program, like dividing by zero
 
@@ -1654,7 +1682,7 @@ The fields of this variable
 There is a third possible clause in a try/catch block - the ```finally``` statement - this block of statements is run in both the event of an error or if no error occured within the try block!
 
 
-### <a id='s-1-4-17' />Generators and the yield statement
+### <a id='s-1-4-18' />Generators and the yield statement
 
 The ```for``` statement is a bit special.
 
@@ -1722,20 +1750,20 @@ The ```mygen``` function is called a generator function, because it has a ```yie
 
 ## <a id='s-1-5' />Input and output
 
-### <a id='s-1-5-18' />reading/writing files
+### <a id='s-1-5-19' />reading/writing files
 
 tbd 
 
 Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
 
-### <a id='s-1-5-19' />HTTP clients
+### <a id='s-1-5-20' />HTTP clients
 
 tbd
 
 Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
 
 
-### <a id='s-1-5-20' />HTTP servers
+### <a id='s-1-5-21' />HTTP servers
 
 tbd
 

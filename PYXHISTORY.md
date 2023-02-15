@@ -1,6 +1,6 @@
 ## PYX releases
 
-* PYX 0.16 / PRS 0.0.4  
+* PYX 0.17 / PRS 0.0.4  
  
     * more text in PYXTUT.md
     * fix some bad errors:

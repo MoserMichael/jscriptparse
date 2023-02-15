@@ -1,5 +1,11 @@
 ## PYX releases
 
+* PYX 0.18 / PRS 0.0.4  
+    
+    * fix default function parameters.
+    * Add description of default parameter in the tutorial
+      (now wondering if the whole language doesn't have too many features :-( )
+
 * PYX 0.17 / PRS 0.0.4  
  
     * more text in PYXTUT.md

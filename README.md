@@ -4,6 +4,8 @@
 
 This programming language is named after Winnie-the-Pooh, in the Russian translation of [Boris Zahoder](https://en.wikipedia.org/wiki/Boris_Zakhoder)
 
+/if you consider to sponsor this project via [this link](https://github.com/sponsors/MoserMichael)/
+
 The scripting language and interpreter for the pyx language.  
 
 - See [pyx tutorial (pyxtut)](PYXTUT.md)

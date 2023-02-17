@@ -9,12 +9,28 @@ const rl=require("node:readline");
 const rt=require(path.join(__dirname,"rt.js"));
 const scr=require(path.join(__dirname,"scripty.js"));
 const prs=require(path.join(__dirname,"prs.js"));
+const cp = require("node:child_process");
 
 const PYX_VERSION = "VERSION_TAG";
 
 let history_file_name = null;
 let nodejsRepl = null;
 let isRunning = false;
+let isWindows = process.platform === "win32";
+
+const regexen = [
+    /'(\\\\.|[^'])*'/g,
+    /"(\\\\.|[^"{])*"/g,
+    /}(\\\\.|[^"{])*{/g,
+    /}(\\\\.|[^"{])*"/g,
+
+    /`(\\\\.|[^`{])*`/g,
+    /}(\\\\.|[^`{])*{/g,
+    /`(\\\\.|[^`{])*{/g,
+    /}(\\\\.|[^`{])*`/g,
+
+    /\/(\\\\.|[^\/])*\/[im]?/g,
+];
 
 function setHistoryFileName() {
     let dir_name = process.cwd()
@@ -79,6 +95,13 @@ function replCommandParsedCallback(parsedSource) {
     }
 }
 
+function removeAllStringConstants(line) {
+    for(let i=0; i < regexen.length; ++i) {
+        line = line.replaceAll(regexen[i],"");
+    }
+    return line;
+}
+
 // syntax error due to string not closed is a lexical error. try to recover from it - so to know if repl is in 'continuation mode'
 // very brittle...
 function isSyntaxErrorDueToStringNotClosed(pos, data, glob) {
@@ -108,10 +131,25 @@ function isSyntaxErrorDueToStringNotClosed(pos, data, glob) {
     return false;
 }
 
+function findLastTokenPos(line, sym) {
+    let index = -1;
+    for(let i=0; i<sym.length; ++i) {
+        let lastIndex = line.lastIndexOf(sym[i]) ;
+        if (lastIndex != -1) {
+            lastIndex += sym[i].length;
+
+            if (lastIndex > index) {
+                index = lastIndex;
+            }
+        }
+    }
+    return index;
+}
+
 function runEvalLoop(cmdLine) {
 
-    let sym = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '(', '}', '.' ];
-    sym = sym.concat( Object.keys(scr.KEYWORDS) );
+    let stopSymPyx = [ ' ', '\t', '\r', '\n', 'ֿֿֿֿ%', '*', '+', '-', '=', '%', ')', '(', '}', '.' ];
+    stopSymPyx = stopSymPyx.concat( Object.keys(scr.KEYWORDS) );
 
     let runEvalImp = function() {
 
@@ -162,17 +200,18 @@ function runEvalLoop(cmdLine) {
 
         let tryToCompleteMapKey = function(line, dotIndex) {
             let lastToken = "";
+
             let lastDot = line.lastIndexOf(".");
             if (lastDot != -1)
                 lastToken = line.substring(lastDot+1).trim()
 
             // search back to the first term - the name of the map.
             let index = -1;
-            for(let i=0; i<sym.length; ++i) {
-                if (sym[i] != ".") {
-                    let lastIndex = line.lastIndexOf(sym[i]) ;
+            for(let i=0; i<stopSymPyx.length; ++i) {
+                if (stopSymPyx[i] != ".") {
+                    let lastIndex = line.lastIndexOf(stopSymPyx[i]) ;
                     if (lastIndex != -1) {
-                        lastIndex += sym[i].length;
+                        lastIndex += stopSymPyx[i].length;
 
                         if (lastIndex > index) {
                             index = lastIndex;
@@ -224,20 +263,9 @@ function runEvalLoop(cmdLine) {
             }
             return comp;
         }
+        let completePyx = function(line) {
 
-        let doComplete = function(line) {
-
-            let index = -1;
-            for(let i=0; i<sym.length; ++i) {
-                let lastIndex = line.lastIndexOf(sym[i]) ;
-                if (lastIndex != -1) {
-                    lastIndex += sym[i].length;
-
-                    if (lastIndex > index) {
-                        index = lastIndex;
-                    }
-                }
-            }
+            let index = findLastTokenPos(line, stopSymPyx);
             let lastToken = "";
             if (index != -1) {
                 lastToken = line.substring(index);
@@ -252,7 +280,6 @@ function runEvalLoop(cmdLine) {
                 lastToken = line;
             }
 
-
             lastToken = lastToken.trim();
 
             let completions = completeKeywords(lastToken);
@@ -261,6 +288,60 @@ function runEvalLoop(cmdLine) {
 
             return [completions, lastToken]
         }
+
+        let isShellExpr = function(line) {
+            if (isWindows) {
+                return null; // no command completion on windows.
+            }
+            
+            line = removeAllStringConstants(line);
+            let count = 0;
+            let pos = -1;
+
+            while((pos = line.indexOf("`", pos)) != -1) {
+                count += 1;
+                pos += 1;
+            }
+            if (count % 2 == 0) {
+                return null;
+            };
+
+            return line.substring( line.lastIndexOf("`")+1 );
+        }
+
+        let completeShell = function(line) {
+            lineToks = line.trim().split(/[ \t\n\r]/);
+            let lastToken = "";
+            if (lineToks.length != 0) {
+                lastToken = lineToks[ lineToks.length - 1 ];
+            }
+
+            let cmd = "";
+            if (lineToks.length <= 1 || (lineToks.length > 0 && lineToks[lineToks.length-1].endsWith(";")))
+                cmd = "bash -c 'compgen -abcd " + lastToken + "'";
+            else
+                cmd = "bash -c 'compgen -f " + lastToken + "'";;
+
+            try {
+                let result = cp.execSync(cmd).toString();
+                return [result.split(/[ \t\n\r]/), lastToken];
+            } catch(er) {
+                return [[], lastToken];
+            }
+        }
+
+        let doComplete  = function(line) {
+            try {
+                let shellExpr = isShellExpr(line);
+                if (shellExpr == null) {
+                    return completePyx(line);
+                }
+                return completeShell(shellExpr);
+            } catch(er) {
+                console.trace("error: " + er);
+            }
+        }
+
 
         nodejsRepl = repl.start({
             prompt: "> ",

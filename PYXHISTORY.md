@@ -1,5 +1,9 @@
 ## PYX releases
 
+*  next version
+
+    * REPL: command completion on writing backstring
+ 
 * PYX 0.18 / PRS 0.0.4  
     
     * fix default function parameters.

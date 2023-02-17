@@ -45,6 +45,7 @@ def prepareAndPublish(version) {
     system("cp PYXDESIGN.md	tmp-publish/")
     system("cp PYXFUNC.md	tmp-publish/") 
     system("cp PYXTUT.md	tmp-publish/")
+    system("cp PYXBUGS.md	tmp-publish/")
     system("cp README.md    tmp-publish/")
 
     system("cp build/pyx-package.json tmp-publish/package.json")

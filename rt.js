@@ -6,6 +6,8 @@ const url = require('node:url');
 const yaml=require("yaml");
 const prs=require(path.join(__dirname,"prs.js"));
 
+const httpAgent = new http.Agent({ keepAlive: true });
+
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
 
@@ -2156,11 +2158,14 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
             hostname: urlObj.hostname,
             port: parseInt(urlObj.port),
             path: urlObj.pathname,
-            method: httpMethod
+            method: httpMethod,
         };
         if (httpHeaders != null) {
             requestOptions['headers'] = httpHeaders;
         }
+    
+        //requestOptions['headers'] = {  'Connection': 'keep-alive' };
+        requestOptions['agent'] = httpAgent;
 
         let callUserFunction = function(data, error) {
             // this one is evaluated from another task. runtime exceptions need to be handled here

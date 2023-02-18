@@ -1,16 +1,19 @@
 ## PYX releases
 
-*  next version
+* PYX 0.1.9 / PRS 0.0.4  
 
-    * REPL: command completion on writing backstring
+    * REPL: some kind of shell command completion on writing back tick strings.
+    * backtick strings: do not allow expressions inside { and } (like in format strings within ")
+      I think that interferes with the command completion feature for backtick strings
+    * docker test: test on both fedora and ubuntu, with the node version 19.x
  
-* PYX 0.18 / PRS 0.0.4  
+* PYX 0.1.8 / PRS 0.0.4  
     
     * fix default function parameters.
     * Add description of default parameter in the tutorial
       (now wondering if the whole language doesn't have too many features :-( )
 
-* PYX 0.17 / PRS 0.0.4  
+* PYX 0.1.7 / PRS 0.0.4  
  
     * more text in PYXTUT.md
     * fix some bad errors:
@@ -19,12 +22,12 @@
         - print/println - show spaces in output for multiple parameters
         - add tests
 
-* PYX 0.16 / PRS 0.0.4  
+* PYX 0.1.6 / PRS 0.0.4  
     * Throw error on redefinition of built-in functions.
     * Add dim function - definition of multi-dimensional array.
     * make PYXTUT.md more accessible. 
 
-* PYX 0.15 / PRS 0.0.4  
+* PYX 0.1.5 / PRS 0.0.4  
      * improved error handling. 
      * improved runtime error reporting (says which parameter is wrong)
      * print/println - receive variable length argument number (like python)

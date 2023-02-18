@@ -5,11 +5,22 @@ test: install
 
 .PHONY: test-installed
 test-installed:
-		bash -exc "./build/test.sh tests pyx; ./build/test.sh leetcode pyx; ./build/test.sh errorTest pyx"
+		bash -exc "node --version; ./build/test.sh tests pyx; ./build/test.sh leetcode pyx; ./build/test.sh errorTest pyx"
+
+
+.PHONY: test-in-docker-ubuntu
+test-in-docker-ubuntu:
+		@echo "*** test in docker - ubuntu ***"
+		./build/test-in-docker-ubuntu.sh
+
+.PHONY: test-in-docker-fedora
+test-in-docker-fedora:
+		@echo "*** test in docker - fedora ***"
+		./build/test-in-docker-fedora.sh
 
 .PHONY: test-in-docker
-test-in-docker:
-		./build/test-in-docker.sh
+test-in-docker: test-in-docker-ubuntu  test-in-docker-fedora
+		@echo "*** test in docker ***"
 
 
 .PHONY: publish-prs

@@ -1074,7 +1074,6 @@ var
 0
 ```
 
-<!--
 You can combine expression values to form just the command that is needed, very similar to strings with the " delimitor.
 An expression within { } brackets is evaluated, and the result is inserted into the string that is run in the shell.
 An expression with backticks can span several lines.
@@ -1109,7 +1108,6 @@ var
 0
 
 ```
-//-->
 
 Both ```system``` and the backtick operator run the process in the default shell ( '/bin/sh' on Unix, process.env.ComSpec on Windows )
 Now the built-in variable ```ENV``` is a map, it stands for the environment variables. If you add or remove an entry in ```ENV``` then the changed environment variables will be passed to the processes that are run via ```system``` or the backtick operator.

@@ -3,8 +3,6 @@
 * PYX 0.1.9 / PRS 0.0.4  
 
     * REPL: some kind of shell command completion on writing back tick strings.
-    * backtick strings: do not allow expressions inside { and } (like in format strings within ")
-      I think that interferes with the command completion feature for backtick strings
     * docker test: test on both fedora and ubuntu, with the node version 19.x
  
 * PYX 0.1.8 / PRS 0.0.4  

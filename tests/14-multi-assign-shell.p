@@ -8,6 +8,6 @@
 
     # the backtick operator works the same as the system function
 
-    out, status = `echo "{a} {b}"`
+    out, status = `echo "!hello world!"`
     print("status: {status} output: {out}")
 

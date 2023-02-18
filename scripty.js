@@ -215,6 +215,7 @@ function makeParserImp() {
             return [rt.makeConstValue(rt.TYPE_STR, arg)];
         }
     );
+    /*
     let backtickStringMidConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^`{])*{/, "string-const"),
         function (arg) {
@@ -237,7 +238,7 @@ function makeParserImp() {
             arg[0] = unquote( arg[0], arg[1]+1);
             return rt.makeConstValue(rt.TYPE_STR, arg);
         });
-
+    */
     let forwardExpr = new prs.makeForwarder();
 
     let nestedExpr = prs.makeTransformer(
@@ -374,6 +375,7 @@ function makeParserImp() {
     );
 
     //backtick strings
+    /*        
     let backtickStringContinuation = prs.makeTransformer(
         prs.makeSequenceParser([
             forwardExpr.forward(),
@@ -399,13 +401,16 @@ function makeParserImp() {
             return rVal;
         }
     );
+    */
 
     let backtickExpr = prs.makeTransformer(
         prs.makeAlternativeParser([
+            /*
             prs.makeSequenceParser([
                 backtickStringStartConst,
                 backtickStringContinuation
             ]),
+            */
             backtickStringConst
         ], "backtick string - process runner"), function (arg) {
 

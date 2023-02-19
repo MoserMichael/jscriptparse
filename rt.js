@@ -858,7 +858,9 @@ let spawnedProcesses = {};
 RTLIB={
 
     // function on scalars or strings
-    "find": new BuiltinFunctionValue(`> find("big cat", "big")
+    "find": new BuiltinFunctionValue(` # search for a string (second argument) in a big string (first argument), return index of match (zero based index)
+
+> find("big cat", "big")
 0
 > find("big cat", "cat")
 4
@@ -873,7 +875,7 @@ RTLIB={
 > find(a,/[a-z]+/)
 10
 
-# the third parameter is an optional offset to start search from.
+# the third parameter is an optional offset to start search from. (zero based index)
 
 > find("a1 !! a1", "a1", 2)
 6
@@ -907,6 +909,8 @@ RTLIB={
 
 
     "match": new BuiltinFunctionValue(`
+# search for a match of regular expression argument (second) argument) in big text (first argument), returns a list - first element is zero based index of match, second is the matching string
+
 > text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
 "a 1232 blablalba 34234 ;aksdf;laksdf 3423"
 
@@ -963,7 +967,9 @@ RTLIB={
     }, [null, null, null]),
 
 
-    "mid": new BuiltinFunctionValue(`> mid("I am me", 2, 4)
+    "mid": new BuiltinFunctionValue(`# returns a substring in the text, first argument is the text, second argument is the start offset, third argument is ending offset (optional)
+
+> mid("I am me", 2, 4)
 "am"
 > mid("I am me", 2)
 "am me"
@@ -990,17 +996,21 @@ RTLIB={
 
         return new Value(TYPE_STR, sval);
     }, [null, null, new Value(TYPE_NUM, -1) ]),
-    "lc": new BuiltinFunctionValue(`> lc("BIG little")
+    "lc": new BuiltinFunctionValue(`# convert to lower case string
+> lc("BIG little")
 "big little"`, 1, function(arg) {
         let val = value2Str(arg, 0);
         return new Value(TYPE_STR, val.toLowerCase());
     }),
-    "uc": new BuiltinFunctionValue(`> uc("BIG little")
+    "uc": new BuiltinFunctionValue(`# convert to upper case string
+> uc("BIG little")
 "BIG LITTLE"`, 1, function(arg) {
         let val = value2Str(arg, 0);
         return new Value(TYPE_STR, val.toUpperCase());
     }),
-    "trim": new BuiltinFunctionValue(`> a= ' honey  '
+    "trim": new BuiltinFunctionValue(`# remove leading and trailing whitespace characters
+
+> a= ' honey  '
 " honey  "
 > trim(a)
 "honey"
@@ -1011,7 +1021,9 @@ RTLIB={
         let val = value2Str(arg, 0);
         return new Value(TYPE_STR, val.trim());
     }),
-    "reverse": new BuiltinFunctionValue(`> reverse([1,2,3,4])
+    "reverse": new BuiltinFunctionValue(`# return the reverse of the argument (either string or list argument)
+
+> reverse([1,2,3,4])
 [4,3,2,1]
 > reverse("abcd")
 "dcba"`, 1, function(arg) {
@@ -1021,7 +1033,9 @@ RTLIB={
         let val = value2Str(arg, 0);
         return new Value(TYPE_STR, val.split("").reverse().join(""));
     }),
-    "split": new BuiltinFunctionValue(`> split("first line\\nsecond line")
+    "split": new BuiltinFunctionValue(`# split the first argument string into tokens, the second argument specifies how to split it.
+
+> split("first line\\nsecond line")
 ["first line","second line"]
 > split("a,b,c", ",")
 ["a","b","c"]
@@ -1071,13 +1085,18 @@ RTLIB={
         return new Value(TYPE_STR, val.repeat(rep));
     }),
 
-    "replace": new BuiltinFunctionValue(`text="a b a c a d"
+    "replace": new BuiltinFunctionValue(`# replace replace occurances of second argument string with third argument string in text (first argument string), fourth argument tells how many substitions (optional, 1 as default)
+
+text="a b a c a d"
 > "a b a c a d"
         
 > replace(text,'a ', 'x ', -1)
 "x b x c x d"        
 
 > replace(text,'a ', 'x ', 1)
+"x b a c a d"
+
+> replace(text,'a ', 'x ')
 "x b a c a d"
 
 > replace(text,'a ', 'x ', 2)
@@ -1109,7 +1128,7 @@ RTLIB={
     }, [null, null, null, null]),
 
 
-    "replacere": new BuiltinFunctionValue(`
+    "replacere": new BuiltinFunctionValue(`# replace the regular expression (second argument) with replacement expression (third argument) in source text (first argument)
     
 > text="Pooh,Bear ## Roo,Kanga ## Christopher,Robin "
 "Pooh,Bear ## Roo,Kanga ## Christopher,Robin "
@@ -1159,7 +1178,9 @@ RTLIB={
     }, [null, null, null, null]),
 
 // Numeric functions
-    "int": new BuiltinFunctionValue(`> int("123")
+    "int": new BuiltinFunctionValue(`# convert string or number to integer value
+
+> int("123")
 123
 > int("123.5")
 123
@@ -1695,7 +1716,7 @@ same as:
     }),
 
     //functions for working with yaml
-    "parseYamlString": new BuiltinFunctionValue(`
+        "parseYamlString": new BuiltinFunctionValue(`
 > a="a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n"
 "a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n"
 > println(a)

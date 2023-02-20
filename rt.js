@@ -1178,7 +1178,7 @@ text="a b a c a d"
     }, [null, null, null, null]),
 
 // Numeric functions
-    "int": new BuiltinFunctionValue(`# convert string or number to integer value
+    "int": new BuiltinFunctionValue(`# convert argument string or number to integer value
 
 > int("123")
 123
@@ -1225,6 +1225,8 @@ text="a b a c a d"
     }, [null, null]),
 
     "num": new BuiltinFunctionValue(`
+#  convert argument string to number 
+
 `, 1, function(arg) {
         checkTypeList(arg, 0, [TYPE_STR, TYPE_NUM]);
 
@@ -1237,7 +1239,9 @@ text="a b a c a d"
         return new Value(TYPE_NUM, res);
     }),
 
-    "max" : new BuiltinFunctionValue(`> max(3,4)
+    "max" : new BuiltinFunctionValue(`# return the bigger of the two two argument values (argument is interpreted as a numbers)
+
+> max(3,4)
 4
 > max(4,3)
 4`, 2, function(arg) {
@@ -1249,7 +1253,8 @@ text="a b a c a d"
         }
         return new Value(TYPE_NUM, res);
     }),
-    "min" : new BuiltinFunctionValue(`> min(4,3)
+    "min" : new BuiltinFunctionValue(`# return the smaller of the two two argument values (argument is interpreted as a numbers)
+> min(4,3)
 3
 > min(3,4)
 3`, 2, function(arg) {
@@ -1261,7 +1266,9 @@ text="a b a c a d"
         }
         return new Value(TYPE_NUM, res);
     }),
-    "abs" : new BuiltinFunctionValue(`> abs(-3)
+    "abs" : new BuiltinFunctionValue(`# return the absolute of the argument value  (if it's negative then turn it into a positive number)
+
+> abs(-3)
 3
 > abs(3)
 3`, 1, function(arg) {
@@ -1271,7 +1278,9 @@ text="a b a c a d"
         }
         return new Value(TYPE_NUM, num);
     }),
-    "sqrt" : new BuiltinFunctionValue(`> sqrt(9)
+    "sqrt" : new BuiltinFunctionValue(`# return the square root of the argument (the number that gives the argument number, if you multiply it by itself)
+
+> sqrt(9)
 3
 > sqrt(4)
 2
@@ -1280,27 +1289,31 @@ text="a b a c a d"
         let num = value2Num(arg, 0);
         return new Value(TYPE_NUM, Math.sqrt(num));
     }),
-    "sin" : new BuiltinFunctionValue(`returns the sine of a number in radians
+    "sin" : new BuiltinFunctionValue(`# returns the sine of a number in radians
+
 > sin(mathconst['pi']/2)
 1`, 1, function(arg) {
         let num = value2Num(arg, 0);
         return new Value(TYPE_NUM, Math.sin(num));
     }),
-    "cos" : new BuiltinFunctionValue(`returns the cosine of a number in radians
+    "cos" : new BuiltinFunctionValue(`# returns the cosine of a number in radians
+
 > cos(mathconst['pi'])
 -1`, 1, function(arg) {
         let num = value2Num(arg, 0);
         return new Value(TYPE_NUM, Math.cos(num));
     }),
-    "tan" : new BuiltinFunctionValue(`returns the tangent of a number in radians`, 1, function(arg) {
+    "tan" : new BuiltinFunctionValue(`# returns the tangent of a number in radians`, 1, function(arg) {
         let num = value2Num(arg, 0);
         return new Value(TYPE_NUM, Math.tan(num));
     }),
-    "atan" : new BuiltinFunctionValue(`returns the inverse tangent (in radians) of a number`, 1, function(arg) {
+    "atan" : new BuiltinFunctionValue(`# returns the inverse tangent (in radians) of a number`, 1, function(arg) {
         let num = value2Num(arg, 0);
         return new Value(TYPE_NUM, Math.atan(num));
     }),
-    "pow" : new BuiltinFunctionValue(`> pow(2,2)
+    "pow" : new BuiltinFunctionValue(`# returns the first arugment nubmer raised to the power of the second argument number
+
+> pow(2,2)
 4
 > pow(2,3)
 8
@@ -1310,7 +1323,7 @@ text="a b a c a d"
         let exp = value2Num(arg, 1);
         return new Value(TYPE_NUM, Math.pow(pow,exp));
     }),
-    "random" : new BuiltinFunctionValue(`# returns random number with value between 0 and 1
+    "random" : new BuiltinFunctionValue(`# returns pseudo random number with value between 0 and 1 (that means it is almost random)
 > random()
 0.8424952895811049
 `, 0, function(arg) {
@@ -1318,16 +1331,16 @@ text="a b a c a d"
     }),
 
     // Input and output functions
-    "print" : new BuiltinFunctionValue("# prints argument values to console", -1, function(arg) {
+    "print" : new BuiltinFunctionValue("# prints argument values to console. Can accept multiple values - each of them is converted to its string representation", -1, function(arg) {
         let msg = printImpl(arg); //value2Str(arg, 0);
         doLogHook(msg)
     }),
-    "println" : new BuiltinFunctionValue("# prints argument values to console, followed by newline", -1, function(arg) {
+    "println" : new BuiltinFunctionValue("# prints argument values to console, followed by newline. Can accept multiple values - each of them is converted to its string representation", -1, function(arg) {
         let msg = printImpl(arg); //value2Str(arg, 0);
         doLogHook(msg + "\n")
     }),
     "readFile" : new BuiltinFunctionValue(`
-# read text file and return string
+# read text file and return it as a string, the file name is the first argument of this function
 
 > fileText = readFile("fileName.txt")    
     `, 1, function(arg) {
@@ -1341,7 +1354,7 @@ text="a b a c a d"
     }),
     
     "writeFile" : new BuiltinFunctionValue(`
-# write string parameter into text file
+# write string parameter into text file. The file name is the first argument, the text value to be written into it is the second argument
 
 > writeFile("fileName.txt","fileContent")
 
@@ -1376,10 +1389,10 @@ text="a b a c a d"
     }, [ null, null, null]),
 
     "unlink" : new BuiltinFunctionValue(`
-# unlink a number of files, returns number of deleted files
+# delete a number of files, returns number of deleted files
 unlink([ "file1.txt", "file2.txt", "file3.txt" ])
 
-# unlink a single file, returns number of deleted files
+# delete a single file, returns number of deleted files
 unlink("file1.txt")    
     `, 1, function(arg) {
         let numUnlinked = 0;
@@ -1398,7 +1411,7 @@ unlink("file1.txt")
     }),
 
     "rename" : new BuiltinFunctionValue(`
-# rename files
+# rename files, old file name is the first argument, the new file name is the second argument
     
 rename("oldFileName","newFileName")    
 `, 2, function(arg) {
@@ -1414,8 +1427,7 @@ rename("oldFileName","newFileName")
     }),
 
     // function for arrays
-    "dim" : new BuiltinFunctionValue(`
-# defines n-dimensional array, all elements are set to zero.
+    "dim" : new BuiltinFunctionValue(`# defines n-dimensional array, all elements are set to zero. Each argument sets the number of element for its own respective dimension (see examples)
     
 > a=dim(4)
 [0,0,0,0]
@@ -1437,14 +1449,21 @@ rename("oldFileName","newFileName")
         return dimArray( 0, dims);
     }),
 
-    "len" : new BuiltinFunctionValue(`> len("abc")
+    "len" : new BuiltinFunctionValue(`# for a string argument - returns the number of characters in the string
+
+> len("abc")
 3
+
+# for a list argument - returns the number of elements in the list
+
 > len([1,2,3])
 3`, 1, function(arg) {
         checkTypeList(arg, 0, [TYPE_STR, TYPE_LIST]);
         return new Value(TYPE_NUM, arg[0].val.length);
     }),
-    "join": new BuiltinFunctionValue(`> join(["a: ",1," b: ", true])
+    "join": new BuiltinFunctionValue(`# given a list argument, joins the values of the list into a single string
+
+> join(["a: ",1," b: ", true])
 "a: 1 b: true"`, 2, function(arg) {
         checkType(arg, 0, TYPE_LIST);
 
@@ -1454,10 +1473,14 @@ rename("oldFileName","newFileName")
         }
         return new Value(TYPE_STR, arg[0].val.map(value2StrDisp).join(delim));
     }, [null, null]),
-    "map": new BuiltinFunctionValue(`> map([1,2,3], def (x) 1 + x)
+    "map": new BuiltinFunctionValue(`# the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
+
+> map([1,2,3], def (x) 1 + x)
 [2,3,4]
 > map([1,2,3], def (x) x * x)
 [1,4,9]
+
+# if called with a dictionary argument: The second parameter function is called with each key-value pair of the dictionary argument. The return values of this function will form the returned list 
 
 a={ 'Ernie': 3, 'Bert': 4, 'Cookie-Monster' : 5, 'GraphCount': 100 }
 map(a,def(k,v) { "key: {k} age: {v}" })
@@ -1492,7 +1515,9 @@ map(a,def(k,v) { "key: {k} age: {v}" })
         }
         return new Value(TYPE_LIST, ret);
     }),
-    "mapIndex": new BuiltinFunctionValue(`> mapIndex([3,4,5,6],def(x,y) [2*x, y])
+    "mapIndex": new BuiltinFunctionValue(`# similar to map, the argument function is called with the list value and the index of that value within the argument list
+
+> mapIndex([3,4,5,6],def(x,y) [2*x, y])
 [[6,0],[8,1],[10,2],[12,3]]`, 2, function(arg, frame) {
 
         checkType(arg, 0, TYPE_LIST);
@@ -1509,7 +1534,10 @@ map(a,def(k,v) { "key: {k} age: {v}" })
         }
         return new Value(TYPE_LIST, ret);
     }),
-    "reduce": new BuiltinFunctionValue(`> reduce([1,2,3], def (x,y) x+y, 0)
+    "reduce": new BuiltinFunctionValue(`
+# form a single return values by applying the arugment value repatedly, works from the first element towards the last element of the argument list. See the following description:
+
+> reduce([1,2,3], def (x,y) x+y, 0)
 6
 
 # same as:
@@ -1539,7 +1567,9 @@ map(a,def(k,v) { "key: {k} age: {v}" })
         return rVal;
     }),
 
-    "reduceFromEnd": new BuiltinFunctionValue(`> def div(a,b) a/b
+    "reduceFromEnd": new BuiltinFunctionValue(`# same as reduce, but working from the end of the list backward.
+
+> def div(a,b) a/b
 
 > reduceFromEnd([4,8,32], div, 1024)
 1
@@ -1562,7 +1592,9 @@ same as:
         return rVal;
     }),
 
-    "pop": new BuiltinFunctionValue(`> a=[1, 2, 3]
+    "pop": new BuiltinFunctionValue(`# takes an argument list, returns the last element of the list - but also removes this last value from the argument list
+
+ > a=[1, 2, 3]
 [1,2,3]
 > pop(a)
 3
@@ -1576,7 +1608,9 @@ same as:
         }
         return arg[0].val.pop(arg[1]);
     }),
-    "push": new BuiltinFunctionValue(`> a=[1, 2]
+    "push": new BuiltinFunctionValue(`# takes the second argument and appends it to the list, which is the first argument to this function
+
+> a=[1, 2]
 [1,2]
 > push(a,3)
 [1,2,3]
@@ -1586,7 +1620,7 @@ same as:
         arg[0].val.push(arg[1]);
         return arg[0];
     }),
-    "shift": new BuiltinFunctionValue(`
+    "shift": new BuiltinFunctionValue(`# removes the first element from the list
 > a=[1,2,3]
 [1,2,3]
 
@@ -1602,7 +1636,8 @@ same as:
         }
         return arg[0].val.shift(arg[1]);
     }),
-    "unshift": new BuiltinFunctionValue(`
+    "unshift": new BuiltinFunctionValue(`# takes the second argument, returns a list where this second argument will be the first value, whereas the first value will be the remainder of the list
+
 > a=[2,3]
 [2,3]
 
@@ -1616,7 +1651,9 @@ same as:
         arg[0].val.unshift(arg[1]);
         return arg[0];
     }),
-    "joinl": new BuiltinFunctionValue(`> joinl([1,2],[3,4])
+    "joinl": new BuiltinFunctionValue(`# takes two lists and joins them into a single list, which is returned by this function
+
+ > joinl([1,2],[3,4])
 [1,2,3,4]`, 2,function(arg, frame) {
         checkType(arg, 0, TYPE_LIST)
         checkType(arg, 1, TYPE_LIST)
@@ -1624,8 +1661,15 @@ same as:
         let lst = arg[0].val.concat(arg[1].val);
         return new Value(TYPE_LIST, lst);
     }),
-    "sort": new BuiltinFunctionValue(`> sort([3,1,4,2,5])
+    "sort": new BuiltinFunctionValue(`# sorts the argument list in increasing order
+
+> sort([3,1,4,2,5])
 [1,2,3,4,5]
+
+# the second argument of sort can specify a function that is to determine the sorting order : For this second arumgent function the following holds:
+#  - a return value of -1 means that the first argument is smaller than the second argument. 
+#  - a return value of 1 means that the first argument is bigger than the second argument. 
+#  - a return value of zero means that both argument values are equal
 
 > def cmp(x, y) {
 ...     if x[1] < y[1] return -1
@@ -1674,9 +1718,14 @@ same as:
     }, [null, null]),
 
     // functions for maps/hashes
-    "each" : new BuiltinFunctionValue( `
+    "each" : new BuiltinFunctionValue( `# iterate over entries of a list or maps. 
+
+# for lists: returns the list values
+    
 > each({"a":1,"b":2,"c":3})
 [["a",1],["b",2],["c",3]]
+
+# for maps: returns each key and value pair in a list of two elements
 
 > pairs = each({"a":1,"b":2,"c":3})
 > map( pairs, def (arg) [ arg[0]+arg[0], arg[1]*arg[1] ] )
@@ -1685,7 +1734,9 @@ same as:
         checkTypeList(arg, 0, [TYPE_MAP, TYPE_LIST]);
         yield* genValues(arg[0]);
     },null, true),
-    "keys": new BuiltinFunctionValue(`> a={ "first":1, "second": 2, "third": 3}
+    "keys": new BuiltinFunctionValue(`# for maps: returns the keys of the map
+    
+> a={ "first":1, "second": 2, "third": 3}
 {"first":1,"second":2,"third":3}
 > keys(a)
 ["first","second","third"]`, 1, function(arg) {
@@ -1699,7 +1750,9 @@ same as:
     }),
 
     // functions for working with json
-    "parseJsonString": new BuiltinFunctionValue(`> parseJsonString('{"name": "Kermit", "surname": "Frog"}')
+    "parseJsonString": new BuiltinFunctionValue(`# given a json formatted string as argument: returns am equivalent data structure of nested lists and maps
+
+> parseJsonString('{"name": "Kermit", "surname": "Frog"}')
 {"name":"Kermit","surname":"Frog"}
 > parseJsonString('[1,2,3]')
 [1,2,3]`, 1,function(arg, frame) {
@@ -1708,7 +1761,9 @@ same as:
         let rt = jsValueToRtVal(val);
         return rt;
     }),
-    "toJsonString": new BuiltinFunctionValue(`> toJsonString([1,2,3])
+    "toJsonString": new BuiltinFunctionValue(`# given a data argument: returns a json formatted string
+
+> toJsonString([1,2,3])
 "[1,2,3]"
 > toJsonString({"name":"Pooh","family":"Bear","likes":["Honey","Songs","Friends"]})
 "{\\"name\\":\\"Pooh\\",\\"family\\":\\"Bear\\",\\"likes\\":[\\"Honey\\",\\"Songs\\",\\"Friends\\"]}"`, 1,function(arg, frame) {
@@ -1716,7 +1771,8 @@ same as:
     }),
 
     //functions for working with yaml
-        "parseYamlString": new BuiltinFunctionValue(`
+        "parseYamlString": new BuiltinFunctionValue(`# given a yaml formatted string, : returns am equivalent data structure of nested lists and maps
+         
 > a="a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n"
 "a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n"
 > println(a)
@@ -1735,7 +1791,8 @@ c:
         let rt = jsValueToRtVal(val);
         return rt;
     }),
-    "toYamlString": new BuiltinFunctionValue(`
+    "toYamlString": new BuiltinFunctionValue(`# given a data argument: returns a yaml formatted string
+    
 > a={"a":1, "b":2, "c":[1,2,3] }
 {"a":1,"b":2,"c":[1,2,3]}
 > println(toYamlString(a))
@@ -1750,7 +1807,9 @@ c:
     }),
 
     // functions for working with processes
-    "system": new BuiltinFunctionValue(`> a=system("ls /")
+    "system": new BuiltinFunctionValue(`# runs the string command in a shell, returns an array where the first element is the standard output of the command, the second element of the list is the exit code of the process
+    
+> a=system("ls /")
 ["Applications\\nLibrary\\nSystem\\nUsers\\nVolumes\\nbin\\ncores\\ndev\\netc\\nhome\\nopt\\nprivate\\nsbin\\ntmp\\nusr\\nvar\\n",0]
 
 > println(a[0])
@@ -1985,7 +2044,9 @@ Names of functions with help text:
         return VALUE_NONE
     }, [null]),
 
-    "type": new BuiltinFunctionValue(`> type(1)
+    "type": new BuiltinFunctionValue(`# returns a string that describes the argument value
+    
+> type(1)
 "Number"
 > type("abc")
 "String"

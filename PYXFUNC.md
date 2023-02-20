@@ -25,6 +25,8 @@
 <hr>function: <b>abs</b>
 
 ```python
+# return the absolute of the argument value  (if it's negative then turn it into a positive number)
+
 > abs(-3)
 3
 > abs(3)
@@ -35,14 +37,15 @@
 <hr>function: <b>atan</b>
 
 ```python
-returns the inverse tangent (in radians) of a number
+# returns the inverse tangent (in radians) of a number
 
 ```
 <a id='s-3'/>
 <hr>function: <b>cos</b>
 
 ```python
-returns the cosine of a number in radians
+# returns the cosine of a number in radians
+
 > cos(mathconst['pi'])
 -1
 
@@ -51,6 +54,8 @@ returns the cosine of a number in radians
 <hr>function: <b>int</b>
 
 ```python
+# convert argument string or number to integer value
+
 > int("123")
 123
 > int("123.5")
@@ -80,6 +85,8 @@ returns the cosine of a number in radians
 <hr>function: <b>max</b>
 
 ```python
+# return the bigger of the two two argument values (argument is interpreted as a numbers)
+
 > max(3,4)
 4
 > max(4,3)
@@ -90,6 +97,7 @@ returns the cosine of a number in radians
 <hr>function: <b>min</b>
 
 ```python
+# return the smaller of the two two argument values (argument is interpreted as a numbers)
 > min(4,3)
 3
 > min(3,4)
@@ -101,6 +109,8 @@ returns the cosine of a number in radians
 
 ```python
 
+#  convert argument string to number 
+
 
 
 ```
@@ -108,6 +118,8 @@ returns the cosine of a number in radians
 <hr>function: <b>pow</b>
 
 ```python
+# returns the first arugment nubmer raised to the power of the second argument number
+
 > pow(2,2)
 4
 > pow(2,3)
@@ -120,7 +132,7 @@ returns the cosine of a number in radians
 <hr>function: <b>random</b>
 
 ```python
-# returns random number with value between 0 and 1
+# returns pseudo random number with value between 0 and 1 (that means it is almost random)
 > random()
 0.8424952895811049
 
@@ -130,7 +142,8 @@ returns the cosine of a number in radians
 <hr>function: <b>sin</b>
 
 ```python
-returns the sine of a number in radians
+# returns the sine of a number in radians
+
 > sin(mathconst['pi']/2)
 1
 
@@ -139,6 +152,8 @@ returns the sine of a number in radians
 <hr>function: <b>sqrt</b>
 
 ```python
+# return the square root of the argument (the number that gives the argument number, if you multiply it by itself)
+
 > sqrt(9)
 3
 > sqrt(4)
@@ -151,13 +166,15 @@ returns the sine of a number in radians
 <hr>function: <b>tan</b>
 
 ```python
-returns the tangent of a number in radians
+# returns the tangent of a number in radians
 
 ```
 <a id='s-13'/>
 <hr>function: <b>find</b>
 
 ```python
+ # search for a string (second argument) in a big string (first argument), return index of match (zero based index)
+
 > find("big cat", "big")
 0
 > find("big cat", "cat")
@@ -173,7 +190,7 @@ returns the tangent of a number in radians
 > find(a,/[a-z]+/)
 10
 
-# the third parameter is an optional offset to start search from.
+# the third parameter is an optional offset to start search from. (zero based index)
 
 > find("a1 !! a1", "a1", 2)
 6
@@ -188,6 +205,7 @@ returns the tangent of a number in radians
 <hr>function: <b>lc</b>
 
 ```python
+# convert to lower case string
 > lc("BIG little")
 "big little"
 
@@ -196,8 +214,13 @@ returns the tangent of a number in radians
 <hr>function: <b>len</b>
 
 ```python
+# for a string argument - returns the number of characters in the string
+
 > len("abc")
 3
+
+# for a list argument - returns the number of elements in the list
+
 > len([1,2,3])
 3
 
@@ -206,6 +229,8 @@ returns the tangent of a number in radians
 <hr>function: <b>mid</b>
 
 ```python
+# returns a substring in the text, first argument is the text, second argument is the start offset, third argument is ending offset (optional)
+
 > mid("I am me", 2, 4)
 "am"
 > mid("I am me", 2)
@@ -229,6 +254,8 @@ returns the tangent of a number in radians
 <hr>function: <b>replace</b>
 
 ```python
+# replace replace occurances of second argument string with third argument string in text (first argument string), fourth argument tells how many substitions (optional, 1 as default)
+
 text="a b a c a d"
 > "a b a c a d"
         
@@ -236,6 +263,9 @@ text="a b a c a d"
 "x b x c x d"        
 
 > replace(text,'a ', 'x ', 1)
+"x b a c a d"
+
+> replace(text,'a ', 'x ')
 "x b a c a d"
 
 > replace(text,'a ', 'x ', 2)
@@ -247,6 +277,8 @@ text="a b a c a d"
 <hr>function: <b>reverse</b>
 
 ```python
+# return the reverse of the argument (either string or list argument)
+
 > reverse([1,2,3,4])
 [4,3,2,1]
 > reverse("abcd")
@@ -257,6 +289,8 @@ text="a b a c a d"
 <hr>function: <b>split</b>
 
 ```python
+# split the first argument string into tokens, the second argument specifies how to split it.
+
 > split("first line\nsecond line")
 ["first line","second line"]
 > split("a,b,c", ",")
@@ -293,6 +327,8 @@ text="a b a c a d"
 <hr>function: <b>trim</b>
 
 ```python
+# remove leading and trailing whitespace characters
+
 > a= ' honey  '
 " honey  "
 > trim(a)
@@ -307,6 +343,7 @@ text="a b a c a d"
 <hr>function: <b>uc</b>
 
 ```python
+# convert to upper case string
 > uc("BIG little")
 "BIG LITTLE"
 
@@ -315,6 +352,8 @@ text="a b a c a d"
 <hr>function: <b>find</b>
 
 ```python
+ # search for a string (second argument) in a big string (first argument), return index of match (zero based index)
+
 > find("big cat", "big")
 0
 > find("big cat", "cat")
@@ -330,7 +369,7 @@ text="a b a c a d"
 > find(a,/[a-z]+/)
 10
 
-# the third parameter is an optional offset to start search from.
+# the third parameter is an optional offset to start search from. (zero based index)
 
 > find("a1 !! a1", "a1", 2)
 6
@@ -345,6 +384,8 @@ text="a b a c a d"
 <hr>function: <b>match</b>
 
 ```python
+
+# search for a match of regular expression argument (second) argument) in big text (first argument), returns a list - first element is zero based index of match, second is the matching string
 
 > text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
 "a 1232 blablalba 34234 ;aksdf;laksdf 3423"
@@ -373,7 +414,7 @@ text="a b a c a d"
 <hr>function: <b>replacere</b>
 
 ```python
-
+# replace the regular expression (second argument) with replacement expression (third argument) in source text (first argument)
     
 > text="Pooh,Bear ## Roo,Kanga ## Christopher,Robin "
 "Pooh,Bear ## Roo,Kanga ## Christopher,Robin "
@@ -397,6 +438,8 @@ text="a b a c a d"
 <hr>function: <b>split</b>
 
 ```python
+# split the first argument string into tokens, the second argument specifies how to split it.
+
 > split("first line\nsecond line")
 ["first line","second line"]
 > split("a,b,c", ",")
@@ -496,14 +539,14 @@ requestData: {req.requestData()}
 <hr>function: <b>print</b>
 
 ```python
-# prints argument values to console
+# prints argument values to console. Can accept multiple values - each of them is converted to its string representation
 
 ```
 <a id='s-32'/>
 <hr>function: <b>println</b>
 
 ```python
-# prints argument values to console, followed by newline
+# prints argument values to console, followed by newline. Can accept multiple values - each of them is converted to its string representation
 
 ```
 <a id='s-33'/>
@@ -511,7 +554,7 @@ requestData: {req.requestData()}
 
 ```python
 
-# read text file and return string
+# read text file and return it as a string, the file name is the first argument of this function
 
 > fileText = readFile("fileName.txt")    
     
@@ -522,7 +565,7 @@ requestData: {req.requestData()}
 
 ```python
 
-# rename files
+# rename files, old file name is the first argument, the new file name is the second argument
     
 rename("oldFileName","newFileName")    
 
@@ -533,10 +576,10 @@ rename("oldFileName","newFileName")
 
 ```python
 
-# unlink a number of files, returns number of deleted files
+# delete a number of files, returns number of deleted files
 unlink([ "file1.txt", "file2.txt", "file3.txt" ])
 
-# unlink a single file, returns number of deleted files
+# delete a single file, returns number of deleted files
 unlink("file1.txt")    
     
 
@@ -546,7 +589,7 @@ unlink("file1.txt")
 
 ```python
 
-# write string parameter into text file
+# write string parameter into text file. The file name is the first argument, the text value to be written into it is the second argument
 
 > writeFile("fileName.txt","fileContent")
 
@@ -561,8 +604,7 @@ unlink("file1.txt")
 <hr>function: <b>dim</b>
 
 ```python
-
-# defines n-dimensional array, all elements are set to zero.
+# defines n-dimensional array, all elements are set to zero. Each argument sets the number of element for its own respective dimension (see examples)
     
 > a=dim(4)
 [0,0,0,0]
@@ -597,6 +639,8 @@ false
 <hr>function: <b>join</b>
 
 ```python
+# given a list argument, joins the values of the list into a single string
+
 > join(["a: ",1," b: ", true])
 "a: 1 b: true"
 
@@ -605,7 +649,9 @@ false
 <hr>function: <b>joinl</b>
 
 ```python
-> joinl([1,2],[3,4])
+# takes two lists and joins them into a single list, which is returned by this function
+
+ > joinl([1,2],[3,4])
 [1,2,3,4]
 
 ```
@@ -613,8 +659,13 @@ false
 <hr>function: <b>len</b>
 
 ```python
+# for a string argument - returns the number of characters in the string
+
 > len("abc")
 3
+
+# for a list argument - returns the number of elements in the list
+
 > len([1,2,3])
 3
 
@@ -623,10 +674,14 @@ false
 <hr>function: <b>map</b>
 
 ```python
+# the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
+
 > map([1,2,3], def (x) 1 + x)
 [2,3,4]
 > map([1,2,3], def (x) x * x)
 [1,4,9]
+
+# if called with a dictionary argument: The second parameter function is called with each key-value pair of the dictionary argument. The return values of this function will form the returned list 
 
 a={ 'Ernie': 3, 'Bert': 4, 'Cookie-Monster' : 5, 'GraphCount': 100 }
 map(a,def(k,v) { "key: {k} age: {v}" })
@@ -638,6 +693,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 <hr>function: <b>mapIndex</b>
 
 ```python
+# similar to map, the argument function is called with the list value and the index of that value within the argument list
+
 > mapIndex([3,4,5,6],def(x,y) [2*x, y])
 [[6,0],[8,1],[10,2],[12,3]]
 
@@ -646,7 +703,9 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 <hr>function: <b>pop</b>
 
 ```python
-> a=[1, 2, 3]
+# takes an argument list, returns the last element of the list - but also removes this last value from the argument list
+
+ > a=[1, 2, 3]
 [1,2,3]
 > pop(a)
 3
@@ -658,6 +717,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 <hr>function: <b>push</b>
 
 ```python
+# takes the second argument and appends it to the list, which is the first argument to this function
+
 > a=[1, 2]
 [1,2]
 > push(a,3)
@@ -682,6 +743,9 @@ number: 3
 <hr>function: <b>reduce</b>
 
 ```python
+
+# form a single return values by applying the arugment value repatedly, works from the first element towards the last element of the argument list. See the following description:
+
 > reduce([1,2,3], def (x,y) x+y, 0)
 6
 
@@ -704,6 +768,8 @@ number: 3
 <hr>function: <b>reduceFromEnd</b>
 
 ```python
+# same as reduce, but working from the end of the list backward.
+
 > def div(a,b) a/b
 
 > reduceFromEnd([4,8,32], div, 1024)
@@ -719,7 +785,7 @@ same as:
 <hr>function: <b>shift</b>
 
 ```python
-
+# removes the first element from the list
 > a=[1,2,3]
 [1,2,3]
 
@@ -735,8 +801,15 @@ same as:
 <hr>function: <b>sort</b>
 
 ```python
+# sorts the argument list in increasing order
+
 > sort([3,1,4,2,5])
 [1,2,3,4,5]
+
+# the second argument of sort can specify a function that is to determine the sorting order : For this second arumgent function the following holds:
+#  - a return value of -1 means that the first argument is smaller than the second argument. 
+#  - a return value of 1 means that the first argument is bigger than the second argument. 
+#  - a return value of zero means that both argument values are equal
 
 > def cmp(x, y) {
 ...     if x[1] < y[1] return -1
@@ -752,6 +825,7 @@ same as:
 <hr>function: <b>unshift</b>
 
 ```python
+# takes the second argument, returns a list where this second argument will be the first value, whereas the first value will be the remainder of the list
 
 > a=[2,3]
 [2,3]
@@ -768,9 +842,14 @@ same as:
 <hr>function: <b>each</b>
 
 ```python
+# iterate over entries of a list or maps. 
 
+# for lists: returns the list values
+    
 > each({"a":1,"b":2,"c":3})
 [["a",1],["b",2],["c",3]]
+
+# for maps: returns each key and value pair in a list of two elements
 
 > pairs = each({"a":1,"b":2,"c":3})
 > map( pairs, def (arg) [ arg[0]+arg[0], arg[1]*arg[1] ] )
@@ -802,6 +881,8 @@ false
 <hr>function: <b>keys</b>
 
 ```python
+# for maps: returns the keys of the map
+    
 > a={ "first":1, "second": 2, "third": 3}
 {"first":1,"second":2,"third":3}
 > keys(a)
@@ -812,10 +893,14 @@ false
 <hr>function: <b>map</b>
 
 ```python
+# the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
+
 > map([1,2,3], def (x) 1 + x)
 [2,3,4]
 > map([1,2,3], def (x) x * x)
 [1,4,9]
+
+# if called with a dictionary argument: The second parameter function is called with each key-value pair of the dictionary argument. The return values of this function will form the returned list 
 
 a={ 'Ernie': 3, 'Bert': 4, 'Cookie-Monster' : 5, 'GraphCount': 100 }
 map(a,def(k,v) { "key: {k} age: {v}" })
@@ -827,6 +912,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 <hr>function: <b>parseJsonString</b>
 
 ```python
+# given a json formatted string as argument: returns am equivalent data structure of nested lists and maps
+
 > parseJsonString('{"name": "Kermit", "surname": "Frog"}')
 {"name":"Kermit","surname":"Frog"}
 > parseJsonString('[1,2,3]')
@@ -837,7 +924,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 <hr>function: <b>parseYamlString</b>
 
 ```python
-
+# given a yaml formatted string, : returns am equivalent data structure of nested lists and maps
+         
 > a="a: 1\nb: 2\nc:\n  - 1\n  - 2\n  - 3\n"
 "a: 1\nb: 2\nc:\n  - 1\n  - 2\n  - 3\n"
 > println(a)
@@ -857,6 +945,8 @@ c:
 <hr>function: <b>toJsonString</b>
 
 ```python
+# given a data argument: returns a json formatted string
+
 > toJsonString([1,2,3])
 "[1,2,3]"
 > toJsonString({"name":"Pooh","family":"Bear","likes":["Honey","Songs","Friends"]})
@@ -867,7 +957,8 @@ c:
 <hr>function: <b>toYamlString</b>
 
 ```python
-
+# given a data argument: returns a yaml formatted string
+    
 > a={"a":1, "b":2, "c":[1,2,3] }
 {"a":1,"b":2,"c":[1,2,3]}
 > println(toYamlString(a))
@@ -948,6 +1039,8 @@ sleep(3)
 <hr>function: <b>system</b>
 
 ```python
+# runs the string command in a shell, returns an array where the first element is the standard output of the command, the second element of the list is the exit code of the process
+    
 > a=system("ls /")
 ["Applications\nLibrary\nSystem\nUsers\nVolumes\nbin\ncores\ndev\netc\nhome\nopt\nprivate\nsbin\ntmp\nusr\nvar\n",0]
 
@@ -1072,6 +1165,8 @@ setTrace(false)
 <hr>function: <b>type</b>
 
 ```python
+# returns a string that describes the argument value
+    
 > type(1)
 "Number"
 > type("abc")

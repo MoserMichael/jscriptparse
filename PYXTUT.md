@@ -1,4 +1,36 @@
 
+<!-- toc-start -->
+
+* [PYXTUT - tutorial for the PYX scripting language](#s-1)
+  * [First steps](#s-1-1)
+    * [Installation](#s-1-1-1)
+    * [Using the interactive shell](#s-1-1-2)
+    * [Running programs](#s-1-1-3)
+  * [An overview](#s-1-2)
+    * [functions and lists of values](#s-1-2-4)
+    * [Statements](#s-1-2-5)
+    * [Multi dimensional lists](#s-1-2-6)
+    * [Maps](#s-1-2-7)
+    * [Splitting up a program into multiple source files](#s-1-2-8)
+  * [Features for specific tasks](#s-1-3)
+    * [Working with text](#s-1-3-9)
+    * [Regular expressions](#s-1-3-10)
+    * [Running processes](#s-1-3-11)
+    * [working with structured data (json and yaml)](#s-1-3-12)
+  * [Even more language features / advanced stuff](#s-1-4)
+    * [functions with default parameters](#s-1-4-13)
+    * [Recursion - a function calling itself](#s-1-4-14)
+    * [Functional programming](#s-1-4-15)
+    * [Object based programming](#s-1-4-16)
+    * [Error handling with exceptions](#s-1-4-17)
+    * [Generators and the yield statement](#s-1-4-18)
+  * [Input and output](#s-1-5)
+    * [reading/writing files](#s-1-5-19)
+    * [HTTP clients](#s-1-5-20)
+    * [HTTP servers](#s-1-5-21)
+  * [Conclusion](#s-1-6)
+<!-- toc-end -->
+
 <!-- toc-start --> 
 * [PYXTUT - tutorial for the PYX scripting language](#s-1)
   * [First steps](#s-1-1)

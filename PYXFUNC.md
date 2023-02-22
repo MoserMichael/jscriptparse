@@ -17,7 +17,7 @@
 ## functions for working with processes
 <a href='#s-60'>chdir</a>&nbsp;,&nbsp;<a href='#s-61'>exec</a>&nbsp;,&nbsp;<a href='#s-62'>exit</a>&nbsp;,&nbsp;<a href='#s-63'>getcwd</a>&nbsp;,&nbsp;<a href='#s-64'>kill</a>&nbsp;,&nbsp;<a href='#s-65'>sleep</a>&nbsp;,&nbsp;<a href='#s-66'>system</a>
 ## Other functions
-<a href='#s-67'>eval</a>&nbsp;,&nbsp;<a href='#s-68'>help</a>&nbsp;,&nbsp;<a href='#s-69'>localtime</a>&nbsp;,&nbsp;<a href='#s-70'>setErrorOnExecFail</a>&nbsp;,&nbsp;<a href='#s-71'>setTrace</a>&nbsp;,&nbsp;<a href='#s-72'>time</a>&nbsp;,&nbsp;<a href='#s-73'>type</a>
+<a href='#s-67'>assert</a>&nbsp;,&nbsp;<a href='#s-68'>eval</a>&nbsp;,&nbsp;<a href='#s-69'>help</a>&nbsp;,&nbsp;<a href='#s-70'>localtime</a>&nbsp;,&nbsp;<a href='#s-71'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-72'>time</a>&nbsp;,&nbsp;<a href='#s-73'>type</a>
 ## Global variables
 <a href='#s-74'>ARGV</a>&nbsp;,&nbsp;<a href='#s-75'>ENV</a>&nbsp;,&nbsp;<a href='#s-76'>mathconst</a>
 
@@ -1067,6 +1067,28 @@ var
 
 ```
 <a id='s-67'/>
+<hr>function: <b>assert</b>
+
+```python
+
+# first argument is a boolean expression, if it's value is false then throw an exception
+# the second argument is optional, it tells the message of the exception, in case of failure
+
+> a=true
+true
+> assert(a, "a should be true")
+
+> a=false
+false
+
+> assert(a, "a should be true")
+Error: a should be true
+#(1) assert(a, "a should be true")
+   |    
+
+
+```
+<a id='s-68'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1094,7 +1116,7 @@ var
 
 
 ```
-<a id='s-68'/>
+<a id='s-69'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1109,7 +1131,7 @@ help()
 
 
 ```
-<a id='s-69'/>
+<a id='s-70'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1120,38 +1142,59 @@ help()
 
 
 ```
-<a id='s-70'/>
-<hr>function: <b>setErrorOnExecFail</b>
-
-```python
-
-# when set: throw exception if running a process failed 
-setErrorOnExecFail(true)
-> setErrorOnExecFail(true)
-
-> system("false")
-Error: failed to run `false` : Command failed: false
-#(1) system("false")
-   |.^
-
-> `false`
-Error: failed to run `false` : Command failed: false
-#(1) `false`
-   |.^
-
-
-```
 <a id='s-71'/>
-<hr>function: <b>setTrace</b>
+<hr>function: <b>setPYXOptions</b>
 
 ```python
 
-# trace the running of a program (for debugging)
-setTrace(true)
+ # set opttions of the PYX runtime
+
+# enable tracing of program (equivalent to -x command line option):w
+# setPYXOptions("trace", true) 
+
+> def f(x) pow(x,2) + 1
+"<function>"
+> f(3)
+10
+
+> setPYXOptions("trace", true)
+
+> f(3)
+f(x=3)
++ pow(3, 2) {
++ 9
+} 10
 
 # stop tracing
-setTrace(false)
+setPYXOptions("trace", false)
 
+# when set: throw exception if running a process failed
+
+> setPYXOptions("errorExit", true)
+
+> system("false")
++ system("false") {
+failed to run: false error: Command failed: false
+Error: internal error: Error: Command failed: false
+#(1) system("false")
+   |.^
+   
+# set limit on number of frames displayed during stack trace
+
+> def stackOverflow(x)  x * stackOverflow(x-1)
+
+> setPYXOptions("framesInError", 3)
+   
+> stackOverflow(1024)
+Error: internal error: RangeError: Maximum call stack size exceeded
+#(1) def stackOverflow(x)  x * stackOverflow(x-1)
+   |...........................^
+#(1) def stackOverflow(x)  x * stackOverflow(x-1)
+   |.........................^
+#(1) def stackOverflow(x)  x * stackOverflow(x-1)
+   |.^
+      
+ 
 
 ```
 <a id='s-72'/>

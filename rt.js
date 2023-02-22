@@ -96,8 +96,6 @@ class ClosureValue {
         }
         return this.hasYield_;
     }
-
-
 }
 
 class BuiltinFunctionValue {
@@ -167,7 +165,7 @@ function typeName(val) {
 
 let NumberNames={ 1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth"};
 
-function getParamName(index) {
+function _ParamName(index) {
     let paramName = "";
     if (index != null) {
         if (NumberNames[index+1] != undefined) {
@@ -2538,6 +2536,7 @@ class AstStmtList extends AstBase {
         this.statements = statements;
         this.hasGen = true;
         this.skipTrace = false;
+        this.hasYield_ = null;
     }
 
     eval(frame) {
@@ -2582,15 +2581,18 @@ class AstStmtList extends AstBase {
     }
 
     hasYield(frame) {
-
-        for (let i = 0; i < this.statements.length; ++i) {
-            let stmt = this.statements[i];
-            if (stmt.hasYield(frame)) {
-                return true;
+        if (this.hasYield_ == null) {
+            let ret = false;
+            for (let i = 0; i < this.statements.length; ++i) {
+                let stmt = this.statements[i];
+                if (stmt.hasYield(frame)) {
+                    ret = true;
+                    break;
+                }
             }
+            this.hasYield_ = ret;
         }
-
-        return false;
+        return this.hasYield_;
     }
 
     show() {
@@ -2610,6 +2612,7 @@ class AstTryCatchBlock extends AstBase {
         this.catchBlock = optCatchBlock;
         this.finallyBlock = optFinallyBlock != null ? optFinallyBlock[0] : null;
         this.hasGen = true;
+        this.hasYield_ = null;
     }
 
     eval(frame) {
@@ -2755,16 +2758,20 @@ class AstTryCatchBlock extends AstBase {
     }
 
     hasYield(frame) {
-        if (this.statements.hasYield(frame)) {
-            return true;
+        if (this.hasYield_ == null) {
+            let ret = false;
+            if (this.statements.hasYield(frame)) {
+                ret = true;
+            }
+            else if (this.catchBlock[2] != null && this.catchBlock[2].hasYield(frame)) {
+                ret =  true;
+            }
+            else if (this.finallyBlock != null && this.finallyBlock.hasYield(frame)) {
+                ret = true;
+            }
+            this.hasYield_ = ret;
         }
-        if (this.catchBlock[2] != null && this.catchBlock[2].hasYield(frame)) {
-            return true;
-        }
-        if (this.finallyBlock != null && this.finallyBlock.hasYield(frame)) {
-            return true;
-        }
-        return false;
+        return this.hasYield_;
     }
 }
 
@@ -3328,6 +3335,7 @@ class AstIfStmt extends AstBase {
         this.ifClauses = [];
         this.addIfClause(expr, stmtList);
         this.hasGen = true;
+        this.hasYield_ = null;
 
         //console.log("else: " + JSON.stringify(elseStmtList));
         this.elseStmtList = null;
@@ -3394,16 +3402,21 @@ class AstIfStmt extends AstBase {
     }
 
     hasYield(frame) {
-        for(let i=0; i< this.ifClauses.length; ++i) {
-            let clause = this.ifClauses[i];
-            if (clause[1].hasYield(frame)) {
-                return true;
+        if (this.hasYield_ == null) {
+
+            let ret = false;
+            for (let i = 0; i < this.ifClauses.length; ++i) {
+                let clause = this.ifClauses[i];
+                if (clause[1].hasYield(frame)) {
+                    ret = true;
+                }
             }
+            if (!ret && this.elseStmtList) {
+                ret = this.elseStmtList.hasYield(frame);
+            }
+            this.hasYield_ = ret;
         }
-        if (this.elseStmtList) {
-            return this.elseStmtList.hasYield(frame);
-        }
-        return false;
+        return this.hasYield_;
     }
 
     show() {
@@ -3767,6 +3780,7 @@ class AstFunctionDef extends AstBase {
         this.params = params;
         this.body = body;
         this.isGeneratorFunction = false;
+        this.hasYield_ = null;
     }
 
     eval(frame) {
@@ -3806,7 +3820,10 @@ class AstFunctionDef extends AstBase {
     }
 
     hasYield(frame) {
-        return this.body.hasYield(frame)
+        if (this.hasYield_ == null) {
+            this.hasYield_ = this.body.hasYield(frame)
+        }
+        return this.hasYield_;
     }
 
     show() {
@@ -3833,6 +3850,7 @@ class AstFunctionCall extends AstBase {
         this.name = name;
         this.expressionList = expressionList;
         this.funcVal_ = null;
+        this.hasYield_ = null;
     }
 
     eval(frame) {
@@ -3855,7 +3873,7 @@ class AstFunctionCall extends AstBase {
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             } else {
                 if (showJavascriptStack) {
-                    console.log(er.stack);
+                    console.log("stack length: " + er.stack);
                 }
                 er = new RuntimeException("internal error: " + er);
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
@@ -3873,8 +3891,27 @@ class AstFunctionCall extends AstBase {
     }
 
     hasYield(frame) {
-        let funcVal = this._getFuncVal(frame);
-        return funcVal.hasYield(frame);
+        if (this.hasYield_ == null) {
+            let funcVal = this._getFuncValSimple(frame);
+            this.hasYield_ = (funcVal != null) ? funcVal.hasYield(frame) : false;
+        }
+        return this.hasYield_;
+    }
+
+    _getFuncValSimple(frame) {
+        let funcVal = null;
+        if (this.name instanceof AstIdentifierRef) {
+            if (this.name.refExpr == null) {
+                funcVal = this.name.eval(frame);
+                funcVal.name = this.name.identifierName;
+                //what if identifier name comes from lookup of values?
+            }
+        } else {
+            funcVal = frame.lookup(this.name);
+            funcVal.name = this.name;
+        }
+        return funcVal;
+
     }
 
     _getFuncVal(frame) {
@@ -3903,7 +3940,6 @@ class AstFunctionCall extends AstBase {
         }
         this.funcVal_ = funcVal;
         return funcVal;
-
     }
 
     _evalCallArguments(frame) {

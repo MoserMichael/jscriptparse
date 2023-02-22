@@ -12,6 +12,8 @@ let doLogHook = function(msg) { process.stdout.write(msg); }
 
 const showJavascriptStack = false;
 
+let maxStackFrames = 20;
+
 // callback for running evaluator
 let evalCallback = null;
 
@@ -387,10 +389,15 @@ class RuntimeException  extends Error {
         }
         this.flags = flags;
         this.firstChance = true;
+        this.hasMoreStackFrames = false;
     }
 
     addToStack(frameInfo) {
-        this.stackTrace.push(frameInfo);
+        if (this.stackTrace.length < maxStackFrames ) {
+            this.stackTrace.push(frameInfo);
+        } else {
+            this.hasMoreStackFrames = true;
+        }
     }
 
     isUnwind() {
@@ -421,6 +428,9 @@ class RuntimeException  extends Error {
             let prefix = "#(" + fname + prs.getLineNo(sourceInfo[1], offset) + ") ";
             ret += prefix + entry[0] + "\n";
             ret += (Array(prefix.length-1).join(' ')) + "|" +  Array(entry[1]+1).join(".") + "^\n";
+        }
+        if (this.hasMoreStackFrames) {
+            ret += "\n.... stack frames ommitted ...\n";
         }
         if (this.originalCause != null) {
             ret += "\nCaused by:\n" + this.originalCause.showStackTrace();

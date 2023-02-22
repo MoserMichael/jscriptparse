@@ -2143,28 +2143,6 @@ Error: internal error: RangeError: Maximum call stack size exceeded
         return VALUE_NONE;
     }),
 
-
-/*
-
-    "setErrorOnExecFail": new BuiltinFunctionValue(`
-# when set: throw exception if running a process failed 
-setErrorOnExecFail(true)
-> setErrorOnExecFail(true)
-
-> system("false")
-Error: failed to run \`false\` : Command failed: false
-#(1) system("false")
-   |.^
-
-> \`false\`
-Error: failed to run \`false\` : Command failed: false
-#(1) \`false\`
-   |.^
-`, 1,function(arg, frame) {
-        errorOnExecFail = value2Bool(arg, 0);
-        return VALUE_NONE;
-    }),
-*/
     "eval": new BuiltinFunctionValue(`
 
 # evaluate the string as a pyx program - in the current scope

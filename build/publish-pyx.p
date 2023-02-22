@@ -31,7 +31,7 @@ def copyAndReplace(oldName, newName) {
 
 def prepareAndPublish(version) {
 
-    setErrorOnExecFail(true)
+    setPYXOptions("errorExit", true)
 
     system("rm -rf tmp-publish || true")
     system("mkdir tmp-publish")

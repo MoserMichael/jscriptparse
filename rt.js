@@ -10,6 +10,7 @@ const httpAgent = new http.Agent({ keepAlive: true });
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
+const showJavascriptStack = false;
 
 // callback for running evaluator
 let evalCallback = null;
@@ -48,22 +49,6 @@ function setErrorOnExecFail(on) {
 }
 
 
-// doesn't seem to make a difference...
-/*
-let evalForceStop = false;
-
-function setForceStopEval() {
-    console.log("force stop");
-    evalForceStop = true;
-}
-
-function checkEvalForceStop() {
-    if (evalForceStop) {
-        evalForceStop = false;
-        throw new RuntimeException("_forcedStop_", null, true);
-    }
-}
-*/
 
 const TYPE_BOOL=0
 const TYPE_NUM=1
@@ -1978,6 +1963,34 @@ sleep(3)
         process.exit(num);
     }),
 
+    "assert": new BuiltinFunctionValue( `
+# first argument is a boolean expression, if it's value is false then throw an exception
+# the second argument is optional, it tells the message of the exception, in case of failure
+
+> a=true
+true
+> assert(a, "a should be true")
+
+> a=false
+false
+
+> assert(a, "a should be true")
+Error: a should be true
+#(1) assert(a, "a should be true")
+   |    
+`,2, function(arg, frame) {
+        let val = value2Bool(arg, 0);
+        if (!val) {
+            let msg="";
+            if (arg[1] != null) {
+                msg = value2Str(arg, 1);
+            } else {
+                msg = "Assertion failed";
+            }
+            throw new RuntimeException(msg)
+        }
+    }, [null, null]),
+
     // other functions
     "exists": new BuiltinFunctionValue(`> a={"first":1}
 {"first":1}
@@ -2404,8 +2417,8 @@ class Frame {
         this.parentFrame = parentFrame;
     }
 
-
     lookup(name) {
+        //console.log("lookup: " + name);
         let ret = this._lookup(name);
         //console.log("lookup: " + name + " ret: " + JSON.stringify(ret));
         return ret;
@@ -2536,8 +2549,6 @@ class AstStmtList extends AstBase {
 
         for(let i=0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
-
-            //checkEvalForceStop();
 
             val = stmt.eval(frame);
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
@@ -2837,6 +2848,15 @@ function checkMixedType(op, lhs, rhs) {
     }
 }
 
+function checkMixedTypeAllowNone(op, lhs, rhs) {
+    if (lhs.type != TYPE_NONE && rhs.type != TYPE_NONE) {
+        if (lhs.type != rhs.type) {
+            throw new RuntimeException(op + " not allowed between " + typeName(rhs) + " and " + typeName(lhs))
+        }
+    }
+}
+
+
 MAP_OP_TO_FUNC={
     "and" : function(lhs,rhs, frame) {
         return new Value(TYPE_BOOL, value2Bool(lhs.eval(frame)) && value2Bool(rhs.eval(frame)));
@@ -2871,13 +2891,13 @@ MAP_OP_TO_FUNC={
     "==" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
-        checkMixedType("==", lhs, rhs);
+        checkMixedTypeAllowNone("==", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val == rhs.val);
     },
     "!=" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
-        checkMixedType("!=", lhs, rhs);
+        checkMixedTypeAllowNone("!=", lhs, rhs);
         return new Value(TYPE_BOOL, lhs.val != rhs.val);
     },
     "+" : function(lhs,rhs, frame) {
@@ -3529,8 +3549,6 @@ class AstForStmt extends AstBase {
         for(let val of genValues(rt)) {
             _assignImp(frame, val, this.lhs);
 
-            //checkEvalForceStop();
-
             let rt = this.stmtList.eval(frame);
 
             if (rt.type >= TYPE_FORCE_RETURN) {
@@ -3818,8 +3836,6 @@ class AstFunctionCall extends AstBase {
     }
 
     eval(frame) {
-        //checkEvalForceStop();
-
         let funcVal = this._getFuncVal(frame);
         try {
             if (!funcVal.hasYield(frame)) {
@@ -3836,6 +3852,12 @@ class AstFunctionCall extends AstBase {
             }
         } catch (er) {
             if (er instanceof RuntimeException && !er.isUnwind()) {
+                er.addToStack([this.startOffset, this.currentSourceInfo]);
+            } else {
+                if (showJavascriptStack) {
+                    console.log(er.stack);
+                }
+                er = new RuntimeException("internal error: " + er);
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
             throw er;

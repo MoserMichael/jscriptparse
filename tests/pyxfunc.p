@@ -29,7 +29,7 @@ funcCats = [
    "func": [ "system", "exit", "sleep", "exec", "kill", "chdir", "getcwd" ]
  },
  { "name": "Other functions",
-   "func": [ "assert", "help", "type", "time", "localtime", "setTrace", "setErrorOnExecFail", "eval" ]
+   "func": [ "assert", "help", "type", "time", "localtime", "setPYXOptions", "eval" ]
  },
  { "name": "Global variables",
     "func": [ "mathconst", "ARGV", "ENV" ]

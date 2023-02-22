@@ -681,7 +681,7 @@ function _system(cmd, frame) {
     try {
         out = cp.execSync(cmd,{env: env}).toString();
     } catch(e) {
-        console.log("failed to run: cmd" + e.message);
+        console.log("failed to run: " + cmd + " error: " + e.message);
         status = 1;//e.status;
         out = e.message;
         throw e;
@@ -2080,16 +2080,71 @@ Names of functions with help text:
         return new Value(TYPE_STR, typeName(arg[0]));
     }),
 
-    "setTrace": new BuiltinFunctionValue(`
-# trace the running of a program (for debugging)
-setTrace(true)
+    "setPYXOptions": new BuiltinFunctionValue(`
+ # set opttions of the PYX runtime
+
+# enable tracing of program (equivalent to -x command line option):w
+# setPYXOptions("trace", true) 
+
+> def f(x) pow(x,2) + 1
+"<function>"
+> f(3)
+10
+
+> setPYXOptions("trace", true)
+
+> f(3)
+f(x=3)
++ pow(3, 2) {
++ 9
+} 10
 
 # stop tracing
-setTrace(false)
-`, 1,function(arg, frame) {
-        traceMode = value2Bool(arg, 0);
+setPYXOptions("trace", false)
+
+# when set: throw exception if running a process failed
+
+> setPYXOptions("errorExit", true)
+
+> system("false")
++ system("false") {
+failed to run: false error: Command failed: false
+Error: internal error: Error: Command failed: false
+#(1) system("false")
+   |.^
+   
+# set limit on number of frames displayed during stack trace
+
+> def stackOverflow(x)  x * stackOverflow(x-1)
+
+> setPYXOptions("framesInError", 3)
+   
+> stackOverflow(1024)
+Error: internal error: RangeError: Maximum call stack size exceeded
+#(1) def stackOverflow(x)  x * stackOverflow(x-1)
+   |...........................^
+#(1) def stackOverflow(x)  x * stackOverflow(x-1)
+   |.........................^
+#(1) def stackOverflow(x)  x * stackOverflow(x-1)
+   |.^
+      
+ `, 2,function(arg, frame) {
+        let optname = value2Str(arg, 0);
+        if (optname == "trace") {
+            setTraceMode( value2Bool(arg, 1) );
+        } else if (optname == "errorExit") {
+            errorOnExecFail = value2Bool(arg, 1);
+        } else if (optname == "framesInError") {    
+            maxStackFrames =  value2Num(arg, 1);
+            console.log("maxStackFrames " + maxStackFrames)
+        } else {
+            throw new RuntimeException("Unknwon option name");
+        }
         return VALUE_NONE;
     }),
+
+
+/*
 
     "setErrorOnExecFail": new BuiltinFunctionValue(`
 # when set: throw exception if running a process failed 
@@ -2109,7 +2164,7 @@ Error: failed to run \`false\` : Command failed: false
         errorOnExecFail = value2Bool(arg, 0);
         return VALUE_NONE;
     }),
-
+*/
     "eval": new BuiltinFunctionValue(`
 
 # evaluate the string as a pyx program - in the current scope

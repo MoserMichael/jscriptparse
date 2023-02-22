@@ -1,10 +1,13 @@
 ## PYX releases
 
 * PYX 0.2.0 / PRS 0.0.4  
-    * add assert function (for tests)
+    * rt: add assert function (for tests)
     * comparison of value with none was not allowed, very bad bug
     * fix comparison with none (wow)
     * prevent eof stack in check for function with yield (no yield in object members)
+    * limit displayed stack frames to 20 (as default)
+    * rt: remove  setTrace and setErrorOnExecFail - instead add setPYXOption that does all of them
+
     
 
 * PYX 0.1.9 / PRS 0.0.4  

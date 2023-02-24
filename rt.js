@@ -3244,7 +3244,9 @@ function lookupIndex(frame, value, refExpr) {
 
         value = value.val[ indexValue.val ];
         if (value == null) {
-            throw new RuntimeException("Can't lookup index " + indexValue.val)
+            let ex = new RuntimeException("Can't lookup index " + indexValue.val);
+            ex.addToStack([expr.startOffset, expr.currentSourceInfo]);
+            throw ex;
         }
 
         if (curValue == TYPE_STR) {

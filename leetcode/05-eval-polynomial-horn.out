@@ -1,0 +1,8 @@
+[3]
+fast: 3 slow 3
+[3,2]
+fast: 14 slow 14
+[5,1,4]
+fast: 88 slow 88
+[9,0,3,2,5]
+fast: 2365 slow 2365

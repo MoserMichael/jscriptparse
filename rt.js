@@ -3065,7 +3065,7 @@ class AstBinaryExpression extends AstBase {
 
 }
 
-function makeExpression(exprList) {
+function makeExpressionLeftToRight(exprList) {
     if (exprList.length == 1) {
         return exprList[0];
     }
@@ -3082,6 +3082,29 @@ function makeExpression(exprList) {
             //console.log("!! " + JSON.stringify(exprList[pos-1]) + " # " +   JSON.stringify(exprList[pos]) + " # " + prevExpression);
             prevExpression = new AstBinaryExpression(exprList[pos-1], exprList[pos], prevExpression);
             pos -= 2;
+        }
+    }
+    //console.log("exit makeExpression: " + JSON.stringify(prevExpression));
+    return prevExpression;
+}
+
+function makeExpression(exprList) {
+    if (exprList.length == 1) {
+        return exprList[0];
+    }
+    let prevExpression = null;
+    let pos = 0;
+
+    //console.log("enter makeExpression");
+    while(pos < exprList.length) {
+        if (prevExpression == null) {
+            //console.log("## " + JSON.stringify(exprList[pos-2]) + " # " +   JSON.stringify(exprList[pos-1]) + " # " + JSON.stringify(exprList[pos]));
+            prevExpression = new AstBinaryExpression(exprList[pos], exprList[pos+1], exprList[pos+2]);
+            pos += 3;
+        } else {
+            //console.log("!! " + JSON.stringify(exprList[pos-1]) + " # " +   JSON.stringify(exprList[pos]) + " # " + prevExpression);
+            prevExpression = new AstBinaryExpression(prevExpression, exprList[pos], exprList[pos+1], );
+            pos += 2;
         }
     }
     //console.log("exit makeExpression: " + JSON.stringify(prevExpression));
@@ -3240,12 +3263,19 @@ class AstIdentifierRef extends AstBase {
 
     // evaluate, if as part of expression (for assignment there is AstAssignment)
     eval(frame) {
-        let value = frame.lookup(this.identifierName);
-        if (this.refExpr != null) {
-            value = lookupIndex(frame, value, this.refExpr)
+        try {
+            let value = frame.lookup(this.identifierName);
+            if (this.refExpr != null) {
+                value = lookupIndex(frame, value, this.refExpr)
+            }
+            return value;
+        } catch(er) {
+            if (er instanceof RuntimeException && !er.isUnwind()) {
+                er.addToStack([this.startOffset, this.currentSourceInfo]);
+            }
+            throw er;
         }
         //console.log("identifier ref: name: " + this.identifierName + " res: " + JSON.stringify(value));
-        return value;
     }
 
     show() {
@@ -3266,7 +3296,7 @@ function _assignImp(frame, value, lhs) {
     let traceRhs=[];
 
     if (lhs.length == 1 ) {
-        let singleLhs = lhs[0]
+        let singleLhs = lhs[0];
         let traceVal = _assign(frame, singleLhs, value);
         if (traceMode) {
             traceLhs.push(traceVal[0]);

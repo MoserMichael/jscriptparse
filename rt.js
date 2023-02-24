@@ -528,7 +528,8 @@ function evalClosure(name, funcVal, args, frame) {
         if (funcVal.frame != null) { // closure with captured variables
             [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, funcVal.frame, args);
         } else {
-            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, frame, args);
+
+            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, frame.parentFrame != null ? frame.parentFrame : frame, args);
         }
 
         if (traceParam) {

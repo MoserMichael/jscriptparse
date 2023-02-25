@@ -404,6 +404,8 @@ pyx -e 'val' : run the string 'val' as a pyx program (one liner)
 
 -f           : throw and exception, if shelling out to command via system or backtick fails 
 
+-s <num>     : set maximum number of frames displayed in stack trace 
+
 -v           : show version
 
 -h           : show this help text   
@@ -417,12 +419,13 @@ function parseCmdLine() {
         cmdLine: null,
         traceMode: false,
         errorOnExecFail: false,
-        expression: null
+        expression: null,
+        maxStackFrames: null
     };
 
     let i=2;
     for(;i<process.argv.length;i++) {
-        if (process.argv[i] == '-h') {
+        if (process.argv[i] == '-h' || process.argv[i] == '--help') {
             printHelp();
         } else if (process.argv[i] == '-v') { 
             showVersion(); 
@@ -442,6 +445,12 @@ function parseCmdLine() {
             ret.traceMode = true;
         } else if (process.argv[i] == '-f') {
             ret.errorOnExecFail = true
+        } else if (process.argv[i] == '-s') {
+            i+=1;
+            if (i>=process.argv.length) {
+                printHelp();
+            }
+            ret.maxStackFrames = parseInt(process.argv[i])
         } else {
             ret.fileName = process.argv[i];
             i += 1;
@@ -476,6 +485,9 @@ function runMain() {
     }
     if (cmd.errorOnExecFail) {
         rt.setErrorOnExecFail( true);
+    }
+    if (cmd.maxStackFrames != null) {
+        rt.setMaxStackFrames(cmd.maxStackFrames);
     }
 
     if (cmd.fileName == null && cmd.expression == null) {

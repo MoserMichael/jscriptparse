@@ -1,4 +1,9 @@
-## PYX releases
+* PYX 0.2.1 / PRS 0.0.4  
+    * fix associativity of operations (what a shame)
+    * regular function calls (not closures): don't lookup variables in frame of calling function
+    * show exact location of index lookup error
+    * add command line option -s : to set the depth of reported stack frames
+    * add test
 
 * PYX 0.2.0 / PRS 0.0.4  
     * rt: add assert function (for tests)
@@ -8,11 +13,9 @@
     * limit displayed stack frames to 20 (as default)
     * rt: remove  setTrace and setErrorOnExecFail - instead add setPYXOption that does all of them
 
-    
-
 * PYX 0.1.9 / PRS 0.0.4  
 
-    * REPL: some kind of shell command completion on writing back tick strings.
+    * REPL: some kind of shell command completion on writing back tick strings (doesn't work on windows)
     * docker test: test on both fedora and ubuntu, with the node version 19.x
  
 * PYX 0.1.8 / PRS 0.0.4  
@@ -32,7 +35,7 @@
 
 * PYX 0.1.6 / PRS 0.0.4  
     * Throw error on redefinition of built-in functions.
-    * Add dim function - definition of multi-dimensional array.
+    * Add dim function - definition of multi-dimensional array (entries initialised with zero)
     * make PYXTUT.md more accessible. 
 
 * PYX 0.1.5 / PRS 0.0.4  

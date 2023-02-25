@@ -50,7 +50,9 @@ function setErrorOnExecFail(on) {
     errorOnExecFail = on;
 }
 
-
+function setMaxStackFrames(nframes) {
+    maxStackFrames = nframes
+}
 
 const TYPE_BOOL=0
 const TYPE_NUM=1
@@ -4141,6 +4143,7 @@ if (typeof(module) == 'object') {
         //setForceStopEval,
         setTraceMode,
         setErrorOnExecFail,
+        setMaxStackFrames,
         rtValueToJsVal,
         isBreakOrContinue,
         isReturnOrYield,

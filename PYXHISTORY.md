@@ -1,4 +1,4 @@
-* PYX 0.2.2 / PRS 0.0.4  
+* PYX 0.2.3 / PRS 0.0.4  
     * fix associativity of operations (what a shame)
     * regular function calls (not closures): don't lookup variables in frame of calling function
     * show exact location of index lookup error

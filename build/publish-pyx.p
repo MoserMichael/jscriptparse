@@ -20,7 +20,7 @@ def makeTag(version) {
 
 def copyAndReplace(oldName, newName, version) {
 
-    pyxFile = readFile(oldName, version)
+    pyxFile = readFile(oldName)
 
     pyxFile = replace(pyxFile, "VERSION_TAG", version)
     pyxFile = replace(pyxFile, 'const prs=require(path.join(__dirname,"prs.js"))','const prs=require("prscombinator")')

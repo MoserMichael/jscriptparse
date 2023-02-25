@@ -18,9 +18,9 @@ def makeTag(version) {
     }
 }
 
-def copyAndReplace(oldName, newName) {
+def copyAndReplace(oldName, newName, version) {
 
-    pyxFile = readFile(oldName)
+    pyxFile = readFile(oldName, version)
 
     pyxFile = replace(pyxFile, "VERSION_TAG", version)
     pyxFile = replace(pyxFile, 'const prs=require(path.join(__dirname,"prs.js"))','const prs=require("prscombinator")')
@@ -37,9 +37,9 @@ def prepareAndPublish(version) {
     system("mkdir tmp-publish")
     
 
-    copyAndReplace("rt.js", "./tmp-publish/rt.js")
-    copyAndReplace("scripty.js", "./tmp-publish/scripty.js")
-    copyAndReplace("pyx", "./tmp-publish/pyx")
+    copyAndReplace("rt.js", "./tmp-publish/rt.js", version)
+    copyAndReplace("scripty.js", "./tmp-publish/scripty.js", version)
+    copyAndReplace("pyx", "./tmp-publish/pyx", version)
 
     system("chmod +x ./tmp-publish/pyx")
     system("cp PYXDESIGN.md	tmp-publish/")

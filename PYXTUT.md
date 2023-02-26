@@ -12,55 +12,28 @@
     * [Multi dimensional lists](#s-1-2-6)
     * [Maps](#s-1-2-7)
     * [Splitting up a program into multiple source files](#s-1-2-8)
+    * [Operator reference](#s-1-2-9)
   * [Features for specific tasks](#s-1-3)
-    * [Working with text](#s-1-3-9)
-    * [Regular expressions](#s-1-3-10)
-    * [Running processes](#s-1-3-11)
-    * [working with structured data (json and yaml)](#s-1-3-12)
+    * [Working with text](#s-1-3-10)
+    * [Regular expressions](#s-1-3-11)
+    * [Running processes](#s-1-3-12)
+    * [working with structured data (json and yaml)](#s-1-3-13)
   * [Even more language features / advanced stuff](#s-1-4)
-    * [functions with default parameters](#s-1-4-13)
-    * [Recursion - a function calling itself](#s-1-4-14)
-    * [Functional programming](#s-1-4-15)
-    * [Object based programming](#s-1-4-16)
-    * [Error handling with exceptions](#s-1-4-17)
-    * [Generators and the yield statement](#s-1-4-18)
+    * [functions with default parameters](#s-1-4-14)
+    * [Recursion - a function calling itself](#s-1-4-15)
+    * [Functional programming](#s-1-4-16)
+    * [Object based programming](#s-1-4-17)
+    * [Error handling with exceptions](#s-1-4-18)
+    * [Generators and the yield statement](#s-1-4-19)
   * [Input and output](#s-1-5)
-    * [reading/writing files](#s-1-5-19)
-    * [HTTP clients](#s-1-5-20)
-    * [HTTP servers](#s-1-5-21)
+    * [reading/writing files](#s-1-5-20)
+    * [HTTP clients](#s-1-5-21)
+    * [HTTP servers](#s-1-5-22)
   * [Conclusion](#s-1-6)
 <!-- toc-end -->
 
-<!-- toc-start --> 
-* [PYXTUT - tutorial for the PYX scripting language](#s-1)
-  * [First steps](#s-1-1)
-    * [Installation](#s-1-1-1)
-    * [Using the interactive shell](#s-1-1-2)
-    * [Running programs](#s-1-1-3)
-  * [An overview](#s-1-2)
-    * [functions and lists of values](#s-1-2-4)
-    * [Statements](#s-1-2-5)
-    * [Multi dimensional lists](#s-1-2-6)
-    * [Maps](#s-1-2-7)
-    * [Splitting up a program into multiple source files](#s-1-2-8)
-  * [Features for specific tasks](#s-1-3)
-    * [Working with text](#s-1-3-9)
-    * [Regular expressions](#s-1-3-10)
-    * [Running processes](#s-1-3-11)
-    * [working with structured data (json and yaml)](#s-1-3-12)
-  * [Even more language features / advanced stuff](#s-1-4)
-    * [functions with default parameters](#s-1-4-13)
-    * [Recursion - a function calling itself](#s-1-4-14)
-    * [Functional programming](#s-1-4-15)
-    * [Object based programming](#s-1-4-16)
-    * [Error handling with exceptions](#s-1-4-17)
-    * [Generators and the yield statement](#s-1-4-18)
-  * [Input and output](#s-1-5)
-    * [reading/writing files](#s-1-5-19)
-    * [HTTP clients](#s-1-5-20)
-    * [HTTP servers](#s-1-5-21)
-  * [Conclusion](#s-1-6)
-<!-- toc-end -->
+
+
 
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
@@ -107,6 +80,7 @@ or even more complicated ones: First the expression ```5-2``` is computed, that'
 10
 ```
 
+
 You can always return to the previous expression with arrow up and to the next expression with the arrow up and down - and change them all over (that's a big deal!)
 
 (the ```pyx``` program is also writing the ```pyx_history``` file, each time that you run a statement successfully it is written onto the end of this file)
@@ -131,12 +105,14 @@ The ```...``` symbol is only displayed in the interactive shell, it is a sign th
 A real program will not have the ```...``` symbol, it is not part of the text that you are typing.
 
 
-Now you also have mathematical constants, these are numbers that should never change, like the number Pi and the Euler constant (it looks a bit strange right now, we will learn about maps in a later chapter)
+Now you also have mathematical constants, these are numbers that should never change, like the number [Pi](https://en.wikipedia.org/wiki/Pi) and the [Euler constant](https://en.wikipedia.org/wiki/Euler%27s_constant) (it looks a bit strange right now, we will learn about maps in a later chapter)
 
 ```
+# the constant pi
 > mathconst.pi
 3.141592653589793
 
+# Euler's constant
 > mathconst.e
 2.718281828459045
 ```
@@ -173,7 +149,7 @@ mathconst.log2e   # - base 2 logarithm of e
 mathconst.log10e  # - base 10 logarithm of e
 ```
 
-You can compute the sinus of pi as follows: ```cos``` is a function, you can ask ```cos``` to compute the cosine on any number ```cos(3)``` returns the cosine of 3.
+We got some built-in functions: ```cos``` is a function, you can ask ```cos``` to compute the cosine on any number ```cos(3)``` returns the cosine of 3.
 
 ```
 > cos(3)
@@ -666,9 +642,102 @@ You can now include the text of file ```testuse.p``` and use all the functions t
 
 An important detail: if you have the ```PATH``` environment variable set, then the statement ```use "testuse.p"``` will search for the file name "testuse.p" in all directories specified by the ```PATH``` environment variable.
 
+
+### <a id='s-1-2-9' />Operator reference
+
+There are the following operations, these can be used in expressions
+
+<table>
+  <tr>
+    <th>
+        Operator
+    </th>
+    <th>
+        Meaning
+    </th>
+  </tr>
+  <tr>
+    <td>
+       +
+    </td>
+    <td>
+       Add two number values, if the arguments are strings then concatenate the strings
+```
+> 12 * 2
+24
+
+> 'aaa-' + 'bbb'
+"aaa-bbb"
+> 12 * 2
+24
+```
+
+    </td>
+  </tr>
+  <tr>
+    <td>
+       -
+    </td>
+    <td>
+        Substract the second argument number from the first argument number.
+    </td>    
+  </tr>
+  <tr>
+    <td>
+       *
+    </td>
+    <td>
+       Multiply two number
+    </td>
+  </tr>
+  <tr>
+    <td>
+       /
+    </td>
+    <td>
+      Divide two numbers
+    </td>
+  </tr>
+  <tr>
+    <td>
+       %
+    </td>
+    <td>
+      Divide two numbers with remainder, divide the first value by the second value and return the remainder of the division.
+    </td>
+  </tr>
+  <tr>
+    <td>
+       and
+    </td>
+    <td>
+      boolean and - both the left and the right side must be true. If the sub expression is a number - the value of zero counts as false, all other numbers count as true.
+    </td>
+  </tr>
+  <tr>
+    <td>
+       or
+    </td>
+    <td>
+      boolean or - either the left or the right side must be true. If the sub expression is a number - the value of zero counts as false, all other numbers count as true.
+    </td>
+  </tr>
+  <tr>
+    <td>
+       not
+    </td>
+    <td>
+      boolean not - gets one parameter, if the parameter is true then the value of false is returned, and vif the parameter is false then the value of true is returned.
+      If the argument expression is a number - the value of zero counts as false, all other numbers count as true.
+    </td>
+  </tr>
+<table>
+
+Everything else is done as functions (including raising a number to the nth power and bitwise operations)
+
 ## <a id='s-1-3' />Features for specific tasks
 
-### <a id='s-1-3-9' />Working with text
+### <a id='s-1-3-10' />Working with text
 
 You can define variables that refer to text. lets define variable `a` that refers to the text  `hello world` and then print that text to the screen with the function println
 
@@ -934,7 +1003,7 @@ Or replace the first two occurances like this:
 "No bother. No bother. Oh, bother. "
 ```
 
-### <a id='s-1-3-10' />Regular expressions
+### <a id='s-1-3-11' />Regular expressions
 
 Sometimes you don't want to find an exact string, instead it is possible to specify a pattern that can match a multitude of possible text values.
 A regular expression describes a text pattern, you can do some neat tricks with these patterns.
@@ -1012,7 +1081,7 @@ Let's look at ```\s*``` , here ```\s``` is standing for a whitespace character a
 
 There are a few more options for regular expression, Please see this [Regualar expression cheatsheet](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions/Cheatsheet) (The explanation in the link is relevant for javascript as well as the PYX language)
 
-### <a id='s-1-3-11' />Running processes
+### <a id='s-1-3-12' />Running processes
 
 You can run other command line programs, just like this:
 
@@ -1144,7 +1213,7 @@ var
 Both ```system``` and the backtick operator run the process in the default shell ( '/bin/sh' on Unix, process.env.ComSpec on Windows )
 Now the built-in variable ```ENV``` is a map, it stands for the environment variables. If you add or remove an entry in ```ENV``` then the changed environment variables will be passed to the processes that are run via ```system``` or the backtick operator.
 
-### <a id='s-1-3-12' />working with structured data (json and yaml)
+### <a id='s-1-3-13' />working with structured data (json and yaml)
 
 let's say you have some structured string encoded as text in the [json](https://en.wikipedia.org/wiki/JSON) format.
 You can make a variable out of it - with the ```parseJsonString``` function
@@ -1225,7 +1294,7 @@ the ```parseYamlString``` function converts the YAML text back into a value of n
 
 ## <a id='s-1-4' />Even more language features / advanced stuff
 
-### <a id='s-1-4-13' />functions with default parameters
+### <a id='s-1-4-14' />functions with default parameters
 
 Sometimes you don't want to define all parameter values. You can assign a default value to a parameter, and that value will be used if the function call does not pass a variable for that parameter.
 
@@ -1250,7 +1319,7 @@ The function is called with only one parameter, the second parameter is ```inc``
 
 Now a second parameer is present in the function call, in this situation the default value is not used.
 
-### <a id='s-1-4-14' />Recursion - a function calling itself
+### <a id='s-1-4-15' />Recursion - a function calling itself
 
 Sometimes a big problem can be divided into smaller pieces, now the small pieces may also look like the big problem, like here:
 
@@ -1389,7 +1458,7 @@ println("14 ", search(tosearch,14))
 
 ```
 
-### <a id='s-1-4-15' />Functional programming
+### <a id='s-1-4-16' />Functional programming
 
 Now compute a list of the squares of all numbers between one and 10.
 
@@ -1499,7 +1568,7 @@ now things become much easier when you only view the progam in terms of function
 i think that it helps to look at problems from a different perspectives, i think that's the real value of functional programming - even if you don't do that in your day-to-day business, it is important to know that there is a different view on things. I think that this is generally important in life, not just in programming.
 
 
-### <a id='s-1-4-16' />Object based programming
+### <a id='s-1-4-17' />Object based programming
 
 Lets say we have a map like this:
 
@@ -1584,7 +1653,7 @@ re: 6 im: 8
 Some say that [Objects and Closures are equivalent](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent), however this is the subject of a lively debate (see the [link](https://wiki.c2.com/?ClosuresAndObjectsAreEquivalent) ).
 
 
-### <a id='s-1-4-17' />Error handling with exceptions
+### <a id='s-1-4-18' />Error handling with exceptions
 
 Runtime errors can happen in a program, like dividing by zero
 
@@ -1659,7 +1728,7 @@ The fields of this variable
 There is a third possible clause in a try/catch block - the ```finally``` statement - this block of statements is run in both the event of an error or if no error occured within the try block!
 
 
-### <a id='s-1-4-18' />Generators and the yield statement
+### <a id='s-1-4-19' />Generators and the yield statement
 
 The ```for``` statement is a bit special.
 
@@ -1727,20 +1796,20 @@ The ```mygen``` function is called a generator function, because it has a ```yie
 
 ## <a id='s-1-5' />Input and output
 
-### <a id='s-1-5-19' />reading/writing files
+### <a id='s-1-5-20' />reading/writing files
 
 tbd 
 
 Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
 
-### <a id='s-1-5-20' />HTTP clients
+### <a id='s-1-5-21' />HTTP clients
 
 tbd
 
 Meanwhile look at [pyxfunc](https://github.com/MoserMichael/jscriptparse/blob/main/PYXFUNC.md) - in the "Input and Output" section.
 
 
-### <a id='s-1-5-21' />HTTP servers
+### <a id='s-1-5-22' />HTTP servers
 
 tbd
 

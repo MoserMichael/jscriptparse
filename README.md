@@ -27,7 +27,9 @@ Now run the shell
 
 ```pyx```
 
-The shell has command completion (tab tab) and a command history (cursor up, cursor down)
+( If you want to uninstall it again, later on, the run ```npm uninstall pyxlang -g``` )
+
+The shell has command completion (tab tab) and a command history (cursor up, cursor down) 
 
 You can also run one-line commands as follows
 

@@ -338,8 +338,9 @@ function runEvalLoop(cmdLine) {
                 }
                 return completeShell(shellExpr);
             } catch(er) {
-                console.trace("error: " + er);
+                //console.trace("error: " + er);
             }
+            return [ [], line];
         }
 
 
@@ -491,7 +492,7 @@ function runMain() {
     }
 
     if (cmd.fileName == null && cmd.expression == null) {
-        runEvalLoop(cmd.cmdLine)
+        runEvalLoop(cmd.cmdLine);
     } else {
         if (cmd.fileName != null) {
             evalFile(cmd.fileName, cmd.cmdLine);

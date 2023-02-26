@@ -1,3 +1,8 @@
+* PYX 0.2.4 / PRS 0.0.4  
+    * add bitwise functions
+    * PYXTUT - add section on operators
+    * got errors in reporting wrong types (in rtlib type checks)
+
 * PYX 0.2.3 / PRS 0.0.4  
     * fix associativity of operations (what a shame)
     * regular function calls (not closures): don't lookup variables in frame of calling function

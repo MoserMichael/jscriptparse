@@ -1,7 +1,7 @@
 # pyxfunc - PYX functions reference by category
 
 ## Numeric functions
-<a href='#s-1'>abs</a>&nbsp;,&nbsp;<a href='#s-2'>atan</a>&nbsp;,&nbsp;<a href='#s-3'>bit_and</a>&nbsp;,&nbsp;<a href='#s-4'>bit_neg</a>&nbsp;,&nbsp;<a href='#s-5'>bit_or</a>&nbsp;,&nbsp;<a href='#s-6'>bit_shifl</a>&nbsp;,&nbsp;<a href='#s-7'>bit_shiftr</a>&nbsp;,&nbsp;<a href='#s-8'>bit_xor</a>&nbsp;,&nbsp;<a href='#s-9'>cos</a>&nbsp;,&nbsp;<a href='#s-10'>int</a>&nbsp;,&nbsp;<a href='#s-11'>max</a>&nbsp;,&nbsp;<a href='#s-12'>min</a>&nbsp;,&nbsp;<a href='#s-13'>num</a>&nbsp;,&nbsp;<a href='#s-14'>pow</a>&nbsp;,&nbsp;<a href='#s-15'>random</a>&nbsp;,&nbsp;<a href='#s-16'>sin</a>&nbsp;,&nbsp;<a href='#s-17'>sqrt</a>&nbsp;,&nbsp;<a href='#s-18'>tan</a>
+<a href='#s-1'>abs</a>&nbsp;,&nbsp;<a href='#s-2'>atan</a>&nbsp;,&nbsp;<a href='#s-3'>bit_and</a>&nbsp;,&nbsp;<a href='#s-4'>bit_neg</a>&nbsp;,&nbsp;<a href='#s-5'>bit_or</a>&nbsp;,&nbsp;<a href='#s-6'>bit_shiftl</a>&nbsp;,&nbsp;<a href='#s-7'>bit_shiftr</a>&nbsp;,&nbsp;<a href='#s-8'>bit_xor</a>&nbsp;,&nbsp;<a href='#s-9'>cos</a>&nbsp;,&nbsp;<a href='#s-10'>int</a>&nbsp;,&nbsp;<a href='#s-11'>max</a>&nbsp;,&nbsp;<a href='#s-12'>min</a>&nbsp;,&nbsp;<a href='#s-13'>num</a>&nbsp;,&nbsp;<a href='#s-14'>pow</a>&nbsp;,&nbsp;<a href='#s-15'>random</a>&nbsp;,&nbsp;<a href='#s-16'>sin</a>&nbsp;,&nbsp;<a href='#s-17'>sqrt</a>&nbsp;,&nbsp;<a href='#s-18'>tan</a>
 ## Functions for scalars or strings
 <a href='#s-19'>find</a>&nbsp;,&nbsp;<a href='#s-20'>lc</a>&nbsp;,&nbsp;<a href='#s-21'>len</a>&nbsp;,&nbsp;<a href='#s-22'>mid</a>&nbsp;,&nbsp;<a href='#s-23'>repeat</a>&nbsp;,&nbsp;<a href='#s-24'>replace</a>&nbsp;,&nbsp;<a href='#s-25'>reverse</a>&nbsp;,&nbsp;<a href='#s-26'>split</a>&nbsp;,&nbsp;<a href='#s-27'>str</a>&nbsp;,&nbsp;<a href='#s-28'>trim</a>&nbsp;,&nbsp;<a href='#s-29'>uc</a>
 ## Functions for regular expressions
@@ -78,14 +78,15 @@
 
 ```
 <a id='s-6'/>
-<hr>function: <b>bit_shifl</b>
+<hr>function: <b>bit_shiftl</b>
 
 ```python
-Error: undefined variable: bit_shifl
-#(1) help(bit_shifl)
-   |......^
-#(1) help(bit_shifl)
-   |.^
+
+# bitwise shift left, both argument must be numbers with integer values (not floating point values)
+
+> bit_shiftl(1,3)
+8                
+
 
 ```
 <a id='s-7'/>

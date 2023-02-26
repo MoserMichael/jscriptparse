@@ -511,11 +511,18 @@ class RuntimeException  extends Error {
     }
 }
 
-function copyPrimitiveVal(val) {
+function clonePrimitiveVal(val) {
     if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
         return new Value(val.type, val.val);
     }
     return val;
+}
+
+function cloneAll(val) {
+    if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
+        return new Value(val.type, val.val);
+    }
+    return new Value(val.type, JSON.parse( JSON.stringify(val.val) ) );
 }
 
 function* genEvalClosure(funcVal, args, frame) {
@@ -755,6 +762,21 @@ function dimArray(currentDim, dims) {
     } else {
         for (let i = 0; i < n; ++i) {
             val[i] = new Value(TYPE_NUM, 0);
+        }
+    }
+    return new Value(TYPE_LIST, val);
+}
+
+function dimArrayInit(initValue, currentDim, dims) {
+    let n = dims[currentDim];
+    let val = [];
+    if (currentDim != dims.length-1) {
+        for (let i = 0; i < n; ++i) {
+            val[i] = dimArrayInit(  initValue, currentDim + 1, dims);
+        }
+    } else {
+        for (let i = 0; i < n; ++i) {
+            val[i] = cloneAll(initValue);
         }
     }
     return new Value(TYPE_LIST, val);
@@ -1543,20 +1565,24 @@ rename("oldFileName","newFileName")
     }),
 
     // function for arrays
-    "dim" : new BuiltinFunctionValue(`# defines n-dimensional array, all elements are set to zero. Each argument sets the number of element for its own respective dimension (see examples)
+    "dim" : new BuiltinFunctionValue(`
+# defines n-dimensional array, all elements are set to zero. 
+# Each argument defines the size of a dimension in the array.
     
 > a=dim(4)
 [0,0,0,0]
+
 > a=dim(2,3)
 [[0,0,0],[0,0,0]]
+
 > a=dim(2,3,4)
 [[[0,0,0,0],[0,0,0,0],[0,0,0,0]],[[0,0,0,0],[0,0,0,0],[0,0,0,0]]]    
 `, -1, function(arg) {
         let dims = [];
         for(let i =0; i<arg.length;++i) {
             dims[i] = parseInt(value2Num(arg,i));
-            if (dims[i]<=0) {
-                throw new RuntimeException("parameter " + (i+1) + " must be a positive number");
+            if (dims[i]<=1) {
+                throw new RuntimeException("parameter " + (i+1) + " must be a positive number greater or equal to one");
             }
         }
         if (dims.length == 0) {
@@ -1564,6 +1590,60 @@ rename("oldFileName","newFileName")
         }
         return dimArray( 0, dims);
     }),
+
+    "dimInit" : new BuiltinFunctionValue(`
+# defines n-dimensional array, all elements are set to a deep copy of the first argument. 
+# Each additional argument defines the size of a dimension in the array.
+
+> a={"a":1}
+{"a":1}
+
+> dimInit(a,2,3)
+[[{"a":1},{"a":1},{"a":1}],[{"a":1},{"a":1},{"a":1}]]
+`, -1, function(arg) {
+        if (arg.length < 2) {
+            throw new RuntimeException("At least two parameters expected");
+        }
+        let initVal = arg[0];
+        let dims = [];
+        for (let i = 1; i < arg.length; ++i) {
+            dims[i-1] = parseInt(value2Num(arg, i));
+            if (dims[i-1] <= 1) {
+                throw new RuntimeException("parameter " + i + " must be a positive number greater or equal to one");
+            }
+        }
+        if (dims.length == 0) {
+            throw new RuntimeException("at least one dimension must be defined");
+        }
+        return dimArrayInit(initVal, 0, dims);
+
+    }),
+
+
+    "clone" : new BuiltinFunctionValue(`
+# create a deep copy of any value
+
+> a=[1,2,3]
+[1,2,3]
+
+> b=clone(a)
+[1,2,3]
+
+> a[0]=1000
+1000
+
+> a
+[1000,2,3]
+
+> b
+[1,2,3]
+
+> a==b
+false
+`, 1, function(arg) {
+        return cloneAll(arg[0]);
+    }),
+
 
     "len" : new BuiltinFunctionValue(`# for a string argument - returns the number of characters in the string
 
@@ -2612,13 +2692,13 @@ class Frame {
 
     assign(name, value) {
         if (!this._assign(name, value)) {
-            this.vars[name] = copyPrimitiveVal(value);
+            this.vars[name] = clonePrimitiveVal(value);
         }
     }
 
     _assign(name, value) {
         if (name in this.vars) {
-            this.vars[name] = copyPrimitiveVal(value);
+            this.vars[name] = clonePrimitiveVal(value);
             return true;
         }
         if (this.parentFrame != null) {
@@ -2628,7 +2708,7 @@ class Frame {
     }
 
     defineVar(name, value) {
-       this.vars[name] = copyPrimitiveVal(value);
+       this.vars[name] = clonePrimitiveVal(value);
     }
 
     undefVar(name) {

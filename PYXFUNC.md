@@ -9,17 +9,17 @@
 ## Input and output functions
 <a href='#s-35'>httpSend</a>&nbsp;,&nbsp;<a href='#s-36'>httpServer</a>&nbsp;,&nbsp;<a href='#s-37'>print</a>&nbsp;,&nbsp;<a href='#s-38'>println</a>&nbsp;,&nbsp;<a href='#s-39'>readFile</a>&nbsp;,&nbsp;<a href='#s-40'>rename</a>&nbsp;,&nbsp;<a href='#s-41'>unlink</a>&nbsp;,&nbsp;<a href='#s-42'>writeFile</a>
 ## Functions for arrays
-<a href='#s-43'>dim</a>&nbsp;,&nbsp;<a href='#s-44'>exists</a>&nbsp;,&nbsp;<a href='#s-45'>join</a>&nbsp;,&nbsp;<a href='#s-46'>joinl</a>&nbsp;,&nbsp;<a href='#s-21'>len</a>&nbsp;,&nbsp;<a href='#s-48'>map</a>&nbsp;,&nbsp;<a href='#s-49'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-50'>pop</a>&nbsp;,&nbsp;<a href='#s-51'>push</a>&nbsp;,&nbsp;<a href='#s-52'>range</a>&nbsp;,&nbsp;<a href='#s-53'>reduce</a>&nbsp;,&nbsp;<a href='#s-54'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-55'>shift</a>&nbsp;,&nbsp;<a href='#s-56'>sort</a>&nbsp;,&nbsp;<a href='#s-57'>unshift</a>
+<a href='#s-43'>dim</a>&nbsp;,&nbsp;<a href='#s-44'>dimInit</a>&nbsp;,&nbsp;<a href='#s-45'>exists</a>&nbsp;,&nbsp;<a href='#s-46'>join</a>&nbsp;,&nbsp;<a href='#s-47'>joinl</a>&nbsp;,&nbsp;<a href='#s-21'>len</a>&nbsp;,&nbsp;<a href='#s-49'>map</a>&nbsp;,&nbsp;<a href='#s-50'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-51'>pop</a>&nbsp;,&nbsp;<a href='#s-52'>push</a>&nbsp;,&nbsp;<a href='#s-53'>range</a>&nbsp;,&nbsp;<a href='#s-54'>reduce</a>&nbsp;,&nbsp;<a href='#s-55'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-56'>shift</a>&nbsp;,&nbsp;<a href='#s-57'>sort</a>&nbsp;,&nbsp;<a href='#s-58'>unshift</a>
 ## Functions for maps
-<a href='#s-58'>each</a>&nbsp;,&nbsp;<a href='#s-44'>exists</a>&nbsp;,&nbsp;<a href='#s-60'>keys</a>&nbsp;,&nbsp;<a href='#s-48'>map</a>
+<a href='#s-59'>each</a>&nbsp;,&nbsp;<a href='#s-45'>exists</a>&nbsp;,&nbsp;<a href='#s-61'>keys</a>&nbsp;,&nbsp;<a href='#s-49'>map</a>
 ## Function for working with json/yaml
-<a href='#s-62'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-63'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-64'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-65'>toYamlString</a>
+<a href='#s-63'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-64'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-65'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-66'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-66'>chdir</a>&nbsp;,&nbsp;<a href='#s-67'>exec</a>&nbsp;,&nbsp;<a href='#s-68'>exit</a>&nbsp;,&nbsp;<a href='#s-69'>getcwd</a>&nbsp;,&nbsp;<a href='#s-70'>kill</a>&nbsp;,&nbsp;<a href='#s-71'>sleep</a>&nbsp;,&nbsp;<a href='#s-72'>system</a>
+<a href='#s-67'>chdir</a>&nbsp;,&nbsp;<a href='#s-68'>exec</a>&nbsp;,&nbsp;<a href='#s-69'>exit</a>&nbsp;,&nbsp;<a href='#s-70'>getcwd</a>&nbsp;,&nbsp;<a href='#s-71'>kill</a>&nbsp;,&nbsp;<a href='#s-72'>sleep</a>&nbsp;,&nbsp;<a href='#s-73'>system</a>
 ## Other functions
-<a href='#s-73'>assert</a>&nbsp;,&nbsp;<a href='#s-74'>eval</a>&nbsp;,&nbsp;<a href='#s-75'>help</a>&nbsp;,&nbsp;<a href='#s-76'>localtime</a>&nbsp;,&nbsp;<a href='#s-77'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-78'>time</a>&nbsp;,&nbsp;<a href='#s-79'>type</a>
+<a href='#s-74'>assert</a>&nbsp;,&nbsp;<a href='#s-75'>clone</a>&nbsp;,&nbsp;<a href='#s-76'>eval</a>&nbsp;,&nbsp;<a href='#s-77'>help</a>&nbsp;,&nbsp;<a href='#s-78'>localtime</a>&nbsp;,&nbsp;<a href='#s-79'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-80'>time</a>&nbsp;,&nbsp;<a href='#s-81'>type</a>
 ## Global variables
-<a href='#s-80'>ARGV</a>&nbsp;,&nbsp;<a href='#s-81'>ENV</a>&nbsp;,&nbsp;<a href='#s-82'>mathconst</a>
+<a href='#s-82'>ARGV</a>&nbsp;,&nbsp;<a href='#s-83'>ENV</a>&nbsp;,&nbsp;<a href='#s-84'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -704,18 +704,38 @@ unlink("file1.txt")
 <hr>function: <b>dim</b>
 
 ```python
-# defines n-dimensional array, all elements are set to zero. Each argument sets the number of element for its own respective dimension (see examples)
+
+# defines n-dimensional array, all elements are set to zero. 
+# Each argument defines the size of a dimension in the array.
     
 > a=dim(4)
 [0,0,0,0]
+
 > a=dim(2,3)
 [[0,0,0],[0,0,0]]
+
 > a=dim(2,3,4)
 [[[0,0,0,0],[0,0,0,0],[0,0,0,0]],[[0,0,0,0],[0,0,0,0],[0,0,0,0]]]    
 
 
 ```
 <a id='s-44'/>
+<hr>function: <b>dimInit</b>
+
+```python
+
+# defines n-dimensional array, all elements are set to a deep copy of the first argument. 
+# Each additional argument defines the size of a dimension in the array.
+
+> a={"a":1}
+{"a":1}
+
+> dimInit(a,2,3)
+[[{"a":1},{"a":1},{"a":1}],[{"a":1},{"a":1},{"a":1}]]
+
+
+```
+<a id='s-45'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -735,7 +755,7 @@ true
 false
 
 ```
-<a id='s-45'/>
+<a id='s-46'/>
 <hr>function: <b>join</b>
 
 ```python
@@ -745,7 +765,7 @@ false
 "a: 1 b: true"
 
 ```
-<a id='s-46'/>
+<a id='s-47'/>
 <hr>function: <b>joinl</b>
 
 ```python
@@ -770,7 +790,7 @@ false
 3
 
 ```
-<a id='s-48'/>
+<a id='s-49'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -791,7 +811,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-49'/>
+<a id='s-50'/>
 <hr>function: <b>mapIndex</b>
 
 ```python
@@ -802,7 +822,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [[6,0],[8,1],[10,2],[12,3]]
 
 ```
-<a id='s-50'/>
+<a id='s-51'/>
 <hr>function: <b>pop</b>
 
 ```python
@@ -818,7 +838,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2]
 
 ```
-<a id='s-51'/>
+<a id='s-52'/>
 <hr>function: <b>push</b>
 
 ```python
@@ -833,7 +853,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-52'/>
+<a id='s-53'/>
 <hr>function: <b>range</b>
 
 ```python
@@ -845,7 +865,7 @@ number: 2
 number: 3
 
 ```
-<a id='s-53'/>
+<a id='s-54'/>
 <hr>function: <b>reduce</b>
 
 ```python
@@ -872,7 +892,7 @@ number: 3
 
 
 ```
-<a id='s-54'/>
+<a id='s-55'/>
 <hr>function: <b>reduceFromEnd</b>
 
 ```python
@@ -890,7 +910,7 @@ same as:
 1
 
 ```
-<a id='s-55'/>
+<a id='s-56'/>
 <hr>function: <b>shift</b>
 
 ```python
@@ -906,7 +926,7 @@ same as:
 
 
 ```
-<a id='s-56'/>
+<a id='s-57'/>
 <hr>function: <b>sort</b>
 
 ```python
@@ -930,7 +950,7 @@ same as:
 [["b",1],["a",100],["c",1000]]
 
 ```
-<a id='s-57'/>
+<a id='s-58'/>
 <hr>function: <b>unshift</b>
 
 ```python
@@ -950,7 +970,7 @@ same as:
 
 
 ```
-<a id='s-58'/>
+<a id='s-59'/>
 <hr>function: <b>each</b>
 
 ```python
@@ -969,7 +989,7 @@ same as:
 
 
 ```
-<a id='s-44'/>
+<a id='s-45'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -989,7 +1009,7 @@ true
 false
 
 ```
-<a id='s-60'/>
+<a id='s-61'/>
 <hr>function: <b>keys</b>
 
 ```python
@@ -1001,7 +1021,7 @@ false
 ["first","second","third"]
 
 ```
-<a id='s-48'/>
+<a id='s-49'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -1022,7 +1042,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-62'/>
+<a id='s-63'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -1034,7 +1054,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-63'/>
+<a id='s-64'/>
 <hr>function: <b>parseYamlString</b>
 
 ```python
@@ -1055,7 +1075,7 @@ c:
     
 
 ```
-<a id='s-64'/>
+<a id='s-65'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -1067,7 +1087,7 @@ c:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-65'/>
+<a id='s-66'/>
 <hr>function: <b>toYamlString</b>
 
 ```python
@@ -1084,7 +1104,7 @@ c:
   - 3
 
 ```
-<a id='s-66'/>
+<a id='s-67'/>
 <hr>function: <b>chdir</b>
 
 ```python
@@ -1095,7 +1115,7 @@ c:
 
 
 ```
-<a id='s-67'/>
+<a id='s-68'/>
 <hr>function: <b>exec</b>
 
 ```python
@@ -1113,7 +1133,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
     
 
 ```
-<a id='s-68'/>
+<a id='s-69'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -1122,7 +1142,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-69'/>
+<a id='s-70'/>
 <hr>function: <b>getcwd</b>
 
 ```python
@@ -1132,7 +1152,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 
 ```
-<a id='s-70'/>
+<a id='s-71'/>
 <hr>function: <b>kill</b>
 
 ```python
@@ -1141,7 +1161,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 
 ```
-<a id='s-71'/>
+<a id='s-72'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -1151,7 +1171,7 @@ sleep(3)
 
 
 ```
-<a id='s-72'/>
+<a id='s-73'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -1182,7 +1202,7 @@ var
 0
 
 ```
-<a id='s-73'/>
+<a id='s-74'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1204,7 +1224,34 @@ Error: a should be true
 
 
 ```
-<a id='s-74'/>
+<a id='s-75'/>
+<hr>function: <b>clone</b>
+
+```python
+
+# create a deep copy of any value
+
+> a=[1,2,3]
+[1,2,3]
+
+> b=clone(a)
+[1,2,3]
+
+> a[0]=1000
+1000
+
+> a
+[1000,2,3]
+
+> b
+[1,2,3]
+
+> a==b
+false
+
+
+```
+<a id='s-76'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1230,7 +1277,7 @@ Error: a should be true
 
 
 ```
-<a id='s-75'/>
+<a id='s-77'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1245,7 +1292,7 @@ help()
 
 
 ```
-<a id='s-76'/>
+<a id='s-78'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1256,7 +1303,7 @@ help()
 
 
 ```
-<a id='s-77'/>
+<a id='s-79'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1310,14 +1357,14 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-78'/>
+<a id='s-80'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-79'/>
+<a id='s-81'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1335,7 +1382,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-80'/>
+<a id='s-82'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1359,14 +1406,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-81'/>
+<a id='s-83'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-82'/>
+<a id='s-84'/>
 <hr>function: <b>mathconst</b>
 
 ```python

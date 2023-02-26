@@ -17,7 +17,7 @@ funcCats = [
    "func": [ "print", "println", "readFile", "writeFile", "rename", "unlink", "httpSend", "httpServer" ]
  },
  { "name": "Functions for arrays",
-    "func": [ "dim", "len", "join", "map", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex", "shift", "unshift" ]
+    "func": [ "dim", "dimInit", "len", "join", "map", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex", "shift", "unshift" ]
  },
  { "name": "Functions for maps",
     "func": [ "each", "keys", "exists", "map" ]
@@ -29,7 +29,7 @@ funcCats = [
    "func": [ "system", "exit", "sleep", "exec", "kill", "chdir", "getcwd" ]
  },
  { "name": "Other functions",
-   "func": [ "assert", "help", "type", "time", "localtime", "setPYXOptions", "eval" ]
+   "func": [ "assert", "help", "type", "time", "localtime", "setPYXOptions", "eval", "clone" ]
  },
  { "name": "Global variables",
     "func": [ "mathconst", "ARGV", "ENV" ]

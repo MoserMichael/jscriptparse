@@ -771,7 +771,10 @@ There are the following operations, these can be used in expressions
        ==
     </td>
     <td>
-       checks if numberic value of first argument is equal to the numeric value of the second argument
+       Requires both argument to be of equal type.
+       For numbers: checks if numberic value of first argument is equal to the numeric value of the second argument.
+       For strings: checks if two strings are equal.
+       Any other type: checks if two variables refer to the same value.
        You can also compare with none.
     </td>
   </tr>
@@ -780,7 +783,10 @@ There are the following operations, these can be used in expressions
        !=
     </td>
     <td>
-       checks if numberic value of first argument is not equal to the numeric value of the second argument
+       Requires both argument to be of equal type.
+       For numbers: checks if numberic value of first argument is not equal to the numeric value of the second argument.
+       For strings: checks if two strings are not equal.
+       Any other type: checks if two variables refer to the same value.
        You can also compare with none.
     </td>
   </tr>

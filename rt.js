@@ -1314,10 +1314,10 @@ text="a b a c a d"
         return new Value(TYPE_NUM, first ^ second);
     }),
 
-    "bit_shifl":  new BuiltinFunctionValue(`
+    "bit_shiftl":  new BuiltinFunctionValue(`
 # bitwise shift left, both argument must be numbers with integer values (not floating point values)
 
-> bit_shifl(1,3)
+> bit_shiftl(1,3)
 8                
 `, 2, function(arg) {
         let first = requireInt(arg,0);
@@ -1325,10 +1325,10 @@ text="a b a c a d"
         return new Value(TYPE_NUM, first << second);
     }),
 
-    "bit_shifr":  new BuiltinFunctionValue(`
+    "bit_shiftr":  new BuiltinFunctionValue(`
 # bitwise shift right, both argument must be numbers with integer values (not floating point values)
 
-> bit_shifr(8,3)
+> bit_shiftr(8,3)
 1                    
 `, 2, function(arg) {
         let first = requireInt(arg,0);

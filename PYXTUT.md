@@ -662,7 +662,7 @@ There are the following operations, these can be used in expressions
     </td>
     <td>
        Add two number values, if the arguments are strings then concatenate the strings
-```
+<pre>
 > 12 * 2
 24
 
@@ -670,7 +670,7 @@ There are the following operations, these can be used in expressions
 "aaa-bbb"
 > 12 * 2
 24
-```
+</pre>
 
     </td>
   </tr>

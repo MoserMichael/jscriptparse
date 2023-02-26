@@ -1,8 +1,9 @@
 * PYX 0.2.4 / PRS 0.0.4  
     * add bitwise functions
-    * PYXTUT - add section on operators
+    * tutorial - add section on operators
     * got errors in reporting wrong types (in rtlib type checks)
     * rtlib - report error if numeric arguments are not a number.
+    * fix bug in completion of hashes, when value does not exit map.novalue<tab tab> got exit from shell.
 
 * PYX 0.2.3 / PRS 0.0.4  
     * fix associativity of operations (what a shame)

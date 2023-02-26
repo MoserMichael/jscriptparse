@@ -662,14 +662,17 @@ There are the following operations, these can be used in expressions
     </td>
     <td>
        Add two number values, if the arguments are strings then concatenate the strings
+
 <pre>
+<code>
 > 12 * 2
 24
 
-> 'aaa-' + 'bbb'
+> "aaa-" + "bbb"
 "aaa-bbb"
 > 12 * 2
 24
+</code>
 </pre>
 
     </td>
@@ -729,6 +732,56 @@ There are the following operations, these can be used in expressions
     <td>
       boolean not - gets one parameter, if the parameter is true then the value of false is returned, and vif the parameter is false then the value of true is returned.
       If the argument expression is a number - the value of zero counts as false, all other numbers count as true.
+    </td>
+  </tr>
+  <tr>
+    <td>
+       <
+    </td>
+    <td>
+       checks if numberic value of first argument is smaller than the numeric value of the second argument
+    </td>
+  </tr>
+  <tr>
+    <td>
+       <=
+    </td>
+    <td>
+       checks if numberic value of first argument is smaller than or equal to the numeric value of the second argument
+    </td>
+  </tr>
+  <tr>
+    <td>
+       >
+    </td>
+    <td>
+       checks if numberic value of first argument is bigger than the numeric value of the second argument
+    </td>
+  </tr>
+  <tr>
+    <td>
+       >=
+    </td>
+    <td>
+       checks if numberic value of first argument is bigger than or equal to the numeric value of the second argument
+    </td>
+  </tr>
+  <tr>
+    <td>
+       ==
+    </td>
+    <td>
+       checks if numberic value of first argument is equal to the numeric value of the second argument
+       You can also compare with none.
+    </td>
+  </tr>
+  <tr>
+    <td>
+       !=
+    </td>
+    <td>
+       checks if numberic value of first argument is not equal to the numeric value of the second argument
+       You can also compare with none.
     </td>
   </tr>
 <table>

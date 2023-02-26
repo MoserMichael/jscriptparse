@@ -260,9 +260,24 @@ function value2Num(arg, index) {
     }
 
     if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+        if (isNaN(val.val)) {
+            let paramName = "";
+            if (index != null) {
+                paramName = getParamName(index);
+            }
+            throw new RuntimeException("The argument value is not a number - " + paramName);
+        }
         return val.val;
     } else if (val.type == TYPE_STR) {
-        return parseFloat(val.val);
+        ret = parseFloat(val.val);
+        if (isNaN(ret)) {
+            let paramName = "";
+            if (index != null) {
+                paramName = getParamName(index);
+            }
+            throw new RuntimeException("The argument value " + val.val + " is not a number - " + paramName); 
+        }
+        return ret;
     }
     let paramName = "";
     if (index != null) {

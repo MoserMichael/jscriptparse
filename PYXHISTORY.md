@@ -2,6 +2,7 @@
     * add bitwise functions
     * PYXTUT - add section on operators
     * got errors in reporting wrong types (in rtlib type checks)
+    * rtlib - report error if numeric arguments are not a number.
 
 * PYX 0.2.3 / PRS 0.0.4  
     * fix associativity of operations (what a shame)

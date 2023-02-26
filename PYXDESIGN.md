@@ -32,10 +32,12 @@ However the objective of a general purpose shell may be out of scope, due to the
 - syntax: go - like syntax (in the sense of: less frequent braces, but without strong typing)
 
 - leave out confusing features
-    no += -= operators (can do a = a + 1 - bit more verbose)
+    - no += -= operators (can do a = a + 1 - bit more verbose)
     for logical operators - require and or (instead of && ||)
-    don't have 2 ** 3 for power, have a function instead
+    - don't have 2 ** 3 for power, have a function instead
     don't have bitwise operators & | ^ ~ - have functions instead
+    - object system: you can have objects as maps with elements that are closures, but don't have equivalent of javascript prototypes or python classes/metaclasses 
+    (i think these concepts are a bit too difficult to teach, also you can do without it in a shell)
 
 - features: (in a flux right now)
 

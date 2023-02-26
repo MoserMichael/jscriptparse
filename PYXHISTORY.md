@@ -1,3 +1,6 @@
+* NEXT VERSION
+    * rt: add dimInit (define array and clone each cell value) and clone (deep copy of argument value)
+
 * PYX 0.2.4 / PRS 0.0.4  
     * add bitwise functions
     * tutorial - add section on operators

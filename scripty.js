@@ -480,11 +480,27 @@ function makeParserImp() {
                 return rt.makeConstValue(rt.TYPE_NUM, arg[1]);
             }
         ),
+
         prs.makeTransformer(number, function (arg) {
             arg[0] = Number(arg[0]);
             return rt.makeConstValue(rt.TYPE_NUM, arg);
-        })
-    ], "signed number");
+        }),
+
+        prs.makeTransformer(
+            prs.makeSequenceParser([
+                prs.makeTokenParser("-"),
+                forwardExpr.forward()
+            ], "negative epression"), function (arg) {
+                let newArg = [
+                        rt.makeConstValue(rt.TYPE_NUM, [ "-1", arg[0][1] ]),
+                        arg[0],
+                        arg[1]
+                     ];
+                return rt.makeExpression(newArg);
+        }),
+
+
+    ], "signed expression");
 
 
     let primaryExpr = prs.makeAlternativeParser(

@@ -174,7 +174,18 @@ function runEvalLoop(cmdLine) {
 
                 try {
                     if (res != null && res.type != rt.TYPE_NONE) {
-                        evalPrintMsg += JSON.stringify(rt.rtValueToJsVal(res));
+                        if (res.type == rt.TYPE_NUM) {
+                            // infinity is not part of json, therefore not displayed by JSON.stringify. weird...
+                            if (res.val == Infinity) {
+                                evalPrintMsg += "Infinity";
+                            } else if (res.val == -Infinity) {
+                                evalPrintMsg += "-Infinity";
+                            } else {
+                                evalPrintMsg += JSON.stringify(rt.rtValueToJsVal(res));
+                            }
+                        } else {
+                            evalPrintMsg += JSON.stringify(rt.rtValueToJsVal(res));
+                        }
                     }
                 } catch(e) {
                     console.error("Can't show result value. internal error",e);

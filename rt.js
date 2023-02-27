@@ -696,7 +696,6 @@ function _prepareClosureFrame(funcVal, frame, args) {
         }
     }
     return [ funcFrame, traceParam];
-
 }
 
 function _getEnv(frame) {
@@ -799,15 +798,11 @@ function * genValues(val) {
 // pythons default float type does not allow Not-a-number - keep it with that...a
 // (that makes for less to explain)
 function checkResNan(res) {
-
     if (isNaN(res)) {
         throw new RuntimeException("results in 'not a number' - that's not allowed here");
     }
     return res;
 }
-
-
-let fooId =1;
 
 function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
 

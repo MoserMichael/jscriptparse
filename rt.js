@@ -796,6 +796,17 @@ function * genValues(val) {
     }
 }
 
+// pythons default float type does not allow Not-a-number - keep it with that...a
+// (that makes for less to explain)
+function checkResNan(res) {
+
+    if (isNaN(res)) {
+        throw new RuntimeException("results in 'not a number' - that's not allowed here");
+    }
+    return res;
+}
+
+
 let fooId =1;
 
 function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
@@ -1344,7 +1355,7 @@ text="a b a c a d"
 `, 2, function(arg) {
         let first = requireInt(arg,0);
         let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, first << second);
+        return new Value(TYPE_NUM, checkResNan(first << second));
     }),
 
     "bit_shiftr":  new BuiltinFunctionValue(`
@@ -1355,7 +1366,7 @@ text="a b a c a d"
 `, 2, function(arg) {
         let first = requireInt(arg,0);
         let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, first >> second);
+        return new Value(TYPE_NUM, checkResNan(first >> second));
     }),
 
     "bit_neg":  new BuiltinFunctionValue(`
@@ -1419,7 +1430,7 @@ text="a b a c a d"
 > sqrt(2)
 1.414213562373095`, 1, function(arg) {
         let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, Math.sqrt(num));
+        return new Value(TYPE_NUM, checkResNan(Math.sqrt(num)));
     }),
     "sin" : new BuiltinFunctionValue(`# returns the sine of a number in radians
 
@@ -1433,15 +1444,15 @@ text="a b a c a d"
 > cos(mathconst['pi'])
 -1`, 1, function(arg) {
         let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, Math.cos(num));
+        return new Value(TYPE_NUM, checkResNan(Math.cos(num)));
     }),
     "tan" : new BuiltinFunctionValue(`# returns the tangent of a number in radians`, 1, function(arg) {
         let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, Math.tan(num));
+        return new Value(TYPE_NUM, checkResNan(Math.tan(num)));
     }),
     "atan" : new BuiltinFunctionValue(`# returns the inverse tangent (in radians) of a number`, 1, function(arg) {
         let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, Math.atan(num));
+        return new Value(TYPE_NUM, checkResNan(Math.atan(num)));
     }),
     "pow" : new BuiltinFunctionValue(`# returns the first arugment nubmer raised to the power of the second argument number
 
@@ -1453,7 +1464,7 @@ text="a b a c a d"
 16`, 2, function(arg) {
         let pow = value2Num(arg, 0);
         let exp = value2Num(arg, 1);
-        return new Value(TYPE_NUM, Math.pow(pow,exp));
+        return new Value(TYPE_NUM, checkResNan(Math.pow(pow,exp)));
     }),
     "random" : new BuiltinFunctionValue(`# returns pseudo random number with value between 0 and 1 (that means it is almost random)
 > random()
@@ -2610,6 +2621,7 @@ requestData: {req.requestData()}
         log2e: new Value(TYPE_NUM, Math.LOG2E),
         sqrt1_2: new Value(TYPE_NUM, Math.SQRT1_2),
         sqrt2: new Value(TYPE_NUM, Math.SQRT2),
+        Infinity: new Value(TYPE_NUM, Infinity),
     }, `# map of mathematical constants.
 
 # the number PI
@@ -3121,7 +3133,6 @@ function checkMixedTypeAllowNone(op, lhs, rhs) {
     }
 }
 
-
 MAP_OP_TO_FUNC={
     "and" : function(lhs,rhs, frame) {
         return new Value(TYPE_BOOL, value2Bool(lhs.eval(frame)) && value2Bool(rhs.eval(frame)));
@@ -3171,15 +3182,17 @@ MAP_OP_TO_FUNC={
         if (lhs.type != rhs.type) {
             throw new RuntimeException("Can't add " + typeNameVal(lhs) + " to " + typeNameVal(rhs));
         }
-        if (lhs.type == TYPE_STR || lhs.type == TYPE_NUM) {
+        if (lhs.type == TYPE_STR) {
             /* allow add for strings - this concats the string values */
             return new Value(lhs.type, lhs.val + rhs.val);
+        }
+        if (lhs.type == TYPE_NUM) {
+            return new Value(lhs.type, checkResNan(lhs.val + rhs.val));
         }
         if (lhs.type == TYPE_LIST) {
             // concat lists
             return new Value(TYPE_LIST, lhs.val.concat(rhs.val));
         }
-
         throw new RuntimeException("Can't add " + typeNameVal(lhs) + " to " + typeNameVal(rhs));
     },
     "-" : function(lhs,rhs, frame) {
@@ -3190,9 +3203,8 @@ MAP_OP_TO_FUNC={
         }
         if (lhs.type != TYPE_NUM) {
             throw new RuntimeException("need number types for substraction" );
-
         }
-        return new Value(lhs.type, lhs.val - rhs.val);
+        return new Value(lhs.type, checkResNan(lhs.val - rhs.val));
     },
     "*" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
@@ -3205,7 +3217,7 @@ MAP_OP_TO_FUNC={
             throw new RuntimeException("need number types for multiplication" );
         }
 
-        return new Value(TYPE_NUM, value2Num(lhs) * value2Num(rhs));
+        return new Value(TYPE_NUM, checkResNan(value2Num(lhs) * value2Num(rhs)));
     },
     "/" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
@@ -3223,7 +3235,7 @@ MAP_OP_TO_FUNC={
             // javascript allows to divide by zero, amazing.
             throw new RuntimeException("Can't divide by zero");
         }
-        return new Value(TYPE_NUM,value2Num(lhs) / rhsVal);
+        return new Value(TYPE_NUM,checkResNan(value2Num(lhs) / rhsVal));
     },
     "%" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);

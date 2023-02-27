@@ -1,0 +1,7 @@
+( 50 ( 20 ) ( 70 ( 52 ) ( 80 ( 79 ) ( 101 ) ) ) ) 
+value:  10 result: none
+value:  20 result: 20
+value:  30 result: none
+value:  70 result: 70
+value:  80 result: 80
+value:  100 result: none

@@ -160,7 +160,7 @@ class RegexValue {
 let VALUE_NONE=new Value(TYPE_NONE,null);
 
 function typeNameVal(val) {
-    if (val.type == null) {
+    if (val == null || val.type == null) {
         console.trace("Not a runtime value!" + JSON.stringify(val));
         return "not a runtime value!";
     }
@@ -3460,25 +3460,50 @@ class AstLambdaExpression extends AstBase {
     }
 }
 
-function makeLambdaExpression(functionDef) {
+  function makeLambdaExpression(functionDef) {
     return new AstLambdaExpression(functionDef);
 }
 
 function lookupIndex(frame, value, refExpr) {
     for(let i=0; i<refExpr.length; ++i) {
+        let expr = refExpr[i];
+
         let curValue = value.type;
         if (curValue != TYPE_LIST && curValue != TYPE_MAP && curValue != TYPE_STR) {
-            throw new RuntimeException("Can't access expression of type " + typeNameVal(value) + " by index");
+            let er = new RuntimeException("Can't access expression of type " + typeNameVal(value) + " by index");
+            if (i > 0) {
+                er.addToStack([expr.startOffset, expr.currentSourceInfo]);
+            }
+            throw er;
         }
-        let expr = refExpr[i];
         let indexValue = expr.eval(frame);
 
-        value = value.val[ indexValue.val ];
-        if (value == null) {
-            let ex = new RuntimeException("Can't lookup index " + indexValue.val);
+        if (curValue == TYPE_LIST || curValue == TYPE_STR) {
+            if (indexValue.type != TYPE_NUM) {
+                let err = new RuntimeException("Can't lookup " + typeNameVal(value) + " entry - the index value must be a number. Instead got a " + typeNameVal(indexValue));
+                err.addToStack([expr.startOffset, expr.currentSourceInfo]);
+                throw err;
+            }
+
+            if (indexValue.val < 0 || indexValue.val >= value.val.length) {
+                let err = new RuntimeException("Can't lookup " + typeNameVal(value) +  " entry - the index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
+                err.addToStack([expr.startOffset, expr.currentSourceInfo]);
+                throw err;
+            }
+        }
+
+        let nextValue = value.val[ indexValue.val ];
+        if (nextValue == null) {
+            let ex =  null;
+            if (value.type != TYPE_MAP) {
+                ex = new RuntimeException("Can't lookup index " + indexValue.val  + " in" + typeNameVal(value) + "  - index value must be less than " + value.val.length + " and greater than zero.");
+            } else {
+                ex = new RuntimeException("Can't lookup key " + indexValue.val + " in map. No value has been set for this key");
+            }
             ex.addToStack([expr.startOffset, expr.currentSourceInfo]);
             throw ex;
         }
+        value = nextValue;
 
         if (curValue == TYPE_STR) {
             value = new Value(TYPE_STR, value);
@@ -3571,6 +3596,13 @@ function _assign(frame, singleLhs, value) {
         if (indexExpr != null) {
             let lhsValue = frame.lookup(varName);
             //console.log("varName: " + varName + " value: " + JSON.stringify(lhsValue));
+
+            if (lhsValue == undefined || (lhsValue.type != TYPE_LIST && lhsValue.type != TYPE_MAP && lhsValue.type != TYPE_STR)) {
+                let err = new RuntimeException("Can't lookup index expression - value is not a list or map");
+                err.addToStack([singleLhs.startOffset, singleLhs.currentSourceInfo]);
+                throw err;
+            }
+
             let indexValues = _indexAssign(frame, lhsValue, indexExpr, value);
             if (traceMode) {
                 let indexExpr = "";
@@ -3596,12 +3628,23 @@ function _indexAssign(frame, value, refExpr, newValue) {
     let traceVals = [];
     for(; i<refExpr.length; ++i) {
         let expr = refExpr[i];
-        if (value == undefined || (value.type != TYPE_LIST && value.type != TYPE_MAP)) {
-            let err = new RuntimeException("Can't lookup index expression. Preceeding expression did not result in list or map");
-            err.addToStack([expr.startOffset, expr.currentSourceInfo]);
-            throw err;
-        }
         let indexValue = expr.eval(frame);
+
+        if (value.type == TYPE_LIST || value.type == TYPE_STR) {
+            if (indexValue.type != TYPE_NUM) {
+                let err = new RuntimeException("Can't assign this " + typeNameVal(value) + " index . Index value of must be an number, instead got " + rtValueToJsVal(indexValue));
+                err.addToStack([expr.startOffset, expr.currentSourceInfo]);
+                throw err;
+            }
+            indexValue.val = Math.round(indexValue.val); // make sure it's an integer.
+
+            if (indexValue.val < 0 || indexValue.val >= value.val.length) {
+                let err = new RuntimeException("Can't assign this "  + typeNameVal(value) + " index. Index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
+                err.addToStack([expr.startOffset, expr.currentSourceInfo]);
+                throw err;
+            }
+        }
+
 
         if (traceMode) {
             traceVals.push(indexValue);
@@ -3609,8 +3652,23 @@ function _indexAssign(frame, value, refExpr, newValue) {
 
         if (i != (refExpr.length-1)) {
             value = value.val[indexValue.val];
+            if (value == undefined || (value.type != TYPE_LIST && value.type != TYPE_MAP)) {
+                let err = new RuntimeException("Can't assign this entry, lookup did not return a list or a map, got " + typeNameVal(value) +" instead. index value: " + rtValueToJsVal(value));
+                err.addToStack([expr.startOffset, expr.currentSourceInfo]);
+                throw err;
+            }
         } else {
-            value.val[indexValue.val] = newValue;
+            if (value.type != TYPE_STR) {
+                value.val[indexValue.val] = newValue;
+            } else {
+                if (newValue.type != TYPE_STR) {
+                    let err = new RuntimeException("Can't assign string index to " + typeNameVal(newValue) + " right handd side value must be a string")
+                    err.addToStack([expr.startOffset, expr.currentSourceInfo]);
+                    throw err;
+                }
+                // strings are immutable in javascript - have to make a new one
+                value.val = value.val.substring(0,indexValue.val) + newValue.val + value.val.substring(indexValue.val+1)
+            }
         }
     }
     return traceVals;

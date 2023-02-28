@@ -1,3 +1,6 @@
+ * PYX 0.2.7 / PRS 0.0.4  
+    * More detailed diagnostics on errors with accessing list and strings (i think that is a very important detail - needs it's own release)
+
  * PYX 0.2.6 / PRS 0.0.4  
     * hotfix: fix very bad error - in assignment with multiple index expressions - bad error reporting when one of the intermediate lookups did not result in list or map.
 

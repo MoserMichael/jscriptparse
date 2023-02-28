@@ -12,6 +12,80 @@ The programming language is named after Winnie-the-Pooh, in the Russian translat
 - should provide for concise expression (map/reduce/short functions/possibly one line scripts)
 - it should be easy to handle structured data, such as json.
 - integration with shell (the repl has tab completion when writing a special backtick operator)
+- the most important thing: readable and detailed error messages. Look at what I mean as error messages for accessing lists and strings
+
+```
+accessing a list [1,2,3]
+Error: Can't lookup List entry - the index value must be a number. Instead got a String
+#(errorTest/11-array-access.p:7)     println(a['aa'])
+                               |...............^
+#(errorTest/11-array-access.p:7)     println(a['aa'])
+                               |.............^
+#(errorTest/11-array-access.p:7)     println(a['aa'])
+                               |.....^
+
+Error: Can't lookup List entry - the index value is out of range. Got 4 - must be smaller than 3 and greater or equal to zero
+#(errorTest/11-array-access.p:14)     println(a[4]) 
+                                |...............^
+#(errorTest/11-array-access.p:14)     println(a[4]) 
+                                |.............^
+#(errorTest/11-array-access.p:14)     println(a[4]) 
+                                |.....^
+
+Error: Can't lookup List entry - the index value is out of range. Got -1 - must be smaller than 3 and greater or equal to zero
+#(errorTest/11-array-access.p:20)     println(a[-1])
+                                |................^
+#(errorTest/11-array-access.p:20)     println(a[-1])
+                                |.............^
+#(errorTest/11-array-access.p:20)     println(a[-1])
+                                |.....^
+
+Error: Can't assign this List index. Index value is out of range. Got 4 - must be smaller than 3 and greater or equal to zero
+#(errorTest/11-array-access.p:26)     a[4] = 1
+                                |.......^
+
+Error: Can't assign this List index . Index value of must be an number, instead got b
+#(errorTest/11-array-access.p:32)     a['b'] = 1
+                                |.......^
+
+accessing a string  abc
+Error: Can't lookup String entry - the index value must be a number. Instead got a String
+#(errorTest/11-array-access.p:42)     println(a['aa'])
+                                |...............^
+#(errorTest/11-array-access.p:42)     println(a['aa'])
+                                |.............^
+#(errorTest/11-array-access.p:42)     println(a['aa'])
+                                |.....^
+
+Error: Can't lookup String entry - the index value is out of range. Got 4 - must be smaller than 3 and greater or equal to zero
+#(errorTest/11-array-access.p:49)     println(a[4]) 
+                                |...............^
+#(errorTest/11-array-access.p:49)     println(a[4]) 
+                                |.............^
+#(errorTest/11-array-access.p:49)     println(a[4]) 
+                                |.....^
+
+Error: Can't lookup String entry - the index value is out of range. Got -1 - must be smaller than 3 and greater or equal to zero
+#(errorTest/11-array-access.p:55)     println(a[-1])
+                                |................^
+#(errorTest/11-array-access.p:55)     println(a[-1])
+                                |.............^
+#(errorTest/11-array-access.p:55)     println(a[-1])
+                                |.....^
+
+Error: Can't assign this String index. Index value is out of range. Got 4 - must be smaller than 3 and greater or equal to zero
+#(errorTest/11-array-access.p:61)     a[4] = 'z'
+                                |.......^
+
+Error: Can't assign this String index . Index value of must be an number, instead got b
+#(errorTest/11-array-access.p:67)     a['b'] = 1
+                                |.......^
+
+Error: Can't assign string index to List right handd side value must be a string
+#(errorTest/11-array-access.p:73)     a[0]=[1,2,3]
+                                |.......^
+
+```
 
 Now the interesting part is that all these features are also required for a good shell. I think we need a shell that is better at handling complex nested data, you have that a lot when dealing with JSON and YAML. I think the bash language is reaching it's limits, when dealing with this class of problem: it is possible to deal do that with jq, but it's not a very easy and pleasant thing to do.
 

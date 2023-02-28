@@ -121,14 +121,14 @@ However the objective of a general purpose shell may be out of scope, due to the
    strings, floating point numbers - yes
    lists - yes
    maps - yes
-   objects - as syntax sugar for maps - NO (can skip that, as an educational language) 
-   type hints - NO
+   objects - as syntax sugar for maps - yes (but no prototypes or classes) 
+   type hints - no
    f-strings - yes
-   regular expressions - (don't have them yet)
+   regular expressions - yes
 
  functions
    closures - YES
-   named parameters - NO
+   named parameters - no
    parameters with default values - yes
    multiple return values, multiple assignment - as list (similar to python) - yes
 
@@ -141,8 +141,8 @@ f-strings - yes
  modules/packages - no (can skip that, as an educational language)
 
 
-with statement - later
- try/catch - maybe later
+try/catch - yes
+with statement - later(?)
 
 
 ```

@@ -1,4 +1,7 @@
-* PYX 0.2.5 / PRS 0.0.4  
+ * PYX 0.2.6 / PRS 0.0.4  
+    * hotfix: fix very bad error - in assignment with multiple index expressions - bad error reporting when one of the intermediate lookups did not result in list or map.
+
+ * PYX 0.2.5 / PRS 0.0.4  
     * rt: add dimInit (define array and clone each cell value) and clone (deep copy of argument value)
     * add mathconst.Infinity 
     * allow for negated expression like  -mathconst.Infinity (only had negative numbers, not negated expressions)

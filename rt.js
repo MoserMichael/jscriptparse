@@ -2117,7 +2117,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
                     }
                     let vargs =  [ argErr, argStdout, argStderr ];
                     evalClosure("", callback, vargs, frame);
-                } catch(er) {3
+                } catch(er) {
                     if (er instanceof RuntimeException) {
                         er.showStackTrace(true);
                     } else {
@@ -3285,6 +3285,7 @@ class AstBinaryExpression extends AstBase {
                 er.firstChance = false;
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
+            //console.trace(er);
             throw er;
         }
     }
@@ -3369,6 +3370,7 @@ class AstUnaryExpression extends AstBase {
                 er.currentSourceInfo = this.currentSourceInfo;
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
+            //console.trace(er);
             throw er;
         }
     }
@@ -3527,7 +3529,7 @@ function _assignImp(frame, value, lhs) {
     let traceLhs=[];
     let traceRhs=[];
 
-    if (lhs.length == 1 ) {
+    if (lhs.length == 1) {
         let singleLhs = lhs[0];
         let traceVal = _assign(frame, singleLhs, value);
         if (traceMode) {
@@ -3568,7 +3570,8 @@ function _assign(frame, singleLhs, value) {
     if (varName != "_") {
         if (indexExpr != null) {
             let lhsValue = frame.lookup(varName);
-            let indexValues = _indexAssign(frame, lhsValue, indexExpr, value)
+            //console.log("varName: " + varName + " value: " + JSON.stringify(lhsValue));
+            let indexValues = _indexAssign(frame, lhsValue, indexExpr, value);
             if (traceMode) {
                 let indexExpr = "";
                 for(let i=0; i< indexValues.length; ++i) {
@@ -3592,10 +3595,12 @@ function _indexAssign(frame, value, refExpr, newValue) {
     let i=0;
     let traceVals = [];
     for(; i<refExpr.length; ++i) {
-        if (value.type != TYPE_LIST && value.type != TYPE_MAP) {
-            throw new RuntimeException("Can't index expression of variable " + this.identifierName);
-        }
         let expr = refExpr[i];
+        if (value == undefined || (value.type != TYPE_LIST && value.type != TYPE_MAP)) {
+            let err = new RuntimeException("Can't lookup index expression. Preceeding expression did not result in list or map");
+            err.addToStack([expr.startOffset, expr.currentSourceInfo]);
+            throw err;
+        }
         let indexValue = expr.eval(frame);
 
         if (traceMode) {

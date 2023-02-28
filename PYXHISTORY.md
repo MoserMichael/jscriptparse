@@ -1,8 +1,9 @@
-* NEXT VERSION
+* PYX 0.2.5 / PRS 0.0.4  
     * rt: add dimInit (define array and clone each cell value) and clone (deep copy of argument value)
     * add mathconst.Infinity 
     * allow for negated expression like  -mathconst.Infinity (only had negative numbers, not negated expressions)
     * all arithmetic expressions and functions: throw errors in 'not a number' values in arithmetic functions/expressions. 
+    * while checking for presence of yield: ignore function calls in statment list (statement body) - yield can't be delegated to called function.
 
 * PYX 0.2.4 / PRS 0.0.4  
     * add bitwise functions

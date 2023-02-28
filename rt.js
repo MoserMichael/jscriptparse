@@ -2619,6 +2619,11 @@ requestData: {req.requestData()}
         Infinity: new Value(TYPE_NUM, Infinity),
     }, `# map of mathematical constants.
 
+# the number that is bigger than any other number (which is kind of a contradiction...)
+
+> mathconst.Infinity
+Infinity
+
 # the number PI
     
 > mathconst.pi
@@ -2850,6 +2855,9 @@ class AstStmtList extends AstBase {
             let ret = false;
             for (let i = 0; i < this.statements.length; ++i) {
                 let stmt = this.statements[i];
+                if (stmt instanceof AstFunctionCall) {
+                    continue;
+                }
                 if (stmt.hasYield(frame)) {
                     ret = true;
                     break;

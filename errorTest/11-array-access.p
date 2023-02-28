@@ -23,6 +23,14 @@ try {
 }
 
 try {
+    println(a[0][1])
+} catch e {
+    println(e.stack)
+}
+
+
+
+try {
     a[4] = 1
 } catch e {
     println(e.stack)

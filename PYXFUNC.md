@@ -1419,6 +1419,11 @@ pyx programFile.p 1 2 3 4
 ```python
 # map of mathematical constants.
 
+# the number that is bigger than any other number (which is kind of a contradiction...)
+
+> mathconst.Infinity
+Infinity
+
 # the number PI
     
 > mathconst.pi

@@ -1,3 +1,8 @@
+ * PYX 0.2.8 / PRS 0.0.4  
+    * add tests
+    * round - add function to properly round to integer. (int is using parseInt - which is always rounding down)
+    * some more check for NaN
+
  * PYX 0.2.7 / PRS 0.0.4  
     * More detailed diagnostics on errors with accessing list and strings (i think that is a very important detail - needs it's own release)
 

@@ -1256,6 +1256,12 @@ text="a b a c a d"
 > int(123)
 123
 
+# beware! numbers are rounded down
+> int('3.7')
+3
+> int(3.7)
+3
+
 # hexadecimal number conversion
 
 > int("0xff")
@@ -1288,12 +1294,17 @@ text="a b a c a d"
         if (res == null) {
             throw new RuntimeException("Can't convert " + arg[0].val + " to integer with base " + parseInt(arg[1].val));
         }
-        return new Value(TYPE_NUM, res);
+        return new Value(TYPE_NUM, checkResNan(res));
     }, [null, null]),
 
     "num": new BuiltinFunctionValue(`
-#  convert argument string to number, if number - returns the same number value 
+#  convert argument string to floating point number, if number - returns the same number value 
 
+> num('3.7')
+3.7
+
+> num('.37e2')
+37
 `, 1, function(arg) {
         checkTypeList(arg, 0, [TYPE_STR, TYPE_NUM]);
 
@@ -1303,8 +1314,31 @@ text="a b a c a d"
         if (res == null) {
             throw new RuntimeException("Can't convert " + sval + " to floating point number.");
         }
-        return new Value(TYPE_NUM, res);
+        return new Value(TYPE_NUM, checkResNan(res));
     }),
+
+    "round": new BuiltinFunctionValue(`
+#  convert an argument value to an integer value - without rounding down 
+
+> round(3.2)
+3
+
+> round('3.2')
+3
+
+> round(3.7)
+4
+
+> round('3.7')
+4
+`, 1, function(arg) {
+        checkTypeList(arg, 0, [TYPE_NUM,TYPE_STR]);
+
+        let res = Math.round(value2Num(arg,0));
+        return new Value(TYPE_NUM, checkResNan(res));
+    }),
+
+
 
     "bit_and":  new BuiltinFunctionValue(`
 # bitwise and, both argument must be numbers with integer values (not floating point values)

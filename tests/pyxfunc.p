@@ -2,7 +2,7 @@
 funcCats = [
  {
   "name": "Numeric functions",
-  "func": [ "int", "num", "max", "min", "abs", "sqrt", "sin", "cos", "tan", "atan", "pow", "random", "bit_and", "bit_or", "bit_xor", "bit_neg", "bit_shiftl", "bit_shiftr"  ]
+  "func": [ "int", "round", "num", "max", "min", "abs", "sqrt", "sin", "cos", "tan", "atan", "pow", "random", "bit_and", "bit_or", "bit_xor", "bit_neg", "bit_shiftl", "bit_shiftr"  ]
  },
  {
  "name": "Functions for scalars or strings",

@@ -1010,8 +1010,9 @@ function runParse(data, openFile, isRepl) {
         } catch(er) {
             throw new rt.RuntimeException("Can't read used/included file " + filePath);
         }
-
     }
+
+    
 
     try {
         let prevValue = rt.setCurrentSourceInfo([ origPath, data]);

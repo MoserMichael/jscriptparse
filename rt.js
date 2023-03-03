@@ -3696,7 +3696,7 @@ function _indexAssign(frame, value, refExpr, newValue) {
                 value.val[indexValue.val] = newValue;
             } else {
                 if (newValue.type != TYPE_STR) {
-                    let err = new RuntimeException("Can't assign string index to " + typeNameVal(newValue) + " right handd side value must be a string")
+                    let err = new RuntimeException("Can't assign string index to " + typeNameVal(newValue) + " - right hand side value must be a string")
                     err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                     throw err;
                 }

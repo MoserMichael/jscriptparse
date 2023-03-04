@@ -100,9 +100,9 @@ class RegexValue {
         let lastPos = value.lastIndexOf('/');
         let flags = null;
         if (!value.endsWith('//')) {
-            flags = value.substring(lastPos+1);
+            flags = value.suring(lastPos+1);
         }
-        let rawRegex = value.substring(firstPos+1, lastPos);
+        let rawRegex = value.suring(firstPos+1, lastPos);
         this.regex = new RegExp(rawRegex, flags);
         this.val = this.regex.toString();
     }
@@ -379,6 +379,22 @@ function rtValueToJson(val) {
     return JSON.stringify(rtValueToJsVal(val));
 }
 
+function clonePrimitiveVal(val) {
+    if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
+        return new Value(val.type, val.val);
+    }
+    return val;
+}
+
+function cloneAll(val) {
+    if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
+        return new Value(val.type, val.val);
+    }
+    return new Value(val.type, JSON.parse( JSON.stringify(val.val) ) );
+}
+
+
+
 if (typeof(module) == 'object') {
     module.exports = {
         doLogHook,
@@ -420,6 +436,9 @@ if (typeof(module) == 'object') {
         jsValueToRtVal,
         rtValueToJsVal,
         rtValueToJson,
+
+        clonePrimitiveVal,
+        cloneAll,
 
     }
 } 

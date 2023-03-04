@@ -142,20 +142,6 @@ class RuntimeException  extends Error {
     }
 }
 
-function clonePrimitiveVal(val) {
-    if (val.type == bs.TYPE_BOOL || val.type == bs.TYPE_STR || val.type == bs.TYPE_NUM) {
-        return new bs.Value(val.type, val.val);
-    }
-    return val;
-}
-
-function cloneAll(val) {
-    if (val.type == bs.TYPE_BOOL || val.type == bs.TYPE_STR || val.type == bs.TYPE_NUM) {
-        return new bs.Value(val.type, val.val);
-    }
-    return new bs.Value(val.type, JSON.parse( JSON.stringify(val.val) ) );
-}
-
 function* genEvalClosure(funcVal, args, frame) {
     if (funcVal.type == bs.TYPE_CLOSURE) {
         let funcFrame = null;
@@ -406,7 +392,7 @@ function dimArrayInit(initValue, currentDim, dims) {
         }
     } else {
         for (let i = 0; i < n; ++i) {
-            val[i] = cloneAll(initValue);
+            val[i] = bs.cloneAll(initValue);
         }
     }
     return new bs.Value(bs.TYPE_LIST, val);
@@ -1312,7 +1298,7 @@ rename("oldFileName","newFileName")
 > a==b
 false
 `, 1, function(arg) {
-        return cloneAll(arg[0]);
+        return bs.cloneAll(arg[0]);
     }),
 
 
@@ -2383,13 +2369,13 @@ class Frame {
 
     assign(name, value) {
         if (!this._assign(name, value)) {
-            this.vars[name] = clonePrimitiveVal(value);
+            this.vars[name] = bs.clonePrimitiveVal(value);
         }
     }
 
     _assign(name, value) {
         if (name in this.vars) {
-            this.vars[name] = clonePrimitiveVal(value);
+            this.vars[name] = bs.clonePrimitiveVal(value);
             return true;
         }
         if (this.parentFrame != null) {
@@ -2399,7 +2385,7 @@ class Frame {
     }
 
     defineVar(name, value) {
-       this.vars[name] = clonePrimitiveVal(value);
+       this.vars[name] = bs.clonePrimitiveVal(value);
     }
 
     undefVar(name) {

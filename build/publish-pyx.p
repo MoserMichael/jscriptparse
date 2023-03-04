@@ -37,6 +37,7 @@ def prepareAndPublish(version) {
     system("mkdir tmp-publish")
     
 
+    copyAndReplace("rtbase.js", "./tmp-publish/rtbase.js", version)    
     copyAndReplace("rt.js", "./tmp-publish/rt.js", version)
     copyAndReplace("scripty.js", "./tmp-publish/scripty.js", version)
     copyAndReplace("pyx", "./tmp-publish/pyx", version)

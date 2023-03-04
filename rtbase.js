@@ -293,6 +293,92 @@ function value2Str2(arg) {
     return value2Str(arg, undefined);
 }
 
+function value2StrDisp(val) {
+    if (val.type == TYPE_STR) {
+        return val.val;
+    } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+        return val.val.toString();
+    } else if (val.type == TYPE_NONE) {
+        return "none";
+    }
+    return rtValueToJson(val);
+}
+
+function jsValueToRtVal(value) {
+    if (value == null) {
+        return VALUE_NONE;
+    }
+
+    if (Array.isArray(value)) {
+        let rt = [];
+        for(let i=0; i<value.length; ++i) {
+            rt.push( jsValueToRtVal(value[i]) );
+        }
+        return new Value(TYPE_LIST, rt);
+    }
+
+    if (value.constructor == Object) { // check if dictionary.
+        let rt = {};
+        let keys = Object.keys(value);
+        for(let i=0; i<keys.length; ++i) {
+            rt[ new String(keys[i]) ] = jsValueToRtVal( value[keys[i]] );
+        }
+        return new Value(TYPE_MAP, rt);
+    }
+
+    if (typeof(value) == "boolean") {
+        return new Value(TYPE_BOOL, value);
+    }
+
+    if (typeof(value) == 'number') {
+        return new Value(TYPE_NUM, value)
+    }
+
+    if (typeof(value) == 'string') {
+        return new Value(TYPE_STR, value)
+    }
+
+    if (typeof(value) == null) {
+        return VALUE_NONE;
+    }
+
+    throw new RuntimeException("Unknown type " + typeof(value));
+}
+
+
+function rtValueToJsVal(value) {
+    if (value.type == TYPE_LIST) {
+        let ret = [];
+        for(let i=0; i<value.val.length; ++i) {
+            ret.push( rtValueToJsVal( value.val[i] ) );
+        }
+        return ret;
+    }
+
+    if (value.type == TYPE_MAP) {
+        let ret = {};
+        let keys = Object.keys(value.val);
+        for (let i = 0; i < keys.length; ++i) {
+            ret[keys[i]] = rtValueToJsVal(value.val[keys[i]]);
+        }
+        return ret;
+    }
+
+    if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM || value.type == TYPE_NONE || value.type == TYPE_REGEX) {
+        return value.val;
+    }
+
+    if (value.type == TYPE_CLOSURE || value.type == TYPE_BUILTIN_FUNCTION) {
+        return "<function>";
+    }
+
+    throw new RuntimeException("Can't convert value " + typeNameVal(value) );
+}
+
+function rtValueToJson(val) {
+    return JSON.stringify(rtValueToJsVal(val));
+}
+
 if (typeof(module) == 'object') {
     module.exports = {
         doLogHook,
@@ -329,5 +415,11 @@ if (typeof(module) == 'object') {
         value2Num,
         value2Str,
         value2Str2,
+
+        value2StrDisp,
+        jsValueToRtVal,
+        rtValueToJsVal,
+        rtValueToJson,
+
     }
 } 

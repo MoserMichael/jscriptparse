@@ -38,89 +38,6 @@ function setErrorOnExecFail(on) {
 }
 
 
-function value2StrDisp(val) {
-    if (val.type == bs.TYPE_STR) {
-        return val.val;
-    } else if (val.type == bs.TYPE_BOOL || val.type == bs.TYPE_NUM) {
-        return val.val.toString();
-    } else if (val.type == bs.TYPE_NONE) {
-        return "none";
-    }
-    return rtValueToJson(val);
-}
-function jsValueToRtVal(value) {
-    if (value == null) {
-        return bs.VALUE_NONE;
-    }
-
-    if (Array.isArray(value)) {
-        let rt = [];
-        for(let i=0; i<value.length; ++i) {
-            rt.push( jsValueToRtVal(value[i]) );
-        }
-        return new bs.Value(bs.TYPE_LIST, rt);
-    }
-
-    if (value.constructor == Object) { // check if dictionary.
-        let rt = {};
-        let keys = Object.keys(value);
-        for(let i=0; i<keys.length; ++i) {
-            rt[ new String(keys[i]) ] = jsValueToRtVal( value[keys[i]] );
-        }
-        return new bs.Value(bs.TYPE_MAP, rt);
-    }
-
-    if (typeof(value) == "boolean") {
-        return new bs.Value(bs.TYPE_BOOL, value);
-    }
-
-    if (typeof(value) == 'number') {
-        return new bs.Value(bs.TYPE_NUM, value)
-    }
-
-    if (typeof(value) == 'string') {
-        return new bs.Value(bs.TYPE_STR, value)
-    }
-
-    if (typeof(value) == null) {
-        return bs.VALUE_NONE;
-    }
-
-    throw new RuntimeException("Unknown type " + typeof(value));
-}
-
-function rtValueToJsVal(value) {
-    if (value.type == bs.TYPE_LIST) {
-        let ret = [];
-        for(let i=0; i<value.val.length; ++i) {
-            ret.push( rtValueToJsVal( value.val[i] ) );
-        }
-        return ret;
-    }
-
-    if (value.type == bs.TYPE_MAP) {
-        let ret = {};
-        let keys = Object.keys(value.val);
-        for (let i = 0; i < keys.length; ++i) {
-            ret[keys[i]] = rtValueToJsVal(value.val[keys[i]]);
-        }
-        return ret;
-    }
-
-    if (value.type == bs.TYPE_STR || value.type == bs.TYPE_BOOL || value.type == bs.TYPE_NUM || value.type == bs.TYPE_NONE || value.type == bs.TYPE_REGEX) {
-        return value.val;
-    }
-
-    if (value.type == bs.TYPE_CLOSURE || value.type == bs.TYPE_BUILTIN_FUNCTION) {
-        return "<function>";
-    }
-
-    throw new RuntimeException("Can't convert value " + bs.typeNameVal(value) );
-}
-
-function rtValueToJson(val) {
-    return JSON.stringify(rtValueToJsVal(val));
-}
 
 const RTE_UNWIND=2
 
@@ -214,14 +131,14 @@ class RuntimeException  extends Error {
             let rtValue = this.rtValue;
             let prevStack = rtValue.stack;
             delete rtValue.stack;
-            let msg = rtValueToJson(rtValue);
+            let msg = bs.rtValueToJson(rtValue);
             rtValue.stack = prevStack;
             console.log(">getMessage: " + msg)
             return msg;
         }
          */
         // should be an error
-        return rtValueToJson(this.rtValue);
+        return bs.rtValueToJson(this.rtValue);
     }
 }
 
@@ -329,7 +246,7 @@ function evalClosure(name, funcVal, args, frame) {
     }
 
     if (bs.getTraceMode() && retVal.type != bs.TYPE_NONE) {
-        process.stderr.write(bs.getTracePrompt + rtValueToJson(retVal) + "\n}");
+        process.stderr.write(bs.getTracePrompt + bs.rtValueToJson(retVal) + "\n}");
     }
 
     return retVal;
@@ -344,7 +261,7 @@ function _prepareBuiltinFuncArgs(funcVal, frame, args) {
             if (traceParams != "") {
                 traceParams += ", ";
             }
-            traceParams += rtValueToJson(args[i]);
+            traceParams += bs.rtValueToJson(args[i]);
         }
     }
 
@@ -359,7 +276,7 @@ function _prepareBuiltinFuncArgs(funcVal, frame, args) {
                     if (traceParams != "") {
                         traceParams += ", ";
                     }
-                    traceParams += rtValueToJson(val);
+                    traceParams += bs.rtValueToJson(val);
                 }
             }
         }
@@ -388,7 +305,7 @@ function _prepareClosureFrame(funcVal, frame, args) {
             if (traceParam != "") {
                 traceParam += ", ";
             }
-            traceParam += paramDef[0][0] + "=" + rtValueToJson(argValue);
+            traceParam += paramDef[0][0] + "=" + bs.rtValueToJson(argValue);
         }
      }
 
@@ -406,7 +323,7 @@ function _prepareClosureFrame(funcVal, frame, args) {
             if (traceParam != "") {
                 traceParam += ", ";
             }
-            traceParam += paramDef[0][0] + "=" + rtValueToJson(defaultParamValue);
+            traceParam += paramDef[0][0] + "=" + bs.rtValueToJson(defaultParamValue);
         }
     }
     return [ funcFrame, traceParam];
@@ -460,7 +377,7 @@ function printImpl(arg) {
         if (isBascType(val.type))
             ret += bs.value2Str2(val);
         else
-            ret += rtValueToJson(val);
+            ret += bs.rtValueToJson(val);
     }
     return ret;
 }
@@ -530,15 +447,15 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
             return new bs.Value(bs.TYPE_STR, httpReq.method );
         }),
         'query' : new bs.BuiltinFunctionValue(``, 0, function() {
-            return jsValueToRtVal(httpReq.query);
+            return bs.jsValueToRtVal(httpReq.query);
         }),
         'headers' : new bs.BuiltinFunctionValue(``, 0, function() {
-            return new jsValueToRtVal(httpReq.headers);
+            return new bs.jsValueToRtVal(httpReq.headers);
         }),
         'header' : new bs.BuiltinFunctionValue(``, 1, function(arg) {
             let name = bs.value2Str(arg, 0);
             let val = httpReq.headers[name.toLowerCase()];
-            return new jsValueToRtVal(val);
+            return new bs.jsValueToRtVal(val);
         }),
         'requestData' : new bs.BuiltinFunctionValue(``, 0, function(arg) {
             return new bs.Value(bs.TYPE_STR, requestData );
@@ -548,7 +465,7 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
     let res_ = new bs.Value(bs.TYPE_MAP, {
 
         'setHeader': new bs.BuiltinFunctionValue(``, 2, function(arg) {
-            httpRes.setHeader(bs.value2Str(arg, 0), rtValueToJsVal(arg[1].val));
+            httpRes.setHeader(bs.value2Str(arg, 0), bs.rtValueToJsVal(arg[1].val));
             return bs.VALUE_NONE;
         }),
 
@@ -1421,7 +1338,7 @@ false
         if (arg[1] != null) {
             delim = bs.value2Str(arg, 1);
         }
-        return new bs.Value(bs.TYPE_STR, arg[0].val.map(value2StrDisp).join(delim));
+        return new bs.Value(bs.TYPE_STR, arg[0].val.map(bs.value2StrDisp).join(delim));
     }, [null, null]),
     "map": new bs.BuiltinFunctionValue(`# the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
 
@@ -1720,7 +1637,7 @@ same as:
 [1,2,3]`, 1,function(arg, frame) {
         bs.checkType(arg, 0, bs.TYPE_STR);
         let val = JSON.parse(arg[0].val);
-        let rt = jsValueToRtVal(val);
+        let rt = bs.jsValueToRtVal(val);
         return rt;
     }),
     "toJsonString": new bs.BuiltinFunctionValue(`# given a data argument: returns a json formatted string
@@ -1729,7 +1646,7 @@ same as:
 "[1,2,3]"
 > toJsonString({"name":"Pooh","family":"Bear","likes":["Honey","Songs","Friends"]})
 "{\\"name\\":\\"Pooh\\",\\"family\\":\\"Bear\\",\\"likes\\":[\\"Honey\\",\\"Songs\\",\\"Friends\\"]}"`, 1,function(arg, frame) {
-        return new bs.Value(bs.TYPE_STR, rtValueToJson(arg[0]));
+        return new bs.Value(bs.TYPE_STR, bs.rtValueToJson(arg[0]));
     }),
 
     //functions for working with yaml
@@ -1750,7 +1667,7 @@ c:
     `, 1,function(arg, frame) {
         bs.checkType(arg, 0, bs.TYPE_STR);
         let val = yaml.parse(arg[0].val);
-        let rt = jsValueToRtVal(val);
+        let rt = bs.jsValueToRtVal(val);
         return rt;
     }),
     "toYamlString": new bs.BuiltinFunctionValue(`# given a data argument: returns a yaml formatted string
@@ -1764,7 +1681,7 @@ c:
   - 1
   - 2
   - 3`, 1,function(arg, frame) {
-        let jsVal = rtValueToJsVal(arg[0]);
+        let jsVal = bs.rtValueToJsVal(arg[0]);
         return new bs.Value(bs.TYPE_STR, yaml.stringify(jsVal));
     }),
 
@@ -2252,7 +2169,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
         if (arg[1] != null && arg[1].type != bs.TYPE_NONE) {
             bs.checkType(arg, 1, bs.TYPE_MAP);
-            options = rtValueToJsVal(arg[1]);
+            options = bs.rtValueToJsVal(arg[1]);
 
             if ('method' in options) {
                 httpMethod = options['method'];
@@ -3369,19 +3286,19 @@ function _assign(frame, singleLhs, value) {
             if (bs.getTraceMode()) {
                 let indexExpr = "";
                 for(let i=0; i< indexValues.length; ++i) {
-                    indexExpr += "[" + rtValueToJsVal(indexValues[i]) + "]";
+                    indexExpr += "[" + bs.rtValueToJsVal(indexValues[i]) + "]";
                 }
-                return [ varName + indexExpr, rtValueToJsVal(value) ];
+                return [ varName + indexExpr, bs.rtValueToJsVal(value) ];
             }
         } else {
             frame.assign(varName, value);
             if (bs.getTraceMode()) {
-                return [ varName, rtValueToJsVal(value) ];
+                return [ varName, bs.rtValueToJsVal(value) ];
             }
         }
     }
     if (bs.getTraceMode()) {
-        return [ "_", rtValueToJsVal(value)];
+        return [ "_", bs.rtValueToJsVal(value)];
     }
 }
 
@@ -3394,7 +3311,7 @@ function _indexAssign(frame, value, refExpr, newValue) {
 
         if (value.type == bs.TYPE_LIST || value.type == bs.TYPE_STR) {
             if (indexValue.type != bs.TYPE_NUM) {
-                let err = new RuntimeException("Can't assign this " + bs.typeNameVal(value) + " index . Index value of must be an number, instead got " + rtValueToJsVal(indexValue));
+                let err = new RuntimeException("Can't assign this " + bs.typeNameVal(value) + " index . Index value of must be an number, instead got " + bs.rtValueToJsVal(indexValue));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
@@ -3415,7 +3332,7 @@ function _indexAssign(frame, value, refExpr, newValue) {
         if (i != (refExpr.length-1)) {
             value = value.val[indexValue.val];
             if (value == undefined || (value.type != bs.TYPE_LIST && value.type != bs.TYPE_MAP)) {
-                let err = new RuntimeException("Can't assign this entry, lookup did not return a list or a map, got " + bs.typeNameVal(value) +" instead. index value: " + rtValueToJsVal(value));
+                let err = new RuntimeException("Can't assign this entry, lookup did not return a list or a map, got " + bs.typeNameVal(value) +" instead. index value: " + bs.rtValueToJsVal(value));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
@@ -3769,7 +3686,7 @@ class AstReturnStmt extends AstBase {
     eval(frame) {
         let retValue = this.expr.eval(frame);
         if (bs.getTraceMode()) {
-            process.stderr.write(bs.getTracePrompt + "return " + rtValueToJson(retValue) + "\n");
+            process.stderr.write(bs.getTracePrompt + "return " + bs.rtValueToJson(retValue) + "\n");
         }
         return new bs.Value(bs.TYPE_FORCE_RETURN, retValue);
     }
@@ -4184,7 +4101,6 @@ if (typeof(module) == 'object') {
         setCurrentSourceInfo,
         //setForceStopEval,
         setErrorOnExecFail,
-        rtValueToJsVal,
         isBreakOrContinue,
         isReturnOrYield,
         addSourceToTopLevelStmts

@@ -258,6 +258,7 @@ String concat
 
 
 Divide by zero
+    They are all into the not a number business - due to the floating point standard)
 
     javascript allows to do that!
         node
@@ -265,7 +266,18 @@ Divide by zero
         Infinity
         >
 
-    The others don't
+        //It's very easy to get not a number 
+
+        > Infinity - Infinity
+        NaN
+
+        > NaN == NaN
+        false
+
+        > Infinity == Infinity
+        true
+
+    Python doesn't allow divide by zero, but has not a number
 
         python
         >>> 1/0
@@ -274,6 +286,16 @@ Divide by zero
         ZeroDivisionError: division by zero
         >>>
 
+        but you have not a number
+
+        >>> float('inf')
+        inf
+        >>> float('inf') - float('inf')
+        nan
+        >>> float('nan') == float('nan')
+        False
+        >>> float('inf') == float('inf')
+        True
 
         php -a
 
@@ -288,6 +310,16 @@ Divide by zero
         Call Stack:
            18.9835     393456   1. {main}() php shell code:0
 
+        # also has not a number
+
+        php > $res=is_numeric(NAN);
+        php > echo $res;
+        1
+
+        php > $res = !( NAN == NAN);
+        php > echo $res;
+        1
+    
 
 two passes or one? (can you call a functions that is defined later on in the same source file?)
 
@@ -467,6 +499,15 @@ None type / implicit conversions
         > undefined == null
         true
 
+        // but 
+
+        > undefined === null
+        false
+
+        > typeof(undefined)
+        'undefined'
+        > typeof(null)
+        'object'
 
     python3
         >>> def fun():

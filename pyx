@@ -181,10 +181,10 @@ function runEvalLoop(cmdLine) {
                             } else if (res.val == -Infinity) {
                                 evalPrintMsg += "-Infinity";
                             } else {
-                                evalPrintMsg += JSON.stringify(rt.bs.rtValueToJsVal(res));
+                                evalPrintMsg += JSON.stringify(bs.rtValueToJsVal(res));
                             }
                         } else {
-                            evalPrintMsg += JSON.stringify(rt.bs.rtValueToJsVal(res));
+                            evalPrintMsg += JSON.stringify(bs.rtValueToJsVal(res));
                         }
                     }
                 } catch(e) {

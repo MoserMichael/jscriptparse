@@ -395,6 +395,96 @@ function cloneAll(val) {
     return new Value(val.type, JSON.parse( JSON.stringify(val.val) ) );
 }
 
+// there is a global frame, also each function invocation has is own frame.a
+// closures have a parent frame - which is the frame where they where evaluated.
+// simple rules. aren't they?
+class Frame {
+    constructor(parentFrame = null) {
+        this.vars = {}; // maps variable name to Value instance
+        this.parentFrame = parentFrame;
+    }
+
+    lookup(name) {
+        //console.log("lookup: " + name);
+        let ret = this._lookup(name);
+        //console.log("lookup: " + name + " ret: " + JSON.stringify(ret));
+        return ret;
+    }
+
+    _lookup(name) {
+        if (name in this.vars) {
+            return this.vars[name];
+        }
+        if (this.parentFrame != null) {
+            return this.parentFrame._lookup(name);
+        }
+        throw new RuntimeException("undefined variable: " + name  );
+    }
+
+    assign(name, value) {
+        if (!this._assign(name, value)) {
+            this.vars[name] = clonePrimitiveVal(value);
+        }
+    }
+
+    _assign(name, value) {
+        if (name in this.vars) {
+            this.vars[name] = clonePrimitiveVal(value);
+            return true;
+        }
+        if (this.parentFrame != null) {
+            return this.parentFrame._assign(name, value);
+        }
+        return false;
+    }
+
+    defineVar(name, value) {
+       this.vars[name] = clonePrimitiveVal(value);
+    }
+
+    undefVar(name) {
+        delete this.vars[name];
+    }
+
+    complete(prefix, resultList) {
+        let keys = Object.keys(this.vars);
+        for(let i=0; i<keys.length; ++i) {
+            let it=keys[i];
+            if (prefix == "" || it.startsWith(prefix)) {
+                let varVal = this.vars[keys[i]];
+                if (varVal.type == TYPE_CLOSURE || varVal.type == TYPE_BUILTIN_FUNCTION) {
+                    if (it.startsWith("_")) {
+                        continue;
+                    }
+                    it += "(";
+                }
+                resultList.push(it);
+                //resultList.push(it.suring(prefix.length));
+            }
+        }
+        if (this.parentFrame != null) {
+            this.parentFrame.complete(prefix, resultList);
+        }
+    }
+
+    listOfFuncsWithHelp(resultList) {
+        let keys = Object.keys(this.vars);
+        for(let i=0; i<keys.length; ++i) {
+            let it=keys[i];
+
+            let varVal = this.vars[keys[i]];
+            if ((varVal.type == TYPE_CLOSURE || varVal.type == TYPE_BUILTIN_FUNCTION)) {
+                if ("help" in varVal) {
+                    resultList.push(it);
+                }
+            }
+        }
+        if (this.parentFrame != null) {
+            this.parentFrame.listOfFuncsWithHelp(resultList);
+        }
+    }
+}
+
 const RTE_UNWIND=2
 
 class RuntimeException  extends Error {
@@ -498,10 +588,185 @@ class RuntimeException  extends Error {
     }
 }
 
+function* genEvalClosure(funcVal, args, frame) {
+    if (funcVal.type == TYPE_CLOSURE) {
+        let funcFrame = null;
+
+        if (funcVal.frame != null) { // closure with captured variables
+            [ funcFrame, _ ] = _prepareClosureFrame(funcVal, funcVal.frame, args);
+        } else {
+            [ funcFrame, _ ] = _prepareClosureFrame(funcVal, frame, args);
+        }
+
+        try {
+            // frame is ready, evaluate the statement list
+            yield *funcVal.functionDef.body.genEval(funcFrame);
+        } catch(er) {
+            if (er instanceof RuntimeException && !er.isUnwind()) {
+                er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
+            }
+            throw er;
+        }
+        return;
+    }
+
+    // builtin functions
+    _prepareBuiltinFuncArgs(funcVal, frame, args);
+
+    // function call
+    if (funcVal.numParams != -1 && funcVal.numParams != args.length) {
+        throw new RuntimeException("generator takes " + funcVal.numParams + " parameters, whereas " + args.length +
+            " parameters are passed in call");
+    }
+    yield* funcVal.funcImpl(args);
+}
+
+function evalClosure(name, funcVal, args, frame) {
+    if (funcVal.type == TYPE_CLOSURE) {
+
+        let funcFrame = null;
+        let traceParam = "";
+
+        if (funcVal.frame != null) { // closure with captured variables
+            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, funcVal.frame, args);
+        } else {
+
+            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, frame.parentFrame != null ? frame.parentFrame : frame, args);
+        }
+
+        if (traceParam) {
+            let traceName = name;
+
+            if (name == "") {
+                traceName ="<unnamed-function>";
+            }
+            console.log(traceName + "(" + traceParam + ")");
+        }
+
+        try {
+            // frame is ready, evaluate the statement list
+            let rVal = funcVal.functionDef.body.eval(funcFrame);
+
+            if (rVal.type == TYPE_FORCE_RETURN) {
+                return rVal.val;
+            }
+            return rVal;
+        } catch(er) {
+            if (er instanceof RuntimeException && !er.isUnwind()) {
+                er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
+            }
+            throw er;
+        }
+    }
+
+    // builtin functions
+    let traceParams = _prepareBuiltinFuncArgs(funcVal, frame, args);
+
+    if (getTraceMode()) {
+        process.stderr.write(getTracePrompt + name + "(" + traceParams + ") {\n");
+    }
+
+    // function call
+    if (funcVal.numParams != -1 && funcVal.numParams != args.length) {
+        throw new RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
+            "  parameters are passed in call");
+    }
+    let retVal = funcVal.funcImpl(args, frame);
+
+    if (retVal == undefined) {
+        retVal = VALUE_NONE;
+    }
+
+    if (getTraceMode() && retVal.type != TYPE_NONE) {
+        process.stderr.write(getTracePrompt + rtValueToJson(retVal) + "\n}");
+    }
+
+    return retVal;
+}
+
+function _prepareBuiltinFuncArgs(funcVal, frame, args) {
+
+    let traceParams = "";
+
+    if (getTraceMode()) {
+        for(let i=0;i<args.length;++i) {
+            if (traceParams != "") {
+                traceParams += ", ";
+            }
+            traceParams += rtValueToJson(args[i]);
+        }
+    }
+
+    if (funcVal.defaultParamValues != null) {
+        // try to add omitted params with default values;
+        if (args.length < funcVal.defaultParamValues.length) {
+            for (let i = args.length; i < funcVal.defaultParamValues.length; ++i) {
+                let val = funcVal.defaultParamValues[i];
+                args.push(val);
+
+                if (getTraceMode() && val != null) {
+                    if (traceParams != "") {
+                        traceParams += ", ";
+                    }
+                    traceParams += rtValueToJson(val);
+                }
+            }
+        }
+    }
+    return traceParams;
+}
+
+
+function _prepareClosureFrame(funcVal, frame, args) {
+    let functionDef = funcVal.functionDef;
+    let funcFrame = new Frame(frame);
+    let traceParam = "";
+
+    if (args.length > functionDef.params.length) {
+        throw new RuntimeException("function takes " + functionDef.params.length + " params, but " + args.length + " were given", [funcVal.startOffset, funcVal.currentSourceInfo]);
+    }
+
+    // define all provided parameters in the new function frmae
+    let i = 0;
+    for (; i < args.length; ++i) {
+        let argValue = args[i];
+        let paramDef = functionDef.params[i]; // name of parameter
+        funcFrame.defineVar(paramDef[0][0], argValue);
+
+        if (getTraceMode()) {
+            if (traceParam != "") {
+                traceParam += ", ";
+            }
+            traceParam += paramDef[0][0] + "=" + rtValueToJson(argValue);
+        }
+     }
+
+    // provide values for arguments with default values
+    for (; i < functionDef.params.length; ++i) {
+        let paramDef = functionDef.params[i]; // name of parameter
+
+        let defaultParamValue = funcVal.defaultParamValues[i];
+        if (defaultParamValue == null) {
+            throw new RuntimeException(" no value for parameter " + paramDef[0][0], [funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
+        }
+        funcFrame.defineVar(paramDef[0][0], defaultParamValue);
+
+        if (getTraceMode()) {
+            if (traceParam != "") {
+                traceParam += ", ";
+            }
+            traceParam += paramDef[0][0] + "=" + rtValueToJson(defaultParamValue);
+        }
+    }
+    return [ funcFrame, traceParam];
+}
+
 
 
 if (typeof(module) == 'object') {
     module.exports = {
+        Frame, 
+
         doLogHook,
         setLogHook,
         maxStackFrames,
@@ -546,6 +811,9 @@ if (typeof(module) == 'object') {
         cloneAll,
 
         RuntimeException,
+
+        genEvalClosure,
+        evalClosure
 
     }
 } 

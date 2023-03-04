@@ -37,181 +37,6 @@ function setErrorOnExecFail(on) {
     errorOnExecFail = on;
 }
 
-
-
-function* genEvalClosure(funcVal, args, frame) {
-    if (funcVal.type == bs.TYPE_CLOSURE) {
-        let funcFrame = null;
-
-        if (funcVal.frame != null) { // closure with captured variables
-            [ funcFrame, _ ] = _prepareClosureFrame(funcVal, funcVal.frame, args);
-        } else {
-            [ funcFrame, _ ] = _prepareClosureFrame(funcVal, frame, args);
-        }
-
-        try {
-            // frame is ready, evaluate the statement list
-            yield *funcVal.functionDef.body.genEval(funcFrame);
-        } catch(er) {
-            if (er instanceof bs.RuntimeException && !er.isUnwind()) {
-                er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
-            }
-            throw er;
-        }
-        return;
-    }
-
-    // builtin functions
-    _prepareBuiltinFuncArgs(funcVal, frame, args);
-
-    // function call
-    if (funcVal.numParams != -1 && funcVal.numParams != args.length) {
-        throw new bs.RuntimeException("generator takes " + funcVal.numParams + " parameters, whereas " + args.length +
-            " parameters are passed in call");
-    }
-    yield* funcVal.funcImpl(args);
-}
-
-function evalClosure(name, funcVal, args, frame) {
-    if (funcVal.type == bs.TYPE_CLOSURE) {
-
-        let funcFrame = null;
-        let traceParam = "";
-
-        if (funcVal.frame != null) { // closure with captured variables
-            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, funcVal.frame, args);
-        } else {
-
-            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, frame.parentFrame != null ? frame.parentFrame : frame, args);
-        }
-
-        if (traceParam) {
-            let traceName = name;
-
-            if (name == "") {
-                traceName ="<unnamed-function>";
-            }
-            console.log(traceName + "(" + traceParam + ")");
-        }
-
-        try {
-            // frame is ready, evaluate the statement list
-            let rVal = funcVal.functionDef.body.eval(funcFrame);
-
-            if (rVal.type == bs.TYPE_FORCE_RETURN) {
-                return rVal.val;
-            }
-            return rVal;
-        } catch(er) {
-            if (er instanceof bs.RuntimeException && !er.isUnwind()) {
-                er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
-            }
-            throw er;
-        }
-    }
-
-    // builtin functions
-    let traceParams = _prepareBuiltinFuncArgs(funcVal, frame, args);
-
-    if (bs.getTraceMode()) {
-        process.stderr.write(bs.getTracePrompt + name + "(" + traceParams + ") {\n");
-    }
-
-    // function call
-    if (funcVal.numParams != -1 && funcVal.numParams != args.length) {
-        throw new bs.RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
-            "  parameters are passed in call");
-    }
-    let retVal = funcVal.funcImpl(args, frame);
-
-    if (retVal == undefined) {
-        retVal = bs.VALUE_NONE;
-    }
-
-    if (bs.getTraceMode() && retVal.type != bs.TYPE_NONE) {
-        process.stderr.write(bs.getTracePrompt + bs.rtValueToJson(retVal) + "\n}");
-    }
-
-    return retVal;
-}
-
-function _prepareBuiltinFuncArgs(funcVal, frame, args) {
-
-    let traceParams = "";
-
-    if (bs.getTraceMode()) {
-        for(let i=0;i<args.length;++i) {
-            if (traceParams != "") {
-                traceParams += ", ";
-            }
-            traceParams += bs.rtValueToJson(args[i]);
-        }
-    }
-
-    if (funcVal.defaultParamValues != null) {
-        // try to add omitted params with default values;
-        if (args.length < funcVal.defaultParamValues.length) {
-            for (let i = args.length; i < funcVal.defaultParamValues.length; ++i) {
-                let val = funcVal.defaultParamValues[i];
-                args.push(val);
-
-                if (bs.getTraceMode() && val != null) {
-                    if (traceParams != "") {
-                        traceParams += ", ";
-                    }
-                    traceParams += bs.rtValueToJson(val);
-                }
-            }
-        }
-    }
-    return traceParams;
-}
-
-
-function _prepareClosureFrame(funcVal, frame, args) {
-    let functionDef = funcVal.functionDef;
-    let funcFrame = new Frame(frame);
-    let traceParam = "";
-
-    if (args.length > functionDef.params.length) {
-        throw new bs.RuntimeException("function takes " + functionDef.params.length + " params, but " + args.length + " were given", [funcVal.startOffset, funcVal.currentSourceInfo]);
-    }
-
-    // define all provided parameters in the new function frmae
-    let i = 0;
-    for (; i < args.length; ++i) {
-        let argValue = args[i];
-        let paramDef = functionDef.params[i]; // name of parameter
-        funcFrame.defineVar(paramDef[0][0], argValue);
-
-        if (bs.getTraceMode()) {
-            if (traceParam != "") {
-                traceParam += ", ";
-            }
-            traceParam += paramDef[0][0] + "=" + bs.rtValueToJson(argValue);
-        }
-     }
-
-    // provide values for arguments with default values
-    for (; i < functionDef.params.length; ++i) {
-        let paramDef = functionDef.params[i]; // name of parameter
-
-        let defaultParamValue = funcVal.defaultParamValues[i];
-        if (defaultParamValue == null) {
-            throw new bs.RuntimeException(" no value for parameter " + paramDef[0][0], [funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
-        }
-        funcFrame.defineVar(paramDef[0][0], defaultParamValue);
-
-        if (bs.getTraceMode()) {
-            if (traceParam != "") {
-                traceParam += ", ";
-            }
-            traceParam += paramDef[0][0] + "=" + bs.rtValueToJson(defaultParamValue);
-        }
-    }
-    return [ funcFrame, traceParam];
-}
-
 function _getEnv(frame) {
     let val = frame.lookup("ENV");
 
@@ -404,7 +229,7 @@ function makeHttpServerListener(callback, frame) {
             // this one is evaluated from another task. runtime exceptions need to be handled here
             try {
                 let vargs =  makeHttpCallbackInvocationParams(req,res, data);
-                evalClosure("", callback, vargs, frame);
+                bs.evalClosure("", callback, vargs, frame);
             } catch(er) {
                 if (er instanceof bs.RuntimeException) {
                     er.showStackTrace(true);
@@ -1250,7 +1075,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
             for(let i=0; i<argList.val.length;++i) {
                 let arg = [ argList.val[i] ];
-                let mapVal = evalClosure("", funVal, arg, frame);
+                let mapVal = bs.evalClosure("", funVal, arg, frame);
                 ret.push(mapVal);
             }
         }
@@ -1260,7 +1085,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
             for(let k in argMap.val) {
                 let amap = [ new bs.Value(bs.TYPE_STR, new String(k)), argMap.val[k] ];
-                let mapVal = evalClosure("", funVal, amap, frame);
+                let mapVal = bs.evalClosure("", funVal, amap, frame);
                 ret.push(mapVal);
             }
 
@@ -1282,7 +1107,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
         for(let i=0; i<argList.val.length;++i) {
             let arg = [ argList.val[i], new bs.Value(bs.TYPE_NUM, i) ];
-            let mapVal = evalClosure("", funVal, arg, frame);
+            let mapVal = bs.evalClosure("", funVal, arg, frame);
             ret.push(mapVal)
         }
         return new bs.Value(bs.TYPE_LIST, ret);
@@ -1317,7 +1142,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
         for(let i=0; i<argList.val.length;++i) {
             let arg = [rVal, argList.val[i]];
-            rVal = evalClosure("", funVal, arg, frame);
+            rVal = bs.evalClosure("", funVal, arg, frame);
         }
         return rVal;
     }),
@@ -1343,7 +1168,7 @@ same as:
 
         for(let i=argList.val.length-1; i>=0; i--) {
             let arg = [rVal, argList.val[i]];
-            rVal = evalClosure("", funVal, arg, frame);
+            rVal = bs.evalClosure("", funVal, arg, frame);
         }
         return rVal;
     }),
@@ -1465,7 +1290,7 @@ same as:
         } else {
             rt = arg[0].val.sort(function (a, b) {
                 let arg = [ a, b ];
-                let mapVal = evalClosure("", funVal, arg, frame);
+                let mapVal = bs.evalClosure("", funVal, arg, frame);
                 let nVal = bs.value2Num(mapVal);
                 if (nVal < 0) {
                     return -1;
@@ -1664,7 +1489,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
                         argStderr = new bs.Value(bs.TYPE_STR, stderr.toString());
                     }
                     let vargs =  [ argErr, argStdout, argStderr ];
-                    evalClosure("", callback, vargs, frame);
+                    bs.evalClosure("", callback, vargs, frame);
                 } catch(er) {
                     if (er instanceof bs.RuntimeException) {
                         er.showStackTrace(true);
@@ -2091,7 +1916,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
             let varg = [ new bs.Value(bs.TYPE_STR,data), error ];
 
             try {
-                evalClosure("", callback, varg, frame);
+                bs.evalClosure("", callback, varg, frame);
             } catch(er) {
                 if (er instanceof bs.RuntimeException) {
                     er.showStackTrace(true);
@@ -2236,96 +2061,6 @@ pyx programFile.p 1 2 3 4
             } , {}) ,
         "# environment variables, entry key is the name of the environment variable, the entry value is it's value"
     ),
-}
-
-// there is a global frame, also each function invocation has is own frame.a
-// closures have a parent frame - which is the frame where they where evaluated.
-// simple rules. aren't they?
-class Frame {
-    constructor(parentFrame = null) {
-        this.vars = {}; // maps variable name to Value instance
-        this.parentFrame = parentFrame;
-    }
-
-    lookup(name) {
-        //console.log("lookup: " + name);
-        let ret = this._lookup(name);
-        //console.log("lookup: " + name + " ret: " + JSON.stringify(ret));
-        return ret;
-    }
-
-    _lookup(name) {
-        if (name in this.vars) {
-            return this.vars[name];
-        }
-        if (this.parentFrame != null) {
-            return this.parentFrame._lookup(name);
-        }
-        throw new bs.RuntimeException("undefined variable: " + name  );
-    }
-
-    assign(name, value) {
-        if (!this._assign(name, value)) {
-            this.vars[name] = bs.clonePrimitiveVal(value);
-        }
-    }
-
-    _assign(name, value) {
-        if (name in this.vars) {
-            this.vars[name] = bs.clonePrimitiveVal(value);
-            return true;
-        }
-        if (this.parentFrame != null) {
-            return this.parentFrame._assign(name, value);
-        }
-        return false;
-    }
-
-    defineVar(name, value) {
-       this.vars[name] = bs.clonePrimitiveVal(value);
-    }
-
-    undefVar(name) {
-        delete this.vars[name];
-    }
-
-    complete(prefix, resultList) {
-        let keys = Object.keys(this.vars);
-        for(let i=0; i<keys.length; ++i) {
-            let it=keys[i];
-            if (prefix == "" || it.startsWith(prefix)) {
-                let varVal = this.vars[keys[i]];
-                if (varVal.type == bs.TYPE_CLOSURE || varVal.type == bs.TYPE_BUILTIN_FUNCTION) {
-                    if (it.startsWith("_")) {
-                        continue;
-                    }
-                    it += "(";
-                }
-                resultList.push(it);
-                //resultList.push(it.substring(prefix.length));
-            }
-        }
-        if (this.parentFrame != null) {
-            this.parentFrame.complete(prefix, resultList);
-        }
-    }
-
-    listOfFuncsWithHelp(resultList) {
-        let keys = Object.keys(this.vars);
-        for(let i=0; i<keys.length; ++i) {
-            let it=keys[i];
-
-            let varVal = this.vars[keys[i]];
-            if ((varVal.type == bs.TYPE_CLOSURE || varVal.type == bs.TYPE_BUILTIN_FUNCTION)) {
-                if ("help" in varVal) {
-                    resultList.push(it);
-                }
-            }
-        }
-        if (this.parentFrame != null) {
-            this.parentFrame.listOfFuncsWithHelp(resultList);
-        }
-    }
 }
 
 function showList(lst, dsp = null, separator = "\n") {
@@ -3788,12 +3523,12 @@ class AstFunctionCall extends AstBase {
         try {
             if (!funcVal.hasYield(frame)) {
                 let args = this._evalCallArguments(frame);
-                return evalClosure(funcVal.name, funcVal, args, frame);
+                return bs.evalClosure(funcVal.name, funcVal, args, frame);
             } else {
                 let ret = [];
 
                 let args = this._evalCallArguments(frame);
-                for (let val of genEvalClosure(funcVal, args, frame)) {
+                for (let val of bs.genEvalClosure(funcVal, args, frame)) {
                     ret.push(val);
                 }
                 return new bs.Value(bs.TYPE_LIST, ret);
@@ -3816,7 +3551,7 @@ class AstFunctionCall extends AstBase {
         let funcVal = this._getFuncVal(frame);
         if (funcVal.hasYield(frame)) {
             let args = this._evalCallArguments(frame);
-            yield* genEvalClosure(funcVal, args, frame)
+            yield* bs.genEvalClosure(funcVal, args, frame)
         }
     }
 
@@ -3909,7 +3644,7 @@ function isReturnOrYield(arg) {
 }
 
 function makeFrame(cmdLine) {
-    let frame = new Frame();
+    let frame = new bs.Frame();
     frame.vars = RTLIB;
 
     if (cmdLine != null) {
@@ -3955,7 +3690,6 @@ function addSourceToTopLevelStmts(data,ast) {
 
 if (typeof(module) == 'object') {
     module.exports = {
-        Frame,
         makeConstValue,
         makeExpression,
         makeUnaryExpression,

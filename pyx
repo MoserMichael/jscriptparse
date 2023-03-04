@@ -493,7 +493,7 @@ function runMain() {
     let cmd = parseCmdLine();
 
     if (cmd.traceMode) {
-        rt.setTraceMode(true);
+        bs.setTraceMode(true);
     }
     if (cmd.errorOnExecFail) {
         rt.setErrorOnExecFail( true);

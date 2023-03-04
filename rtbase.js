@@ -1,16 +1,29 @@
 
+let doLogHook = function(msg) { process.stdout.write(msg); }
+
 let maxStackFrames = 20;
+let traceMode = false;
+let tracePrompt = "+ ";
 
 function setMaxStackFrames(nframes) {
     maxStackFrames = nframes
 }
 
-let doLogHook = function(msg) { process.stdout.write(msg); }
-
 function setLogHook(hook) {
     doLogHook = hook;
 }
 
+function setTraceMode(on) {
+    traceMode = on;
+}
+
+function getTraceMode() {
+    return traceMode;
+}
+
+function getTracePrompt() {
+    return tracePrompt;
+}
 
 const TYPE_BOOL=0
 const TYPE_NUM=1
@@ -26,14 +39,16 @@ const TYPE_FORCE_RETURN=9
 const TYPE_FORCE_BREAK=10
 const TYPE_FORCE_CONTINUE=11
 
-
 if (typeof(module) == 'object') {
     module.exports = {
         doLogHook,
         setLogHook,
         maxStackFrames,
         setMaxStackFrames,
-
+        tracePrompt,
+        setTraceMode,
+        getTraceMode,
+        getTracePrompt,
         TYPE_BOOL,
         TYPE_NUM,
         TYPE_STR,

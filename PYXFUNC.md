@@ -17,9 +17,9 @@
 ## functions for working with processes
 <a href='#s-68'>chdir</a>&nbsp;,&nbsp;<a href='#s-69'>exec</a>&nbsp;,&nbsp;<a href='#s-70'>exit</a>&nbsp;,&nbsp;<a href='#s-71'>getcwd</a>&nbsp;,&nbsp;<a href='#s-72'>kill</a>&nbsp;,&nbsp;<a href='#s-73'>sleep</a>&nbsp;,&nbsp;<a href='#s-74'>system</a>
 ## Other functions
-<a href='#s-75'>assert</a>&nbsp;,&nbsp;<a href='#s-76'>clone</a>&nbsp;,&nbsp;<a href='#s-77'>eval</a>&nbsp;,&nbsp;<a href='#s-78'>help</a>&nbsp;,&nbsp;<a href='#s-79'>localtime</a>&nbsp;,&nbsp;<a href='#s-80'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-81'>time</a>&nbsp;,&nbsp;<a href='#s-82'>type</a>
+<a href='#s-75'>assert</a>&nbsp;,&nbsp;<a href='#s-76'>clone</a>&nbsp;,&nbsp;<a href='#s-77'>eval</a>&nbsp;,&nbsp;<a href='#s-78'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-79'>help</a>&nbsp;,&nbsp;<a href='#s-80'>localtime</a>&nbsp;,&nbsp;<a href='#s-81'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-82'>time</a>&nbsp;,&nbsp;<a href='#s-83'>type</a>
 ## Global variables
-<a href='#s-83'>ARGV</a>&nbsp;,&nbsp;<a href='#s-84'>ENV</a>&nbsp;,&nbsp;<a href='#s-85'>mathconst</a>
+<a href='#s-84'>ARGV</a>&nbsp;,&nbsp;<a href='#s-85'>ENV</a>&nbsp;,&nbsp;<a href='#s-86'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -1310,6 +1310,19 @@ false
 
 ```
 <a id='s-78'/>
+<hr>function: <b>getPYXOptions</b>
+
+```python
+
+# get opttions of the PYX runtime
+
+> getPYXOptions()
+{"trace":false,"errorExit":false,"framesInError":20}
+
+
+
+```
+<a id='s-79'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1324,7 +1337,7 @@ help()
 
 
 ```
-<a id='s-79'/>
+<a id='s-80'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1335,7 +1348,7 @@ help()
 
 
 ```
-<a id='s-80'/>
+<a id='s-81'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1389,14 +1402,14 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-81'/>
+<a id='s-82'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-82'/>
+<a id='s-83'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1414,7 +1427,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-83'/>
+<a id='s-84'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1438,14 +1451,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-84'/>
+<a id='s-85'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-85'/>
+<a id='s-86'/>
 <hr>function: <b>mathconst</b>
 
 ```python

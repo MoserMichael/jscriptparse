@@ -29,13 +29,6 @@ function setCurrentSourceInfo(info) {
     return prevValue;
 }
 
-// trace mode - trace evaluation of the program.
-let traceMode = false;
-let tracePrompt = "+ ";
-
-function setTraceMode(on) {
-    traceMode = on;
-}
 
 // if set - throw exception if executing a process fails / returns error status
 let errorOnExecFail = false;
@@ -575,8 +568,8 @@ function evalClosure(name, funcVal, args, frame) {
     // builtin functions
     let traceParams = _prepareBuiltinFuncArgs(funcVal, frame, args);
 
-    if (traceMode) {
-        process.stderr.write(tracePrompt + name + "(" + traceParams + ") {\n");
+    if (bs.getTraceMode()) {
+        process.stderr.write(bs.getTracePrompt + name + "(" + traceParams + ") {\n");
     }
 
     // function call
@@ -590,8 +583,8 @@ function evalClosure(name, funcVal, args, frame) {
         retVal = VALUE_NONE;
     }
 
-    if (traceMode && retVal.type != bs.TYPE_NONE) {
-        process.stderr.write(tracePrompt + rtValueToJson(retVal) + "\n}");
+    if (bs.getTraceMode() && retVal.type != bs.TYPE_NONE) {
+        process.stderr.write(bs.getTracePrompt + rtValueToJson(retVal) + "\n}");
     }
 
     return retVal;
@@ -601,7 +594,7 @@ function _prepareBuiltinFuncArgs(funcVal, frame, args) {
 
     let traceParams = "";
 
-    if (traceMode) {
+    if (bs.getTraceMode()) {
         for(let i=0;i<args.length;++i) {
             if (traceParams != "") {
                 traceParams += ", ";
@@ -617,7 +610,7 @@ function _prepareBuiltinFuncArgs(funcVal, frame, args) {
                 let val = funcVal.defaultParamValues[i];
                 args.push(val);
 
-                if (traceMode && val != null) {
+                if (bs.getTraceMode() && val != null) {
                     if (traceParams != "") {
                         traceParams += ", ";
                     }
@@ -646,7 +639,7 @@ function _prepareClosureFrame(funcVal, frame, args) {
         let paramDef = functionDef.params[i]; // name of parameter
         funcFrame.defineVar(paramDef[0][0], argValue);
 
-        if (traceMode) {
+        if (bs.getTraceMode()) {
             if (traceParam != "") {
                 traceParam += ", ";
             }
@@ -664,7 +657,7 @@ function _prepareClosureFrame(funcVal, frame, args) {
         }
         funcFrame.defineVar(paramDef[0][0], defaultParamValue);
 
-        if (traceMode) {
+        if (bs.getTraceMode()) {
             if (traceParam != "") {
                 traceParam += ", ";
             }
@@ -2364,7 +2357,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 `, 2,function(arg, frame) {
         let optname = value2Str(arg, 0);
         if (optname == "trace") {
-            setTraceMode( value2Bool(arg, 1) );
+            bs.setTraceMode( value2Bool(arg, 1) );
         } else if (optname == "errorExit") {
             errorOnExecFail = value2Bool(arg, 1);
         } else if (optname == "framesInError") {    
@@ -2375,7 +2368,22 @@ Error: internal error: RangeError: Maximum call stack size exceeded
         return VALUE_NONE;
     }),
 
-    "eval": new BuiltinFunctionValue(`
+    "getPYXOptions": new BuiltinFunctionValue(`
+# get opttions of the PYX runtime
+
+> getPYXOptions()
+{"trace":false,"errorExit":false,"framesInError":20}
+
+`, 0,function(arg, frame) {
+       return new Value(bs.TYPE_MAP, {
+                "trace": new Value(bs.TYPE_BOOL, bs.getTraceMode()),
+                "errorExit" :new Value(bs.TYPE_BOOL, errorOnExecFail),
+                "framesInError": new Value(bs.TYPE_NUM, bs.maxStackFrames),
+           }
+       );
+    }),
+
+        "eval": new BuiltinFunctionValue(`
 # evaluate the string as a pyx program - in the current scope
 
 > eval("2*2")
@@ -2821,8 +2829,8 @@ class AstStmtList extends AstBase {
     eval(frame) {
         let val = VALUE_NONE;
 
-        if (traceMode && !this.skipTrace && this.statements.length > 1) {
-            process.stderr.write(tracePrompt + "{\n");
+        if (bs.getTraceMode() && !this.skipTrace && this.statements.length > 1) {
+            process.stderr.write(bs.getTracePrompt + "{\n");
         }
 
         for(let i=0; i < this.statements.length; ++i) {
@@ -2835,8 +2843,8 @@ class AstStmtList extends AstBase {
             }
         }
 
-        if (traceMode && !this.skipTrace && this.statements.length > 1) {
-            process.stderr.write(tracePrompt + "}\n");
+        if (bs.getTraceMode() && !this.skipTrace && this.statements.length > 1) {
+            process.stderr.write(bs.getTracePrompt + "}\n");
         }
 
         return val;
@@ -3566,7 +3574,7 @@ function _assignImp(frame, value, lhs) {
     if (lhs.length == 1) {
         let singleLhs = lhs[0];
         let traceVal = _assign(frame, singleLhs, value);
-        if (traceMode) {
+        if (bs.getTraceMode()) {
             traceLhs.push(traceVal[0]);
             traceRhs.push(traceVal[1]);
         }
@@ -3584,15 +3592,15 @@ function _assignImp(frame, value, lhs) {
         }
         for(let i=0; i<rhsVal.length; ++i) {
             let traceVal = _assign(frame, lhs[i], rhsVal[i]);
-            if (traceMode) {
+            if (bs.getTraceMode()) {
                 traceLhs.push(traceVal[0]);
                 traceRhs.push(traceVal[1]);
             }
 
         }
     }
-    if (traceMode) {
-        process.stderr.write(tracePrompt + traceLhs.join(", ") + " = " + traceRhs.join(",") + "\n");
+    if (bs.getTraceMode()) {
+        process.stderr.write(bs.getTracePrompt + traceLhs.join(", ") + " = " + traceRhs.join(",") + "\n");
     }
     return VALUE_NONE;
 }
@@ -3613,7 +3621,7 @@ function _assign(frame, singleLhs, value) {
             }
 
             let indexValues = _indexAssign(frame, lhsValue, indexExpr, value);
-            if (traceMode) {
+            if (bs.getTraceMode()) {
                 let indexExpr = "";
                 for(let i=0; i< indexValues.length; ++i) {
                     indexExpr += "[" + rtValueToJsVal(indexValues[i]) + "]";
@@ -3622,12 +3630,12 @@ function _assign(frame, singleLhs, value) {
             }
         } else {
             frame.assign(varName, value);
-            if (traceMode) {
+            if (bs.getTraceMode()) {
                 return [ varName, rtValueToJsVal(value) ];
             }
         }
     }
-    if (traceMode) {
+    if (bs.getTraceMode()) {
         return [ "_", rtValueToJsVal(value)];
     }
 }
@@ -3655,7 +3663,7 @@ function _indexAssign(frame, value, refExpr, newValue) {
         }
 
 
-        if (traceMode) {
+        if (bs.getTraceMode()) {
             traceVals.push(indexValue);
         }
 
@@ -3732,12 +3740,12 @@ class AstIfStmt extends AstBase {
             let val = clause[0].eval(frame);
 
             let boolVal = value2Bool(val);
-            if (traceMode) {
+            if (bs.getTraceMode()) {
                 if (i == 0) {
-                    process.stderr.write(tracePrompt + "if " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
+                    process.stderr.write(bs.getTracePrompt + "if " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
 
                 } else {
-                    process.stderr.write(tracePrompt + "elif " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
+                    process.stderr.write(bs.getTracePrompt + "elif " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
                 }
             }
 
@@ -3746,8 +3754,8 @@ class AstIfStmt extends AstBase {
             }
         }
         if (this.elseStmtList != null) {
-            if (traceMode) {
-                process.stderr.write(tracePrompt + "else\n");
+            if (bs.getTraceMode()) {
+                process.stderr.write(bs.getTracePrompt + "else\n");
             }
 
             return this.elseStmtList.eval(frame);
@@ -3832,8 +3840,8 @@ class AstWhileStmt extends AstBase {
                 break;
             }
 
-            if (traceMode) {
-                process.stderr.write(tracePrompt + "while " + cond + "\n" )
+            if (bs.getTraceMode()) {
+                process.stderr.write(bs.getTracePrompt + "while " + cond + "\n" )
             }
 
             let rt = this.stmtList.eval(frame);
@@ -3909,8 +3917,8 @@ class AstForStmt extends AstBase {
     }
 
     eval(frame) {
-        if (traceMode) {
-            process.stderr.write(tracePrompt + "for ");
+        if (bs.getTraceMode()) {
+            process.stderr.write(bs.getTracePrompt + "for ");
         }
         if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
             for (let val of this.expr.genEval(frame)) {
@@ -4015,8 +4023,8 @@ class AstReturnStmt extends AstBase {
 
     eval(frame) {
         let retValue = this.expr.eval(frame);
-        if (traceMode) {
-            process.stderr.write(tracePrompt + "return " + rtValueToJson(retValue) + "\n");
+        if (bs.getTraceMode()) {
+            process.stderr.write(bs.getTracePrompt + "return " + rtValueToJson(retValue) + "\n");
         }
         return new Value(bs.TYPE_FORCE_RETURN, retValue);
     }
@@ -4097,8 +4105,8 @@ class AstBreakStmt extends AstBase {
     }
 
     eval(frame) {
-        if (traceMode) {
-            process.stderr.write(tracePrompt + "break\n");
+        if (bs.getTraceMode()) {
+            process.stderr.write(bs.getTracePrompt + "break\n");
         }
         return new Value(bs.TYPE_FORCE_BREAK, null);
     }
@@ -4118,8 +4126,8 @@ class AstContinueStmt extends AstBase {
     }
 
     eval(frame) {
-        if (traceMode) {
-            process.stderr.write(tracePrompt + "continue\n");
+        if (bs.getTraceMode()) {
+            process.stderr.write(bs.getTracePrompt + "continue\n");
         }
         return new Value(bs.TYPE_FORCE_CONTINUE, null);
     }
@@ -4431,7 +4439,6 @@ if (typeof(module) == 'object') {
         setEvalCallback,
         setCurrentSourceInfo,
         //setForceStopEval,
-        setTraceMode,
         setErrorOnExecFail,
         rtValueToJsVal,
         isBreakOrContinue,

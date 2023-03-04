@@ -1,3 +1,5 @@
+const path=require("node:path");
+const prs=require(path.join(__dirname,"prs.js"));
 
 let doLogHook = function(msg) { process.stdout.write(msg); }
 
@@ -393,6 +395,109 @@ function cloneAll(val) {
     return new Value(val.type, JSON.parse( JSON.stringify(val.val) ) );
 }
 
+const RTE_UNWIND=2
+
+class RuntimeException  extends Error {
+    constructor(message, frameInfo = null, flags = 0) {
+        super(typeof(message) == 'string' ? message : "");
+        this.rtValue = message instanceof Object ? message : null;
+        this.originalCause = null;
+        this.stackTrace = [];
+        if (frameInfo != null) {
+            this.addToStack(frameInfo);
+        }
+        this.flags = flags;
+        this.firstChance = true;
+        this.hasMoreStackFrames = false;
+    }
+
+    addToStack(frameInfo) {
+        if (this.stackTrace.length < maxStackFrames ) {
+            this.stackTrace.push(frameInfo);
+        } else {
+            this.hasMoreStackFrames = true;
+        }
+    }
+
+    isUnwind() {
+        return this.flags & RTE_UNWIND;
+    }
+
+    // called exception is thrown inside of catch block.
+    setOriginalCause(originalCause) {
+        this.originalCause = originalCause;
+    }
+
+    showStackTrace(reportError = true) {
+        let ret = "Error: " + this.getMessage() + "\n";
+
+        for(let i=0; i<this.stackTrace.length; ++i) {
+            let stackTraceEntry = this.stackTrace[i];
+            let offset = stackTraceEntry[0];
+            let sourceInfo = stackTraceEntry[1];
+            let fileInfo = sourceInfo[0];
+            let fname = "";
+            if (fileInfo != null) {
+                fname = fileInfo + ":";
+            }
+
+            let entry = prs.getLineAt(sourceInfo[1], offset);
+            let nFrame = this.stackTrace.length - i;
+            //let prefix = "#(" + fname + nFrame + ") ";
+            let prefix = "#(" + fname + prs.getLineNo(sourceInfo[1], offset) + ") ";
+            ret += prefix + entry[0] + "\n";
+            ret += (Array(prefix.length-1).join(' ')) + "|" +  Array(entry[1]+1).join(".") + "^\n";
+        }
+        if (this.hasMoreStackFrames) {
+            ret += "\n.... stack frames ommitted ...\n";
+        }
+        if (this.originalCause != null) {
+            ret += "\nCaused by:\n" + this.originalCause.showStackTrace();
+        }
+        if (reportError) {
+            doLogHook(ret);
+        }
+        return ret;
+    }
+
+    toRTValue() {
+        let map = {
+            "message": new Value(TYPE_STR, this.getMessage()),
+            "stack": new Value(TYPE_STR, this.showStackTrace(false))
+        };
+
+        if (this.stackTrace != null) {
+            let stackInfo = this.stackTrace[0];
+            map['offset'] = new Value(TYPE_NUM, stackInfo[0]);
+            if (stackInfo[1] != null) {
+                map['fileName'] = new Value(TYPE_STR, stackInfo[1]);
+            }
+        }
+        return new Value(TYPE_MAP, map)
+    }
+
+    getMessage() {
+
+        if (this.message !="") {
+            return this.message;
+        }
+        /*
+        if (this.rtValue instanceof RuntimeException) {
+
+            let rtValue = this.rtValue;
+            let prevStack = rtValue.stack;
+            delete rtValue.stack;
+            let msg = rtValueToJson(rtValue);
+            rtValue.stack = prevStack;
+            console.log(">getMessage: " + msg)
+            return msg;
+        }
+         */
+        // should be an error
+        return rtValueToJson(this.rtValue);
+    }
+}
+
 
 
 if (typeof(module) == 'object') {
@@ -439,6 +544,8 @@ if (typeof(module) == 'object') {
 
         clonePrimitiveVal,
         cloneAll,
+
+        RuntimeException,
 
     }
 } 

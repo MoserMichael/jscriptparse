@@ -1008,7 +1008,7 @@ function runParse(data, openFile, isRepl) {
         try {
             data = fs.readFileSync(filePath).toString();
         } catch(er) {
-            throw new rt.RuntimeException("Can't read used/included file " + filePath);
+            throw new bs.RuntimeException("Can't read used/included file " + filePath);
         }
     }
 
@@ -1058,7 +1058,7 @@ function runParserAndEval(data, openFile,  frame, replCommandParsedCallback = nu
         return evalRet;
 
     } catch(er) {
-        if (er instanceof rt.RuntimeException) {
+        if (er instanceof bs.RuntimeException) {
             if (!er.isUnwind()) {
                 er.showStackTrace();
             }

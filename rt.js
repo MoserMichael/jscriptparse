@@ -3320,15 +3320,28 @@ function makeYieldStmt(expr, offset) {
 }
 
 class AstUseStatement extends AstBase {
-    constructor(expr, offset, parserFunction) {
+    constructor(expr, asClause, offset, parserFunction) {
         super(offset);
         this.expr = expr;
         this.parserFunction = parserFunction;
-        this.statements = null;
+        this.firstCall = true;
+        this.namespaceId = (asClause != null && asClause.length != 0) ? asClause[0][1][0] : null;
     }
 
      eval(frame) {
-        if (this.statements == null) {
+        if (this.firstCall) {
+            this.firstCall = false;
+
+            if (this.namespaceId != null) {
+                
+                let namespace = new bs.Value(bs.TYPE_MAP, {});
+                frame.defineVar(this.namespaceId, namespace);
+
+                let newFrame = new bs.Frame(frame);
+                newFrame.vars = namespace.val;
+
+                frame = newFrame;
+            }
 
             let fileToInclude = this.expr.eval(frame);
             let includedFile = bs.value2Str2(fileToInclude);
@@ -3340,24 +3353,24 @@ class AstUseStatement extends AstBase {
             let extension =  this.fileExtension(includedFile)
             if (extension  == "p") {
                 try {
-                    this.statements = this.parserFunction(includedFile, true);
+                    let statements = this.parserFunction(includedFile, true);
+                    return statements.eval(frame);
                 } catch (er) {
                     er.addToStack([this.startOffset, this.currentSourceInfo]);
                     throw er;
                 }
             }
             else if (extension == "js") {
-                this.useJsExtension(includedFile);
+                this.useJsExtension(includedFile, frame);
             } else {
                 let er = new bs.RuntimeException("file extension of included file should be either .p or .js, is: " + extension + " using: " + includedFile);
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
                 throw er;
             }
         }
-        return this.statements.eval(frame);
     }
 
-    useJsExtension(incFile) {
+    useJsExtension(incFile, frame) {
         let ext = require(incFile);
         try {
             ext.addExtension(frame);
@@ -3378,8 +3391,8 @@ class AstUseStatement extends AstBase {
     }
 }
 
-function makeUseStmt(parser, expression, offset) {
-    return new AstUseStatement(expression, offset, parser);
+function makeUseStmt(parser, expression, asClause, offset) {
+    return new AstUseStatement(expression, asClause, offset, parser);
 }
 
 

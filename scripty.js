@@ -11,6 +11,7 @@ let theParser = null;
 
 KEYWORDS = {
     "use" : 1,
+    "as" : 1,
     'def': 1,
     'return': 1,
     'break': 1,
@@ -752,10 +753,17 @@ function makeParserImp() {
     let useStmt = prs.makeTransformer(
         prs.makeSequenceParser([
             prs.makeTokenParser("use"),
-            expression
+            expression,
+            prs.makeOptParser( 
+                prs.makeSequenceParser([
+                    prs.makeTokenParser("as"),
+                    identifier
+                ], "optional as clause for use statement")
+            )
         ], "use statement / include"),
         function (arg) {
-            return rt.makeUseStmt(runParse, arg[1], arg[0][1])
+            //console.log(JSON.stringify(arg[2]));
+            return rt.makeUseStmt(runParse, arg[1], arg[2], arg[0][1])
         }
     );
 

@@ -248,7 +248,7 @@ function makeHttpServerListener(callback, frame) {
 let spawnedProcesses = {};
 
 // the runtime library is defined here
-RTLIB={
+bs.RTLIB={
 
     // function on scalars or strings
     "find": new bs.BuiltinFunctionValue(` 
@@ -3645,7 +3645,7 @@ function isReturnOrYield(arg) {
 
 function makeFrame(cmdLine) {
     let frame = new bs.Frame();
-    frame.vars = RTLIB;
+    frame.vars = bs.RTLIB;
 
     if (cmdLine != null) {
         let cmd = frame.lookup("ARGV");

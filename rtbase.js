@@ -761,7 +761,16 @@ function _prepareClosureFrame(funcVal, frame, args) {
     return [ funcFrame, traceParam];
 }
 
+RTLIB={}
 
+
+function addRTLibFunction(name, value) {
+    if (value instanceof bs.BuiltinFunctionValue) {
+        RTLIB[name]=value;
+        return;
+    }
+    throw new RuntimeException( "can't add runtime library function " + name + " value must be BuiltinFunctionValue");
+}
 
 if (typeof(module) == 'object') {
     module.exports = {
@@ -813,7 +822,8 @@ if (typeof(module) == 'object') {
         RuntimeException,
 
         genEvalClosure,
-        evalClosure
-
+        evalClosure,
+        addRTLibFunction,
+        RTLIB
     }
 } 

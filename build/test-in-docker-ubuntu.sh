@@ -10,6 +10,6 @@ set -ex
 #
 VER=19
 
-docker run --rm -v $PWD:/mnt ubuntu:latest  bash -cx 'apt update; apt install -y make curl; curl -sL https://deb.nodesource.com/setup_'${VER}'.x | bash; apt-get install -y nodejs; npm install pyxlang -g; cd /mnt; make test-installed'
+docker run --rm -v $PWD:/mnt ubuntu:latest  bash -cx 'apt update; apt install -y make curl; curl -sL https://deb.nodesource.com/setup_'${VER}'.x | bash; apt-get install -y nodejs; npm install pyxlang -g; pyx -v; cd /mnt; make test-installed'
 
 

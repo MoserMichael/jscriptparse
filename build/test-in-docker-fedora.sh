@@ -11,6 +11,6 @@ set -ex
 VER=19
 
 
-docker run --rm -v $PWD:/mnt fedora:latest  bash -cx 'dnf update; dnf install -y make curl; curl -fsSL https://rpm.nodesource.com/setup_'$VER'.x | bash -; dnf install -y nodejs; npm install pyxlang -g; cd /mnt; make test-installed'
+docker run --rm -v $PWD:/mnt fedora:latest  bash -cx 'dnf update; dnf install -y make curl; curl -fsSL https://rpm.nodesource.com/setup_'$VER'.x | bash -; dnf install -y nodejs; npm install pyxlang -g; cd /mnt; pyx -v || true; make test-installed'
 
 

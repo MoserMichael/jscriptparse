@@ -3,7 +3,7 @@
   },
   "name": "pyxlang",
   "description": "educational scripting language / shell with read-eval-print loop",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "devDependencies": {},
   "scripts": {
     "test": 
@@ -20,6 +20,7 @@
     "PYXHSTORY.md",
     "PYXBUGS.md",
     "rt.js",
+    "rtbase.js",
     "scripty.js",
     "pyx"  
   ],    

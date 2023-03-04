@@ -1,4 +1,4 @@
- * PYX 0.3.0 / PRS 0.0.4  
+ * PYX 0.3.1 / PRS 0.0.4  
     * add import with namespace (use as)
     * split runtime library into base and runtime
     * add support for extension modules, these are written in javascript

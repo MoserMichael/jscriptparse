@@ -129,6 +129,19 @@ mapTypeToName = {
     11 : "Continue",
 }
 
+let NumberNames={ 1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth"};
+
+function getParamName(index) {
+    let paramName = "";
+    if (index != null) {
+        if (NumberNames[index+1] != undefined) {
+            paramName = "in " + NumberNames[index+1] + " parameter ";
+        } else {
+            paramName = "in parameter " + (index + 1);
+        }
+    }
+    return paramName;
+}
 
 function typeNameVal(val) {
     if (val == null || val.type == null) {
@@ -156,7 +169,7 @@ function checkType(arg, index, expectedType) {
         if (index != null) {
             paramName = getParamName(index);
         }
-        throw new RuntimeException("expected " + bs.typeNameRaw(expectedType)  + " - " + paramName + " - Instead got value of " + bs.typeNameVal(val) );
+        throw new RuntimeException("expected " + typeNameRaw(expectedType)  + " - " + paramName + " - Instead got value of " + typeNameVal(val) );
     }
 }
 
@@ -179,11 +192,106 @@ function checkTypeList(arg, index, expectedTypeList) {
     if (index != null) {
         paramName = getParamName(index);
     }
-    let typeNames = expectedTypeList.map(bs.typeNameRaw).join(", ");
-    throw new RuntimeException("expected " + typeNames  + " - " + paramName + " - Instead got value of " + bs.typeNameVal(val) );
+    let typeNames = expectedTypeList.map(typeNameRaw).join(", ");
+    throw new RuntimeException("expected " + typeNames  + " - " + paramName + " - Instead got value of " + typeNameVal(val) );
 }
 
+function requireInt(arg, index) {
+    let val = arg[index];
+    if (val.type == TYPE_NUM) {
+        let intval = parseInt(val.val);
+        if (intval == val.val) {
+            return intval;
+        }
+    }
+    let paramName =  getParamName(index);
+    throw new RuntimeException("Integer value required " + paramName + " - instead got " + typeNameVal(val));
+}
 
+function value2Bool(arg, index) {
+    let val;
+
+    if (index != null) {
+        val = arg[index];
+    } else {
+        val = arg
+    }
+
+    if (val.type == TYPE_BOOL) {
+        return val.val;
+    } else if (val.type == TYPE_NUM) {
+        return val.val != 0;
+    } else if (val.type == TYPE_STR) {
+        return val.val;
+    }
+    let paramName = "";
+    if (index != null) {
+        paramName = getParamName(index);
+    }
+    throw new RuntimeException("can't convert " + typeNameVal(val) + " to boolean. " + paramName);
+}
+
+function value2Num(arg, index) {
+    let val;
+
+    if (index != null) {
+        val = arg[index];
+    } else {
+        val = arg
+    }
+
+    if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+        if (isNaN(val.val)) {
+            let paramName = "";
+            if (index != null) {
+                paramName = getParamName(index);
+            }
+            throw new RuntimeException("The argument value is not a number - " + paramName);
+        }
+        return val.val;
+    } else if (val.type == TYPE_STR) {
+        ret = parseFloat(val.val);
+        if (isNaN(ret)) {
+            let paramName = "";
+            if (index != null) {
+                paramName = getParamName(index);
+            }
+            throw new RuntimeException("The argument value " + val.val + " is not a number - " + paramName); 
+        }
+        return ret;
+    }
+    let paramName = "";
+    if (index != null) {
+        paramName = getParamName(index);
+    }
+    throw new RuntimeException("can't convert " + typeNameVal(val) + " to number - " + paramName);
+}
+
+function value2Str(arg, index) {
+    let val;
+
+    if (index !== undefined) {
+        val = arg[index];
+    } else {
+        val = arg
+    }
+    if (val.type == TYPE_STR || val.type == TYPE_REGEX) {
+        return val.val;
+    } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+        return val.val.toString();
+    } else if (val.type == TYPE_NONE) {
+        return "none";
+    }
+    let paramName = "";
+    if (paramName != null) {
+        paramName = getParamName(index);
+    }
+    throw new RuntimeException("can't convert " + typeNameVal(val) + " to string - " + paramName);
+}
+
+function value2Str2(arg) {
+    return value2Str(arg, undefined);
+}
 
 if (typeof(module) == 'object') {
     module.exports = {
@@ -216,5 +324,10 @@ if (typeof(module) == 'object') {
         typeNameRaw,
         checkType,
         checkTypeList,
+        requireInt,
+        value2Bool,
+        value2Num,
+        value2Str,
+        value2Str2,
     }
 } 

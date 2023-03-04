@@ -38,36 +38,6 @@ function setErrorOnExecFail(on) {
 }
 
 
-mapTypeToName = {
-    0 : "Boolean",
-    1  : "Number",
-    2  : "String",
-    3 : "Regular expression",
-    4 : "List",
-    5 : "Map",
-    6 : "None",
-    7 : "Closure",
-    8 : "BuiltinFunction",
-    9 : "Return",
-    10 : "Break",
-    11 : "Continue",
-}
-
-
-let VALUE_NONE=new bs.Value(bs.TYPE_NONE,null);
-
-function typeNameVal(val) {
-    if (val == null || val.type == null) {
-        console.trace("Not a runtime value!" + JSON.stringify(val));
-        return "not a runtime value!";
-    }
-    return mapTypeToName[val.type];
-}
-
-function typeNameRaw(val) {
-    return mapTypeToName[val];
-}
-
 let NumberNames={ 1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth"};
 
 function getParamName(index) {
@@ -102,7 +72,7 @@ function value2Bool(arg, index) {
     if (index != null) {
         paramName = getParamName(index);
     }
-    throw new RuntimeException("can't convert " + typeNameVal(val) + " to boolean. " + paramName);
+    throw new RuntimeException("can't convert " + bs.typeNameVal(val) + " to boolean. " + paramName);
 }
 
 function checkType(arg, index, expectedType) {
@@ -119,7 +89,7 @@ function checkType(arg, index, expectedType) {
         if (index != null) {
             paramName = getParamName(index);
         }
-        throw new RuntimeException("expected " + typeNameRaw(expectedType)  + " - " + paramName + " - Instead got value of " + typeNameVal(val) );
+        throw new RuntimeException("expected " + bs.typeNameRaw(expectedType)  + " - " + paramName + " - Instead got value of " + bs.typeNameVal(val) );
     }
 }
 
@@ -142,8 +112,8 @@ function checkTypeList(arg, index, expectedTypeList) {
     if (index != null) {
         paramName = getParamName(index);
     }
-    let typeNames = expectedTypeList.map(typeNameRaw).join(", ");
-    throw new RuntimeException("expected " + typeNames  + " - " + paramName + " - Instead got value of " + typeNameVal(val) );
+    let typeNames = expectedTypeList.map(bs.typeNameRaw).join(", ");
+    throw new RuntimeException("expected " + typeNames  + " - " + paramName + " - Instead got value of " + bs.typeNameVal(val) );
 }
 
 
@@ -180,7 +150,7 @@ function value2Num(arg, index) {
     if (index != null) {
         paramName = getParamName(index);
     }
-    throw new RuntimeException("can't convert " + typeNameVal(val) + " to number - " + paramName);
+    throw new RuntimeException("can't convert " + bs.typeNameVal(val) + " to number - " + paramName);
 }
 
 function requireInt(arg, index) {
@@ -192,7 +162,7 @@ function requireInt(arg, index) {
         }
     }
     let paramName =  getParamName(index);
-    throw new RuntimeException("Integer value required " + paramName + " - instead got " + typeNameVal(val));
+    throw new RuntimeException("Integer value required " + paramName + " - instead got " + bs.typeNameVal(val));
 }
 
 function value2Str(arg, index) {
@@ -214,7 +184,7 @@ function value2Str(arg, index) {
     if (paramName != null) {
         paramName = getParamName(index);
     }
-    throw new RuntimeException("can't convert " + typeNameVal(val) + " to string - " + paramName);
+    throw new RuntimeException("can't convert " + bs.typeNameVal(val) + " to string - " + paramName);
 }
 
 function value2Str2(arg) {
@@ -233,7 +203,7 @@ function value2StrDisp(val) {
 }
 function jsValueToRtVal(value) {
     if (value == null) {
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     if (Array.isArray(value)) {
@@ -266,7 +236,7 @@ function jsValueToRtVal(value) {
     }
 
     if (typeof(value) == null) {
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     throw new RuntimeException("Unknown type " + typeof(value));
@@ -298,7 +268,7 @@ function rtValueToJsVal(value) {
         return "<function>";
     }
 
-    throw new RuntimeException("Can't convert value " + typeNameVal(value) );
+    throw new RuntimeException("Can't convert value " + bs.typeNameVal(value) );
 }
 
 function rtValueToJson(val) {
@@ -508,7 +478,7 @@ function evalClosure(name, funcVal, args, frame) {
     let retVal = funcVal.funcImpl(args, frame);
 
     if (retVal == undefined) {
-        retVal = VALUE_NONE;
+        retVal = bs.VALUE_NONE;
     }
 
     if (bs.getTraceMode() && retVal.type != bs.TYPE_NONE) {
@@ -732,7 +702,7 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
 
         'setHeader': new bs.BuiltinFunctionValue(``, 2, function(arg) {
             httpRes.setHeader(value2Str(arg, 0), rtValueToJsVal(arg[1].val));
-            return VALUE_NONE;
+            return bs.VALUE_NONE;
         }),
 
         'send': new bs.BuiltinFunctionValue(``,3, function(arg) {
@@ -766,7 +736,7 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
             //httpRes.end(textResponse);
 
             //console.log("eof send: " + textResponse);
-            return VALUE_NONE;
+            return bs.VALUE_NONE;
         }, [null, null, null])
     });
 
@@ -1460,7 +1430,7 @@ text="a b a c a d"
         } catch(err) {
             throw new RuntimeException("Can't " + (append ? "append" : "write") + " file: " + fname + " error: " + err);
         };
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }, [ null, null, null]),
 
     "unlink" : new bs.BuiltinFunctionValue(`
@@ -1497,7 +1467,7 @@ rename("oldFileName","newFileName")
         } catch(er){
             throw new RuntimeException("failed to rename " + oldFileName + " to " + newFileName + " error: " + er.message);
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
 
     }),
 
@@ -2009,7 +1979,7 @@ var
             } catch(er) {
                 throw new RuntimeException("Can't change directory to " + dir + " error: " +  er.message);
             }
-            return VALUE_NONE;
+            return bs.VALUE_NONE;
         }),
 
     "exec": new bs.BuiltinFunctionValue(`
@@ -2034,15 +2004,15 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
                 // call the callback
                 try {
-                    let argErr = VALUE_NONE;
+                    let argErr = bs.VALUE_NONE;
                     if (error != null) {
                         argErr = new bs.Value(bs.TYPE_STR,error.message);
                     }
-                    let argStdout = VALUE_NONE;
+                    let argStdout = bs.VALUE_NONE;
                     if (stdout != null) {
                         argStdout = new bs.Value(bs.TYPE_STR, stdout.toString());
                     }
-                    let argStderr = VALUE_NONE;
+                    let argStderr = bs.VALUE_NONE;
                     if (stdout != null) {
                         argStderr = new bs.Value(bs.TYPE_STR, stderr.toString());
                     }
@@ -2082,7 +2052,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
         if (processEntry != null) {
             processEntry.kill();
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }),
 
     "sleep": new bs.BuiltinFunctionValue(`    
@@ -2099,7 +2069,7 @@ sleep(3)
             curDate = new Date();
         }  while(curDate-date < num);
 
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }),
 
     "_system_backtick": new bs.BuiltinFunctionValue(null, 1,function(arg, frame) {
@@ -2214,10 +2184,10 @@ Names of functions with help text:
             if ('help' in arg[0]) {
                 console.log(arg[0].help);
             } else {
-                console.log(typeNameVal(arg[0]));
+                console.log(bs.typeNameVal(arg[0]));
             }
         }
-        return VALUE_NONE
+        return bs.VALUE_NONE
     }, [null]),
 
     "type": new bs.BuiltinFunctionValue(`# returns a string that describes the argument value
@@ -2232,7 +2202,7 @@ Names of functions with help text:
 "Map"
 > type(def(x) 1+x)
 "Closure"`, 1,function(arg, frame) {
-        return new bs.Value(bs.TYPE_STR, typeNameVal(arg[0]));
+        return new bs.Value(bs.TYPE_STR, bs.typeNameVal(arg[0]));
     }),
 
     "setPYXOptions": new bs.BuiltinFunctionValue(`
@@ -2293,7 +2263,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
         } else {
             throw new RuntimeException("Unknwon option name");
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }),
 
     "getPYXOptions": new bs.BuiltinFunctionValue(`
@@ -2338,7 +2308,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
                 return rt;
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }),
 
 
@@ -2494,12 +2464,12 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
                 data += chunk.toString();
             });
             resp.on('end', () => {
-                callUserFunction(data, VALUE_NONE);
+                callUserFunction(data, bs.VALUE_NONE);
             });
         });
 
         reqObj.on('error', (e) => {
-            callUserFunction(VALUE_NONE, new bs.Value(bs.TYPE_STR, e.message));
+            callUserFunction(bs.VALUE_NONE, new bs.Value(bs.TYPE_STR, e.message));
         });
 
 
@@ -2507,7 +2477,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
             reqObj.write(httpRequestData);
         }
         reqObj.end();
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }, [null, null, null]),
 
     "httpServer": new bs.BuiltinFunctionValue(` 
@@ -2548,7 +2518,7 @@ requestData: {req.requestData()}
 
         http.createServer(makeHttpServerListener(arg[1], frame)).listen(listenPort);
 
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
 
     }, [null]),
 
@@ -2755,7 +2725,7 @@ class AstStmtList extends AstBase {
     }
 
     eval(frame) {
-        let val = VALUE_NONE;
+        let val = bs.VALUE_NONE;
 
         if (bs.getTraceMode() && !this.skipTrace && this.statements.length > 1) {
             process.stderr.write(bs.getTracePrompt + "{\n");
@@ -2779,7 +2749,7 @@ class AstStmtList extends AstBase {
     }
 
     *genEval(frame) {
-        let val = VALUE_NONE;
+        let val = bs.VALUE_NONE;
         for (let i = 0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
 
@@ -2834,7 +2804,7 @@ class AstTryCatchBlock extends AstBase {
     }
 
     eval(frame) {
-        let res = VALUE_NONE;
+        let res = bs.VALUE_NONE;
         let throwErr = null;
         let throwNow = false;
 
@@ -2897,7 +2867,7 @@ class AstTryCatchBlock extends AstBase {
     }
 
     *genEval(frame) {
-        let res = VALUE_NONE;
+        let res = bs.VALUE_NONE;
         let throwErr = null;
         let throwNow = false;
 
@@ -2970,7 +2940,7 @@ class AstTryCatchBlock extends AstBase {
             throw throwErr;
         }
         if (res == null) {
-            res = VALUE_NONE;
+            res = bs.VALUE_NONE;
         }
         return res;
     }
@@ -3069,14 +3039,14 @@ function makeConstValue(type, value) {
 
 function checkMixedType(op, lhs, rhs) {
     if (lhs.type != rhs.type) {
-        throw new RuntimeException(op + " not allowed between " + typeNameVal(rhs) + " and " + typeNameVal(lhs))
+        throw new RuntimeException(op + " not allowed between " + bs.typeNameVal(rhs) + " and " + bs.typeNameVal(lhs))
     }
 }
 
 function checkMixedTypeAllowNone(op, lhs, rhs) {
     if (lhs.type != bs.TYPE_NONE && rhs.type != bs.TYPE_NONE) {
         if (lhs.type != rhs.type) {
-            throw new RuntimeException(op + " not allowed between " + typeNameVal(rhs) + " and " + typeNameVal(lhs))
+            throw new RuntimeException(op + " not allowed between " + bs.typeNameVal(rhs) + " and " + bs.typeNameVal(lhs))
         }
     }
 }
@@ -3128,7 +3098,7 @@ MAP_OP_TO_FUNC={
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't add " + typeNameVal(lhs) + " to " + typeNameVal(rhs));
+            throw new RuntimeException("Can't add " + bs.typeNameVal(lhs) + " to " + bs.typeNameVal(rhs));
         }
         if (lhs.type == bs.TYPE_STR) {
             /* allow add for strings - this concats the string values */
@@ -3141,13 +3111,13 @@ MAP_OP_TO_FUNC={
             // concat lists
             return new bs.Value(bs.TYPE_LIST, lhs.val.concat(rhs.val));
         }
-        throw new RuntimeException("Can't add " + typeNameVal(lhs) + " to " + typeNameVal(rhs));
+        throw new RuntimeException("Can't add " + bs.typeNameVal(lhs) + " to " + bs.typeNameVal(rhs));
     },
     "-" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't subtract " + typeNameVal(rhs) + " from " + typeNameVal(lhs) );
+            throw new RuntimeException("Can't subtract " + bs.typeNameVal(rhs) + " from " + bs.typeNameVal(lhs) );
         }
         if (lhs.type != bs.TYPE_NUM) {
             throw new RuntimeException("need number types for substraction" );
@@ -3159,7 +3129,7 @@ MAP_OP_TO_FUNC={
         rhs = rhs.eval(frame);
 
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't multiply " + typeNameVal(lhs) + " with " + typeNameVal(rhs));
+            throw new RuntimeException("Can't multiply " + bs.typeNameVal(lhs) + " with " + bs.typeNameVal(rhs));
         }
         if (lhs.type != bs.TYPE_NUM) {
             throw new RuntimeException("need number types for multiplication" );
@@ -3172,7 +3142,7 @@ MAP_OP_TO_FUNC={
         rhs = rhs.eval(frame);
 
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't divide " + typeNameVal(lhs) + " by " + typeNameVal(rhs) );
+            throw new RuntimeException("Can't divide " + bs.typeNameVal(lhs) + " by " + bs.typeNameVal(rhs) );
         }
         if (lhs.type != bs.TYPE_NUM) {
             throw new RuntimeException("need number types for division" );
@@ -3190,7 +3160,7 @@ MAP_OP_TO_FUNC={
         rhs = rhs.eval(frame);
 
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't divide modulo " + typeNameVal(lhs) + " by " + typeNameVal(rhs) );
+            throw new RuntimeException("Can't divide modulo " + bs.typeNameVal(lhs) + " by " + bs.typeNameVal(rhs) );
         }
 
         if (lhs.type != bs.TYPE_NUM) {
@@ -3415,7 +3385,7 @@ function lookupIndex(frame, value, refExpr) {
 
         let curValue = value.type;
         if (curValue != bs.TYPE_LIST && curValue != bs.TYPE_MAP && curValue != bs.TYPE_STR) {
-            let er = new RuntimeException("Can't access expression of type " + typeNameVal(value) + " by index");
+            let er = new RuntimeException("Can't access expression of type " + bs.typeNameVal(value) + " by index");
             if (i > 0) {
                 er.addToStack([expr.startOffset, expr.currentSourceInfo]);
             }
@@ -3425,13 +3395,13 @@ function lookupIndex(frame, value, refExpr) {
 
         if (curValue == bs.TYPE_LIST || curValue == bs.TYPE_STR) {
             if (indexValue.type != bs.TYPE_NUM) {
-                let err = new RuntimeException("Can't lookup " + typeNameVal(value) + " entry - the index value must be a number. Instead got a " + typeNameVal(indexValue));
+                let err = new RuntimeException("Can't lookup " + bs.typeNameVal(value) + " entry - the index value must be a number. Instead got a " + bs.typeNameVal(indexValue));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
 
             if (indexValue.val < 0 || indexValue.val >= value.val.length) {
-                let err = new RuntimeException("Can't lookup " + typeNameVal(value) +  " entry - the index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
+                let err = new RuntimeException("Can't lookup " + bs.typeNameVal(value) +  " entry - the index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
@@ -3441,7 +3411,7 @@ function lookupIndex(frame, value, refExpr) {
         if (nextValue == null) {
             let ex =  null;
             if (value.type != bs.TYPE_MAP) {
-                ex = new RuntimeException("Can't lookup index " + indexValue.val  + " in" + typeNameVal(value) + "  - index value must be less than " + value.val.length + " and greater than zero.");
+                ex = new RuntimeException("Can't lookup index " + indexValue.val  + " in" + bs.typeNameVal(value) + "  - index value must be less than " + value.val.length + " and greater than zero.");
             } else {
                 ex = new RuntimeException("Can't lookup key " + indexValue.val + " in map. No value has been set for this key");
             }
@@ -3530,7 +3500,7 @@ function _assignImp(frame, value, lhs) {
     if (bs.getTraceMode()) {
         process.stderr.write(bs.getTracePrompt + traceLhs.join(", ") + " = " + traceRhs.join(",") + "\n");
     }
-    return VALUE_NONE;
+    return bs.VALUE_NONE;
 }
 
 function _assign(frame, singleLhs, value) {
@@ -3577,14 +3547,14 @@ function _indexAssign(frame, value, refExpr, newValue) {
 
         if (value.type == bs.TYPE_LIST || value.type == bs.TYPE_STR) {
             if (indexValue.type != bs.TYPE_NUM) {
-                let err = new RuntimeException("Can't assign this " + typeNameVal(value) + " index . Index value of must be an number, instead got " + rtValueToJsVal(indexValue));
+                let err = new RuntimeException("Can't assign this " + bs.typeNameVal(value) + " index . Index value of must be an number, instead got " + rtValueToJsVal(indexValue));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
             indexValue.val = Math.round(indexValue.val); // make sure it's an integer.
 
             if (indexValue.val < 0 || indexValue.val >= value.val.length) {
-                let err = new RuntimeException("Can't assign this "  + typeNameVal(value) + " index. Index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
+                let err = new RuntimeException("Can't assign this "  + bs.typeNameVal(value) + " index. Index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
@@ -3598,7 +3568,7 @@ function _indexAssign(frame, value, refExpr, newValue) {
         if (i != (refExpr.length-1)) {
             value = value.val[indexValue.val];
             if (value == undefined || (value.type != bs.TYPE_LIST && value.type != bs.TYPE_MAP)) {
-                let err = new RuntimeException("Can't assign this entry, lookup did not return a list or a map, got " + typeNameVal(value) +" instead. index value: " + rtValueToJsVal(value));
+                let err = new RuntimeException("Can't assign this entry, lookup did not return a list or a map, got " + bs.typeNameVal(value) +" instead. index value: " + rtValueToJsVal(value));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
@@ -3607,7 +3577,7 @@ function _indexAssign(frame, value, refExpr, newValue) {
                 value.val[indexValue.val] = newValue;
             } else {
                 if (newValue.type != bs.TYPE_STR) {
-                    let err = new RuntimeException("Can't assign string index to " + typeNameVal(newValue) + " - right hand side value must be a string")
+                    let err = new RuntimeException("Can't assign string index to " + bs.typeNameVal(newValue) + " - right hand side value must be a string")
                     err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                     throw err;
                 }
@@ -3688,7 +3658,7 @@ class AstIfStmt extends AstBase {
 
             return this.elseStmtList.eval(frame);
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     *genEval(frame) {
@@ -3711,7 +3681,7 @@ class AstIfStmt extends AstBase {
                 return this.elseStmtList.eval(frame);
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     hasYield(frame) {
@@ -3786,7 +3756,7 @@ class AstWhileStmt extends AstBase {
                 }
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     *genEval(frame) {
@@ -3819,7 +3789,7 @@ class AstWhileStmt extends AstBase {
                 }
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     hasYield(frame) {
@@ -3865,7 +3835,7 @@ class AstForStmt extends AstBase {
                     }
                 }
             }
-            return VALUE_NONE;
+            return bs.VALUE_NONE;
         }
 
         let rt = this.expr.eval(frame);
@@ -3886,7 +3856,7 @@ class AstForStmt extends AstBase {
                 }
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     *genEval(frame) {
@@ -3907,7 +3877,7 @@ class AstForStmt extends AstBase {
                     }
                 }
             }
-            return VALUE_NONE;
+            return bs.VALUE_NONE;
         }
 
         let rt = this.expr.eval(frame);
@@ -3927,7 +3897,7 @@ class AstForStmt extends AstBase {
                 }
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
 
@@ -3974,13 +3944,13 @@ class AstYieldStmt extends AstBase {
     }
 
     eval(frame) {
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     *genEval(frame) {
         let retValue = this.expr.eval(frame);
         yield retValue;
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     hasYield() {
@@ -4249,7 +4219,7 @@ class AstFunctionCall extends AstBase {
         }
 
         if (funcVal.type != bs.TYPE_CLOSURE && funcVal.type != bs.TYPE_BUILTIN_FUNCTION) {
-            throw new RuntimeException("variable is not a function/closure, it is a " + typeNameVal(funcVal), this.startOffset);
+            throw new RuntimeException("variable is not a function/closure, it is a " + bs.typeNameVal(funcVal), this.startOffset);
         }
         this.funcVal_ = funcVal;
         return funcVal;

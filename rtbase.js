@@ -112,6 +112,35 @@ class RegexValue {
     }
 }
 
+let VALUE_NONE=new Value(TYPE_NONE,null);
+
+mapTypeToName = {
+    0 : "Boolean",
+    1  : "Number",
+    2  : "String",
+    3 : "Regular expression",
+    4 : "List",
+    5 : "Map",
+    6 : "None",
+    7 : "Closure",
+    8 : "BuiltinFunction",
+    9 : "Return",
+    10 : "Break",
+    11 : "Continue",
+}
+
+
+function typeNameVal(val) {
+    if (val == null || val.type == null) {
+        console.trace("Not a runtime value!" + JSON.stringify(val));
+        return "not a runtime value!";
+    }
+    return mapTypeToName[val.type];
+}
+
+function typeNameRaw(val) {
+    return mapTypeToName[val];
+}
 
 if (typeof(module) == 'object') {
     module.exports = {
@@ -139,5 +168,8 @@ if (typeof(module) == 'object') {
         BuiltinFunctionValue,
         Value,
         RegexValue,
+        VALUE_NONE,
+        typeNameVal,
+        typeNameRaw,
     }
 } 

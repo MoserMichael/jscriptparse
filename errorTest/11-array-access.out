@@ -72,7 +72,7 @@ Error: Can't assign this String index . Index value of must be an number, instea
 #(errorTest/11-array-access.p:75)     a['b'] = 1
                                 |.......^
 
-Error: Can't assign string index to List right handd side value must be a string
+Error: Can't assign string index to List - right hand side value must be a string
 #(errorTest/11-array-access.p:81)     a[0]=[1,2,3]
                                 |.......^
 

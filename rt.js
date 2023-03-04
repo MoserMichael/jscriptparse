@@ -5,14 +5,12 @@ const http = require('node:http');
 const url = require('node:url');
 const yaml=require("yaml");
 const prs=require(path.join(__dirname,"prs.js"));
+const bs=require(path.join(__dirname,"rtbase.js"));
 
 const httpAgent = new http.Agent({ keepAlive: true });
 
-let doLogHook = function(msg) { process.stdout.write(msg); }
 
 const showJavascriptStack = false;
-
-let maxStackFrames = 20;
 
 // callback for running evaluator
 let evalCallback = null;
@@ -25,22 +23,10 @@ function setEvalCallback(cb) {
 // Should be thread local, or something like this.
 let currentSourceInfo = null;
 
-function setLogHook(hook) {
-    doLogHook = hook;
-}
-
 function setCurrentSourceInfo(info) {
     let prevValue = currentSourceInfo;
     currentSourceInfo = info;
     return prevValue;
-}
-
-// trace mode - trace evaluation of the program.
-let traceMode = false;
-let tracePrompt = "+ ";
-
-function setTraceMode(on) {
-    traceMode = on;
 }
 
 // if set - throw exception if executing a process fails / returns error status
@@ -50,664 +36,16 @@ function setErrorOnExecFail(on) {
     errorOnExecFail = on;
 }
 
-function setMaxStackFrames(nframes) {
-    maxStackFrames = nframes
-}
-
-const TYPE_BOOL=0
-const TYPE_NUM=1
-const TYPE_STR=2
-const TYPE_REGEX=3
-const TYPE_LIST=4
-const TYPE_MAP=5
-const TYPE_NONE=6
-const TYPE_CLOSURE=7
-const TYPE_BUILTIN_FUNCTION=8
-
-const TYPE_FORCE_RETURN=9
-const TYPE_FORCE_BREAK=10
-const TYPE_FORCE_CONTINUE=11
-
-
-mapTypeToName = {
-    0 : "Boolean",
-    1  : "Number",
-    2  : "String",
-    3 : "Regular expression",
-    4 : "List",
-    5 : "Map",
-    6 : "None",
-    7 : "Closure",
-    8 : "BuiltinFunction",
-    9 : "Return",
-    10 : "Break",
-    11 : "Continue",
-}
-
-
-class ClosureValue {
-    // needs the function definition and the frame of the current function (for lookup of captured vars)
-    constructor(functionDef, defaultParamValues, frame) {
-        this.type = TYPE_CLOSURE;
-        this.functionDef = functionDef;
-        this.defaultParamValues = defaultParamValues; // default params are set when function/closure is evaluated.
-        this.frame = frame;
-        this.hasYield_ = null;
-    }
-    hasYield(frame) {
-        if (this.hasYield_ == null) {
-            this.hasYield_ = this.functionDef.hasYield(frame);
-        }
-        return this.hasYield_;
-    }
-}
-
-class BuiltinFunctionValue {
-    constructor(help_, numParams, funcImpl, defaultParamValues = [], hasYield = false) {
-        this.type = TYPE_BUILTIN_FUNCTION;
-        this.numParams = numParams;
-        this.funcImpl = funcImpl;
-        this.defaultParamValues = defaultParamValues;
-        this.hasYield_ = hasYield;
-        if (help_ != null) {
-            this.help = help_;
-        }
-    }
-
-    hasYield() {
-        return this.hasYield_;
-    }
-}
-
-class Value {
-    constructor(type, val, help_ = null) {
-        this.type = type;
-        this.val = val;
-
-        if (help_ != null) {
-            this.help = help_;
-        }
-
-    }
-
-    show() {
-        return this.val.toString()
-    }
-}
-
-class RegexValue {
-    constructor(value) {
-        this.type = TYPE_REGEX;
-
-        this.isGlobal = value.endsWith('g');
-
-        let firstPos = value.indexOf('/');
-        let lastPos = value.lastIndexOf('/');
-        let flags = null;
-        if (!value.endsWith('//')) {
-            flags = value.substring(lastPos+1);
-        }
-        let rawRegex = value.substring(firstPos+1, lastPos);
-        this.regex = new RegExp(rawRegex, flags);
-        this.val = this.regex.toString();
-    }
-
-    show() {
-        return this.val;
-    }
-}
-
-let VALUE_NONE=new Value(TYPE_NONE,null);
-
-function typeNameVal(val) {
-    if (val == null || val.type == null) {
-        console.trace("Not a runtime value!" + JSON.stringify(val));
-        return "not a runtime value!";
-    }
-    return mapTypeToName[val.type];
-}
-
-function typeNameRaw(val) {
-    return mapTypeToName[val];
-}
-
-let NumberNames={ 1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth"};
-
-function getParamName(index) {
-    let paramName = "";
-    if (index != null) {
-        if (NumberNames[index+1] != undefined) {
-            paramName = "in " + NumberNames[index+1] + " parameter ";
-        } else {
-            paramName = "in parameter " + (index + 1);
-        }
-    }
-    return paramName;
-}
-
-function value2Bool(arg, index) {
-    let val;
-
-    if (index != null) {
-        val = arg[index];
-    } else {
-        val = arg
-    }
-
-    if (val.type == TYPE_BOOL) {
-        return val.val;
-    } else if (val.type == TYPE_NUM) {
-        return val.val != 0;
-    } else if (val.type == TYPE_STR) {
-        return val.val;
-    }
-    let paramName = "";
-    if (index != null) {
-        paramName = getParamName(index);
-    }
-    throw new RuntimeException("can't convert " + typeNameVal(val) + " to boolean. " + paramName);
-}
-
-function checkType(arg, index, expectedType) {
-    let val;
-
-    if (index != null) {
-        val = arg[index];
-    } else {
-        val = arg
-    }
-
-    if (val.type != expectedType) {
-        let paramName = "";
-        if (index != null) {
-            paramName = getParamName(index);
-        }
-        throw new RuntimeException("expected " + typeNameRaw(expectedType)  + " - " + paramName + " - Instead got value of " + typeNameVal(val) );
-    }
-}
-
-function checkTypeList(arg, index, expectedTypeList) {
-    let val;
-
-    if (index != null) {
-        val = arg[index];
-    } else {
-        val = arg
-    }
-    for(let i=0; i<expectedTypeList.length; ++i) {
-        let expectedType = expectedTypeList[i];
-
-        if (val.type == expectedType) {
-            return;
-        }
-    }
-    let paramName = "";
-    if (index != null) {
-        paramName = getParamName(index);
-    }
-    let typeNames = expectedTypeList.map(typeNameRaw).join(", ");
-    throw new RuntimeException("expected " + typeNames  + " - " + paramName + " - Instead got value of " + typeNameVal(val) );
-}
-
-
-function value2Num(arg, index) {
-    let val;
-
-    if (index != null) {
-        val = arg[index];
-    } else {
-        val = arg
-    }
-
-    if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
-        if (isNaN(val.val)) {
-            let paramName = "";
-            if (index != null) {
-                paramName = getParamName(index);
-            }
-            throw new RuntimeException("The argument value is not a number - " + paramName);
-        }
-        return val.val;
-    } else if (val.type == TYPE_STR) {
-        ret = parseFloat(val.val);
-        if (isNaN(ret)) {
-            let paramName = "";
-            if (index != null) {
-                paramName = getParamName(index);
-            }
-            throw new RuntimeException("The argument value " + val.val + " is not a number - " + paramName); 
-        }
-        return ret;
-    }
-    let paramName = "";
-    if (index != null) {
-        paramName = getParamName(index);
-    }
-    throw new RuntimeException("can't convert " + typeNameVal(val) + " to number - " + paramName);
-}
-
-function requireInt(arg, index) {
-    let val = arg[index];
-    if (val.type == TYPE_NUM) {
-        let intval = parseInt(val.val);
-        if (intval == val.val) {
-            return intval;
-        }
-    }
-    let paramName =  getParamName(index);
-    throw new RuntimeException("Integer value required " + paramName + " - instead got " + typeNameVal(val));
-}
-
-function value2Str(arg, index) {
-    let val;
-
-    if (index !== undefined) {
-        val = arg[index];
-    } else {
-        val = arg
-    }
-    if (val.type == TYPE_STR || val.type == TYPE_REGEX) {
-        return val.val;
-    } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
-        return val.val.toString();
-    } else if (val.type == TYPE_NONE) {
-        return "none";
-    }
-    let paramName = "";
-    if (paramName != null) {
-        paramName = getParamName(index);
-    }
-    throw new RuntimeException("can't convert " + typeNameVal(val) + " to string - " + paramName);
-}
-
-function value2Str2(arg) {
-    return value2Str(arg, undefined);
-}
-
-function value2StrDisp(val) {
-    if (val.type == TYPE_STR) {
-        return val.val;
-    } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
-        return val.val.toString();
-    } else if (val.type == TYPE_NONE) {
-        return "none";
-    }
-    return rtValueToJson(val);
-}
-function jsValueToRtVal(value) {
-    if (value == null) {
-        return VALUE_NONE;
-    }
-
-    if (Array.isArray(value)) {
-        let rt = [];
-        for(let i=0; i<value.length; ++i) {
-            rt.push( jsValueToRtVal(value[i]) );
-        }
-        return new Value(TYPE_LIST, rt);
-    }
-
-    if (value.constructor == Object) { // check if dictionary.
-        let rt = {};
-        let keys = Object.keys(value);
-        for(let i=0; i<keys.length; ++i) {
-            rt[ new String(keys[i]) ] = jsValueToRtVal( value[keys[i]] );
-        }
-        return new Value(TYPE_MAP, rt);
-    }
-
-    if (typeof(value) == "boolean") {
-        return new Value(TYPE_BOOL, value);
-    }
-
-    if (typeof(value) == 'number') {
-        return new Value(TYPE_NUM, value)
-    }
-
-    if (typeof(value) == 'string') {
-        return new Value(TYPE_STR, value)
-    }
-
-    if (typeof(value) == null) {
-        return VALUE_NONE;
-    }
-
-    throw new RuntimeException("Unknown type " + typeof(value));
-}
-
-function rtValueToJsVal(value) {
-    if (value.type == TYPE_LIST) {
-        let ret = [];
-        for(let i=0; i<value.val.length; ++i) {
-            ret.push( rtValueToJsVal( value.val[i] ) );
-        }
-        return ret;
-    }
-
-    if (value.type == TYPE_MAP) {
-        let ret = {};
-        let keys = Object.keys(value.val);
-        for (let i = 0; i < keys.length; ++i) {
-            ret[keys[i]] = rtValueToJsVal(value.val[keys[i]]);
-        }
-        return ret;
-    }
-
-    if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM || value.type == TYPE_NONE || value.type == TYPE_REGEX) {
-        return value.val;
-    }
-
-    if (value.type == TYPE_CLOSURE || value.type == TYPE_BUILTIN_FUNCTION) {
-        return "<function>";
-    }
-
-    throw new RuntimeException("Can't convert value " + typeNameVal(value) );
-}
-
-function rtValueToJson(val) {
-    return JSON.stringify(rtValueToJsVal(val));
-}
-
-const RTE_UNWIND=2
-
-class RuntimeException  extends Error {
-    constructor(message, frameInfo = null, flags = 0) {
-        super(typeof(message) == 'string' ? message : "");
-        this.rtValue = message instanceof Object ? message : null;
-        this.originalCause = null;
-        this.stackTrace = [];
-        if (frameInfo != null) {
-            this.addToStack(frameInfo);
-        }
-        this.flags = flags;
-        this.firstChance = true;
-        this.hasMoreStackFrames = false;
-    }
-
-    addToStack(frameInfo) {
-        if (this.stackTrace.length < maxStackFrames ) {
-            this.stackTrace.push(frameInfo);
-        } else {
-            this.hasMoreStackFrames = true;
-        }
-    }
-
-    isUnwind() {
-        return this.flags & RTE_UNWIND;
-    }
-
-    // called exception is thrown inside of catch block.
-    setOriginalCause(originalCause) {
-        this.originalCause = originalCause;
-    }
-
-    showStackTrace(reportError = true) {
-        let ret = "Error: " + this.getMessage() + "\n";
-
-        for(let i=0; i<this.stackTrace.length; ++i) {
-            let stackTraceEntry = this.stackTrace[i];
-            let offset = stackTraceEntry[0];
-            let sourceInfo = stackTraceEntry[1];
-            let fileInfo = sourceInfo[0];
-            let fname = "";
-            if (fileInfo != null) {
-                fname = fileInfo + ":";
-            }
-
-            let entry = prs.getLineAt(sourceInfo[1], offset);
-            let nFrame = this.stackTrace.length - i;
-            //let prefix = "#(" + fname + nFrame + ") ";
-            let prefix = "#(" + fname + prs.getLineNo(sourceInfo[1], offset) + ") ";
-            ret += prefix + entry[0] + "\n";
-            ret += (Array(prefix.length-1).join(' ')) + "|" +  Array(entry[1]+1).join(".") + "^\n";
-        }
-        if (this.hasMoreStackFrames) {
-            ret += "\n.... stack frames ommitted ...\n";
-        }
-        if (this.originalCause != null) {
-            ret += "\nCaused by:\n" + this.originalCause.showStackTrace();
-        }
-        if (reportError) {
-            doLogHook(ret);
-        }
-        return ret;
-    }
-
-    toRTValue() {
-        let map = {
-            "message": new Value(TYPE_STR, this.getMessage()),
-            "stack": new Value(TYPE_STR, this.showStackTrace(false))
-        };
-
-        if (this.stackTrace != null) {
-            let stackInfo = this.stackTrace[0];
-            map['offset'] = new Value(TYPE_NUM, stackInfo[0]);
-            if (stackInfo[1] != null) {
-                map['fileName'] = new Value(TYPE_STR, stackInfo[1]);
-            }
-        }
-        return new Value(TYPE_MAP, map)
-    }
-
-    getMessage() {
-
-        if (this.message !="") {
-            return this.message;
-        }
-        /*
-        if (this.rtValue instanceof RuntimeException) {
-
-            let rtValue = this.rtValue;
-            let prevStack = rtValue.stack;
-            delete rtValue.stack;
-            let msg = rtValueToJson(rtValue);
-            rtValue.stack = prevStack;
-            console.log(">getMessage: " + msg)
-            return msg;
-        }
-         */
-        // should be an error
-        return rtValueToJson(this.rtValue);
-    }
-}
-
-function clonePrimitiveVal(val) {
-    if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
-        return new Value(val.type, val.val);
-    }
-    return val;
-}
-
-function cloneAll(val) {
-    if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
-        return new Value(val.type, val.val);
-    }
-    return new Value(val.type, JSON.parse( JSON.stringify(val.val) ) );
-}
-
-function* genEvalClosure(funcVal, args, frame) {
-    if (funcVal.type == TYPE_CLOSURE) {
-        let funcFrame = null;
-
-        if (funcVal.frame != null) { // closure with captured variables
-            [ funcFrame, _ ] = _prepareClosureFrame(funcVal, funcVal.frame, args);
-        } else {
-            [ funcFrame, _ ] = _prepareClosureFrame(funcVal, frame, args);
-        }
-
-        try {
-            // frame is ready, evaluate the statement list
-            yield *funcVal.functionDef.body.genEval(funcFrame);
-        } catch(er) {
-            if (er instanceof RuntimeException && !er.isUnwind()) {
-                er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
-            }
-            throw er;
-        }
-        return;
-    }
-
-    // builtin functions
-    _prepareBuiltinFuncArgs(funcVal, frame, args);
-
-    // function call
-    if (funcVal.numParams != -1 && funcVal.numParams != args.length) {
-        throw new RuntimeException("generator takes " + funcVal.numParams + " parameters, whereas " + args.length +
-            " parameters are passed in call");
-    }
-    yield* funcVal.funcImpl(args);
-}
-
-function evalClosure(name, funcVal, args, frame) {
-    if (funcVal.type == TYPE_CLOSURE) {
-
-        let funcFrame = null;
-        let traceParam = "";
-
-        if (funcVal.frame != null) { // closure with captured variables
-            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, funcVal.frame, args);
-        } else {
-
-            [ funcFrame, traceParam ] = _prepareClosureFrame(funcVal, frame.parentFrame != null ? frame.parentFrame : frame, args);
-        }
-
-        if (traceParam) {
-            let traceName = name;
-
-            if (name == "") {
-                traceName ="<unnamed-function>";
-            }
-            console.log(traceName + "(" + traceParam + ")");
-        }
-
-        try {
-            // frame is ready, evaluate the statement list
-            let rVal = funcVal.functionDef.body.eval(funcFrame);
-
-            if (rVal.type == TYPE_FORCE_RETURN) {
-                return rVal.val;
-            }
-            return rVal;
-        } catch(er) {
-            if (er instanceof RuntimeException && !er.isUnwind()) {
-                er.addToStack([funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
-            }
-            throw er;
-        }
-    }
-
-    // builtin functions
-    let traceParams = _prepareBuiltinFuncArgs(funcVal, frame, args);
-
-    if (traceMode) {
-        process.stderr.write(tracePrompt + name + "(" + traceParams + ") {\n");
-    }
-
-    // function call
-    if (funcVal.numParams != -1 && funcVal.numParams != args.length) {
-        throw new RuntimeException("function takes " + funcVal.numParams + " parameters, whereas " + args.length +
-            "  parameters are passed in call");
-    }
-    let retVal = funcVal.funcImpl(args, frame);
-
-    if (retVal == undefined) {
-        retVal = VALUE_NONE;
-    }
-
-    if (traceMode && retVal.type != TYPE_NONE) {
-        process.stderr.write(tracePrompt + rtValueToJson(retVal) + "\n}");
-    }
-
-    return retVal;
-}
-
-function _prepareBuiltinFuncArgs(funcVal, frame, args) {
-
-    let traceParams = "";
-
-    if (traceMode) {
-        for(let i=0;i<args.length;++i) {
-            if (traceParams != "") {
-                traceParams += ", ";
-            }
-            traceParams += rtValueToJson(args[i]);
-        }
-    }
-
-    if (funcVal.defaultParamValues != null) {
-        // try to add omitted params with default values;
-        if (args.length < funcVal.defaultParamValues.length) {
-            for (let i = args.length; i < funcVal.defaultParamValues.length; ++i) {
-                let val = funcVal.defaultParamValues[i];
-                args.push(val);
-
-                if (traceMode && val != null) {
-                    if (traceParams != "") {
-                        traceParams += ", ";
-                    }
-                    traceParams += rtValueToJson(val);
-                }
-            }
-        }
-    }
-    return traceParams;
-}
-
-
-function _prepareClosureFrame(funcVal, frame, args) {
-    let functionDef = funcVal.functionDef;
-    let funcFrame = new Frame(frame);
-    let traceParam = "";
-
-    if (args.length > functionDef.params.length) {
-        throw new RuntimeException("function takes " + functionDef.params.length + " params, but " + args.length + " were given", [funcVal.startOffset, funcVal.currentSourceInfo]);
-    }
-
-    // define all provided parameters in the new function frmae
-    let i = 0;
-    for (; i < args.length; ++i) {
-        let argValue = args[i];
-        let paramDef = functionDef.params[i]; // name of parameter
-        funcFrame.defineVar(paramDef[0][0], argValue);
-
-        if (traceMode) {
-            if (traceParam != "") {
-                traceParam += ", ";
-            }
-            traceParam += paramDef[0][0] + "=" + rtValueToJson(argValue);
-        }
-     }
-
-    // provide values for arguments with default values
-    for (; i < functionDef.params.length; ++i) {
-        let paramDef = functionDef.params[i]; // name of parameter
-
-        let defaultParamValue = funcVal.defaultParamValues[i];
-        if (defaultParamValue == null) {
-            throw new RuntimeException(" no value for parameter " + paramDef[0][0], [funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
-        }
-        funcFrame.defineVar(paramDef[0][0], defaultParamValue);
-
-        if (traceMode) {
-            if (traceParam != "") {
-                traceParam += ", ";
-            }
-            traceParam += paramDef[0][0] + "=" + rtValueToJson(defaultParamValue);
-        }
-    }
-    return [ funcFrame, traceParam];
-}
-
 function _getEnv(frame) {
     let val = frame.lookup("ENV");
 
-    if (val == null || val.type != TYPE_MAP) {
+    if (val == null || val.type != bs.TYPE_MAP) {
         return {};
     }
 
     let envDct = {}
     for (let [key, value] of Object.entries(val.val)) {
-        envDct[key] = value2Str(value);
+        envDct[key] = bs.value2Str(value);
     }
     return envDct;
 }
@@ -726,14 +64,14 @@ function _system(cmd, frame) {
         throw e;
     }
     if (status !=0 && errorOnExecFail) {
-        throw new RuntimeException("failed to run `" + cmd + "` : " + out);
+        throw new bs.RuntimeException("failed to run `" + cmd + "` : " + out);
     }
-    let val = [ new Value(TYPE_STR, out), new Value(TYPE_NUM, status) ];
-    return new Value(TYPE_LIST, val);
+    let val = [ new bs.Value(bs.TYPE_STR, out), new bs.Value(bs.TYPE_NUM, status) ];
+    return new bs.Value(bs.TYPE_LIST, val);
 }
 
 function isBascType(ty) {
-    return ty==TYPE_BOOL || ty == TYPE_NUM || ty == TYPE_STR || ty == TYPE_REGEX || ty ==  TYPE_NONE;
+    return ty==bs.TYPE_BOOL || ty == bs.TYPE_NUM || ty == bs.TYPE_STR || ty == bs.TYPE_REGEX || ty ==  bs.TYPE_NONE;
 }
 
 function printImpl(arg) {
@@ -744,9 +82,9 @@ function printImpl(arg) {
         }    
         let val=arg[i];
         if (isBascType(val.type))
-            ret += value2Str2(val);
+            ret += bs.value2Str2(val);
         else
-            ret += rtValueToJson(val);
+            ret += bs.rtValueToJson(val);
     }
     return ret;
 }
@@ -760,10 +98,10 @@ function dimArray(currentDim, dims) {
         }
     } else {
         for (let i = 0; i < n; ++i) {
-            val[i] = new Value(TYPE_NUM, 0);
+            val[i] = new bs.Value(bs.TYPE_NUM, 0);
         }
     }
-    return new Value(TYPE_LIST, val);
+    return new bs.Value(bs.TYPE_LIST, val);
 }
 
 function dimArrayInit(initValue, currentDim, dims) {
@@ -775,22 +113,22 @@ function dimArrayInit(initValue, currentDim, dims) {
         }
     } else {
         for (let i = 0; i < n; ++i) {
-            val[i] = cloneAll(initValue);
+            val[i] = bs.cloneAll(initValue);
         }
     }
-    return new Value(TYPE_LIST, val);
+    return new bs.Value(bs.TYPE_LIST, val);
 }
 
 function * genValues(val) {
-    if (val.type == TYPE_LIST) {
+    if (val.type == bs.TYPE_LIST) {
         for(let i=0; i <val.val.length; ++i) {
             yield val.val[i];
         }
     }
-    if (val.type == TYPE_MAP) {
+    if (val.type == bs.TYPE_MAP) {
         for (let keyVal of Object.entries(val.val)) {
-            let yval = [ new Value(TYPE_STR, keyVal[0]), keyVal[1] ];
-            yield new Value(TYPE_LIST, yval);
+            let yval = [ new bs.Value(bs.TYPE_STR, keyVal[0]), keyVal[1] ];
+            yield new bs.Value(bs.TYPE_LIST, yval);
         }
     }
 }
@@ -799,57 +137,57 @@ function * genValues(val) {
 // (that makes for less to explain)
 function checkResNan(res) {
     if (isNaN(res)) {
-        throw new RuntimeException("results in 'not a number' - that's not allowed here");
+        throw new bs.RuntimeException("results in 'not a number' - that's not allowed here");
     }
     return res;
 }
 
 function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
 
-    let req_ = new Value(TYPE_MAP, {
-        'url_' : new Value(TYPE_STR, httpReq.url),
+    let req_ = new bs.Value(bs.TYPE_MAP, {
+        'url_' : new bs.Value(bs.TYPE_STR, httpReq.url),
 
-        'url' : new BuiltinFunctionValue(``, 0, function() {
-            return new Value(TYPE_STR,  httpReq.url );
+        'url' : new bs.BuiltinFunctionValue(``, 0, function() {
+            return new bs.Value(bs.TYPE_STR,  httpReq.url );
         }),
-        'method' : new BuiltinFunctionValue(``, 0, function() {
-            return new Value(TYPE_STR, httpReq.method );
+        'method' : new bs.BuiltinFunctionValue(``, 0, function() {
+            return new bs.Value(bs.TYPE_STR, httpReq.method );
         }),
-        'query' : new BuiltinFunctionValue(``, 0, function() {
-            return jsValueToRtVal(httpReq.query);
+        'query' : new bs.BuiltinFunctionValue(``, 0, function() {
+            return bs.jsValueToRtVal(httpReq.query);
         }),
-        'headers' : new BuiltinFunctionValue(``, 0, function() {
-            return new jsValueToRtVal(httpReq.headers);
+        'headers' : new bs.BuiltinFunctionValue(``, 0, function() {
+            return new bs.jsValueToRtVal(httpReq.headers);
         }),
-        'header' : new BuiltinFunctionValue(``, 1, function(arg) {
-            let name = value2Str(arg, 0);
+        'header' : new bs.BuiltinFunctionValue(``, 1, function(arg) {
+            let name = bs.value2Str(arg, 0);
             let val = httpReq.headers[name.toLowerCase()];
-            return new jsValueToRtVal(val);
+            return new bs.jsValueToRtVal(val);
         }),
-        'requestData' : new BuiltinFunctionValue(``, 0, function(arg) {
-            return new Value(TYPE_STR, requestData );
+        'requestData' : new bs.BuiltinFunctionValue(``, 0, function(arg) {
+            return new bs.Value(bs.TYPE_STR, requestData );
         }),
     });
 
-    let res_ = new Value(TYPE_MAP, {
+    let res_ = new bs.Value(bs.TYPE_MAP, {
 
-        'setHeader': new BuiltinFunctionValue(``, 2, function(arg) {
-            httpRes.setHeader(value2Str(arg, 0), rtValueToJsVal(arg[1].val));
-            return VALUE_NONE;
+        'setHeader': new bs.BuiltinFunctionValue(``, 2, function(arg) {
+            httpRes.setHeader(bs.value2Str(arg, 0), bs.rtValueToJsVal(arg[1].val));
+            return bs.VALUE_NONE;
         }),
 
-        'send': new BuiltinFunctionValue(``,3, function(arg) {
+        'send': new bs.BuiltinFunctionValue(``,3, function(arg) {
 
             let code = arg[0];
-            let textResponse = value2Str(arg, 1);
+            let textResponse = bs.value2Str(arg, 1);
             let contentType = "text/plain"
 
-            if (code.type != TYPE_NUM) {
-                throw new RuntimeException("first argument: expected number")
+            if (code.type != bs.TYPE_NUM) {
+                throw new bs.RuntimeException("first argument: expected number")
             }
 
             if (arg[2] != null) {
-                contentType = value2Str(arg, 2);
+                contentType = bs.value2Str(arg, 2);
             }
 
             let respHeader = {};
@@ -869,7 +207,7 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
             //httpRes.end(textResponse);
 
             //console.log("eof send: " + textResponse);
-            return VALUE_NONE;
+            return bs.VALUE_NONE;
         }, [null, null, null])
     });
 
@@ -890,9 +228,9 @@ function makeHttpServerListener(callback, frame) {
             // this one is evaluated from another task. runtime exceptions need to be handled here
             try {
                 let vargs =  makeHttpCallbackInvocationParams(req,res, data);
-                evalClosure("", callback, vargs, frame);
+                bs.evalClosure("", callback, vargs, frame);
             } catch(er) {
-                if (er instanceof RuntimeException) {
+                if (er instanceof bs.RuntimeException) {
                     er.showStackTrace(true);
                 } else {
                     throw er;
@@ -909,10 +247,10 @@ function makeHttpServerListener(callback, frame) {
 let spawnedProcesses = {};
 
 // the runtime library is defined here
-RTLIB={
+bs.RTLIB={
 
     // function on scalars or strings
-    "find": new BuiltinFunctionValue(` 
+    "find": new bs.BuiltinFunctionValue(` 
 # search for a string (second argument) in a big string (first argument)
 # return indexs of match (zero based index, first match is position zero, if no match -1)
 
@@ -940,14 +278,14 @@ RTLIB={
 6
 
 `, 3, function(arg) {
-        let hay = value2Str(arg, 0);
+        let hay = bs.value2Str(arg, 0);
         let index = 0;
 
         if (arg[2] != null) {
-            index = parseInt(value2Num(arg, 2));
+            index = parseInt(bs.value2Num(arg, 2));
         }
 
-        if (arg[1].type == TYPE_REGEX) {
+        if (arg[1].type == bs.TYPE_REGEX) {
             if (index != 0) {
                 hay = hay.substring(index);
             }
@@ -955,16 +293,16 @@ RTLIB={
             if (matches != -1) {
                 matches += index;
             }
-            return new Value(TYPE_NUM, matches);
+            return new bs.Value(bs.TYPE_NUM, matches);
         }
 
-        let needle = value2Str(arg, 1);
+        let needle = bs.value2Str(arg, 1);
         let res = hay.indexOf(needle, index)
-        return new Value(TYPE_NUM, res);
+        return new bs.Value(bs.TYPE_NUM, res);
     }, [null, null, null]),
 
 
-    "match": new BuiltinFunctionValue(`
+    "match": new bs.BuiltinFunctionValue(`
 # search for a match of regular expression argument (second) argument) in big text (first argument)
 # returns a list - first element is zero based index of match, second is the matching string
 
@@ -975,19 +313,19 @@ RTLIB={
 [2,"1232"]    
 
 `, 3, function(arg) {
-        let hay = value2Str(arg, 0);
+        let hay = bs.value2Str(arg, 0);
 
-        checkType(arg, 1, TYPE_REGEX)
+        bs.checkType(arg, 1, bs.TYPE_REGEX)
 
         let ret = hay.match(arg[1].regex);
 
         if (ret == null) {
             return [ -1, "" ];
         }
-        return new Value(TYPE_LIST, [ new Value(TYPE_NUM, ret['index']), new Value(TYPE_STR, ret[0]) ]);
+        return new bs.Value(bs.TYPE_LIST, [ new bs.Value(bs.TYPE_NUM, ret['index']), new bs.Value(bs.TYPE_STR, ret[0]) ]);
     }, [null, null, null]),
 
-    "matchAll": new BuiltinFunctionValue(`
+    "matchAll": new bs.BuiltinFunctionValue(`
 > text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
 "a 1232 blablalba 34234 ;aksdf;laksdf 3423"
 
@@ -995,10 +333,10 @@ RTLIB={
 [[2,"1232"],[17,"34234"],[37,"3423"]]
 
 `, 3, function(arg) {
-        let hay = value2Str(arg, 0);
+        let hay = bs.value2Str(arg, 0);
         let ret = []
 
-        checkType(arg, 1, TYPE_REGEX)
+        bs.checkType(arg, 1, bs.TYPE_REGEX)
 
         let lenConsumed = 0;
 
@@ -1009,8 +347,8 @@ RTLIB={
             }
             let index = mval['index'];
 
-            let r = [ new Value(TYPE_NUM, lenConsumed + index), new Value(TYPE_STR, mval[0]) ];
-            ret.push( new Value(TYPE_LIST, r ) );
+            let r = [ new bs.Value(bs.TYPE_NUM, lenConsumed + index), new bs.Value(bs.TYPE_STR, mval[0]) ];
+            ret.push( new bs.Value(bs.TYPE_LIST, r ) );
 
             let toAdd = mval[0].length;
             if (toAdd == 0) {
@@ -1020,11 +358,11 @@ RTLIB={
             lenConsumed += index + mval[0].length;
 
         }
-        return new Value(TYPE_LIST, ret );
+        return new bs.Value(bs.TYPE_LIST, ret );
     }, [null, null, null]),
 
 
-    "mid": new BuiltinFunctionValue(`
+    "mid": new bs.BuiltinFunctionValue(`
 # returns a substring in the text, first argument is the text, 
 # second argument is the start offset, third argument is ending offset (optional)
 
@@ -1035,15 +373,15 @@ RTLIB={
 > mid("I am me", 2, -1)
 "am me"
 `, 3, function(arg) {
-        let sval = value2Str(arg, 0);
-        let from = parseInt(value2Num(arg[1]), 10);
+        let sval = bs.value2Str(arg, 0);
+        let from = parseInt(bs.value2Num(arg[1]), 10);
         let to = null;
 
         if (arg[2] != null) {
-            if (arg[2].type == TYPE_NUM) {
+            if (arg[2].type == bs.TYPE_NUM) {
                 to = arg[2].val;
             } else {
-                to = parseInt(value2Num(arg[2]), 10);
+                to = parseInt(bs.value2Num(arg[2]), 10);
             }
         }
 
@@ -1053,21 +391,21 @@ RTLIB={
             sval = sval.substring(from, to);
         }
 
-        return new Value(TYPE_STR, sval);
-    }, [null, null, new Value(TYPE_NUM, -1) ]),
-    "lc": new BuiltinFunctionValue(`# convert to lower case string
+        return new bs.Value(bs.TYPE_STR, sval);
+    }, [null, null, new bs.Value(bs.TYPE_NUM, -1) ]),
+    "lc": new bs.BuiltinFunctionValue(`# convert to lower case string
 > lc("BIG little")
 "big little"`, 1, function(arg) {
-        let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val.toLowerCase());
+        let val = bs.value2Str(arg, 0);
+        return new bs.Value(bs.TYPE_STR, val.toLowerCase());
     }),
-    "uc": new BuiltinFunctionValue(`# convert to upper case string
+    "uc": new bs.BuiltinFunctionValue(`# convert to upper case string
 > uc("BIG little")
 "BIG LITTLE"`, 1, function(arg) {
-        let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val.toUpperCase());
+        let val = bs.value2Str(arg, 0);
+        return new bs.Value(bs.TYPE_STR, val.toUpperCase());
     }),
-    "trim": new BuiltinFunctionValue(`# remove leading and trailing whitespace characters
+    "trim": new bs.BuiltinFunctionValue(`# remove leading and trailing whitespace characters
 
 > a= ' honey  '
 " honey  "
@@ -1077,22 +415,22 @@ RTLIB={
 "\\t\\n a lot of honey honey \\n "
 > trim(a)
 "a lot of honey honey"`, 1, function(arg) {
-        let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val.trim());
+        let val = bs.value2Str(arg, 0);
+        return new bs.Value(bs.TYPE_STR, val.trim());
     }),
-    "reverse": new BuiltinFunctionValue(`# return the reverse of the argument (either string or list argument)
+    "reverse": new bs.BuiltinFunctionValue(`# return the reverse of the argument (either string or list argument)
 
 > reverse([1,2,3,4])
 [4,3,2,1]
 > reverse("abcd")
 "dcba"`, 1, function(arg) {
-        if (arg[0].type == TYPE_LIST) {
-            return new Value(TYPE_LIST, arg[0].val.reverse());
+        if (arg[0].type == bs.TYPE_LIST) {
+            return new bs.Value(bs.TYPE_LIST, arg[0].val.reverse());
         }
-        let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val.split("").reverse().join(""));
+        let val = bs.value2Str(arg, 0);
+        return new bs.Value(bs.TYPE_STR, val.split("").reverse().join(""));
     }),
-    "split": new BuiltinFunctionValue(`
+    "split": new bs.BuiltinFunctionValue(`
 # split the first argument string into tokens, the second argument specifies how to split it.
 
 > split("first line\\nsecond line")
@@ -1115,37 +453,37 @@ RTLIB={
 ["Roo "," Kanga "," Piglet "," Pooh"]
 
 `, 2,function *(arg, frame) {
-        let hay = value2Str(arg, 0);
+        let hay = bs.value2Str(arg, 0);
         let delim = "\n";
 
         if (arg[1] != null) {
-            if (arg[1].type == TYPE_REGEX) {
+            if (arg[1].type == bs.TYPE_REGEX) {
                 delim = arg[1].regex;
             } else {
-                delim = value2Str(arg, 1);
+                delim = bs.value2Str(arg, 1);
             }
         }
         for(let n of hay.split(delim)) {
-            yield new Value(TYPE_STR, n);
+            yield new bs.Value(bs.TYPE_STR, n);
         }
     }, [null, null], true),
-    "str": new BuiltinFunctionValue(`> str(123)
+    "str": new bs.BuiltinFunctionValue(`> str(123)
 "123"
 > str("abc")
 "abc"`, 1, function(arg) {
-        let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val);
+        let val = bs.value2Str(arg, 0);
+        return new bs.Value(bs.TYPE_STR, val);
     }),
-    "repeat" : new BuiltinFunctionValue(`> repeat("a",3)
+    "repeat" : new bs.BuiltinFunctionValue(`> repeat("a",3)
 "aaa"
 > repeat("ab",3)
 "ababab"`, 2, function(arg) {
-        let val = value2Str(arg, 0);
-        let rep = value2Num(arg, 1);
-        return new Value(TYPE_STR, val.repeat(rep));
+        let val = bs.value2Str(arg, 0);
+        let rep = bs.value2Num(arg, 1);
+        return new bs.Value(bs.TYPE_STR, val.repeat(rep));
     }),
 
-    "replace": new BuiltinFunctionValue(`
+    "replace": new bs.BuiltinFunctionValue(`
 # replace replace occurances of second argument string with third argument string in text.
 # first arugment - the text
 # second argument - string to search for
@@ -1167,15 +505,15 @@ text="a b a c a d"
 > replace(text,'a ', 'x ', 2)
 "x b x c a d"
 `, 4, function(arg) {
-        let hay = value2Str(arg, 0);
+        let hay = bs.value2Str(arg, 0);
 
-        let needle = value2Str(arg, 1);
-        let newNeedle = value2Str(arg, 2);
+        let needle = bs.value2Str(arg, 1);
+        let newNeedle = bs.value2Str(arg, 2);
         let numTimes = 1;
 
 
         if (arg[3] != null) {
-            numTimes = parseInt(value2Num(arg, 3));
+            numTimes = parseInt(bs.value2Num(arg, 3));
         }
 
 
@@ -1189,11 +527,11 @@ text="a b a c a d"
             retVal += hay.substring(start, findPos) + newNeedle;
             start = findPos + needle.length;
         }
-        return new Value(TYPE_STR, retVal);
+        return new bs.Value(bs.TYPE_STR, retVal);
     }, [null, null, null, null]),
 
 
-    "replacere": new BuiltinFunctionValue(`
+    "replacere": new bs.BuiltinFunctionValue(`
 # replace the regular expression (second argument) with replacement expression (third argument) 
 # in source text (first argument)
     
@@ -1213,16 +551,16 @@ text="a b a c a d"
 "Bear,Pooh ## Kanga,Roo ## Christopher,Robin "
     
 `, 4, function(arg) {
-        let hay = value2Str(arg, 0);
+        let hay = bs.value2Str(arg, 0);
 
-        checkType(arg, 1, TYPE_REGEX)
+        bs.checkType(arg, 1, bs.TYPE_REGEX)
 
         let needle = arg[1].regex;
-        let newNeedle = value2Str(arg, 2);
+        let newNeedle = bs.value2Str(arg, 2);
         let numTimes = 1;
 
         if (arg[3] != null) {
-            numTimes = parseInt(value2Num(arg, 3));
+            numTimes = parseInt(bs.value2Num(arg, 3));
         }
 
         let retVal = "";
@@ -1241,11 +579,11 @@ text="a b a c a d"
             let posAfterMatch = ret['index'] + ret[0].length;
             hay = hay.substring(posAfterMatch);
         }
-        return new Value(TYPE_STR, retVal);
+        return new bs.Value(bs.TYPE_STR, retVal);
     }, [null, null, null, null]),
 
 // Numeric functions
-    "int": new BuiltinFunctionValue(`# convert argument string or number to integer value
+    "int": new bs.BuiltinFunctionValue(`# convert argument string or number to integer value
 
 > int("123")
 123
@@ -1276,13 +614,13 @@ text="a b a c a d"
 292
 
 `, 2, function(arg) {
-        checkTypeList(arg, 0, [TYPE_STR, TYPE_REGEX, TYPE_NUM]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_REGEX, bs.TYPE_NUM]);
 
-        let sval = value2Str(arg, 0);
+        let sval = bs.value2Str(arg, 0);
         let radix = 10;
 
         if (arg[1] != null) {
-            radix = parseInt(value2Str(arg, 1));
+            radix = parseInt(bs.value2Str(arg, 1));
         }
 
         if (sval.startsWith("0x")) {
@@ -1292,12 +630,12 @@ text="a b a c a d"
         let res = parseInt(sval, radix);
 
         if (res == null) {
-            throw new RuntimeException("Can't convert " + arg[0].val + " to integer with base " + parseInt(arg[1].val));
+            throw new bs.RuntimeException("Can't convert " + arg[0].val + " to integer with base " + parseInt(arg[1].val));
         }
-        return new Value(TYPE_NUM, checkResNan(res));
+        return new bs.Value(bs.TYPE_NUM, checkResNan(res));
     }, [null, null]),
 
-    "num": new BuiltinFunctionValue(`
+    "num": new bs.BuiltinFunctionValue(`
 #  convert argument string to floating point number, if number - returns the same number value 
 
 > num('3.7')
@@ -1306,18 +644,18 @@ text="a b a c a d"
 > num('.37e2')
 37
 `, 1, function(arg) {
-        checkTypeList(arg, 0, [TYPE_STR, TYPE_NUM]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_NUM]);
 
-        let sval = value2Str(arg, 0);
+        let sval = bs.value2Str(arg, 0);
         let res = parseFloat(sval);
 
         if (res == null) {
-            throw new RuntimeException("Can't convert " + sval + " to floating point number.");
+            throw new bs.RuntimeException("Can't convert " + sval + " to floating point number.");
         }
-        return new Value(TYPE_NUM, checkResNan(res));
+        return new bs.Value(bs.TYPE_NUM, checkResNan(res));
     }),
 
-    "round": new BuiltinFunctionValue(`
+    "round": new bs.BuiltinFunctionValue(`
 #  convert an argument value to an integer value - without rounding down 
 
 > round(3.2)
@@ -1332,15 +670,15 @@ text="a b a c a d"
 > round('3.7')
 4
 `, 1, function(arg) {
-        checkTypeList(arg, 0, [TYPE_NUM,TYPE_STR]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_NUM,bs.TYPE_STR]);
 
-        let res = Math.round(value2Num(arg,0));
-        return new Value(TYPE_NUM, checkResNan(res));
+        let res = Math.round(bs.value2Num(arg,0));
+        return new bs.Value(bs.TYPE_NUM, checkResNan(res));
     }),
 
 
 
-    "bit_and":  new BuiltinFunctionValue(`
+    "bit_and":  new bs.BuiltinFunctionValue(`
 # bitwise and, both argument must be numbers with integer values (not floating point values)
 
 > bit_and(4,5)
@@ -1349,106 +687,106 @@ text="a b a c a d"
 > bit_and(1,3)
 1    
 `, 2, function(arg) {
-       let first = requireInt(arg,0);
-       let second = requireInt(arg,1);
-       return new Value(TYPE_NUM, first & second);
+       let first = bs.requireInt(arg,0);
+       let second = bs.requireInt(arg,1);
+       return new bs.Value(bs.TYPE_NUM, first & second);
     }),
 
-    "bit_or":  new BuiltinFunctionValue(`
+    "bit_or":  new bs.BuiltinFunctionValue(`
 # bitwise or, both argument must be numbers with integer values (not floating point values)
 
 > bit_or(1,2)
 3        
 `, 2, function(arg) {
-        let first = requireInt(arg,0);
-        let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, first | second);
+        let first = bs.requireInt(arg,0);
+        let second = bs.requireInt(arg,1);
+        return new bs.Value(bs.TYPE_NUM, first | second);
     }),
 
-    "bit_xor":  new BuiltinFunctionValue(`
+    "bit_xor":  new bs.BuiltinFunctionValue(`
 # bitwise xor, both argument must be numbers with integer values (not floating point values)
 
 > bit_xor(1,7)
 6            
 `, 2, function(arg) {
-        let first = requireInt(arg,0);
-        let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, first ^ second);
+        let first = bs.requireInt(arg,0);
+        let second = bs.requireInt(arg,1);
+        return new bs.Value(bs.TYPE_NUM, first ^ second);
     }),
 
-    "bit_shiftl":  new BuiltinFunctionValue(`
+    "bit_shiftl":  new bs.BuiltinFunctionValue(`
 # bitwise shift left, both argument must be numbers with integer values (not floating point values)
 
 > bit_shiftl(1,3)
 8                
 `, 2, function(arg) {
-        let first = requireInt(arg,0);
-        let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, checkResNan(first << second));
+        let first = bs.requireInt(arg,0);
+        let second = bs.requireInt(arg,1);
+        return new bs.Value(bs.TYPE_NUM, checkResNan(first << second));
     }),
 
-    "bit_shiftr":  new BuiltinFunctionValue(`
+    "bit_shiftr":  new bs.BuiltinFunctionValue(`
 # bitwise shift right, both argument must be numbers with integer values (not floating point values)
 
 > bit_shiftr(8,3)
 1                    
 `, 2, function(arg) {
-        let first = requireInt(arg,0);
-        let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, checkResNan(first >> second));
+        let first = bs.requireInt(arg,0);
+        let second = bs.requireInt(arg,1);
+        return new bs.Value(bs.TYPE_NUM, checkResNan(first >> second));
     }),
 
-    "bit_neg":  new BuiltinFunctionValue(`
+    "bit_neg":  new bs.BuiltinFunctionValue(`
 # bitwise negation, the argument must be numbers with integer value (not floating point value)                        
 `, 1, function(arg) {
-        let first = requireInt(arg,0);
-        return new Value(TYPE_NUM, ~first)
+        let first = bs.requireInt(arg,0);
+        return new bs.Value(bs.TYPE_NUM, ~first)
     }),
 
-    "max" : new BuiltinFunctionValue(`
+    "max" : new bs.BuiltinFunctionValue(`
 # return the bigger of the two two argument values (argument are interpreted as a numbers)
 
 > max(3,4)
 4
 > max(4,3)
 4`, 2, function(arg) {
-        let num = value2Num(arg,0);
-        let num2 = value2Num(arg, 1);
+        let num = bs.value2Num(arg,0);
+        let num2 = bs.value2Num(arg, 1);
         let res = num;
         if (num2 > num) {
             res = num2;
         }
-        return new Value(TYPE_NUM, res);
+        return new bs.Value(bs.TYPE_NUM, res);
     }),
-    "min" : new BuiltinFunctionValue(`
+    "min" : new bs.BuiltinFunctionValue(`
 # return the smaller of the two two argument values (argument are interpreted as a numbers)
 
 > min(4,3)
 3
 > min(3,4)
 3`, 2, function(arg) {
-        let num = value2Num(arg, 0);
-        let num2 = value2Num(arg, 1);
+        let num = bs.value2Num(arg, 0);
+        let num2 = bs.value2Num(arg, 1);
         let res = num;
         if (num2 < num) {
             res = num2;
         }
-        return new Value(TYPE_NUM, res);
+        return new bs.Value(bs.TYPE_NUM, res);
     }),
-    "abs" : new BuiltinFunctionValue(`
+    "abs" : new bs.BuiltinFunctionValue(`
 # return the absolute of the argument value  (if it's negative then turn it into a positive number)
 
 > abs(-3)
 3
 > abs(3)
 3`, 1, function(arg) {
-        let num = value2Num(arg, 0);
+        let num = bs.value2Num(arg, 0);
         if (num < 0) {
             num = -num;
         }
-        return new Value(TYPE_NUM, num);
+        return new bs.Value(bs.TYPE_NUM, num);
     }),
-    "sqrt" : new BuiltinFunctionValue(`
+    "sqrt" : new bs.BuiltinFunctionValue(`
 # return the square root of the argument 
 # that's the number that gives the argument number, if you multiply it by itself.
 
@@ -1458,32 +796,32 @@ text="a b a c a d"
 2
 > sqrt(2)
 1.414213562373095`, 1, function(arg) {
-        let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, checkResNan(Math.sqrt(num)));
+        let num = bs.value2Num(arg, 0);
+        return new bs.Value(bs.TYPE_NUM, checkResNan(Math.sqrt(num)));
     }),
-    "sin" : new BuiltinFunctionValue(`# returns the sine of a number in radians
+    "sin" : new bs.BuiltinFunctionValue(`# returns the sine of a number in radians
 
 > sin(mathconst['pi']/2)
 1`, 1, function(arg) {
-        let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, Math.sin(num));
+        let num = bs.value2Num(arg, 0);
+        return new bs.Value(bs.TYPE_NUM, Math.sin(num));
     }),
-    "cos" : new BuiltinFunctionValue(`# returns the cosine of a number in radians
+    "cos" : new bs.BuiltinFunctionValue(`# returns the cosine of a number in radians
 
 > cos(mathconst['pi'])
 -1`, 1, function(arg) {
-        let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, checkResNan(Math.cos(num)));
+        let num = bs.value2Num(arg, 0);
+        return new bs.Value(bs.TYPE_NUM, checkResNan(Math.cos(num)));
     }),
-    "tan" : new BuiltinFunctionValue(`# returns the tangent of a number in radians`, 1, function(arg) {
-        let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, checkResNan(Math.tan(num)));
+    "tan" : new bs.BuiltinFunctionValue(`# returns the tangent of a number in radians`, 1, function(arg) {
+        let num = bs.value2Num(arg, 0);
+        return new bs.Value(bs.TYPE_NUM, checkResNan(Math.tan(num)));
     }),
-    "atan" : new BuiltinFunctionValue(`# returns the inverse tangent (in radians) of a number`, 1, function(arg) {
-        let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, checkResNan(Math.atan(num)));
+    "atan" : new bs.BuiltinFunctionValue(`# returns the inverse tangent (in radians) of a number`, 1, function(arg) {
+        let num = bs.value2Num(arg, 0);
+        return new bs.Value(bs.TYPE_NUM, checkResNan(Math.atan(num)));
     }),
-    "pow" : new BuiltinFunctionValue(`# returns the first arugment nubmer raised to the power of the second argument number
+    "pow" : new bs.BuiltinFunctionValue(`# returns the first arugment nubmer raised to the power of the second argument number
 
 > pow(2,2)
 4
@@ -1491,45 +829,45 @@ text="a b a c a d"
 8
 > pow(2,4)
 16`, 2, function(arg) {
-        let pow = value2Num(arg, 0);
-        let exp = value2Num(arg, 1);
-        return new Value(TYPE_NUM, checkResNan(Math.pow(pow,exp)));
+        let pow = bs.value2Num(arg, 0);
+        let exp = bs.value2Num(arg, 1);
+        return new bs.Value(bs.TYPE_NUM, checkResNan(Math.pow(pow,exp)));
     }),
-    "random" : new BuiltinFunctionValue(`# returns pseudo random number with value between 0 and 1 (that means it is almost random)
+    "random" : new bs.BuiltinFunctionValue(`# returns pseudo random number with value between 0 and 1 (that means it is almost random)
 > random()
 0.8424952895811049
 `, 0, function(arg) {
-        return new Value(TYPE_NUM, Math.random());
+        return new bs.Value(bs.TYPE_NUM, Math.random());
     }),
 
     // Input and output functions
-    "print" : new BuiltinFunctionValue(`
+    "print" : new bs.BuiltinFunctionValue(`
 # prints argument values to console. 
 # Can accept multiple values - each of them is converted to a string`, -1, function(arg) {
-        let msg = printImpl(arg); //value2Str(arg, 0);
-        doLogHook(msg)
+        let msg = printImpl(arg); //bs.value2Str(arg, 0);
+        bs.doLogHook(msg)
     }),
-    "println" : new BuiltinFunctionValue(`
+    "println" : new bs.BuiltinFunctionValue(`
 # prints argument values to console, followed by newline.
 # Can accept multiple values - each of them is converted to a string`, -1, function(arg) {
-        let msg = printImpl(arg); //value2Str(arg, 0);
-        doLogHook(msg + "\n")
+        let msg = printImpl(arg); //bs.value2Str(arg, 0);
+        bs.doLogHook(msg + "\n")
     }),
-    "readFile" : new BuiltinFunctionValue(`
+    "readFile" : new bs.BuiltinFunctionValue(`
 # read text file and return it as a string, the file name is the first argument of this function
 
 > fileText = readFile("fileName.txt")    
     `, 1, function(arg) {
-        let fname = value2Str(arg, 0);
+        let fname = bs.value2Str(arg, 0);
         try {
             let res = fs.readFileSync(fname, {encoding: 'utf8', flag: 'r'});
-            return new Value(TYPE_STR,res);
+            return new bs.Value(bs.TYPE_STR,res);
         } catch(err) {
-            throw new RuntimeException("Can't read file: " + fname + " error: " + err);
+            throw new bs.RuntimeException("Can't read file: " + fname + " error: " + err);
         };
     }),
     
-    "writeFile" : new BuiltinFunctionValue(`
+    "writeFile" : new bs.BuiltinFunctionValue(`
 # write string parameter into text file. 
 # The file name is the first argument, 
 # the text value to be written into the file is the second argument
@@ -1541,17 +879,17 @@ text="a b a c a d"
 > writeFile("fileName.txt","add this after end of file", "append")
    
     `, 3, function(arg) {
-        let fname = value2Str(arg, 0);
-        let data = value2Str(arg, 1);
+        let fname = bs.value2Str(arg, 0);
+        let data = bs.value2Str(arg, 1);
         let append = false;
         if (arg[2] != null ) {
-            let mode = value2Str(arg, 2);
+            let mode = bs.value2Str(arg, 2);
             if (mode == "append") {
                 append = true;
             } else if (mode == "write") {
                 append = false;
             } else {
-                throw new RuntimeException("third argument must be either 'append' or 'write'");
+                throw new bs.RuntimeException("third argument must be either 'append' or 'write'");
             }
         }
         try {
@@ -1561,12 +899,12 @@ text="a b a c a d"
                 fs.writeFileSync(fname, data);
             }
         } catch(err) {
-            throw new RuntimeException("Can't " + (append ? "append" : "write") + " file: " + fname + " error: " + err);
+            throw new bs.RuntimeException("Can't " + (append ? "append" : "write") + " file: " + fname + " error: " + err);
         };
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }, [ null, null, null]),
 
-    "unlink" : new BuiltinFunctionValue(`
+    "unlink" : new bs.BuiltinFunctionValue(`
 # delete a number of files, returns number of deleted files
 unlink([ "file1.txt", "file2.txt", "file3.txt" ])
 
@@ -1575,37 +913,37 @@ unlink("file1.txt")
     `, 1, function(arg) {
         let numUnlinked = 0;
 
-        if (arg[0].type == TYPE_LIST) {
+        if (arg[0].type == bs.TYPE_LIST) {
             // delete multiple files
             for(let i=0; i< arg[0].value.length;++i) {
-                fs.unlink( value2Str(arg[0].value[i]), function(arg) { numUnlinked -=1; } );
+                fs.unlink( bs.value2Str(arg[0].value[i]), function(arg) { numUnlinked -=1; } );
                 numUnlinked += 1;
             }
         } else {
-            fs.unlink( value2Str(arg, 0), function(arg) { numUnlinked -=1; } );
+            fs.unlink( bs.value2Str(arg, 0), function(arg) { numUnlinked -=1; } );
             numUnlinked += 1;
         }
-        return new Value(TYPE_NUM, numUnlinked);
+        return new bs.Value(bs.TYPE_NUM, numUnlinked);
     }),
 
-    "rename" : new BuiltinFunctionValue(`
+    "rename" : new bs.BuiltinFunctionValue(`
 # rename files, old file name is the first argument, the new file name is the second argument
     
 rename("oldFileName","newFileName")    
 `, 2, function(arg) {
-        let oldFileName = value2Str(arg, 0);
-        let newFileName = value2Str(arg, 1);
+        let oldFileName = bs.value2Str(arg, 0);
+        let newFileName = bs.value2Str(arg, 1);
         try {
             fs.renameSync(oldFileName, newFileName);
         } catch(er){
-            throw new RuntimeException("failed to rename " + oldFileName + " to " + newFileName + " error: " + er.message);
+            throw new bs.RuntimeException("failed to rename " + oldFileName + " to " + newFileName + " error: " + er.message);
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
 
     }),
 
     // function for arrays
-    "dim" : new BuiltinFunctionValue(`
+    "dim" : new bs.BuiltinFunctionValue(`
 # defines n-dimensional array, all elements are set to zero. 
 # Each argument defines the size of a dimension in the array.
     
@@ -1620,18 +958,18 @@ rename("oldFileName","newFileName")
 `, -1, function(arg) {
         let dims = [];
         for(let i =0; i<arg.length;++i) {
-            dims[i] = parseInt(value2Num(arg,i));
+            dims[i] = parseInt(bs.value2Num(arg,i));
             if (dims[i]<=1) {
-                throw new RuntimeException("parameter " + (i+1) + " must be a positive number greater or equal to one");
+                throw new bs.RuntimeException("parameter " + (i+1) + " must be a positive number greater or equal to one");
             }
         }
         if (dims.length == 0) {
-            throw new RuntimeException("at least one dimension must be defined");
+            throw new bs.RuntimeException("at least one dimension must be defined");
         }
         return dimArray( 0, dims);
     }),
 
-    "dimInit" : new BuiltinFunctionValue(`
+    "dimInit" : new bs.BuiltinFunctionValue(`
 # defines n-dimensional array, all elements are set to a deep copy of the first argument. 
 # Each additional argument defines the size of a dimension in the array.
 
@@ -1642,25 +980,25 @@ rename("oldFileName","newFileName")
 [[{"a":1},{"a":1},{"a":1}],[{"a":1},{"a":1},{"a":1}]]
 `, -1, function(arg) {
         if (arg.length < 2) {
-            throw new RuntimeException("At least two parameters expected");
+            throw new bs.RuntimeException("At least two parameters expected");
         }
         let initVal = arg[0];
         let dims = [];
         for (let i = 1; i < arg.length; ++i) {
-            dims[i-1] = parseInt(value2Num(arg, i));
+            dims[i-1] = parseInt(bs.value2Num(arg, i));
             if (dims[i-1] <= 1) {
-                throw new RuntimeException("parameter " + i + " must be a positive number greater or equal to one");
+                throw new bs.RuntimeException("parameter " + i + " must be a positive number greater or equal to one");
             }
         }
         if (dims.length == 0) {
-            throw new RuntimeException("at least one dimension must be defined");
+            throw new bs.RuntimeException("at least one dimension must be defined");
         }
         return dimArrayInit(initVal, 0, dims);
 
     }),
 
 
-    "clone" : new BuiltinFunctionValue(`
+    "clone" : new bs.BuiltinFunctionValue(`
 # create a deep copy of any value
 
 > a=[1,2,3]
@@ -1681,11 +1019,11 @@ rename("oldFileName","newFileName")
 > a==b
 false
 `, 1, function(arg) {
-        return cloneAll(arg[0]);
+        return bs.cloneAll(arg[0]);
     }),
 
 
-    "len" : new BuiltinFunctionValue(`# for a string argument - returns the number of characters in the string
+    "len" : new bs.BuiltinFunctionValue(`# for a string argument - returns the number of characters in the string
 
 > len("abc")
 3
@@ -1694,22 +1032,22 @@ false
 
 > len([1,2,3])
 3`, 1, function(arg) {
-        checkTypeList(arg, 0, [TYPE_STR, TYPE_LIST]);
-        return new Value(TYPE_NUM, arg[0].val.length);
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST]);
+        return new bs.Value(bs.TYPE_NUM, arg[0].val.length);
     }),
-    "join": new BuiltinFunctionValue(`# given a list argument, joins the values of the list into a single string
+    "join": new bs.BuiltinFunctionValue(`# given a list argument, joins the values of the list into a single string
 
 > join(["a: ",1," b: ", true])
 "a: 1 b: true"`, 2, function(arg) {
-        checkType(arg, 0, TYPE_LIST);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
 
         let delim ="";
         if (arg[1] != null) {
-            delim = value2Str(arg, 1);
+            delim = bs.value2Str(arg, 1);
         }
-        return new Value(TYPE_STR, arg[0].val.map(value2StrDisp).join(delim));
+        return new bs.Value(bs.TYPE_STR, arg[0].val.map(bs.value2StrDisp).join(delim));
     }, [null, null]),
-    "map": new BuiltinFunctionValue(`# the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
+    "map": new bs.BuiltinFunctionValue(`# the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
 
 > map([1,2,3], def (x) 1 + x)
 [2,3,4]
@@ -1725,55 +1063,55 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 > ["key: Ernie age: 3","key: Bert age: 4","key: Cookie-Monster age: 5","key: GraphCount age: 100"]
 `, 2, function(arg, frame) {
 
-        checkTypeList(arg, 0, [TYPE_LIST, TYPE_MAP])
-        checkTypeList(arg, 1, [TYPE_CLOSURE, TYPE_BUILTIN_FUNCTION])
+        bs.checkTypeList(arg, 0, [bs.TYPE_LIST, bs.TYPE_MAP])
+        bs.checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION])
 
         let ret = [];
         let funVal = arg[1];
 
-        if (arg[0].type == TYPE_LIST) {
+        if (arg[0].type == bs.TYPE_LIST) {
             let argList = arg[0];
 
             for(let i=0; i<argList.val.length;++i) {
                 let arg = [ argList.val[i] ];
-                let mapVal = evalClosure("", funVal, arg, frame);
+                let mapVal = bs.evalClosure("", funVal, arg, frame);
                 ret.push(mapVal);
             }
         }
 
-        if (arg[0].type == TYPE_MAP) {
+        if (arg[0].type == bs.TYPE_MAP) {
             let argMap = arg[0];
 
             for(let k in argMap.val) {
-                let amap = [ new Value(TYPE_STR, new String(k)), argMap.val[k] ];
-                let mapVal = evalClosure("", funVal, amap, frame);
+                let amap = [ new bs.Value(bs.TYPE_STR, new String(k)), argMap.val[k] ];
+                let mapVal = bs.evalClosure("", funVal, amap, frame);
                 ret.push(mapVal);
             }
 
         }
-        return new Value(TYPE_LIST, ret);
+        return new bs.Value(bs.TYPE_LIST, ret);
     }),
-    "mapIndex": new BuiltinFunctionValue(`
+    "mapIndex": new bs.BuiltinFunctionValue(`
 # similar to map, the argument function is called with the list value and the index of that value within the argument list
 
 > mapIndex([3,4,5,6],def(x,y) [2*x, y])
 [[6,0],[8,1],[10,2],[12,3]]`, 2, function(arg, frame) {
 
-        checkType(arg, 0, TYPE_LIST);
-        checkTypeList(arg, 0, [TYPE_CLOSURE, TYPE_BUILTIN_FUNCTION]);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
+        bs.checkTypeList(arg, 0, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION]);
 
         let ret = [];
         let argList = arg[0];
         let funVal = arg[1];
 
         for(let i=0; i<argList.val.length;++i) {
-            let arg = [ argList.val[i], new Value(TYPE_NUM, i) ];
-            let mapVal = evalClosure("", funVal, arg, frame);
+            let arg = [ argList.val[i], new bs.Value(bs.TYPE_NUM, i) ];
+            let mapVal = bs.evalClosure("", funVal, arg, frame);
             ret.push(mapVal)
         }
-        return new Value(TYPE_LIST, ret);
+        return new bs.Value(bs.TYPE_LIST, ret);
     }),
-    "reduce": new BuiltinFunctionValue(`
+    "reduce": new bs.BuiltinFunctionValue(`
 # form a single return values by applying the arugment value repatedly
 # works from the first element towards the last element of the argument list. 
 # See the following description:
@@ -1794,8 +1132,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 > (((2+1)+2)+3)
 8
 `, 3, function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST);
-        checkType(arg, 1, TYPE_CLOSURE);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
+        bs.checkType(arg, 1, bs.TYPE_CLOSURE);
 
         let argList = arg[0];
         let funVal = arg[1];
@@ -1803,12 +1141,12 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
         for(let i=0; i<argList.val.length;++i) {
             let arg = [rVal, argList.val[i]];
-            rVal = evalClosure("", funVal, arg, frame);
+            rVal = bs.evalClosure("", funVal, arg, frame);
         }
         return rVal;
     }),
 
-    "reduceFromEnd": new BuiltinFunctionValue(`
+    "reduceFromEnd": new bs.BuiltinFunctionValue(`
 # same as reduce, but working from the end of the list backward.
 
 > def div(a,b) a/b
@@ -1820,8 +1158,8 @@ same as:
 
 > (((1024/32) / 8) / 4)
 1`, 3, function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST);
-        checkType(arg, 1, TYPE_CLOSURE);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
+        bs.checkType(arg, 1, bs.TYPE_CLOSURE);
 
         let argList = arg[0];
         let funVal = arg[1];
@@ -1829,12 +1167,12 @@ same as:
 
         for(let i=argList.val.length-1; i>=0; i--) {
             let arg = [rVal, argList.val[i]];
-            rVal = evalClosure("", funVal, arg, frame);
+            rVal = bs.evalClosure("", funVal, arg, frame);
         }
         return rVal;
     }),
 
-    "pop": new BuiltinFunctionValue(`
+    "pop": new bs.BuiltinFunctionValue(`
 # takes an argument list, returns the last element of the list
 # but also removes this last value from the argument list
 
@@ -1845,14 +1183,14 @@ same as:
 > a
 [1,2]`, 1,function(arg, frame) {
 
-        checkType(arg, 0, TYPE_LIST);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
 
         if (arg[0].val.length == 0) {
-            throw new RuntimeException("Can't pop from an empty list");
+            throw new bs.RuntimeException("Can't pop from an empty list");
         }
         return arg[0].val.pop(arg[1]);
     }),
-    "push": new BuiltinFunctionValue(`
+    "push": new bs.BuiltinFunctionValue(`
 # takes the second argument and appends it to the list, which is the first argument to this function
 
 > a=[1, 2]
@@ -1861,11 +1199,11 @@ same as:
 [1,2,3]
 > a
 [1,2,3]`, 2, function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST)
+        bs.checkType(arg, 0, bs.TYPE_LIST)
         arg[0].val.push(arg[1]);
         return arg[0];
     }),
-    "shift": new BuiltinFunctionValue(`# removes the first element from the list
+    "shift": new bs.BuiltinFunctionValue(`# removes the first element from the list
 > a=[1,2,3]
 [1,2,3]
 
@@ -1875,13 +1213,13 @@ same as:
 > a
 [2,3]    
 `, 1,function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST)
+        bs.checkType(arg, 0, bs.TYPE_LIST)
         if (arg[0].val.length == 0) {
-            throw new RuntimeException("Can't pop from an empty list");
+            throw new bs.RuntimeException("Can't pop from an empty list");
         }
         return arg[0].val.shift(arg[1]);
     }),
-    "unshift": new BuiltinFunctionValue(`
+    "unshift": new bs.BuiltinFunctionValue(`
 # The first argument is a list, the second argument will be prepended to the argument list
 # The second argument will bet the first element of the list.
 # also returns the modified list
@@ -1895,21 +1233,21 @@ same as:
 > a
 [1,2,3]    
 `, 2, function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST)
+        bs.checkType(arg, 0, bs.TYPE_LIST)
         arg[0].val.unshift(arg[1]);
         return arg[0];
     }),
-    "joinl": new BuiltinFunctionValue(`# takes two lists and joins them into a single list, which is returned by this function
+    "joinl": new bs.BuiltinFunctionValue(`# takes two lists and joins them into a single list, which is returned by this function
 
  > joinl([1,2],[3,4])
 [1,2,3,4]`, 2,function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST)
-        checkType(arg, 1, TYPE_LIST)
+        bs.checkType(arg, 0, bs.TYPE_LIST)
+        bs.checkType(arg, 1, bs.TYPE_LIST)
 
         let lst = arg[0].val.concat(arg[1].val);
-        return new Value(TYPE_LIST, lst);
+        return new bs.Value(bs.TYPE_LIST, lst);
     }),
-    "sort": new BuiltinFunctionValue(`# sorts the argument list in increasing order
+    "sort": new bs.BuiltinFunctionValue(`# sorts the argument list in increasing order
 
 > sort([3,1,4,2,5])
 [1,2,3,4,5]
@@ -1932,10 +1270,10 @@ same as:
 
         if (arg[1] != null) {
             funVal = arg[1];
-            checkTypeList(arg, 1, [TYPE_CLOSURE, TYPE_BUILTIN_FUNCTION])
+            bs.checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION])
         }
 
-        checkType(arg, 0, TYPE_LIST);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
 
         let rt = null;
         if (funVal == null) {
@@ -1951,8 +1289,8 @@ same as:
         } else {
             rt = arg[0].val.sort(function (a, b) {
                 let arg = [ a, b ];
-                let mapVal = evalClosure("", funVal, arg, frame);
-                let nVal = value2Num(mapVal);
+                let mapVal = bs.evalClosure("", funVal, arg, frame);
+                let nVal = bs.value2Num(mapVal);
                 if (nVal < 0) {
                     return -1;
                 }
@@ -1962,11 +1300,11 @@ same as:
                 return 0;
             });
         }
-        return new Value(TYPE_LIST, rt);
+        return new bs.Value(bs.TYPE_LIST, rt);
     }, [null, null]),
 
     // functions for maps/hashes
-    "each" : new BuiltinFunctionValue( `# iterate over entries of a list or maps. 
+    "each" : new bs.BuiltinFunctionValue( `# iterate over entries of a list or maps. 
 
 # for lists: returns the list values
     
@@ -1979,47 +1317,47 @@ same as:
 > map( pairs, def (arg) [ arg[0]+arg[0], arg[1]*arg[1] ] )
 [["aa",1],["bb",4],["cc",9]]    
 `, 1, function*(arg) {
-        checkTypeList(arg, 0, [TYPE_MAP, TYPE_LIST]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_MAP, bs.TYPE_LIST]);
         yield* genValues(arg[0]);
     },null, true),
-    "keys": new BuiltinFunctionValue(`# for maps: returns the keys of the map
+    "keys": new bs.BuiltinFunctionValue(`# for maps: returns the keys of the map
     
 > a={ "first":1, "second": 2, "third": 3}
 {"first":1,"second":2,"third":3}
 > keys(a)
 ["first","second","third"]`, 1, function(arg) {
-        checkType(arg, 0, TYPE_MAP);
+        bs.checkType(arg, 0, bs.TYPE_MAP);
         let keys = Object.keys(arg[0].val);
         let rt = [];
         for(let i=0; i<keys.length;++i) {
-            rt.push( new Value(TYPE_STR, keys[i] ) );
+            rt.push( new bs.Value(bs.TYPE_STR, keys[i] ) );
         }
-        return new Value(TYPE_LIST, rt);
+        return new bs.Value(bs.TYPE_LIST, rt);
     }),
 
     // functions for working with json
-    "parseJsonString": new BuiltinFunctionValue(`# given a json formatted string as argument: returns am equivalent data structure of nested lists and maps
+    "parseJsonString": new bs.BuiltinFunctionValue(`# given a json formatted string as argument: returns am equivalent data structure of nested lists and maps
 
 > parseJsonString('{"name": "Kermit", "surname": "Frog"}')
 {"name":"Kermit","surname":"Frog"}
 > parseJsonString('[1,2,3]')
 [1,2,3]`, 1,function(arg, frame) {
-        checkType(arg, 0, TYPE_STR);
+        bs.checkType(arg, 0, bs.TYPE_STR);
         let val = JSON.parse(arg[0].val);
-        let rt = jsValueToRtVal(val);
+        let rt = bs.jsValueToRtVal(val);
         return rt;
     }),
-    "toJsonString": new BuiltinFunctionValue(`# given a data argument: returns a json formatted string
+    "toJsonString": new bs.BuiltinFunctionValue(`# given a data argument: returns a json formatted string
 
 > toJsonString([1,2,3])
 "[1,2,3]"
 > toJsonString({"name":"Pooh","family":"Bear","likes":["Honey","Songs","Friends"]})
 "{\\"name\\":\\"Pooh\\",\\"family\\":\\"Bear\\",\\"likes\\":[\\"Honey\\",\\"Songs\\",\\"Friends\\"]}"`, 1,function(arg, frame) {
-        return new Value(TYPE_STR, rtValueToJson(arg[0]));
+        return new bs.Value(bs.TYPE_STR, bs.rtValueToJson(arg[0]));
     }),
 
     //functions for working with yaml
-        "parseYamlString": new BuiltinFunctionValue(`# given a yaml formatted string, : returns am equivalent data structure of nested lists and maps
+        "parseYamlString": new bs.BuiltinFunctionValue(`# given a yaml formatted string, : returns am equivalent data structure of nested lists and maps
          
 > a="a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n"
 "a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n"
@@ -2034,12 +1372,12 @@ c:
 > parseYamlString("a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n")
 {"a":1,"b":2,"c":[1,2,3]}    
     `, 1,function(arg, frame) {
-        checkType(arg, 0, TYPE_STR);
+        bs.checkType(arg, 0, bs.TYPE_STR);
         let val = yaml.parse(arg[0].val);
-        let rt = jsValueToRtVal(val);
+        let rt = bs.jsValueToRtVal(val);
         return rt;
     }),
-    "toYamlString": new BuiltinFunctionValue(`# given a data argument: returns a yaml formatted string
+    "toYamlString": new bs.BuiltinFunctionValue(`# given a data argument: returns a yaml formatted string
     
 > a={"a":1, "b":2, "c":[1,2,3] }
 {"a":1,"b":2,"c":[1,2,3]}
@@ -2050,12 +1388,12 @@ c:
   - 1
   - 2
   - 3`, 1,function(arg, frame) {
-        let jsVal = rtValueToJsVal(arg[0]);
-        return new Value(TYPE_STR, yaml.stringify(jsVal));
+        let jsVal = bs.rtValueToJsVal(arg[0]);
+        return new bs.Value(bs.TYPE_STR, yaml.stringify(jsVal));
     }),
 
     // functions for working with processes
-    "system": new BuiltinFunctionValue(`# runs the string command in a shell, returns an array where the first element is the standard output of the command, the second element of the list is the exit code of the process
+    "system": new bs.BuiltinFunctionValue(`# runs the string command in a shell, returns an array where the first element is the standard output of the command, the second element of the list is the exit code of the process
     
 > a=system("ls /")
 ["Applications\\nLibrary\\nSystem\\nUsers\\nVolumes\\nbin\\ncores\\ndev\\netc\\nhome\\nopt\\nprivate\\nsbin\\ntmp\\nusr\\nvar\\n",0]
@@ -2083,39 +1421,39 @@ var
 
         let cmd ="";
 
-        if (arg[0].type == TYPE_STR) {
+        if (arg[0].type == bs.TYPE_STR) {
             cmd = arg[0].val;
         } else {
-            if (arg[0].type == TYPE_LIST) {
+            if (arg[0].type == bs.TYPE_LIST) {
                 cmd = arg[0].val.map(value2Str).join(" ");
             }
         }
         return _system(cmd, frame);
     }),
 
-    "getcwd": new BuiltinFunctionValue(`
+    "getcwd": new bs.BuiltinFunctionValue(`
 # returns the current directory of processes created with system, exec or via backick operator \`
 
 `, 0, function(arg, frame) {
         let value = process.cwd();
-        return new Value(TYPE_STR, value);
+        return new bs.Value(bs.TYPE_STR, value);
     }),
 
-    "chdir": new BuiltinFunctionValue(`
+    "chdir": new bs.BuiltinFunctionValue(`
 # change the current directory. 
 # That's the current directory of processes created with system, exec or via backick operator
  
 `, 1, function(arg, frame) {
-            let dir = value2Str(arg, 0)
+            let dir = bs.value2Str(arg, 0)
             try {
                 process.chdir(dir);
             } catch(er) {
-                throw new RuntimeException("Can't change directory to " + dir + " error: " +  er.message);
+                throw new bs.RuntimeException("Can't change directory to " + dir + " error: " +  er.message);
             }
-            return VALUE_NONE;
+            return bs.VALUE_NONE;
         }),
 
-    "exec": new BuiltinFunctionValue(`
+    "exec": new bs.BuiltinFunctionValue(`
 # run a process and receive the input output in a callback. Returns the process id as return value 
 
 # callback is called 
@@ -2127,8 +1465,8 @@ var
 pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out} standard error: {err}") })
 
     `, 2,function(arg, frame) {
-        let cmd = value2Str(arg, 0);
-        checkType(arg, 1, TYPE_CLOSURE);
+        let cmd = bs.value2Str(arg, 0);
+        bs.checkType(arg, 1, bs.TYPE_CLOSURE);
         let callback = arg[1];
 
         let env = _getEnv(frame);
@@ -2137,22 +1475,22 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
                 // call the callback
                 try {
-                    let argErr = VALUE_NONE;
+                    let argErr = bs.VALUE_NONE;
                     if (error != null) {
-                        argErr = new Value(TYPE_STR,error.message);
+                        argErr = new bs.Value(bs.TYPE_STR,error.message);
                     }
-                    let argStdout = VALUE_NONE;
+                    let argStdout = bs.VALUE_NONE;
                     if (stdout != null) {
-                        argStdout = new Value(TYPE_STR, stdout.toString());
+                        argStdout = new bs.Value(bs.TYPE_STR, stdout.toString());
                     }
-                    let argStderr = VALUE_NONE;
+                    let argStderr = bs.VALUE_NONE;
                     if (stdout != null) {
-                        argStderr = new Value(TYPE_STR, stderr.toString());
+                        argStderr = new bs.Value(bs.TYPE_STR, stderr.toString());
                     }
                     let vargs =  [ argErr, argStdout, argStderr ];
-                    evalClosure("", callback, vargs, frame);
+                    bs.evalClosure("", callback, vargs, frame);
                 } catch(er) {
-                    if (er instanceof RuntimeException) {
+                    if (er instanceof bs.RuntimeException) {
                         er.showStackTrace(true);
                     } else {
                         throw er;
@@ -2168,31 +1506,31 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
             childProcess.addListener('error', onExit)
 
             spawnedProcesses[childProcess.pid] = childProcess;
-            return new Value(TYPE_NUM, childProcess.pid);
+            return new bs.Value(bs.TYPE_NUM, childProcess.pid);
 
         } catch(e) {
             console.log("failed to run: cmd" + e.message);
-            throw RuntimeException("failed to run " + cmd + " error: " + e.message);
+            throw bs.RuntimeException("failed to run " + cmd + " error: " + e.message);
         }
     }),
 
-    "kill": new BuiltinFunctionValue(`
+    "kill": new bs.BuiltinFunctionValue(`
 # gets process id returned by exec. kills the process.    
 `, 1,function(arg, frame) {
-        let pid = value2Num(arg, 0);
+        let pid = bs.value2Num(arg, 0);
 
         let processEntry = spawnedProcesses[pid];
         if (processEntry != null) {
             processEntry.kill();
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }),
 
-    "sleep": new BuiltinFunctionValue(`    
+    "sleep": new bs.BuiltinFunctionValue(`    
 # sleep for three seconds    
 sleep(3)
 `, 1,function(arg, frame) {
-        let num = value2Num(arg,0) * 1000;
+        let num = bs.value2Num(arg,0) * 1000;
 
         let date = new Date();
         let curDate = null;
@@ -2202,34 +1540,34 @@ sleep(3)
             curDate = new Date();
         }  while(curDate-date < num);
 
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }),
 
-    "_system_backtick": new BuiltinFunctionValue(null, 1,function(arg, frame) {
+    "_system_backtick": new bs.BuiltinFunctionValue(null, 1,function(arg, frame) {
 
         let cmd ="";
 
-        if (arg[0].type == TYPE_LIST) {
-            cmd = arg[0].val.map(value2Str2).join("");
+        if (arg[0].type == bs.TYPE_LIST) {
+            cmd = arg[0].val.map(bs.value2Str2).join("");
         } else {
-            throw new RuntimeException("list parameter required");
+            throw new bs.RuntimeException("list parameter required");
         }
         return _system(cmd, frame);
     }),
 
     // control flow
-    "exit": new BuiltinFunctionValue(`
+    "exit": new bs.BuiltinFunctionValue(`
 # exit() - exit program with status 0 (success)
 # exit(1) - exit program with status 1 (failure)`,
         1,function(arg, frame) {
         let num = 0;
         if (arg[0] != null) {
-            num = value2Num(arg, 0);
+            num = bs.value2Num(arg, 0);
         }
         process.exit(num);
     }),
 
-    "assert": new BuiltinFunctionValue( `
+    "assert": new bs.BuiltinFunctionValue( `
 # first argument is a boolean expression, if it's value is false then throw an exception
 # the second argument is optional, it tells the message of the exception, in case of failure
 
@@ -2245,20 +1583,20 @@ Error: a should be true
 #(1) assert(a, "a should be true")
    |    
 `,2, function(arg, frame) {
-        let val = value2Bool(arg, 0);
+        let val = bs.value2Bool(arg, 0);
         if (!val) {
             let msg="";
             if (arg[1] != null) {
-                msg = value2Str(arg, 1);
+                msg = bs.value2Str(arg, 1);
             } else {
                 msg = "Assertion failed";
             }
-            throw new RuntimeException(msg)
+            throw new bs.RuntimeException(msg)
         }
     }, [null, null]),
 
     // other functions
-    "exists": new BuiltinFunctionValue(`> a={"first":1}
+    "exists": new bs.BuiltinFunctionValue(`> a={"first":1}
 {"first":1}
 > exists("first", a)
 true
@@ -2272,20 +1610,20 @@ true
 true
 > exists(5, a)
 false`, 2,function(arg, frame) {
-        checkTypeList(arg, 1, [TYPE_MAP, TYPE_LIST]);
+        bs.checkTypeList(arg, 1, [bs.TYPE_MAP, bs.TYPE_LIST]);
 
-        if (arg[1].type == TYPE_MAP) {
+        if (arg[1].type == bs.TYPE_MAP) {
            // check if map has first argument as key
-           let key = value2Str(arg,  0);
-           return new Value(TYPE_BOOL, key in arg[1].val);
+           let key = bs.value2Str(arg,  0);
+           return new bs.Value(bs.TYPE_BOOL, key in arg[1].val);
         }
-        if (arg[1].type == TYPE_LIST) {
-            return new Value(TYPE_BOOL, arg[1].val.some( function(a) {
+        if (arg[1].type == bs.TYPE_LIST) {
+            return new bs.Value(bs.TYPE_BOOL, arg[1].val.some( function(a) {
                 return arg[0].type == a.type && arg[0].val == a.val;
             }));
         }
     }),
-    "help": new BuiltinFunctionValue(`
+    "help": new bs.BuiltinFunctionValue(`
 # Show help text for built-in functions: Example usage:
  
 help(sort)
@@ -2317,13 +1655,13 @@ Names of functions with help text:
             if ('help' in arg[0]) {
                 console.log(arg[0].help);
             } else {
-                console.log(typeNameVal(arg[0]));
+                console.log(bs.typeNameVal(arg[0]));
             }
         }
-        return VALUE_NONE
+        return bs.VALUE_NONE
     }, [null]),
 
-    "type": new BuiltinFunctionValue(`# returns a string that describes the argument value
+    "type": new bs.BuiltinFunctionValue(`# returns a string that describes the argument value
     
 > type(1)
 "Number"
@@ -2335,10 +1673,10 @@ Names of functions with help text:
 "Map"
 > type(def(x) 1+x)
 "Closure"`, 1,function(arg, frame) {
-        return new Value(TYPE_STR, typeNameVal(arg[0]));
+        return new bs.Value(bs.TYPE_STR, bs.typeNameVal(arg[0]));
     }),
 
-    "setPYXOptions": new BuiltinFunctionValue(`
+    "setPYXOptions": new bs.BuiltinFunctionValue(`
 # set opttions of the PYX runtime
 
 # enable tracing of program (equivalent to -x command line option)
@@ -2386,21 +1724,35 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 #(1) def stackOverflow(x)  x * stackOverflow(x-1)
    |.^      
 `, 2,function(arg, frame) {
-        let optname = value2Str(arg, 0);
+        let optname = bs.value2Str(arg, 0);
         if (optname == "trace") {
-            setTraceMode( value2Bool(arg, 1) );
+            bs.setTraceMode( bs.value2Bool(arg, 1) );
         } else if (optname == "errorExit") {
-            errorOnExecFail = value2Bool(arg, 1);
+            errorOnExecFail = bs.value2Bool(arg, 1);
         } else if (optname == "framesInError") {    
-            maxStackFrames =  value2Num(arg, 1);
-            console.log("maxStackFrames " + maxStackFrames)
+            bs.maxStackFrames =  bs.value2Num(arg, 1);
         } else {
-            throw new RuntimeException("Unknwon option name");
+            throw new bs.RuntimeException("Unknwon option name");
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }),
 
-    "eval": new BuiltinFunctionValue(`
+    "getPYXOptions": new bs.BuiltinFunctionValue(`
+# get opttions of the PYX runtime
+
+> getPYXOptions()
+{"trace":false,"errorExit":false,"framesInError":20}
+
+`, 0,function(arg, frame) {
+       return new bs.Value(bs.TYPE_MAP, {
+                "trace": new bs.Value(bs.TYPE_BOOL, bs.getTraceMode()),
+                "errorExit" :new bs.Value(bs.TYPE_BOOL, errorOnExecFail),
+                "framesInError": new bs.Value(bs.TYPE_NUM, bs.maxStackFrames),
+           }
+       );
+    }),
+
+        "eval": new bs.BuiltinFunctionValue(`
 # evaluate the string as a pyx program - in the current scope
 
 > eval("2*2")
@@ -2420,50 +1772,50 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 5
 
 `, 1,function(arg, frame) {
-        let script = value2Str(arg, 0);
+        let script = bs.value2Str(arg, 0);
         if (evalCallback != null) {
             let rt = evalCallback(script, frame);
             if (rt != null) {
                 return rt;
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }),
 
 
     // generators
-    "range": new BuiltinFunctionValue(`> range(1,4)
+    "range": new bs.BuiltinFunctionValue(`> range(1,4)
 [1,2,3]
 > for n range(1,4) println("number: {n}")
 number: 1
 number: 2
 number: 3`, 3,function *(arg, frame) {
-        let from = value2Num(arg, 0);
-        let to = value2Num(arg, 1);
+        let from = bs.value2Num(arg, 0);
+        let to = bs.value2Num(arg, 1);
         let step = 1;
         if (arg[2] != null) {
-            step = value2Num(arg, 2);
+            step = bs.value2Num(arg, 2);
         }
         if (step>0) {
             while (from < to) {
-                yield new Value(TYPE_NUM, from);
+                yield new bs.Value(bs.TYPE_NUM, from);
                 from += step;
             }
         }
         if (step<0) {
             while (from > to) {
-                yield new Value(TYPE_NUM, from);
+                yield new bs.Value(bs.TYPE_NUM, from);
                 from += step;
             }
         }
     }, [null, null, null], true),
 
     // functions for working with time
-    "time": new BuiltinFunctionValue("# returns epoch time in seconds", 0,function(arg, frame) {
+    "time": new bs.BuiltinFunctionValue("# returns epoch time in seconds", 0,function(arg, frame) {
         let secondsSinceEpoch = new Date().getTime() / 1000;
-        return new Value(TYPE_NUM, secondsSinceEpoch);
+        return new bs.Value(bs.TYPE_NUM, secondsSinceEpoch);
     }),
-    "localtime": new BuiltinFunctionValue(`# decodes epoch time into map
+    "localtime": new bs.BuiltinFunctionValue(`# decodes epoch time into map
     
 > localtime(time())
 {"seconds":22,"minutes":33,"hours":7,"days":1,"year":2023,"month":0}    
@@ -2472,20 +1824,20 @@ number: 3`, 3,function *(arg, frame) {
         if (arg[0] == null) {
             date = new Date();
         } else {
-            date = new Date(value2Num(arg, 0) * 1000);
+            date = new Date(bs.value2Num(arg, 0) * 1000);
         }
         let retMap = {
-            "seconds": new Value(TYPE_NUM, date.getSeconds()),
-            "minutes": new Value(TYPE_NUM, date.getMinutes()),
-            "hours": new Value(TYPE_NUM, date.getHours()),
-            "days": new Value(TYPE_NUM, date.getDay()),
-            "year": new Value(TYPE_NUM, date.getFullYear()),
-            "month": new Value(TYPE_NUM, date.getMonth()),
+            "seconds": new bs.Value(bs.TYPE_NUM, date.getSeconds()),
+            "minutes": new bs.Value(bs.TYPE_NUM, date.getMinutes()),
+            "hours": new bs.Value(bs.TYPE_NUM, date.getHours()),
+            "days": new bs.Value(bs.TYPE_NUM, date.getDay()),
+            "year": new bs.Value(bs.TYPE_NUM, date.getFullYear()),
+            "month": new bs.Value(bs.TYPE_NUM, date.getMonth()),
         };
-        return new Value(TYPE_MAP, retMap);
+        return new bs.Value(bs.TYPE_MAP, retMap);
     }, [null]),
 
-    "httpSend": new BuiltinFunctionValue(`
+    "httpSend": new bs.BuiltinFunctionValue(`
 
 # send htp request
 # - first argument - the request url
@@ -2520,11 +1872,11 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
         let httpHeaders = null;
         let httpRequestData = null;
         let callback = null;
-        let surl = value2Str(arg, 0);
+        let surl = bs.value2Str(arg, 0);
 
-        if (arg[1] != null && arg[1].type != TYPE_NONE) {
-            checkType(arg, 1, TYPE_MAP);
-            options = rtValueToJsVal(arg[1]);
+        if (arg[1] != null && arg[1].type != bs.TYPE_NONE) {
+            bs.checkType(arg, 1, bs.TYPE_MAP);
+            options = bs.rtValueToJsVal(arg[1]);
 
             if ('method' in options) {
                 httpMethod = options['method'];
@@ -2538,7 +1890,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
         }
 
         if (arg[2] != null) {
-            checkType(arg, 2, TYPE_CLOSURE);
+            bs.checkType(arg, 2, bs.TYPE_CLOSURE);
         }
         callback = arg[2];
 
@@ -2560,12 +1912,12 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
         let callUserFunction = function(data, error) {
             // this one is evaluated from another task. runtime exceptions need to be handled here
-            let varg = [ new Value(TYPE_STR,data), error ];
+            let varg = [ new bs.Value(bs.TYPE_STR,data), error ];
 
             try {
-                evalClosure("", callback, varg, frame);
+                bs.evalClosure("", callback, varg, frame);
             } catch(er) {
-                if (er instanceof RuntimeException) {
+                if (er instanceof bs.RuntimeException) {
                     er.showStackTrace(true);
                 } else {
                     throw er;
@@ -2583,12 +1935,12 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
                 data += chunk.toString();
             });
             resp.on('end', () => {
-                callUserFunction(data, VALUE_NONE);
+                callUserFunction(data, bs.VALUE_NONE);
             });
         });
 
         reqObj.on('error', (e) => {
-            callUserFunction(VALUE_NONE, new Value(TYPE_STR, e.message));
+            callUserFunction(bs.VALUE_NONE, new bs.Value(bs.TYPE_STR, e.message));
         });
 
 
@@ -2596,10 +1948,10 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
             reqObj.write(httpRequestData);
         }
         reqObj.end();
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }, [null, null, null]),
 
-    "httpServer": new BuiltinFunctionValue(` 
+    "httpServer": new bs.BuiltinFunctionValue(` 
 
 # listen for incoming http requests on port 9010.     
 httpServer(9010, def (req,resp) {
@@ -2629,28 +1981,28 @@ requestData: {req.requestData()}
 })
 
 `, 2,function(arg, frame) {
-        let  listenPort = value2Num(arg, 0);
+        let  listenPort = bs.value2Num(arg, 0);
 
-        if (arg[1].type != TYPE_CLOSURE) {
-            throw new RuntimeException("Callback function expected as second parameter")
+        if (arg[1].type != bs.TYPE_CLOSURE) {
+            throw new bs.RuntimeException("Callback function expected as second parameter")
         }
 
         http.createServer(makeHttpServerListener(arg[1], frame)).listen(listenPort);
 
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
 
     }, [null]),
 
-    "mathconst" : new Value(TYPE_MAP, {
-        pi: new Value(TYPE_NUM, Math.PI),
-        e: new Value(TYPE_NUM, Math.E),
-        ln10: new Value(TYPE_NUM, Math.LN10),
-        ln2: new Value(TYPE_NUM, Math.LN2),
-        log10e: new Value(TYPE_NUM, Math.LOG10E),
-        log2e: new Value(TYPE_NUM, Math.LOG2E),
-        sqrt1_2: new Value(TYPE_NUM, Math.SQRT1_2),
-        sqrt2: new Value(TYPE_NUM, Math.SQRT2),
-        Infinity: new Value(TYPE_NUM, Infinity),
+    "mathconst" : new bs.Value(bs.TYPE_MAP, {
+        pi: new bs.Value(bs.TYPE_NUM, Math.PI),
+        e: new bs.Value(bs.TYPE_NUM, Math.E),
+        ln10: new bs.Value(bs.TYPE_NUM, Math.LN10),
+        ln2: new bs.Value(bs.TYPE_NUM, Math.LN2),
+        log10e: new bs.Value(bs.TYPE_NUM, Math.LOG10E),
+        log2e: new bs.Value(bs.TYPE_NUM, Math.LOG2E),
+        sqrt1_2: new bs.Value(bs.TYPE_NUM, Math.SQRT1_2),
+        sqrt2: new bs.Value(bs.TYPE_NUM, Math.SQRT2),
+        Infinity: new bs.Value(bs.TYPE_NUM, Infinity),
     }, `# map of mathematical constants.
 
 # the number that is bigger than any other number (which is kind of a contradiction...)
@@ -2681,7 +2033,7 @@ mathconst.log2e   # - base 2 logarithm of e
 mathconst.log10e  # - base 10 logarithm of e    
     `),
 
-    "ARGV" : new Value(TYPE_LIST, [], `
+    "ARGV" : new bs.Value(bs.TYPE_LIST, [], `
 # array of command line parameters passed to the program.
 # you can pass command line parameter to the shell like this:
 
@@ -2700,104 +2052,14 @@ pyx programFile.p 1 2 3 4
     
 `),
 
-    "ENV": new Value(TYPE_MAP,
+    "ENV": new bs.Value(bs.TYPE_MAP,
         Object.entries(process.env).reduce(
             (prev,current)=>{
-                prev[current[0]]= new Value(TYPE_STR, current[1]);
+                prev[current[0]]= new bs.Value(bs.TYPE_STR, current[1]);
                 return prev
             } , {}) ,
         "# environment variables, entry key is the name of the environment variable, the entry value is it's value"
     ),
-}
-
-// there is a global frame, also each function invocation has is own frame.a
-// closures have a parent frame - which is the frame where they where evaluated.
-// simple rules. aren't they?
-class Frame {
-    constructor(parentFrame = null) {
-        this.vars = {}; // maps variable name to Value instance
-        this.parentFrame = parentFrame;
-    }
-
-    lookup(name) {
-        //console.log("lookup: " + name);
-        let ret = this._lookup(name);
-        //console.log("lookup: " + name + " ret: " + JSON.stringify(ret));
-        return ret;
-    }
-
-    _lookup(name) {
-        if (name in this.vars) {
-            return this.vars[name];
-        }
-        if (this.parentFrame != null) {
-            return this.parentFrame._lookup(name);
-        }
-        throw new RuntimeException("undefined variable: " + name  );
-    }
-
-    assign(name, value) {
-        if (!this._assign(name, value)) {
-            this.vars[name] = clonePrimitiveVal(value);
-        }
-    }
-
-    _assign(name, value) {
-        if (name in this.vars) {
-            this.vars[name] = clonePrimitiveVal(value);
-            return true;
-        }
-        if (this.parentFrame != null) {
-            return this.parentFrame._assign(name, value);
-        }
-        return false;
-    }
-
-    defineVar(name, value) {
-       this.vars[name] = clonePrimitiveVal(value);
-    }
-
-    undefVar(name) {
-        delete this.vars[name];
-    }
-
-    complete(prefix, resultList) {
-        let keys = Object.keys(this.vars);
-        for(let i=0; i<keys.length; ++i) {
-            let it=keys[i];
-            if (prefix == "" || it.startsWith(prefix)) {
-                let varVal = this.vars[keys[i]];
-                if (varVal.type == TYPE_CLOSURE || varVal.type == TYPE_BUILTIN_FUNCTION) {
-                    if (it.startsWith("_")) {
-                        continue;
-                    }
-                    it += "(";
-                }
-                resultList.push(it);
-                //resultList.push(it.substring(prefix.length));
-            }
-        }
-        if (this.parentFrame != null) {
-            this.parentFrame.complete(prefix, resultList);
-        }
-    }
-
-    listOfFuncsWithHelp(resultList) {
-        let keys = Object.keys(this.vars);
-        for(let i=0; i<keys.length; ++i) {
-            let it=keys[i];
-
-            let varVal = this.vars[keys[i]];
-            if ((varVal.type == TYPE_CLOSURE || varVal.type == TYPE_BUILTIN_FUNCTION)) {
-                if ("help" in varVal) {
-                    resultList.push(it);
-                }
-            }
-        }
-        if (this.parentFrame != null) {
-            this.parentFrame.listOfFuncsWithHelp(resultList);
-        }
-    }
 }
 
 function showList(lst, dsp = null, separator = "\n") {
@@ -2844,10 +2106,10 @@ class AstStmtList extends AstBase {
     }
 
     eval(frame) {
-        let val = VALUE_NONE;
+        let val = bs.VALUE_NONE;
 
-        if (traceMode && !this.skipTrace && this.statements.length > 1) {
-            process.stderr.write(tracePrompt + "{\n");
+        if (bs.getTraceMode() && !this.skipTrace && this.statements.length > 1) {
+            process.stderr.write(bs.getTracePrompt + "{\n");
         }
 
         for(let i=0; i < this.statements.length; ++i) {
@@ -2855,20 +2117,20 @@ class AstStmtList extends AstBase {
 
             val = stmt.eval(frame);
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
-            if (val.type >= TYPE_FORCE_RETURN) {
+            if (val.type >= bs.TYPE_FORCE_RETURN) {
                 break;
             }
         }
 
-        if (traceMode && !this.skipTrace && this.statements.length > 1) {
-            process.stderr.write(tracePrompt + "}\n");
+        if (bs.getTraceMode() && !this.skipTrace && this.statements.length > 1) {
+            process.stderr.write(bs.getTracePrompt + "}\n");
         }
 
         return val;
     }
 
     *genEval(frame) {
-        let val = VALUE_NONE;
+        let val = bs.VALUE_NONE;
         for (let i = 0; i < this.statements.length; ++i) {
             let stmt = this.statements[i];
 
@@ -2878,7 +2140,7 @@ class AstStmtList extends AstBase {
                 val = stmt.eval(frame);
             }
 
-            if (val.type >= TYPE_FORCE_RETURN) {
+            if (val.type >= bs.TYPE_FORCE_RETURN) {
                 return val;
             }
         }
@@ -2923,7 +2185,7 @@ class AstTryCatchBlock extends AstBase {
     }
 
     eval(frame) {
-        let res = VALUE_NONE;
+        let res = bs.VALUE_NONE;
         let throwErr = null;
         let throwNow = false;
 
@@ -2932,7 +2194,7 @@ class AstTryCatchBlock extends AstBase {
             res = this.statements.eval(frame)
         } catch(er) {
             throwErr = er;
-            if (!(er instanceof RuntimeException)) {
+            if (!(er instanceof bs.RuntimeException)) {
                 throwNow = true;
             }
         }
@@ -2951,7 +2213,7 @@ class AstTryCatchBlock extends AstBase {
 
                 } catch (er) {
                     throwNow = true;
-                    if (er instanceof RuntimeException && throwErr instanceof RuntimeException) {
+                    if (er instanceof bs.RuntimeException && throwErr instanceof bs.RuntimeException) {
                         er.stackTrace = throwErr.stackTrace.concat(er.stackTrace);
                     }
                     throwErr = er;
@@ -2968,11 +2230,11 @@ class AstTryCatchBlock extends AstBase {
         if (this.finallyBlock != null) {
             try {
                 let res2 = this.finallyBlock.eval(frame);
-                if (res2.type != TYPE_NONE) {
+                if (res2.type != bs.TYPE_NONE) {
                     res = res2;
                 }
             } catch(er) {
-                if (er instanceof RuntimeException) {
+                if (er instanceof bs.RuntimeException) {
                     throwErr = er;
                 }
                 throwNow = true;
@@ -2986,7 +2248,7 @@ class AstTryCatchBlock extends AstBase {
     }
 
     *genEval(frame) {
-        let res = VALUE_NONE;
+        let res = bs.VALUE_NONE;
         let throwErr = null;
         let throwNow = false;
 
@@ -2999,7 +2261,7 @@ class AstTryCatchBlock extends AstBase {
             }
         } catch(er) {
             throwErr = er;
-            if (!(er instanceof RuntimeException)) {
+            if (!(er instanceof bs.RuntimeException)) {
                 throwNow = true;
             }
         }
@@ -3019,7 +2281,7 @@ class AstTryCatchBlock extends AstBase {
 
                 } catch (er) {
                     throwNow = true;
-                    if (er instanceof RuntimeException && throwErr instanceof RuntimeException) {
+                    if (er instanceof bs.RuntimeException && throwErr instanceof bs.RuntimeException) {
                         er.stackTrace = throwErr.stackTrace.concat(er.stackTrace);
                     }
                     throwErr = er;
@@ -3043,11 +2305,11 @@ class AstTryCatchBlock extends AstBase {
                     res2 = this.finallyBlock.eval(frame);
                 }
 
-                if (res == null || res2.type != TYPE_NONE) {
+                if (res == null || res2.type != bs.TYPE_NONE) {
                     res = res2;
                 }
             } catch(er) {
-                if (er instanceof RuntimeException) {
+                if (er instanceof bs.RuntimeException) {
                     throwErr = er;
                 }
                 throwNow = true;
@@ -3059,7 +2321,7 @@ class AstTryCatchBlock extends AstBase {
             throw throwErr;
         }
         if (res == null) {
-            res = VALUE_NONE;
+            res = bs.VALUE_NONE;
         }
         return res;
     }
@@ -3094,37 +2356,13 @@ class AstThrowStmt extends AstBase {
 
     eval(frame) {
         let value = this.expression.eval(frame);
-        throw new RuntimeException(value, [this.startOffset, this.currentSourceInfo]);
+        throw new bs.RuntimeException(value, [this.startOffset, this.currentSourceInfo]);
     };
 }
 
 function makeThrowStmt(expression, offset) {
     return new AstThrowStmt(expression, offset);
 }
-
-/*
-class RegexConstValue extends AstBase {
-    constructor(value, offset) {
-        super(offset);
-
-        this.isGlobal = value.endsWith('g');
-        try {
-            this.regex = new RegExp(value);
-        } catch(ex) {
-            throw new ParserError(ex, offset);
-        }
-    }
-
-    eval(frame) {
-        console.log("haha");
-        return new Value(TYPE_STR, this.regex.toString());
-    }
-
-    show() {
-        return this.regex.toString();
-    }
-}
-*/
 
 class AstConstValue extends AstBase {
     constructor(value, offset) {
@@ -3144,154 +2382,154 @@ class AstConstValue extends AstBase {
 function makeConstValue(type, value) {
     let val = value[0];
 
-    if (type == TYPE_REGEX) {
-        return new AstConstValue(new RegexValue(value[0]), value[1]);
+    if (type == bs.TYPE_REGEX) {
+        return new AstConstValue(new bs.RegexValue(value[0]), value[1]);
     }
-    if (type == TYPE_BOOL) {
+    if (type == bs.TYPE_BOOL) {
         value[0] = val == "true";
     }
     if (val == "none") {
         val[0] = null;
     }
-    return new AstConstValue(new Value(type, value[0]), value[1]);
+    return new AstConstValue(new bs.Value(type, value[0]), value[1]);
 }
 
 function checkMixedType(op, lhs, rhs) {
     if (lhs.type != rhs.type) {
-        throw new RuntimeException(op + " not allowed between " + typeNameVal(rhs) + " and " + typeNameVal(lhs))
+        throw new bs.RuntimeException(op + " not allowed between " + bs.typeNameVal(rhs) + " and " + bs.typeNameVal(lhs))
     }
 }
 
 function checkMixedTypeAllowNone(op, lhs, rhs) {
-    if (lhs.type != TYPE_NONE && rhs.type != TYPE_NONE) {
+    if (lhs.type != bs.TYPE_NONE && rhs.type != bs.TYPE_NONE) {
         if (lhs.type != rhs.type) {
-            throw new RuntimeException(op + " not allowed between " + typeNameVal(rhs) + " and " + typeNameVal(lhs))
+            throw new bs.RuntimeException(op + " not allowed between " + bs.typeNameVal(rhs) + " and " + bs.typeNameVal(lhs))
         }
     }
 }
 
 MAP_OP_TO_FUNC={
     "and" : function(lhs,rhs, frame) {
-        return new Value(TYPE_BOOL, value2Bool(lhs.eval(frame)) && value2Bool(rhs.eval(frame)));
+        return new bs.Value(bs.TYPE_BOOL, bs.value2Bool(lhs.eval(frame)) && bs.value2Bool(rhs.eval(frame)));
     },
     "or" : function(lhs,rhs, frame) {
-        return new Value(TYPE_BOOL, value2Bool(lhs.eval(frame)) || value2Bool(rhs.eval(frame)));
+        return new bs.Value(bs.TYPE_BOOL, bs.value2Bool(lhs.eval(frame)) || bs.value2Bool(rhs.eval(frame)));
     },
     "<" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedType("<", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val < rhs.val); // javascript takes care of it, does it?
+        return new bs.Value(bs.TYPE_BOOL, lhs.val < rhs.val); // javascript takes care of it, does it?
     },
     ">" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedType(">", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val > rhs.val);
+        return new bs.Value(bs.TYPE_BOOL, lhs.val > rhs.val);
     },
     "<=" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedType("<=", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val <= rhs.val);
+        return new bs.Value(bs.TYPE_BOOL, lhs.val <= rhs.val);
     },
     ">=" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedType(">=", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val >= rhs.val);
+        return new bs.Value(bs.TYPE_BOOL, lhs.val >= rhs.val);
     },
     "==" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedTypeAllowNone("==", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val == rhs.val);
+        return new bs.Value(bs.TYPE_BOOL, lhs.val == rhs.val);
     },
     "!=" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedTypeAllowNone("!=", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val != rhs.val);
+        return new bs.Value(bs.TYPE_BOOL, lhs.val != rhs.val);
     },
     "+" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't add " + typeNameVal(lhs) + " to " + typeNameVal(rhs));
+            throw new bs.RuntimeException("Can't add " + bs.typeNameVal(lhs) + " to " + bs.typeNameVal(rhs));
         }
-        if (lhs.type == TYPE_STR) {
+        if (lhs.type == bs.TYPE_STR) {
             /* allow add for strings - this concats the string values */
-            return new Value(lhs.type, lhs.val + rhs.val);
+            return new bs.Value(lhs.type, lhs.val + rhs.val);
         }
-        if (lhs.type == TYPE_NUM) {
-            return new Value(lhs.type, checkResNan(lhs.val + rhs.val));
+        if (lhs.type == bs.TYPE_NUM) {
+            return new bs.Value(lhs.type, checkResNan(lhs.val + rhs.val));
         }
-        if (lhs.type == TYPE_LIST) {
+        if (lhs.type == bs.TYPE_LIST) {
             // concat lists
-            return new Value(TYPE_LIST, lhs.val.concat(rhs.val));
+            return new bs.Value(bs.TYPE_LIST, lhs.val.concat(rhs.val));
         }
-        throw new RuntimeException("Can't add " + typeNameVal(lhs) + " to " + typeNameVal(rhs));
+        throw new bs.RuntimeException("Can't add " + bs.typeNameVal(lhs) + " to " + bs.typeNameVal(rhs));
     },
     "-" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't subtract " + typeNameVal(rhs) + " from " + typeNameVal(lhs) );
+            throw new bs.RuntimeException("Can't subtract " + bs.typeNameVal(rhs) + " from " + bs.typeNameVal(lhs) );
         }
-        if (lhs.type != TYPE_NUM) {
-            throw new RuntimeException("need number types for substraction" );
+        if (lhs.type != bs.TYPE_NUM) {
+            throw new bs.RuntimeException("need number types for substraction" );
         }
-        return new Value(lhs.type, checkResNan(lhs.val - rhs.val));
+        return new bs.Value(lhs.type, checkResNan(lhs.val - rhs.val));
     },
     "*" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
 
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't multiply " + typeNameVal(lhs) + " with " + typeNameVal(rhs));
+            throw new bs.RuntimeException("Can't multiply " + bs.typeNameVal(lhs) + " with " + bs.typeNameVal(rhs));
         }
-        if (lhs.type != TYPE_NUM) {
-            throw new RuntimeException("need number types for multiplication" );
+        if (lhs.type != bs.TYPE_NUM) {
+            throw new bs.RuntimeException("need number types for multiplication" );
         }
 
-        return new Value(TYPE_NUM, checkResNan(value2Num(lhs) * value2Num(rhs)));
+        return new bs.Value(bs.TYPE_NUM, checkResNan(bs.value2Num(lhs) * bs.value2Num(rhs)));
     },
     "/" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
 
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't divide " + typeNameVal(lhs) + " by " + typeNameVal(rhs) );
+            throw new bs.RuntimeException("Can't divide " + bs.typeNameVal(lhs) + " by " + bs.typeNameVal(rhs) );
         }
-        if (lhs.type != TYPE_NUM) {
-            throw new RuntimeException("need number types for division" );
+        if (lhs.type != bs.TYPE_NUM) {
+            throw new bs.RuntimeException("need number types for division" );
         }
 
-        let rhsVal = value2Num(rhs);
+        let rhsVal = bs.value2Num(rhs);
         if (rhsVal == 0) {
             // javascript allows to divide by zero, amazing.
-            throw new RuntimeException("Can't divide by zero");
+            throw new bs.RuntimeException("Can't divide by zero");
         }
-        return new Value(TYPE_NUM,checkResNan(value2Num(lhs) / rhsVal));
+        return new bs.Value(bs.TYPE_NUM,checkResNan(bs.value2Num(lhs) / rhsVal));
     },
     "%" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
 
         if (lhs.type != rhs.type) {
-            throw new RuntimeException("Can't divide modulo " + typeNameVal(lhs) + " by " + typeNameVal(rhs) );
+            throw new bs.RuntimeException("Can't divide modulo " + bs.typeNameVal(lhs) + " by " + bs.typeNameVal(rhs) );
         }
 
-        if (lhs.type != TYPE_NUM) {
-            throw new RuntimeException("need number types for modulo division" );
+        if (lhs.type != bs.TYPE_NUM) {
+            throw new bs.RuntimeException("need number types for modulo division" );
         }
 
-        let rhsVal = value2Num(rhs);
+        let rhsVal = bs.value2Num(rhs);
         if (rhsVal == 0) {
             // javascript allows to divide by zero, amazing.
-            throw new RuntimeException("Can't divide modulo by zero");
+            throw new bs.RuntimeException("Can't divide modulo by zero");
         }
-        return new Value(TYPE_NUM,value2Num(lhs) % rhsVal);
+        return new bs.Value(bs.TYPE_NUM,bs.value2Num(lhs) % rhsVal);
     },
 
 }
@@ -3310,16 +2548,12 @@ class AstBinaryExpression extends AstBase {
     
     eval(frame) {
         try {
-            //let lhsVal = this.lhs.eval(frame);
-            //let rhsVal = this.rhs.eval(frame);
-            //return this.fun(lhsVal, rhsVal);
             return this.fun(this.lhs, this.rhs, frame);
         } catch(er) {
-            if (er instanceof RuntimeException && er.firstChance) {
+            if (er instanceof bs.RuntimeException && er.firstChance) {
                 er.firstChance = false;
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
-            //console.trace(er);
             throw er;
         }
     }
@@ -3378,11 +2612,11 @@ function makeExpression(exprList) {
 
 MAP_UNARY_OP_TO_FUNC={
     "not": function(value) {
-        return new Value(TYPE_BOOL, !value2Bool(value));
+        return new bs.Value(bs.TYPE_BOOL, !bs.value2Bool(value));
 
     },
     "-": function(value) {
-        return new Value(TYPE_NUM, -1 * value2Num(value));
+        return new bs.Value(bs.TYPE_NUM, -1 * bs.value2Num(value));
     }
 }
 
@@ -3399,7 +2633,7 @@ class AstUnaryExpression extends AstBase {
             let exprVal = this.expr.eval(frame);
             return this.fun(exprVal);
         } catch(er) {
-            if (er instanceof RuntimeException && er.firstChance) {
+            if (er instanceof bs.RuntimeException && er.firstChance) {
                 er.firstChance = false;
                 er.currentSourceInfo = this.currentSourceInfo;
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
@@ -3427,12 +2661,12 @@ class AstDictCtorExpression extends AstBase {
             let nameValueDef = this.exprList[i];
 
             let nameVal = nameValueDef[0].eval(frame);
-            let name = value2Str( nameVal );
+            let name = bs.value2Str( nameVal );
             let value = nameValueDef[1].eval(frame);
 
             ret[ name ] = value;
         }
-        return new Value(TYPE_MAP, ret);
+        return new bs.Value(bs.TYPE_MAP, ret);
     }
 
     show() {
@@ -3456,7 +2690,7 @@ class AstListCtorExpression extends AstBase {
             let val = this.exprList[i].eval(frame);
             vals.push(val)
         }
-        return new Value(TYPE_LIST, vals);
+        return new bs.Value(bs.TYPE_LIST, vals);
     }
 
     show() {
@@ -3486,7 +2720,7 @@ class AstLambdaExpression extends AstBase {
 
     eval(frame) {
         let defaultParams = _evalDefaultParams(frame, this.functionDef.params);
-        return new ClosureValue(this.functionDef, defaultParams, frame);
+        return new bs.ClosureValue(this.functionDef, defaultParams, frame);
     }
 
     show() {
@@ -3503,8 +2737,8 @@ function lookupIndex(frame, value, refExpr) {
         let expr = refExpr[i];
 
         let curValue = value.type;
-        if (curValue != TYPE_LIST && curValue != TYPE_MAP && curValue != TYPE_STR) {
-            let er = new RuntimeException("Can't access expression of type " + typeNameVal(value) + " by index");
+        if (curValue != bs.TYPE_LIST && curValue != bs.TYPE_MAP && curValue != bs.TYPE_STR) {
+            let er = new bs.RuntimeException("Can't access expression of type " + bs.typeNameVal(value) + " by index");
             if (i > 0) {
                 er.addToStack([expr.startOffset, expr.currentSourceInfo]);
             }
@@ -3512,15 +2746,15 @@ function lookupIndex(frame, value, refExpr) {
         }
         let indexValue = expr.eval(frame);
 
-        if (curValue == TYPE_LIST || curValue == TYPE_STR) {
-            if (indexValue.type != TYPE_NUM) {
-                let err = new RuntimeException("Can't lookup " + typeNameVal(value) + " entry - the index value must be a number. Instead got a " + typeNameVal(indexValue));
+        if (curValue == bs.TYPE_LIST || curValue == bs.TYPE_STR) {
+            if (indexValue.type != bs.TYPE_NUM) {
+                let err = new bs.RuntimeException("Can't lookup " + bs.typeNameVal(value) + " entry - the index value must be a number. Instead got a " + bs.typeNameVal(indexValue));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
 
             if (indexValue.val < 0 || indexValue.val >= value.val.length) {
-                let err = new RuntimeException("Can't lookup " + typeNameVal(value) +  " entry - the index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
+                let err = new bs.RuntimeException("Can't lookup " + bs.typeNameVal(value) +  " entry - the index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
@@ -3529,18 +2763,18 @@ function lookupIndex(frame, value, refExpr) {
         let nextValue = value.val[ indexValue.val ];
         if (nextValue == null) {
             let ex =  null;
-            if (value.type != TYPE_MAP) {
-                ex = new RuntimeException("Can't lookup index " + indexValue.val  + " in" + typeNameVal(value) + "  - index value must be less than " + value.val.length + " and greater than zero.");
+            if (value.type != bs.TYPE_MAP) {
+                ex = new bs.RuntimeException("Can't lookup index " + indexValue.val  + " in" + bs.typeNameVal(value) + "  - index value must be less than " + value.val.length + " and greater than zero.");
             } else {
-                ex = new RuntimeException("Can't lookup key " + indexValue.val + " in map. No value has been set for this key");
+                ex = new bs.RuntimeException("Can't lookup key " + indexValue.val + " in map. No value has been set for this key");
             }
             ex.addToStack([expr.startOffset, expr.currentSourceInfo]);
             throw ex;
         }
         value = nextValue;
 
-        if (curValue == TYPE_STR) {
-            value = new Value(TYPE_STR, value);
+        if (curValue == bs.TYPE_STR) {
+            value = new bs.Value(bs.TYPE_STR, value);
         }
     }
 
@@ -3563,7 +2797,7 @@ class AstIdentifierRef extends AstBase {
             }
             return value;
         } catch(er) {
-            if (er instanceof RuntimeException && !er.isUnwind()) {
+            if (er instanceof bs.RuntimeException && !er.isUnwind()) {
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
             throw er;
@@ -3591,35 +2825,35 @@ function _assignImp(frame, value, lhs) {
     if (lhs.length == 1) {
         let singleLhs = lhs[0];
         let traceVal = _assign(frame, singleLhs, value);
-        if (traceMode) {
+        if (bs.getTraceMode()) {
             traceLhs.push(traceVal[0]);
             traceRhs.push(traceVal[1]);
         }
     } else {
-        if (value.type != TYPE_LIST) {
-            throw new RuntimeException("list value expected on right hand side of assignment");
+        if (value.type != bs.TYPE_LIST) {
+            throw new bs.RuntimeException("list value expected on right hand side of assignment");
         }
         let rhsVal = value.val;
         if (lhs.length != rhsVal.length) {
             if (lhs.length < rhsVal.length) {
-                throw new RuntimeException("not enough values to assign");
+                throw new bs.RuntimeException("not enough values to assign");
             } else {
-                throw new RuntimeException("too many values to assign");
+                throw new bs.RuntimeException("too many values to assign");
             }
         }
         for(let i=0; i<rhsVal.length; ++i) {
             let traceVal = _assign(frame, lhs[i], rhsVal[i]);
-            if (traceMode) {
+            if (bs.getTraceMode()) {
                 traceLhs.push(traceVal[0]);
                 traceRhs.push(traceVal[1]);
             }
 
         }
     }
-    if (traceMode) {
-        process.stderr.write(tracePrompt + traceLhs.join(", ") + " = " + traceRhs.join(",") + "\n");
+    if (bs.getTraceMode()) {
+        process.stderr.write(bs.getTracePrompt + traceLhs.join(", ") + " = " + traceRhs.join(",") + "\n");
     }
-    return VALUE_NONE;
+    return bs.VALUE_NONE;
 }
 
 function _assign(frame, singleLhs, value) {
@@ -3631,29 +2865,29 @@ function _assign(frame, singleLhs, value) {
             let lhsValue = frame.lookup(varName);
             //console.log("varName: " + varName + " value: " + JSON.stringify(lhsValue));
 
-            if (lhsValue == undefined || (lhsValue.type != TYPE_LIST && lhsValue.type != TYPE_MAP && lhsValue.type != TYPE_STR)) {
-                let err = new RuntimeException("Can't lookup index expression - value is not a list or map");
+            if (lhsValue == undefined || (lhsValue.type != bs.TYPE_LIST && lhsValue.type != bs.TYPE_MAP && lhsValue.type != bs.TYPE_STR)) {
+                let err = new bs.RuntimeException("Can't lookup index expression - value is not a list or map");
                 err.addToStack([singleLhs.startOffset, singleLhs.currentSourceInfo]);
                 throw err;
             }
 
             let indexValues = _indexAssign(frame, lhsValue, indexExpr, value);
-            if (traceMode) {
+            if (bs.getTraceMode()) {
                 let indexExpr = "";
                 for(let i=0; i< indexValues.length; ++i) {
-                    indexExpr += "[" + rtValueToJsVal(indexValues[i]) + "]";
+                    indexExpr += "[" + bs.rtValueToJsVal(indexValues[i]) + "]";
                 }
-                return [ varName + indexExpr, rtValueToJsVal(value) ];
+                return [ varName + indexExpr, bs.rtValueToJsVal(value) ];
             }
         } else {
             frame.assign(varName, value);
-            if (traceMode) {
-                return [ varName, rtValueToJsVal(value) ];
+            if (bs.getTraceMode()) {
+                return [ varName, bs.rtValueToJsVal(value) ];
             }
         }
     }
-    if (traceMode) {
-        return [ "_", rtValueToJsVal(value)];
+    if (bs.getTraceMode()) {
+        return [ "_", bs.rtValueToJsVal(value)];
     }
 }
 
@@ -3664,39 +2898,39 @@ function _indexAssign(frame, value, refExpr, newValue) {
         let expr = refExpr[i];
         let indexValue = expr.eval(frame);
 
-        if (value.type == TYPE_LIST || value.type == TYPE_STR) {
-            if (indexValue.type != TYPE_NUM) {
-                let err = new RuntimeException("Can't assign this " + typeNameVal(value) + " index . Index value of must be an number, instead got " + rtValueToJsVal(indexValue));
+        if (value.type == bs.TYPE_LIST || value.type == bs.TYPE_STR) {
+            if (indexValue.type != bs.TYPE_NUM) {
+                let err = new bs.RuntimeException("Can't assign this " + bs.typeNameVal(value) + " index . Index value of must be an number, instead got " + bs.rtValueToJsVal(indexValue));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
             indexValue.val = Math.round(indexValue.val); // make sure it's an integer.
 
             if (indexValue.val < 0 || indexValue.val >= value.val.length) {
-                let err = new RuntimeException("Can't assign this "  + typeNameVal(value) + " index. Index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
+                let err = new bs.RuntimeException("Can't assign this "  + bs.typeNameVal(value) + " index. Index value is out of range. Got " + indexValue.val + " - must be smaller than " + value.val.length + " and greater or equal to zero");
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
         }
 
 
-        if (traceMode) {
+        if (bs.getTraceMode()) {
             traceVals.push(indexValue);
         }
 
         if (i != (refExpr.length-1)) {
             value = value.val[indexValue.val];
-            if (value == undefined || (value.type != TYPE_LIST && value.type != TYPE_MAP)) {
-                let err = new RuntimeException("Can't assign this entry, lookup did not return a list or a map, got " + typeNameVal(value) +" instead. index value: " + rtValueToJsVal(value));
+            if (value == undefined || (value.type != bs.TYPE_LIST && value.type != bs.TYPE_MAP)) {
+                let err = new bs.RuntimeException("Can't assign this entry, lookup did not return a list or a map, got " + bs.typeNameVal(value) +" instead. index value: " + bs.rtValueToJsVal(value));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
         } else {
-            if (value.type != TYPE_STR) {
+            if (value.type != bs.TYPE_STR) {
                 value.val[indexValue.val] = newValue;
             } else {
-                if (newValue.type != TYPE_STR) {
-                    let err = new RuntimeException("Can't assign string index to " + typeNameVal(newValue) + " right handd side value must be a string")
+                if (newValue.type != bs.TYPE_STR) {
+                    let err = new bs.RuntimeException("Can't assign string index to " + bs.typeNameVal(newValue) + " - right hand side value must be a string")
                     err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                     throw err;
                 }
@@ -3756,13 +2990,13 @@ class AstIfStmt extends AstBase {
             let clause = this.ifClauses[i];
             let val = clause[0].eval(frame);
 
-            let boolVal = value2Bool(val);
-            if (traceMode) {
+            let boolVal = bs.value2Bool(val);
+            if (bs.getTraceMode()) {
                 if (i == 0) {
-                    process.stderr.write(tracePrompt + "if " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
+                    process.stderr.write(bs.getTracePrompt + "if " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
 
                 } else {
-                    process.stderr.write(tracePrompt + "elif " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
+                    process.stderr.write(bs.getTracePrompt + "elif " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
                 }
             }
 
@@ -3771,20 +3005,20 @@ class AstIfStmt extends AstBase {
             }
         }
         if (this.elseStmtList != null) {
-            if (traceMode) {
-                process.stderr.write(tracePrompt + "else\n");
+            if (bs.getTraceMode()) {
+                process.stderr.write(bs.getTracePrompt + "else\n");
             }
 
             return this.elseStmtList.eval(frame);
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     *genEval(frame) {
         for(let i=0; i< this.ifClauses.length; ++i) {
             let clause = this.ifClauses[i];
             let val = clause[0].eval(frame);
-            if (value2Bool(val)) {
+            if (bs.value2Bool(val)) {
                 if (clause[i].hasGen) {
                    return yield* clause[1].eval(frame);
                 } else {
@@ -3800,7 +3034,7 @@ class AstIfStmt extends AstBase {
                 return this.elseStmtList.eval(frame);
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     hasYield(frame) {
@@ -3852,37 +3086,37 @@ class AstWhileStmt extends AstBase {
         while(true) {
             let condVal = this.expr.eval(frame);
 
-            let cond =  value2Bool(condVal);
+            let cond =  bs.value2Bool(condVal);
             if (cond == false) {
                 break;
             }
 
-            if (traceMode) {
-                process.stderr.write(tracePrompt + "while " + cond + "\n" )
+            if (bs.getTraceMode()) {
+                process.stderr.write(bs.getTracePrompt + "while " + cond + "\n" )
             }
 
             let rt = this.stmtList.eval(frame);
 
-            if (rt.type >= TYPE_FORCE_RETURN) {
-                if (rt.type == TYPE_FORCE_BREAK) {
+            if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_BREAK) {
                     break;
                 }
-                if (rt.type == TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_RETURN) {
                     return rt;
                 }
-                if (rt.type ==TYPE_FORCE_CONTINUE) {
+                if (rt.type ==bs.TYPE_FORCE_CONTINUE) {
                     continue;
                 }
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     *genEval(frame) {
         while(true) {
             let condVal = this.expr.eval(frame);
 
-            let cond =  value2Bool(condVal);
+            let cond =  bs.value2Bool(condVal);
 
             if (cond == false) {
                 break;
@@ -3899,16 +3133,16 @@ class AstWhileStmt extends AstBase {
                 rt = this.stmtList.eval(frame);
             }
 
-            if (rt.type >= TYPE_FORCE_RETURN) {
-                if (rt.type == TYPE_FORCE_BREAK) {
+            if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_BREAK) {
                     break;
                 }
-                if (rt.type == TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_RETURN) {
                     return rt;
                 }
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     hasYield(frame) {
@@ -3934,48 +3168,48 @@ class AstForStmt extends AstBase {
     }
 
     eval(frame) {
-        if (traceMode) {
-            process.stderr.write(tracePrompt + "for ");
+        if (bs.getTraceMode()) {
+            process.stderr.write(bs.getTracePrompt + "for ");
         }
         if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
             for (let val of this.expr.genEval(frame)) {
                 _assignImp(frame, val, this.lhs);
                 let rt = this.stmtList.eval(frame);
 
-                if (rt.type >= TYPE_FORCE_RETURN) {
-                    if (rt.type == TYPE_FORCE_BREAK) {
+                if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                    if (rt.type == bs.TYPE_FORCE_BREAK) {
                         break;
                     }
-                    if (rt.type == TYPE_FORCE_RETURN) {
+                    if (rt.type == bs.TYPE_FORCE_RETURN) {
                         return rt;
                     }
-                    if (rt.type == TYPE_FORCE_CONTINUE) {
+                    if (rt.type == bs.TYPE_FORCE_CONTINUE) {
                         continue;
                     }
                 }
             }
-            return VALUE_NONE;
+            return bs.VALUE_NONE;
         }
 
         let rt = this.expr.eval(frame);
-        if (rt.type != TYPE_LIST && rt.type != TYPE_MAP) {
-            throw new RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
+        if (rt.type != bs.TYPE_LIST && rt.type != bs.TYPE_MAP) {
+            throw new bs.RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
         }
         for(let val of genValues(rt)) {
             _assignImp(frame, val, this.lhs);
 
             let rt = this.stmtList.eval(frame);
 
-            if (rt.type >= TYPE_FORCE_RETURN) {
-                if (rt.type == TYPE_FORCE_BREAK) {
+            if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_BREAK) {
                     break;
                 }
-                if (rt.type == TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_RETURN) {
                     return rt;
                 }
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     *genEval(frame) {
@@ -3984,39 +3218,39 @@ class AstForStmt extends AstBase {
                 _assignImp(frame, val, this.lhs);
                 let rt = yield *this.stmtList.genEval(frame);
 
-                if (rt != null && rt.type >= TYPE_FORCE_RETURN) {
-                    if (rt.type == TYPE_FORCE_BREAK) {
+                if (rt != null && rt.type >= bs.TYPE_FORCE_RETURN) {
+                    if (rt.type == bs.TYPE_FORCE_BREAK) {
                         break;
                     }
-                    if (rt.type == TYPE_FORCE_RETURN) {
+                    if (rt.type == bs.TYPE_FORCE_RETURN) {
                         return rt;
                     }
-                    if (rt.type == TYPE_FORCE_CONTINUE) {
+                    if (rt.type == bs.TYPE_FORCE_CONTINUE) {
                         continue;
                     }
                 }
             }
-            return VALUE_NONE;
+            return bs.VALUE_NONE;
         }
 
         let rt = this.expr.eval(frame);
-        if (rt.type != TYPE_LIST && rt.type != TYPE_MAP) {
-            throw new RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
+        if (rt.type != bs.TYPE_LIST && rt.type != bs.TYPE_MAP) {
+            throw new bs.RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
         }
         for(let val of genValues(rt)) {
             _assignImp(frame, val, this.lhs);
             let rt = yield* this.stmtList.genEval(frame);
 
-            if (rt.type >= TYPE_FORCE_RETURN) {
-                if (rt.type == TYPE_FORCE_BREAK) {
+            if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_BREAK) {
                     break;
                 }
-                if (rt.type == TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_RETURN) {
                     return rt;
                 }
             }
         }
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
 
@@ -4040,10 +3274,10 @@ class AstReturnStmt extends AstBase {
 
     eval(frame) {
         let retValue = this.expr.eval(frame);
-        if (traceMode) {
-            process.stderr.write(tracePrompt + "return " + rtValueToJson(retValue) + "\n");
+        if (bs.getTraceMode()) {
+            process.stderr.write(bs.getTracePrompt + "return " + bs.rtValueToJson(retValue) + "\n");
         }
-        return new Value(TYPE_FORCE_RETURN, retValue);
+        return new bs.Value(bs.TYPE_FORCE_RETURN, retValue);
     }
 
     show() {
@@ -4063,13 +3297,13 @@ class AstYieldStmt extends AstBase {
     }
 
     eval(frame) {
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     *genEval(frame) {
         let retValue = this.expr.eval(frame);
         yield retValue;
-        return VALUE_NONE;
+        return bs.VALUE_NONE;
     }
 
     hasYield() {
@@ -4086,33 +3320,81 @@ function makeYieldStmt(expr, offset) {
 }
 
 class AstUseStatement extends AstBase {
-    constructor(expr, offset, parserFunction) {
+    constructor(expr, asClause, offset, parserFunction) {
         super(offset);
         this.expr = expr;
         this.parserFunction = parserFunction;
-        this.statements = null;
+        this.firstCall = true;
+        this.namespaceId = (asClause != null && asClause.length != 0) ? asClause[0][1][0] : null;
     }
 
      eval(frame) {
-        if (this.statements == null) {
+        if (this.firstCall) {
+            this.firstCall = false;
+
+            if (this.namespaceId != null) {
+                
+                let namespace = new bs.Value(bs.TYPE_MAP, {});
+                frame.defineVar(this.namespaceId, namespace);
+
+                let newFrame = new bs.Frame(frame);
+                newFrame.vars = namespace.val;
+
+                frame = newFrame;
+            }
 
             let fileToInclude = this.expr.eval(frame);
-            let includedFile = value2Str(fileToInclude);
-            if (includedFile == "" || includedFile==null) {
-                throw new RuntimeException("expression in use statement gives an empty value. (should be a string with the name of a file)", this.startOffset);
+            let includedFile = bs.value2Str2(fileToInclude);
+
+            if (includedFile == "" || includedFile == null) {
+                throw new bs.RuntimeException("expression in use statement gives an empty string value. (should be a string with the name of a file)", this.startOffset);
             }
-            try {
-                this.statements = this.parserFunction(includedFile, true);
-            } catch(er) {
+
+            let extension =  this.fileExtension(includedFile)
+            if (extension  == "p") {
+                try {
+                    let statements = this.parserFunction(includedFile, true);
+                    return statements.eval(frame);
+                } catch (er) {
+                    er.addToStack([this.startOffset, this.currentSourceInfo]);
+                    throw er;
+                }
+            }
+            else if (extension == "js") {
+                return this.useJsExtension(includedFile, frame);
+            } else {
+                let er = new bs.RuntimeException("file extension of included file should be either .p or .js, is: " + extension + " using: " + includedFile);
+                er.addToStack([this.startOffset, this.currentSourceInfo]);
                 throw er;
             }
         }
-        return this.statements.eval(frame);
+    }
+
+    useJsExtension(incFile, frame) {
+        let ext = require(incFile);
+        try {
+            ext.addExtension(frame);
+            return bs.VALUE_NONE;
+        } catch(ex) {
+            //console.trace(ex);
+            let er = new bs.RuntimeException("Can't use/include extension module. " + incFile + " error:",  ex);
+            er.addToStack([this.startOffset, this.currentSourceInfo]);
+            throw er;
+        }
+
+    }
+
+    fileExtension(filename) {
+        let components = filename.split('.');
+        if (components.length > 1) {
+            return components[components.length-1];
+        }
+        return '';
     }
 }
 
-function makeUseStmt(parser, expression, offset) {
-    return new AstUseStatement(expression, offset, parser);
+function makeUseStmt(parser, expression, asClause, offset) {
+    return new AstUseStatement(expression, asClause, offset, parser);
 }
 
 
@@ -4122,10 +3404,10 @@ class AstBreakStmt extends AstBase {
     }
 
     eval(frame) {
-        if (traceMode) {
-            process.stderr.write(tracePrompt + "break\n");
+        if (bs.getTraceMode()) {
+            process.stderr.write(bs.getTracePrompt + "break\n");
         }
-        return new Value(TYPE_FORCE_BREAK, null);
+        return new bs.Value(bs.TYPE_FORCE_BREAK, null);
     }
 
     show() {
@@ -4143,10 +3425,10 @@ class AstContinueStmt extends AstBase {
     }
 
     eval(frame) {
-        if (traceMode) {
-            process.stderr.write(tracePrompt + "continue\n");
+        if (bs.getTraceMode()) {
+            process.stderr.write(bs.getTracePrompt + "continue\n");
         }
-        return new Value(TYPE_FORCE_CONTINUE, null);
+        return new bs.Value(bs.TYPE_FORCE_CONTINUE, null);
     }
 
     show() {
@@ -4191,7 +3473,7 @@ class AstFunctionDef extends AstBase {
         if (this.name != null) {
             argFrame = null;
         }
-        let closureValue = new ClosureValue(this, defaultParamValues, argFrame);
+        let closureValue = new bs.ClosureValue(this, defaultParamValues, argFrame);
         if (this.name != null) {
             let prevValue = null
             try {
@@ -4199,8 +3481,8 @@ class AstFunctionDef extends AstBase {
             } catch(er) {
                 // can throw runtime exception - when value is not defined
             }
-            if (prevValue != null && prevValue.type == TYPE_BUILTIN_FUNCTION) {
-                throw new RuntimeException("Can't redefine built-in function " + this.name);
+            if (prevValue != null && prevValue.type == bs.TYPE_BUILTIN_FUNCTION) {
+                throw new bs.RuntimeException("Can't redefine built-in function " + this.name);
             }
             frame.assign(this.name, closureValue);
         }
@@ -4260,24 +3542,24 @@ class AstFunctionCall extends AstBase {
         try {
             if (!funcVal.hasYield(frame)) {
                 let args = this._evalCallArguments(frame);
-                return evalClosure(funcVal.name, funcVal, args, frame);
+                return bs.evalClosure(funcVal.name, funcVal, args, frame);
             } else {
                 let ret = [];
 
                 let args = this._evalCallArguments(frame);
-                for (let val of genEvalClosure(funcVal, args, frame)) {
+                for (let val of bs.genEvalClosure(funcVal, args, frame)) {
                     ret.push(val);
                 }
-                return new Value(TYPE_LIST, ret);
+                return new bs.Value(bs.TYPE_LIST, ret);
             }
         } catch (er) {
-            if (er instanceof RuntimeException && !er.isUnwind()) {
+            if (er instanceof bs.RuntimeException && !er.isUnwind()) {
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             } else {
                 if (showJavascriptStack) {
                     console.log("stack length: " + er.stack);
                 }
-                er = new RuntimeException("internal error: " + er);
+                er = new bs.RuntimeException("internal error: " + er);
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
             throw er;
@@ -4288,7 +3570,7 @@ class AstFunctionCall extends AstBase {
         let funcVal = this._getFuncVal(frame);
         if (funcVal.hasYield(frame)) {
             let args = this._evalCallArguments(frame);
-            yield* genEvalClosure(funcVal, args, frame)
+            yield* bs.genEvalClosure(funcVal, args, frame)
         }
     }
 
@@ -4334,11 +3616,11 @@ class AstFunctionCall extends AstBase {
             funcVal.name = this.name;
         }
         if (funcVal == undefined) {
-            throw new RuntimeException("Can't call undefined function " + this.name, this.startOffset);
+            throw new bs.RuntimeException("Can't call undefined function " + this.name, this.startOffset);
         }
 
-        if (funcVal.type != TYPE_CLOSURE && funcVal.type != TYPE_BUILTIN_FUNCTION) {
-            throw new RuntimeException("variable is not a function/closure, it is a " + typeNameVal(funcVal), this.startOffset);
+        if (funcVal.type != bs.TYPE_CLOSURE && funcVal.type != bs.TYPE_BUILTIN_FUNCTION) {
+            throw new bs.RuntimeException("variable is not a function/closure, it is a " + bs.typeNameVal(funcVal), this.startOffset);
         }
         this.funcVal_ = funcVal;
         return funcVal;
@@ -4381,8 +3663,8 @@ function isReturnOrYield(arg) {
 }
 
 function makeFrame(cmdLine) {
-    let frame = new Frame();
-    frame.vars = RTLIB;
+    let frame = new bs.Frame();
+    frame.vars = bs.RTLIB;
 
     if (cmdLine != null) {
         let cmd = frame.lookup("ARGV");
@@ -4394,7 +3676,7 @@ function makeFrame(cmdLine) {
 }
 
 function listToString(lst) {
-    let stringList = lst.map(function (arg) { return new Value(TYPE_STR, arg); });
+    let stringList = lst.map(function (arg) { return new bs.Value(bs.TYPE_STR, arg); });
     return stringList;
 
 }
@@ -4427,17 +3709,6 @@ function addSourceToTopLevelStmts(data,ast) {
 
 if (typeof(module) == 'object') {
     module.exports = {
-        TYPE_BOOL,
-        TYPE_NUM,
-        TYPE_STR,
-        TYPE_REGEX,
-        TYPE_LIST,
-        TYPE_MAP,
-        TYPE_NONE,
-        TYPE_CLOSURE,
-        Value,
-        RuntimeException,
-        Frame,
         makeConstValue,
         makeExpression,
         makeUnaryExpression,
@@ -4461,14 +3732,9 @@ if (typeof(module) == 'object') {
         makeFunctionCall,
         makeFrame,
         eval,
-        setLogHook,
         setEvalCallback,
         setCurrentSourceInfo,
-        //setForceStopEval,
-        setTraceMode,
         setErrorOnExecFail,
-        setMaxStackFrames,
-        rtValueToJsVal,
         isBreakOrContinue,
         isReturnOrYield,
         addSourceToTopLevelStmts

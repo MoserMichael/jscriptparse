@@ -643,6 +643,26 @@ You can now include the text of file ```testuse.p``` and use all the functions t
 An important detail: if you have the ```PATH``` environment variable set, then the statement ```use "testuse.p"``` will search for the file name "testuse.p" in all directories specified by the ```PATH``` environment variable.
 
 
+There is a second form of the ```use``` statement, the ```as``` keyword will put all symbols into a map/namespace.
+
+See the example, where all the symbols are accessible via the ```complex``` map/namespace
+
+```
+    # include the source of another file with the use directive
+    use "tests/testuse.p" as complex
+
+    c = complex.newComplex(2,3)
+    d = complex.newComplex(4,5)
+    e = complex.cmul(c, d)
+
+
+    println("complex product: {complex.cshow(e)}")
+
+```
+
+
+
+
 ### <a id='s-1-2-9' />Operator reference
 
 There are the following operations, these can be used in expressions

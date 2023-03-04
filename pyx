@@ -5,11 +5,11 @@ const fs=require("fs");
 const path=require("node:path");
 const repl=require("node:repl");
 const rl=require("node:readline");
-//const repl=require(path.join(__dirname,"repln.js")) //"node:repl");
+const cp = require("node:child_process");
 const rt=require(path.join(__dirname,"rt.js"));
+const bs=require(path.join(__dirname,"rtbase.js"));
 const scr=require(path.join(__dirname,"scripty.js"));
 const prs=require(path.join(__dirname,"prs.js"));
-const cp = require("node:child_process");
 
 const PYX_VERSION = "VERSION_TAG";
 
@@ -173,8 +173,8 @@ function runEvalLoop(cmdLine) {
                 isRunning = false;
 
                 try {
-                    if (res != null && res.type != rt.TYPE_NONE) {
-                        if (res.type == rt.TYPE_NUM) {
+                    if (res != null && res.type != bs.TYPE_NONE) {
+                        if (res.type == bs.TYPE_NUM) {
                             // infinity is not part of json, therefore not displayed by JSON.stringify. weird...
                             if (res.val == Infinity) {
                                 evalPrintMsg += "Infinity";
@@ -255,7 +255,7 @@ function runEvalLoop(cmdLine) {
                     val = val.val[ sval ];
                 }
 
-                if (val == null || val.type != rt.TYPE_MAP) {
+                if (val == null || val.type != bs.TYPE_MAP) {
                     return null;
                 }
                 if (nextIndex == dotIndex) {

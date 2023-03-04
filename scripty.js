@@ -1,10 +1,10 @@
 
 
-
 const path=require("node:path");
+const fs=require("fs");
 const prs=require(path.join(__dirname,"prs.js"));
 const rt=require(path.join(__dirname,"rt.js"));
-const fs=require("fs");
+const bs=require(path.join(__dirname,"rtbase.js"));
 
 
 let theParser = null;
@@ -139,7 +139,7 @@ function makeParserImp() {
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
             arg[0] = unquote( arg[0], arg[1]+1);
-            return rt.makeConstValue(rt.TYPE_STR, arg);
+            return rt.makeConstValue(bs.TYPE_STR, arg);
         }
     );
 
@@ -147,7 +147,7 @@ function makeParserImp() {
         prs.makeRegexParser(/^\/(\\\\.|[^\/])*\/[im]?/, "regular expression-const"),
         function (arg) {
             try {
-                return rt.makeConstValue(rt.TYPE_REGEX, arg);
+                return rt.makeConstValue(bs.TYPE_REGEX, arg);
             } catch(ex) {
                 throw new prs.ParserError(ex, arg[1]+1);
             }
@@ -160,26 +160,26 @@ function makeParserImp() {
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
             arg[0] = unquote( arg[0], arg[1]+1);
-            return rt.makeConstValue(rt.TYPE_STR, arg);
+            return rt.makeConstValue(bs.TYPE_STR, arg);
             }
     );
 
     let trueConst = prs.makeTransformer(
         prs.makeTokenParser("true"),
         function (arg) {
-            return rt.makeConstValue(rt.TYPE_BOOL, arg);
+            return rt.makeConstValue(bs.TYPE_BOOL, arg);
         });
 
     let falseConst = prs.makeTransformer(
         prs.makeTokenParser("false"),
         function (arg) {
-            return rt.makeConstValue(rt.TYPE_BOOL, arg);
+            return rt.makeConstValue(bs.TYPE_BOOL, arg);
         });
 
     let noneConst = prs.makeTransformer(
         prs.makeTokenParser("none"),
         function (arg) {
-            return rt.makeConstValue(rt.TYPE_NONE, arg);
+            return rt.makeConstValue(bs.TYPE_NONE, arg);
         });
 
     // f-string tokens
@@ -188,21 +188,21 @@ function makeParserImp() {
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
             arg[0] = unquote( arg[0], arg[1]+1);
-            return rt.makeConstValue(rt.TYPE_STR, arg);
+            return rt.makeConstValue(bs.TYPE_STR, arg);
         });
     let formatStringMidConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^"{])*{/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
             arg[0] = unquote( arg[0], arg[1]+1);
-            return rt.makeConstValue(rt.TYPE_STR, arg);
+            return rt.makeConstValue(bs.TYPE_STR, arg);
         });
     let formatStringEndConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^"{])*"/, "string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
             arg[0] = unquote( arg[0], arg[1]+1);
-            return rt.makeConstValue(rt.TYPE_STR, arg);
+            return rt.makeConstValue(bs.TYPE_STR, arg);
         })
 
     // backtick string tokens
@@ -212,7 +212,7 @@ function makeParserImp() {
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
             arg[0] = unquote( arg[0], arg[1]+1);
-            return [rt.makeConstValue(rt.TYPE_STR, arg)];
+            return [rt.makeConstValue(bs.TYPE_STR, arg)];
         }
     );
     let backtickStringMidConst = prs.makeTransformer(
@@ -220,7 +220,7 @@ function makeParserImp() {
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
             arg[0] = unquote( arg[0], arg[1]+1);
-            return rt.makeConstValue(rt.TYPE_STR, arg);
+            return rt.makeConstValue(bs.TYPE_STR, arg);
         });
 
     let backtickStringStartConst = prs.makeTransformer(
@@ -228,14 +228,14 @@ function makeParserImp() {
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
             arg[0] = unquote( arg[0], arg[1]+1);
-            return rt.makeConstValue(rt.TYPE_STR, arg);
+            return rt.makeConstValue(bs.TYPE_STR, arg);
         });
     let backtickStringEndConst = prs.makeTransformer(
         prs.makeRegexParser(/^}(\\\\.|[^`{])*`/, "backtick-string-const"),
         function (arg) {
             arg[0] = arg[0].slice(1, -1);
             arg[0] = unquote( arg[0], arg[1]+1);
-            return rt.makeConstValue(rt.TYPE_STR, arg);
+            return rt.makeConstValue(bs.TYPE_STR, arg);
         });
     
     let forwardExpr = new prs.makeForwarder();
@@ -448,7 +448,7 @@ function makeParserImp() {
                     identifier
                 ], "dot index expression"),
                 function(arg) {
-                    return rt.makeConstValue(rt.TYPE_STR, arg[1]);
+                    return rt.makeConstValue(bs.TYPE_STR, arg[1]);
                 }
             )
         ], "index expression"),
@@ -477,13 +477,13 @@ function makeParserImp() {
                 number
             ], "negative number"), function (arg) {
                 arg[1][0] = -1 * Number(arg[1][0]);
-                return rt.makeConstValue(rt.TYPE_NUM, arg[1]);
+                return rt.makeConstValue(bs.TYPE_NUM, arg[1]);
             }
         ),
 
         prs.makeTransformer(number, function (arg) {
             arg[0] = Number(arg[0]);
-            return rt.makeConstValue(rt.TYPE_NUM, arg);
+            return rt.makeConstValue(bs.TYPE_NUM, arg);
         }),
 
         prs.makeTransformer(
@@ -492,7 +492,7 @@ function makeParserImp() {
                 forwardExpr.forward()
             ], "negative epression"), function (arg) {
                 let newArg = [
-                        rt.makeConstValue(rt.TYPE_NUM, [ "-1", arg[0][1] ]),
+                        rt.makeConstValue(bs.TYPE_NUM, [ "-1", arg[0][1] ]),
                         arg[0],
                         arg[1]
                      ];

@@ -5,6 +5,7 @@ const http = require('node:http');
 const url = require('node:url');
 const yaml=require("yaml");
 const prs=require(path.join(__dirname,"prs.js"));
+const bs=require(path.join(__dirname,"rtbase.js"));
 
 const httpAgent = new http.Agent({ keepAlive: true });
 
@@ -54,20 +55,6 @@ function setMaxStackFrames(nframes) {
     maxStackFrames = nframes
 }
 
-const TYPE_BOOL=0
-const TYPE_NUM=1
-const TYPE_STR=2
-const TYPE_REGEX=3
-const TYPE_LIST=4
-const TYPE_MAP=5
-const TYPE_NONE=6
-const TYPE_CLOSURE=7
-const TYPE_BUILTIN_FUNCTION=8
-
-const TYPE_FORCE_RETURN=9
-const TYPE_FORCE_BREAK=10
-const TYPE_FORCE_CONTINUE=11
-
 
 mapTypeToName = {
     0 : "Boolean",
@@ -88,7 +75,7 @@ mapTypeToName = {
 class ClosureValue {
     // needs the function definition and the frame of the current function (for lookup of captured vars)
     constructor(functionDef, defaultParamValues, frame) {
-        this.type = TYPE_CLOSURE;
+        this.type = bs.TYPE_CLOSURE;
         this.functionDef = functionDef;
         this.defaultParamValues = defaultParamValues; // default params are set when function/closure is evaluated.
         this.frame = frame;
@@ -104,7 +91,7 @@ class ClosureValue {
 
 class BuiltinFunctionValue {
     constructor(help_, numParams, funcImpl, defaultParamValues = [], hasYield = false) {
-        this.type = TYPE_BUILTIN_FUNCTION;
+        this.type = bs.TYPE_BUILTIN_FUNCTION;
         this.numParams = numParams;
         this.funcImpl = funcImpl;
         this.defaultParamValues = defaultParamValues;
@@ -137,7 +124,7 @@ class Value {
 
 class RegexValue {
     constructor(value) {
-        this.type = TYPE_REGEX;
+        this.type = bs.TYPE_REGEX;
 
         this.isGlobal = value.endsWith('g');
 
@@ -157,7 +144,7 @@ class RegexValue {
     }
 }
 
-let VALUE_NONE=new Value(TYPE_NONE,null);
+let VALUE_NONE=new Value(bs.TYPE_NONE,null);
 
 function typeNameVal(val) {
     if (val == null || val.type == null) {
@@ -194,11 +181,11 @@ function value2Bool(arg, index) {
         val = arg
     }
 
-    if (val.type == TYPE_BOOL) {
+    if (val.type == bs.TYPE_BOOL) {
         return val.val;
-    } else if (val.type == TYPE_NUM) {
+    } else if (val.type == bs.TYPE_NUM) {
         return val.val != 0;
-    } else if (val.type == TYPE_STR) {
+    } else if (val.type == bs.TYPE_STR) {
         return val.val;
     }
     let paramName = "";
@@ -259,7 +246,7 @@ function value2Num(arg, index) {
         val = arg
     }
 
-    if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+    if (val.type == bs.TYPE_BOOL || val.type == bs.TYPE_NUM) {
         if (isNaN(val.val)) {
             let paramName = "";
             if (index != null) {
@@ -268,7 +255,7 @@ function value2Num(arg, index) {
             throw new RuntimeException("The argument value is not a number - " + paramName);
         }
         return val.val;
-    } else if (val.type == TYPE_STR) {
+    } else if (val.type == bs.TYPE_STR) {
         ret = parseFloat(val.val);
         if (isNaN(ret)) {
             let paramName = "";
@@ -288,7 +275,7 @@ function value2Num(arg, index) {
 
 function requireInt(arg, index) {
     let val = arg[index];
-    if (val.type == TYPE_NUM) {
+    if (val.type == bs.TYPE_NUM) {
         let intval = parseInt(val.val);
         if (intval == val.val) {
             return intval;
@@ -306,11 +293,11 @@ function value2Str(arg, index) {
     } else {
         val = arg
     }
-    if (val.type == TYPE_STR || val.type == TYPE_REGEX) {
+    if (val.type == bs.TYPE_STR || val.type == bs.TYPE_REGEX) {
         return val.val;
-    } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+    } else if (val.type == bs.TYPE_BOOL || val.type == bs.TYPE_NUM) {
         return val.val.toString();
-    } else if (val.type == TYPE_NONE) {
+    } else if (val.type == bs.TYPE_NONE) {
         return "none";
     }
     let paramName = "";
@@ -325,11 +312,11 @@ function value2Str2(arg) {
 }
 
 function value2StrDisp(val) {
-    if (val.type == TYPE_STR) {
+    if (val.type == bs.TYPE_STR) {
         return val.val;
-    } else if (val.type == TYPE_BOOL || val.type == TYPE_NUM) {
+    } else if (val.type == bs.TYPE_BOOL || val.type == bs.TYPE_NUM) {
         return val.val.toString();
-    } else if (val.type == TYPE_NONE) {
+    } else if (val.type == bs.TYPE_NONE) {
         return "none";
     }
     return rtValueToJson(val);
@@ -344,7 +331,7 @@ function jsValueToRtVal(value) {
         for(let i=0; i<value.length; ++i) {
             rt.push( jsValueToRtVal(value[i]) );
         }
-        return new Value(TYPE_LIST, rt);
+        return new Value(bs.TYPE_LIST, rt);
     }
 
     if (value.constructor == Object) { // check if dictionary.
@@ -353,19 +340,19 @@ function jsValueToRtVal(value) {
         for(let i=0; i<keys.length; ++i) {
             rt[ new String(keys[i]) ] = jsValueToRtVal( value[keys[i]] );
         }
-        return new Value(TYPE_MAP, rt);
+        return new Value(bs.TYPE_MAP, rt);
     }
 
     if (typeof(value) == "boolean") {
-        return new Value(TYPE_BOOL, value);
+        return new Value(bs.TYPE_BOOL, value);
     }
 
     if (typeof(value) == 'number') {
-        return new Value(TYPE_NUM, value)
+        return new Value(bs.TYPE_NUM, value)
     }
 
     if (typeof(value) == 'string') {
-        return new Value(TYPE_STR, value)
+        return new Value(bs.TYPE_STR, value)
     }
 
     if (typeof(value) == null) {
@@ -376,7 +363,7 @@ function jsValueToRtVal(value) {
 }
 
 function rtValueToJsVal(value) {
-    if (value.type == TYPE_LIST) {
+    if (value.type == bs.TYPE_LIST) {
         let ret = [];
         for(let i=0; i<value.val.length; ++i) {
             ret.push( rtValueToJsVal( value.val[i] ) );
@@ -384,7 +371,7 @@ function rtValueToJsVal(value) {
         return ret;
     }
 
-    if (value.type == TYPE_MAP) {
+    if (value.type == bs.TYPE_MAP) {
         let ret = {};
         let keys = Object.keys(value.val);
         for (let i = 0; i < keys.length; ++i) {
@@ -393,11 +380,11 @@ function rtValueToJsVal(value) {
         return ret;
     }
 
-    if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM || value.type == TYPE_NONE || value.type == TYPE_REGEX) {
+    if (value.type == bs.TYPE_STR || value.type == bs.TYPE_BOOL || value.type == bs.TYPE_NUM || value.type == bs.TYPE_NONE || value.type == bs.TYPE_REGEX) {
         return value.val;
     }
 
-    if (value.type == TYPE_CLOSURE || value.type == TYPE_BUILTIN_FUNCTION) {
+    if (value.type == bs.TYPE_CLOSURE || value.type == bs.TYPE_BUILTIN_FUNCTION) {
         return "<function>";
     }
 
@@ -475,18 +462,18 @@ class RuntimeException  extends Error {
 
     toRTValue() {
         let map = {
-            "message": new Value(TYPE_STR, this.getMessage()),
-            "stack": new Value(TYPE_STR, this.showStackTrace(false))
+            "message": new Value(bs.TYPE_STR, this.getMessage()),
+            "stack": new Value(bs.TYPE_STR, this.showStackTrace(false))
         };
 
         if (this.stackTrace != null) {
             let stackInfo = this.stackTrace[0];
-            map['offset'] = new Value(TYPE_NUM, stackInfo[0]);
+            map['offset'] = new Value(bs.TYPE_NUM, stackInfo[0]);
             if (stackInfo[1] != null) {
-                map['fileName'] = new Value(TYPE_STR, stackInfo[1]);
+                map['fileName'] = new Value(bs.TYPE_STR, stackInfo[1]);
             }
         }
-        return new Value(TYPE_MAP, map)
+        return new Value(bs.TYPE_MAP, map)
     }
 
     getMessage() {
@@ -512,21 +499,21 @@ class RuntimeException  extends Error {
 }
 
 function clonePrimitiveVal(val) {
-    if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
+    if (val.type == bs.TYPE_BOOL || val.type == bs.TYPE_STR || val.type == bs.TYPE_NUM) {
         return new Value(val.type, val.val);
     }
     return val;
 }
 
 function cloneAll(val) {
-    if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
+    if (val.type == bs.TYPE_BOOL || val.type == bs.TYPE_STR || val.type == bs.TYPE_NUM) {
         return new Value(val.type, val.val);
     }
     return new Value(val.type, JSON.parse( JSON.stringify(val.val) ) );
 }
 
 function* genEvalClosure(funcVal, args, frame) {
-    if (funcVal.type == TYPE_CLOSURE) {
+    if (funcVal.type == bs.TYPE_CLOSURE) {
         let funcFrame = null;
 
         if (funcVal.frame != null) { // closure with captured variables
@@ -559,7 +546,7 @@ function* genEvalClosure(funcVal, args, frame) {
 }
 
 function evalClosure(name, funcVal, args, frame) {
-    if (funcVal.type == TYPE_CLOSURE) {
+    if (funcVal.type == bs.TYPE_CLOSURE) {
 
         let funcFrame = null;
         let traceParam = "";
@@ -584,7 +571,7 @@ function evalClosure(name, funcVal, args, frame) {
             // frame is ready, evaluate the statement list
             let rVal = funcVal.functionDef.body.eval(funcFrame);
 
-            if (rVal.type == TYPE_FORCE_RETURN) {
+            if (rVal.type == bs.TYPE_FORCE_RETURN) {
                 return rVal.val;
             }
             return rVal;
@@ -614,7 +601,7 @@ function evalClosure(name, funcVal, args, frame) {
         retVal = VALUE_NONE;
     }
 
-    if (traceMode && retVal.type != TYPE_NONE) {
+    if (traceMode && retVal.type != bs.TYPE_NONE) {
         process.stderr.write(tracePrompt + rtValueToJson(retVal) + "\n}");
     }
 
@@ -701,7 +688,7 @@ function _prepareClosureFrame(funcVal, frame, args) {
 function _getEnv(frame) {
     let val = frame.lookup("ENV");
 
-    if (val == null || val.type != TYPE_MAP) {
+    if (val == null || val.type != bs.TYPE_MAP) {
         return {};
     }
 
@@ -728,12 +715,12 @@ function _system(cmd, frame) {
     if (status !=0 && errorOnExecFail) {
         throw new RuntimeException("failed to run `" + cmd + "` : " + out);
     }
-    let val = [ new Value(TYPE_STR, out), new Value(TYPE_NUM, status) ];
-    return new Value(TYPE_LIST, val);
+    let val = [ new Value(bs.TYPE_STR, out), new Value(bs.TYPE_NUM, status) ];
+    return new Value(bs.TYPE_LIST, val);
 }
 
 function isBascType(ty) {
-    return ty==TYPE_BOOL || ty == TYPE_NUM || ty == TYPE_STR || ty == TYPE_REGEX || ty ==  TYPE_NONE;
+    return ty==bs.TYPE_BOOL || ty == bs.TYPE_NUM || ty == bs.TYPE_STR || ty == bs.TYPE_REGEX || ty ==  bs.TYPE_NONE;
 }
 
 function printImpl(arg) {
@@ -760,10 +747,10 @@ function dimArray(currentDim, dims) {
         }
     } else {
         for (let i = 0; i < n; ++i) {
-            val[i] = new Value(TYPE_NUM, 0);
+            val[i] = new Value(bs.TYPE_NUM, 0);
         }
     }
-    return new Value(TYPE_LIST, val);
+    return new Value(bs.TYPE_LIST, val);
 }
 
 function dimArrayInit(initValue, currentDim, dims) {
@@ -778,19 +765,19 @@ function dimArrayInit(initValue, currentDim, dims) {
             val[i] = cloneAll(initValue);
         }
     }
-    return new Value(TYPE_LIST, val);
+    return new Value(bs.TYPE_LIST, val);
 }
 
 function * genValues(val) {
-    if (val.type == TYPE_LIST) {
+    if (val.type == bs.TYPE_LIST) {
         for(let i=0; i <val.val.length; ++i) {
             yield val.val[i];
         }
     }
-    if (val.type == TYPE_MAP) {
+    if (val.type == bs.TYPE_MAP) {
         for (let keyVal of Object.entries(val.val)) {
-            let yval = [ new Value(TYPE_STR, keyVal[0]), keyVal[1] ];
-            yield new Value(TYPE_LIST, yval);
+            let yval = [ new Value(bs.TYPE_STR, keyVal[0]), keyVal[1] ];
+            yield new Value(bs.TYPE_LIST, yval);
         }
     }
 }
@@ -806,14 +793,14 @@ function checkResNan(res) {
 
 function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
 
-    let req_ = new Value(TYPE_MAP, {
-        'url_' : new Value(TYPE_STR, httpReq.url),
+    let req_ = new Value(bs.TYPE_MAP, {
+        'url_' : new Value(bs.TYPE_STR, httpReq.url),
 
         'url' : new BuiltinFunctionValue(``, 0, function() {
-            return new Value(TYPE_STR,  httpReq.url );
+            return new Value(bs.TYPE_STR,  httpReq.url );
         }),
         'method' : new BuiltinFunctionValue(``, 0, function() {
-            return new Value(TYPE_STR, httpReq.method );
+            return new Value(bs.TYPE_STR, httpReq.method );
         }),
         'query' : new BuiltinFunctionValue(``, 0, function() {
             return jsValueToRtVal(httpReq.query);
@@ -827,11 +814,11 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
             return new jsValueToRtVal(val);
         }),
         'requestData' : new BuiltinFunctionValue(``, 0, function(arg) {
-            return new Value(TYPE_STR, requestData );
+            return new Value(bs.TYPE_STR, requestData );
         }),
     });
 
-    let res_ = new Value(TYPE_MAP, {
+    let res_ = new Value(bs.TYPE_MAP, {
 
         'setHeader': new BuiltinFunctionValue(``, 2, function(arg) {
             httpRes.setHeader(value2Str(arg, 0), rtValueToJsVal(arg[1].val));
@@ -844,7 +831,7 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
             let textResponse = value2Str(arg, 1);
             let contentType = "text/plain"
 
-            if (code.type != TYPE_NUM) {
+            if (code.type != bs.TYPE_NUM) {
                 throw new RuntimeException("first argument: expected number")
             }
 
@@ -947,7 +934,7 @@ RTLIB={
             index = parseInt(value2Num(arg, 2));
         }
 
-        if (arg[1].type == TYPE_REGEX) {
+        if (arg[1].type == bs.TYPE_REGEX) {
             if (index != 0) {
                 hay = hay.substring(index);
             }
@@ -955,12 +942,12 @@ RTLIB={
             if (matches != -1) {
                 matches += index;
             }
-            return new Value(TYPE_NUM, matches);
+            return new Value(bs.TYPE_NUM, matches);
         }
 
         let needle = value2Str(arg, 1);
         let res = hay.indexOf(needle, index)
-        return new Value(TYPE_NUM, res);
+        return new Value(bs.TYPE_NUM, res);
     }, [null, null, null]),
 
 
@@ -977,14 +964,14 @@ RTLIB={
 `, 3, function(arg) {
         let hay = value2Str(arg, 0);
 
-        checkType(arg, 1, TYPE_REGEX)
+        checkType(arg, 1, bs.TYPE_REGEX)
 
         let ret = hay.match(arg[1].regex);
 
         if (ret == null) {
             return [ -1, "" ];
         }
-        return new Value(TYPE_LIST, [ new Value(TYPE_NUM, ret['index']), new Value(TYPE_STR, ret[0]) ]);
+        return new Value(bs.TYPE_LIST, [ new Value(bs.TYPE_NUM, ret['index']), new Value(bs.TYPE_STR, ret[0]) ]);
     }, [null, null, null]),
 
     "matchAll": new BuiltinFunctionValue(`
@@ -998,7 +985,7 @@ RTLIB={
         let hay = value2Str(arg, 0);
         let ret = []
 
-        checkType(arg, 1, TYPE_REGEX)
+        checkType(arg, 1, bs.TYPE_REGEX)
 
         let lenConsumed = 0;
 
@@ -1009,8 +996,8 @@ RTLIB={
             }
             let index = mval['index'];
 
-            let r = [ new Value(TYPE_NUM, lenConsumed + index), new Value(TYPE_STR, mval[0]) ];
-            ret.push( new Value(TYPE_LIST, r ) );
+            let r = [ new Value(bs.TYPE_NUM, lenConsumed + index), new Value(bs.TYPE_STR, mval[0]) ];
+            ret.push( new Value(bs.TYPE_LIST, r ) );
 
             let toAdd = mval[0].length;
             if (toAdd == 0) {
@@ -1020,7 +1007,7 @@ RTLIB={
             lenConsumed += index + mval[0].length;
 
         }
-        return new Value(TYPE_LIST, ret );
+        return new Value(bs.TYPE_LIST, ret );
     }, [null, null, null]),
 
 
@@ -1040,7 +1027,7 @@ RTLIB={
         let to = null;
 
         if (arg[2] != null) {
-            if (arg[2].type == TYPE_NUM) {
+            if (arg[2].type == bs.TYPE_NUM) {
                 to = arg[2].val;
             } else {
                 to = parseInt(value2Num(arg[2]), 10);
@@ -1053,19 +1040,19 @@ RTLIB={
             sval = sval.substring(from, to);
         }
 
-        return new Value(TYPE_STR, sval);
-    }, [null, null, new Value(TYPE_NUM, -1) ]),
+        return new Value(bs.TYPE_STR, sval);
+    }, [null, null, new Value(bs.TYPE_NUM, -1) ]),
     "lc": new BuiltinFunctionValue(`# convert to lower case string
 > lc("BIG little")
 "big little"`, 1, function(arg) {
         let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val.toLowerCase());
+        return new Value(bs.TYPE_STR, val.toLowerCase());
     }),
     "uc": new BuiltinFunctionValue(`# convert to upper case string
 > uc("BIG little")
 "BIG LITTLE"`, 1, function(arg) {
         let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val.toUpperCase());
+        return new Value(bs.TYPE_STR, val.toUpperCase());
     }),
     "trim": new BuiltinFunctionValue(`# remove leading and trailing whitespace characters
 
@@ -1078,7 +1065,7 @@ RTLIB={
 > trim(a)
 "a lot of honey honey"`, 1, function(arg) {
         let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val.trim());
+        return new Value(bs.TYPE_STR, val.trim());
     }),
     "reverse": new BuiltinFunctionValue(`# return the reverse of the argument (either string or list argument)
 
@@ -1086,11 +1073,11 @@ RTLIB={
 [4,3,2,1]
 > reverse("abcd")
 "dcba"`, 1, function(arg) {
-        if (arg[0].type == TYPE_LIST) {
-            return new Value(TYPE_LIST, arg[0].val.reverse());
+        if (arg[0].type == bs.TYPE_LIST) {
+            return new Value(bs.TYPE_LIST, arg[0].val.reverse());
         }
         let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val.split("").reverse().join(""));
+        return new Value(bs.TYPE_STR, val.split("").reverse().join(""));
     }),
     "split": new BuiltinFunctionValue(`
 # split the first argument string into tokens, the second argument specifies how to split it.
@@ -1119,14 +1106,14 @@ RTLIB={
         let delim = "\n";
 
         if (arg[1] != null) {
-            if (arg[1].type == TYPE_REGEX) {
+            if (arg[1].type == bs.TYPE_REGEX) {
                 delim = arg[1].regex;
             } else {
                 delim = value2Str(arg, 1);
             }
         }
         for(let n of hay.split(delim)) {
-            yield new Value(TYPE_STR, n);
+            yield new Value(bs.TYPE_STR, n);
         }
     }, [null, null], true),
     "str": new BuiltinFunctionValue(`> str(123)
@@ -1134,7 +1121,7 @@ RTLIB={
 > str("abc")
 "abc"`, 1, function(arg) {
         let val = value2Str(arg, 0);
-        return new Value(TYPE_STR, val);
+        return new Value(bs.TYPE_STR, val);
     }),
     "repeat" : new BuiltinFunctionValue(`> repeat("a",3)
 "aaa"
@@ -1142,7 +1129,7 @@ RTLIB={
 "ababab"`, 2, function(arg) {
         let val = value2Str(arg, 0);
         let rep = value2Num(arg, 1);
-        return new Value(TYPE_STR, val.repeat(rep));
+        return new Value(bs.TYPE_STR, val.repeat(rep));
     }),
 
     "replace": new BuiltinFunctionValue(`
@@ -1189,7 +1176,7 @@ text="a b a c a d"
             retVal += hay.substring(start, findPos) + newNeedle;
             start = findPos + needle.length;
         }
-        return new Value(TYPE_STR, retVal);
+        return new Value(bs.TYPE_STR, retVal);
     }, [null, null, null, null]),
 
 
@@ -1215,7 +1202,7 @@ text="a b a c a d"
 `, 4, function(arg) {
         let hay = value2Str(arg, 0);
 
-        checkType(arg, 1, TYPE_REGEX)
+        checkType(arg, 1, bs.TYPE_REGEX)
 
         let needle = arg[1].regex;
         let newNeedle = value2Str(arg, 2);
@@ -1241,7 +1228,7 @@ text="a b a c a d"
             let posAfterMatch = ret['index'] + ret[0].length;
             hay = hay.substring(posAfterMatch);
         }
-        return new Value(TYPE_STR, retVal);
+        return new Value(bs.TYPE_STR, retVal);
     }, [null, null, null, null]),
 
 // Numeric functions
@@ -1276,7 +1263,7 @@ text="a b a c a d"
 292
 
 `, 2, function(arg) {
-        checkTypeList(arg, 0, [TYPE_STR, TYPE_REGEX, TYPE_NUM]);
+        checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_REGEX, bs.TYPE_NUM]);
 
         let sval = value2Str(arg, 0);
         let radix = 10;
@@ -1294,7 +1281,7 @@ text="a b a c a d"
         if (res == null) {
             throw new RuntimeException("Can't convert " + arg[0].val + " to integer with base " + parseInt(arg[1].val));
         }
-        return new Value(TYPE_NUM, checkResNan(res));
+        return new Value(bs.TYPE_NUM, checkResNan(res));
     }, [null, null]),
 
     "num": new BuiltinFunctionValue(`
@@ -1306,7 +1293,7 @@ text="a b a c a d"
 > num('.37e2')
 37
 `, 1, function(arg) {
-        checkTypeList(arg, 0, [TYPE_STR, TYPE_NUM]);
+        checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_NUM]);
 
         let sval = value2Str(arg, 0);
         let res = parseFloat(sval);
@@ -1314,7 +1301,7 @@ text="a b a c a d"
         if (res == null) {
             throw new RuntimeException("Can't convert " + sval + " to floating point number.");
         }
-        return new Value(TYPE_NUM, checkResNan(res));
+        return new Value(bs.TYPE_NUM, checkResNan(res));
     }),
 
     "round": new BuiltinFunctionValue(`
@@ -1332,10 +1319,10 @@ text="a b a c a d"
 > round('3.7')
 4
 `, 1, function(arg) {
-        checkTypeList(arg, 0, [TYPE_NUM,TYPE_STR]);
+        checkTypeList(arg, 0, [bs.TYPE_NUM,bs.TYPE_STR]);
 
         let res = Math.round(value2Num(arg,0));
-        return new Value(TYPE_NUM, checkResNan(res));
+        return new Value(bs.TYPE_NUM, checkResNan(res));
     }),
 
 
@@ -1351,7 +1338,7 @@ text="a b a c a d"
 `, 2, function(arg) {
        let first = requireInt(arg,0);
        let second = requireInt(arg,1);
-       return new Value(TYPE_NUM, first & second);
+       return new Value(bs.TYPE_NUM, first & second);
     }),
 
     "bit_or":  new BuiltinFunctionValue(`
@@ -1362,7 +1349,7 @@ text="a b a c a d"
 `, 2, function(arg) {
         let first = requireInt(arg,0);
         let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, first | second);
+        return new Value(bs.TYPE_NUM, first | second);
     }),
 
     "bit_xor":  new BuiltinFunctionValue(`
@@ -1373,7 +1360,7 @@ text="a b a c a d"
 `, 2, function(arg) {
         let first = requireInt(arg,0);
         let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, first ^ second);
+        return new Value(bs.TYPE_NUM, first ^ second);
     }),
 
     "bit_shiftl":  new BuiltinFunctionValue(`
@@ -1384,7 +1371,7 @@ text="a b a c a d"
 `, 2, function(arg) {
         let first = requireInt(arg,0);
         let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, checkResNan(first << second));
+        return new Value(bs.TYPE_NUM, checkResNan(first << second));
     }),
 
     "bit_shiftr":  new BuiltinFunctionValue(`
@@ -1395,14 +1382,14 @@ text="a b a c a d"
 `, 2, function(arg) {
         let first = requireInt(arg,0);
         let second = requireInt(arg,1);
-        return new Value(TYPE_NUM, checkResNan(first >> second));
+        return new Value(bs.TYPE_NUM, checkResNan(first >> second));
     }),
 
     "bit_neg":  new BuiltinFunctionValue(`
 # bitwise negation, the argument must be numbers with integer value (not floating point value)                        
 `, 1, function(arg) {
         let first = requireInt(arg,0);
-        return new Value(TYPE_NUM, ~first)
+        return new Value(bs.TYPE_NUM, ~first)
     }),
 
     "max" : new BuiltinFunctionValue(`
@@ -1418,7 +1405,7 @@ text="a b a c a d"
         if (num2 > num) {
             res = num2;
         }
-        return new Value(TYPE_NUM, res);
+        return new Value(bs.TYPE_NUM, res);
     }),
     "min" : new BuiltinFunctionValue(`
 # return the smaller of the two two argument values (argument are interpreted as a numbers)
@@ -1433,7 +1420,7 @@ text="a b a c a d"
         if (num2 < num) {
             res = num2;
         }
-        return new Value(TYPE_NUM, res);
+        return new Value(bs.TYPE_NUM, res);
     }),
     "abs" : new BuiltinFunctionValue(`
 # return the absolute of the argument value  (if it's negative then turn it into a positive number)
@@ -1446,7 +1433,7 @@ text="a b a c a d"
         if (num < 0) {
             num = -num;
         }
-        return new Value(TYPE_NUM, num);
+        return new Value(bs.TYPE_NUM, num);
     }),
     "sqrt" : new BuiltinFunctionValue(`
 # return the square root of the argument 
@@ -1459,29 +1446,29 @@ text="a b a c a d"
 > sqrt(2)
 1.414213562373095`, 1, function(arg) {
         let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, checkResNan(Math.sqrt(num)));
+        return new Value(bs.TYPE_NUM, checkResNan(Math.sqrt(num)));
     }),
     "sin" : new BuiltinFunctionValue(`# returns the sine of a number in radians
 
 > sin(mathconst['pi']/2)
 1`, 1, function(arg) {
         let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, Math.sin(num));
+        return new Value(bs.TYPE_NUM, Math.sin(num));
     }),
     "cos" : new BuiltinFunctionValue(`# returns the cosine of a number in radians
 
 > cos(mathconst['pi'])
 -1`, 1, function(arg) {
         let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, checkResNan(Math.cos(num)));
+        return new Value(bs.TYPE_NUM, checkResNan(Math.cos(num)));
     }),
     "tan" : new BuiltinFunctionValue(`# returns the tangent of a number in radians`, 1, function(arg) {
         let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, checkResNan(Math.tan(num)));
+        return new Value(bs.TYPE_NUM, checkResNan(Math.tan(num)));
     }),
     "atan" : new BuiltinFunctionValue(`# returns the inverse tangent (in radians) of a number`, 1, function(arg) {
         let num = value2Num(arg, 0);
-        return new Value(TYPE_NUM, checkResNan(Math.atan(num)));
+        return new Value(bs.TYPE_NUM, checkResNan(Math.atan(num)));
     }),
     "pow" : new BuiltinFunctionValue(`# returns the first arugment nubmer raised to the power of the second argument number
 
@@ -1493,13 +1480,13 @@ text="a b a c a d"
 16`, 2, function(arg) {
         let pow = value2Num(arg, 0);
         let exp = value2Num(arg, 1);
-        return new Value(TYPE_NUM, checkResNan(Math.pow(pow,exp)));
+        return new Value(bs.TYPE_NUM, checkResNan(Math.pow(pow,exp)));
     }),
     "random" : new BuiltinFunctionValue(`# returns pseudo random number with value between 0 and 1 (that means it is almost random)
 > random()
 0.8424952895811049
 `, 0, function(arg) {
-        return new Value(TYPE_NUM, Math.random());
+        return new Value(bs.TYPE_NUM, Math.random());
     }),
 
     // Input and output functions
@@ -1523,7 +1510,7 @@ text="a b a c a d"
         let fname = value2Str(arg, 0);
         try {
             let res = fs.readFileSync(fname, {encoding: 'utf8', flag: 'r'});
-            return new Value(TYPE_STR,res);
+            return new Value(bs.TYPE_STR,res);
         } catch(err) {
             throw new RuntimeException("Can't read file: " + fname + " error: " + err);
         };
@@ -1575,7 +1562,7 @@ unlink("file1.txt")
     `, 1, function(arg) {
         let numUnlinked = 0;
 
-        if (arg[0].type == TYPE_LIST) {
+        if (arg[0].type == bs.TYPE_LIST) {
             // delete multiple files
             for(let i=0; i< arg[0].value.length;++i) {
                 fs.unlink( value2Str(arg[0].value[i]), function(arg) { numUnlinked -=1; } );
@@ -1585,7 +1572,7 @@ unlink("file1.txt")
             fs.unlink( value2Str(arg, 0), function(arg) { numUnlinked -=1; } );
             numUnlinked += 1;
         }
-        return new Value(TYPE_NUM, numUnlinked);
+        return new Value(bs.TYPE_NUM, numUnlinked);
     }),
 
     "rename" : new BuiltinFunctionValue(`
@@ -1694,20 +1681,20 @@ false
 
 > len([1,2,3])
 3`, 1, function(arg) {
-        checkTypeList(arg, 0, [TYPE_STR, TYPE_LIST]);
-        return new Value(TYPE_NUM, arg[0].val.length);
+        checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST]);
+        return new Value(bs.TYPE_NUM, arg[0].val.length);
     }),
     "join": new BuiltinFunctionValue(`# given a list argument, joins the values of the list into a single string
 
 > join(["a: ",1," b: ", true])
 "a: 1 b: true"`, 2, function(arg) {
-        checkType(arg, 0, TYPE_LIST);
+        checkType(arg, 0, bs.TYPE_LIST);
 
         let delim ="";
         if (arg[1] != null) {
             delim = value2Str(arg, 1);
         }
-        return new Value(TYPE_STR, arg[0].val.map(value2StrDisp).join(delim));
+        return new Value(bs.TYPE_STR, arg[0].val.map(value2StrDisp).join(delim));
     }, [null, null]),
     "map": new BuiltinFunctionValue(`# the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
 
@@ -1725,13 +1712,13 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 > ["key: Ernie age: 3","key: Bert age: 4","key: Cookie-Monster age: 5","key: GraphCount age: 100"]
 `, 2, function(arg, frame) {
 
-        checkTypeList(arg, 0, [TYPE_LIST, TYPE_MAP])
-        checkTypeList(arg, 1, [TYPE_CLOSURE, TYPE_BUILTIN_FUNCTION])
+        checkTypeList(arg, 0, [bs.TYPE_LIST, bs.TYPE_MAP])
+        checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION])
 
         let ret = [];
         let funVal = arg[1];
 
-        if (arg[0].type == TYPE_LIST) {
+        if (arg[0].type == bs.TYPE_LIST) {
             let argList = arg[0];
 
             for(let i=0; i<argList.val.length;++i) {
@@ -1741,17 +1728,17 @@ map(a,def(k,v) { "key: {k} age: {v}" })
             }
         }
 
-        if (arg[0].type == TYPE_MAP) {
+        if (arg[0].type == bs.TYPE_MAP) {
             let argMap = arg[0];
 
             for(let k in argMap.val) {
-                let amap = [ new Value(TYPE_STR, new String(k)), argMap.val[k] ];
+                let amap = [ new Value(bs.TYPE_STR, new String(k)), argMap.val[k] ];
                 let mapVal = evalClosure("", funVal, amap, frame);
                 ret.push(mapVal);
             }
 
         }
-        return new Value(TYPE_LIST, ret);
+        return new Value(bs.TYPE_LIST, ret);
     }),
     "mapIndex": new BuiltinFunctionValue(`
 # similar to map, the argument function is called with the list value and the index of that value within the argument list
@@ -1759,19 +1746,19 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 > mapIndex([3,4,5,6],def(x,y) [2*x, y])
 [[6,0],[8,1],[10,2],[12,3]]`, 2, function(arg, frame) {
 
-        checkType(arg, 0, TYPE_LIST);
-        checkTypeList(arg, 0, [TYPE_CLOSURE, TYPE_BUILTIN_FUNCTION]);
+        checkType(arg, 0, bs.TYPE_LIST);
+        checkTypeList(arg, 0, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION]);
 
         let ret = [];
         let argList = arg[0];
         let funVal = arg[1];
 
         for(let i=0; i<argList.val.length;++i) {
-            let arg = [ argList.val[i], new Value(TYPE_NUM, i) ];
+            let arg = [ argList.val[i], new Value(bs.TYPE_NUM, i) ];
             let mapVal = evalClosure("", funVal, arg, frame);
             ret.push(mapVal)
         }
-        return new Value(TYPE_LIST, ret);
+        return new Value(bs.TYPE_LIST, ret);
     }),
     "reduce": new BuiltinFunctionValue(`
 # form a single return values by applying the arugment value repatedly
@@ -1794,8 +1781,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 > (((2+1)+2)+3)
 8
 `, 3, function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST);
-        checkType(arg, 1, TYPE_CLOSURE);
+        checkType(arg, 0, bs.TYPE_LIST);
+        checkType(arg, 1, bs.TYPE_CLOSURE);
 
         let argList = arg[0];
         let funVal = arg[1];
@@ -1820,8 +1807,8 @@ same as:
 
 > (((1024/32) / 8) / 4)
 1`, 3, function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST);
-        checkType(arg, 1, TYPE_CLOSURE);
+        checkType(arg, 0, bs.TYPE_LIST);
+        checkType(arg, 1, bs.TYPE_CLOSURE);
 
         let argList = arg[0];
         let funVal = arg[1];
@@ -1845,7 +1832,7 @@ same as:
 > a
 [1,2]`, 1,function(arg, frame) {
 
-        checkType(arg, 0, TYPE_LIST);
+        checkType(arg, 0, bs.TYPE_LIST);
 
         if (arg[0].val.length == 0) {
             throw new RuntimeException("Can't pop from an empty list");
@@ -1861,7 +1848,7 @@ same as:
 [1,2,3]
 > a
 [1,2,3]`, 2, function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST)
+        checkType(arg, 0, bs.TYPE_LIST)
         arg[0].val.push(arg[1]);
         return arg[0];
     }),
@@ -1875,7 +1862,7 @@ same as:
 > a
 [2,3]    
 `, 1,function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST)
+        checkType(arg, 0, bs.TYPE_LIST)
         if (arg[0].val.length == 0) {
             throw new RuntimeException("Can't pop from an empty list");
         }
@@ -1895,7 +1882,7 @@ same as:
 > a
 [1,2,3]    
 `, 2, function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST)
+        checkType(arg, 0, bs.TYPE_LIST)
         arg[0].val.unshift(arg[1]);
         return arg[0];
     }),
@@ -1903,11 +1890,11 @@ same as:
 
  > joinl([1,2],[3,4])
 [1,2,3,4]`, 2,function(arg, frame) {
-        checkType(arg, 0, TYPE_LIST)
-        checkType(arg, 1, TYPE_LIST)
+        checkType(arg, 0, bs.TYPE_LIST)
+        checkType(arg, 1, bs.TYPE_LIST)
 
         let lst = arg[0].val.concat(arg[1].val);
-        return new Value(TYPE_LIST, lst);
+        return new Value(bs.TYPE_LIST, lst);
     }),
     "sort": new BuiltinFunctionValue(`# sorts the argument list in increasing order
 
@@ -1932,10 +1919,10 @@ same as:
 
         if (arg[1] != null) {
             funVal = arg[1];
-            checkTypeList(arg, 1, [TYPE_CLOSURE, TYPE_BUILTIN_FUNCTION])
+            checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION])
         }
 
-        checkType(arg, 0, TYPE_LIST);
+        checkType(arg, 0, bs.TYPE_LIST);
 
         let rt = null;
         if (funVal == null) {
@@ -1962,7 +1949,7 @@ same as:
                 return 0;
             });
         }
-        return new Value(TYPE_LIST, rt);
+        return new Value(bs.TYPE_LIST, rt);
     }, [null, null]),
 
     // functions for maps/hashes
@@ -1979,7 +1966,7 @@ same as:
 > map( pairs, def (arg) [ arg[0]+arg[0], arg[1]*arg[1] ] )
 [["aa",1],["bb",4],["cc",9]]    
 `, 1, function*(arg) {
-        checkTypeList(arg, 0, [TYPE_MAP, TYPE_LIST]);
+        checkTypeList(arg, 0, [bs.TYPE_MAP, bs.TYPE_LIST]);
         yield* genValues(arg[0]);
     },null, true),
     "keys": new BuiltinFunctionValue(`# for maps: returns the keys of the map
@@ -1988,13 +1975,13 @@ same as:
 {"first":1,"second":2,"third":3}
 > keys(a)
 ["first","second","third"]`, 1, function(arg) {
-        checkType(arg, 0, TYPE_MAP);
+        checkType(arg, 0, bs.TYPE_MAP);
         let keys = Object.keys(arg[0].val);
         let rt = [];
         for(let i=0; i<keys.length;++i) {
-            rt.push( new Value(TYPE_STR, keys[i] ) );
+            rt.push( new Value(bs.TYPE_STR, keys[i] ) );
         }
-        return new Value(TYPE_LIST, rt);
+        return new Value(bs.TYPE_LIST, rt);
     }),
 
     // functions for working with json
@@ -2004,7 +1991,7 @@ same as:
 {"name":"Kermit","surname":"Frog"}
 > parseJsonString('[1,2,3]')
 [1,2,3]`, 1,function(arg, frame) {
-        checkType(arg, 0, TYPE_STR);
+        checkType(arg, 0, bs.TYPE_STR);
         let val = JSON.parse(arg[0].val);
         let rt = jsValueToRtVal(val);
         return rt;
@@ -2015,7 +2002,7 @@ same as:
 "[1,2,3]"
 > toJsonString({"name":"Pooh","family":"Bear","likes":["Honey","Songs","Friends"]})
 "{\\"name\\":\\"Pooh\\",\\"family\\":\\"Bear\\",\\"likes\\":[\\"Honey\\",\\"Songs\\",\\"Friends\\"]}"`, 1,function(arg, frame) {
-        return new Value(TYPE_STR, rtValueToJson(arg[0]));
+        return new Value(bs.TYPE_STR, rtValueToJson(arg[0]));
     }),
 
     //functions for working with yaml
@@ -2034,7 +2021,7 @@ c:
 > parseYamlString("a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n")
 {"a":1,"b":2,"c":[1,2,3]}    
     `, 1,function(arg, frame) {
-        checkType(arg, 0, TYPE_STR);
+        checkType(arg, 0, bs.TYPE_STR);
         let val = yaml.parse(arg[0].val);
         let rt = jsValueToRtVal(val);
         return rt;
@@ -2051,7 +2038,7 @@ c:
   - 2
   - 3`, 1,function(arg, frame) {
         let jsVal = rtValueToJsVal(arg[0]);
-        return new Value(TYPE_STR, yaml.stringify(jsVal));
+        return new Value(bs.TYPE_STR, yaml.stringify(jsVal));
     }),
 
     // functions for working with processes
@@ -2083,10 +2070,10 @@ var
 
         let cmd ="";
 
-        if (arg[0].type == TYPE_STR) {
+        if (arg[0].type == bs.TYPE_STR) {
             cmd = arg[0].val;
         } else {
-            if (arg[0].type == TYPE_LIST) {
+            if (arg[0].type == bs.TYPE_LIST) {
                 cmd = arg[0].val.map(value2Str).join(" ");
             }
         }
@@ -2098,7 +2085,7 @@ var
 
 `, 0, function(arg, frame) {
         let value = process.cwd();
-        return new Value(TYPE_STR, value);
+        return new Value(bs.TYPE_STR, value);
     }),
 
     "chdir": new BuiltinFunctionValue(`
@@ -2128,7 +2115,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
     `, 2,function(arg, frame) {
         let cmd = value2Str(arg, 0);
-        checkType(arg, 1, TYPE_CLOSURE);
+        checkType(arg, 1, bs.TYPE_CLOSURE);
         let callback = arg[1];
 
         let env = _getEnv(frame);
@@ -2139,15 +2126,15 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
                 try {
                     let argErr = VALUE_NONE;
                     if (error != null) {
-                        argErr = new Value(TYPE_STR,error.message);
+                        argErr = new Value(bs.TYPE_STR,error.message);
                     }
                     let argStdout = VALUE_NONE;
                     if (stdout != null) {
-                        argStdout = new Value(TYPE_STR, stdout.toString());
+                        argStdout = new Value(bs.TYPE_STR, stdout.toString());
                     }
                     let argStderr = VALUE_NONE;
                     if (stdout != null) {
-                        argStderr = new Value(TYPE_STR, stderr.toString());
+                        argStderr = new Value(bs.TYPE_STR, stderr.toString());
                     }
                     let vargs =  [ argErr, argStdout, argStderr ];
                     evalClosure("", callback, vargs, frame);
@@ -2168,7 +2155,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
             childProcess.addListener('error', onExit)
 
             spawnedProcesses[childProcess.pid] = childProcess;
-            return new Value(TYPE_NUM, childProcess.pid);
+            return new Value(bs.TYPE_NUM, childProcess.pid);
 
         } catch(e) {
             console.log("failed to run: cmd" + e.message);
@@ -2209,7 +2196,7 @@ sleep(3)
 
         let cmd ="";
 
-        if (arg[0].type == TYPE_LIST) {
+        if (arg[0].type == bs.TYPE_LIST) {
             cmd = arg[0].val.map(value2Str2).join("");
         } else {
             throw new RuntimeException("list parameter required");
@@ -2272,15 +2259,15 @@ true
 true
 > exists(5, a)
 false`, 2,function(arg, frame) {
-        checkTypeList(arg, 1, [TYPE_MAP, TYPE_LIST]);
+        checkTypeList(arg, 1, [bs.TYPE_MAP, bs.TYPE_LIST]);
 
-        if (arg[1].type == TYPE_MAP) {
+        if (arg[1].type == bs.TYPE_MAP) {
            // check if map has first argument as key
            let key = value2Str(arg,  0);
-           return new Value(TYPE_BOOL, key in arg[1].val);
+           return new Value(bs.TYPE_BOOL, key in arg[1].val);
         }
-        if (arg[1].type == TYPE_LIST) {
-            return new Value(TYPE_BOOL, arg[1].val.some( function(a) {
+        if (arg[1].type == bs.TYPE_LIST) {
+            return new Value(bs.TYPE_BOOL, arg[1].val.some( function(a) {
                 return arg[0].type == a.type && arg[0].val == a.val;
             }));
         }
@@ -2335,7 +2322,7 @@ Names of functions with help text:
 "Map"
 > type(def(x) 1+x)
 "Closure"`, 1,function(arg, frame) {
-        return new Value(TYPE_STR, typeNameVal(arg[0]));
+        return new Value(bs.TYPE_STR, typeNameVal(arg[0]));
     }),
 
     "setPYXOptions": new BuiltinFunctionValue(`
@@ -2446,13 +2433,13 @@ number: 3`, 3,function *(arg, frame) {
         }
         if (step>0) {
             while (from < to) {
-                yield new Value(TYPE_NUM, from);
+                yield new Value(bs.TYPE_NUM, from);
                 from += step;
             }
         }
         if (step<0) {
             while (from > to) {
-                yield new Value(TYPE_NUM, from);
+                yield new Value(bs.TYPE_NUM, from);
                 from += step;
             }
         }
@@ -2461,7 +2448,7 @@ number: 3`, 3,function *(arg, frame) {
     // functions for working with time
     "time": new BuiltinFunctionValue("# returns epoch time in seconds", 0,function(arg, frame) {
         let secondsSinceEpoch = new Date().getTime() / 1000;
-        return new Value(TYPE_NUM, secondsSinceEpoch);
+        return new Value(bs.TYPE_NUM, secondsSinceEpoch);
     }),
     "localtime": new BuiltinFunctionValue(`# decodes epoch time into map
     
@@ -2475,14 +2462,14 @@ number: 3`, 3,function *(arg, frame) {
             date = new Date(value2Num(arg, 0) * 1000);
         }
         let retMap = {
-            "seconds": new Value(TYPE_NUM, date.getSeconds()),
-            "minutes": new Value(TYPE_NUM, date.getMinutes()),
-            "hours": new Value(TYPE_NUM, date.getHours()),
-            "days": new Value(TYPE_NUM, date.getDay()),
-            "year": new Value(TYPE_NUM, date.getFullYear()),
-            "month": new Value(TYPE_NUM, date.getMonth()),
+            "seconds": new Value(bs.TYPE_NUM, date.getSeconds()),
+            "minutes": new Value(bs.TYPE_NUM, date.getMinutes()),
+            "hours": new Value(bs.TYPE_NUM, date.getHours()),
+            "days": new Value(bs.TYPE_NUM, date.getDay()),
+            "year": new Value(bs.TYPE_NUM, date.getFullYear()),
+            "month": new Value(bs.TYPE_NUM, date.getMonth()),
         };
-        return new Value(TYPE_MAP, retMap);
+        return new Value(bs.TYPE_MAP, retMap);
     }, [null]),
 
     "httpSend": new BuiltinFunctionValue(`
@@ -2522,8 +2509,8 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
         let callback = null;
         let surl = value2Str(arg, 0);
 
-        if (arg[1] != null && arg[1].type != TYPE_NONE) {
-            checkType(arg, 1, TYPE_MAP);
+        if (arg[1] != null && arg[1].type != bs.TYPE_NONE) {
+            checkType(arg, 1, bs.TYPE_MAP);
             options = rtValueToJsVal(arg[1]);
 
             if ('method' in options) {
@@ -2538,7 +2525,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
         }
 
         if (arg[2] != null) {
-            checkType(arg, 2, TYPE_CLOSURE);
+            checkType(arg, 2, bs.TYPE_CLOSURE);
         }
         callback = arg[2];
 
@@ -2560,7 +2547,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
         let callUserFunction = function(data, error) {
             // this one is evaluated from another task. runtime exceptions need to be handled here
-            let varg = [ new Value(TYPE_STR,data), error ];
+            let varg = [ new Value(bs.TYPE_STR,data), error ];
 
             try {
                 evalClosure("", callback, varg, frame);
@@ -2588,7 +2575,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
         });
 
         reqObj.on('error', (e) => {
-            callUserFunction(VALUE_NONE, new Value(TYPE_STR, e.message));
+            callUserFunction(VALUE_NONE, new Value(bs.TYPE_STR, e.message));
         });
 
 
@@ -2631,7 +2618,7 @@ requestData: {req.requestData()}
 `, 2,function(arg, frame) {
         let  listenPort = value2Num(arg, 0);
 
-        if (arg[1].type != TYPE_CLOSURE) {
+        if (arg[1].type != bs.TYPE_CLOSURE) {
             throw new RuntimeException("Callback function expected as second parameter")
         }
 
@@ -2641,16 +2628,16 @@ requestData: {req.requestData()}
 
     }, [null]),
 
-    "mathconst" : new Value(TYPE_MAP, {
-        pi: new Value(TYPE_NUM, Math.PI),
-        e: new Value(TYPE_NUM, Math.E),
-        ln10: new Value(TYPE_NUM, Math.LN10),
-        ln2: new Value(TYPE_NUM, Math.LN2),
-        log10e: new Value(TYPE_NUM, Math.LOG10E),
-        log2e: new Value(TYPE_NUM, Math.LOG2E),
-        sqrt1_2: new Value(TYPE_NUM, Math.SQRT1_2),
-        sqrt2: new Value(TYPE_NUM, Math.SQRT2),
-        Infinity: new Value(TYPE_NUM, Infinity),
+    "mathconst" : new Value(bs.TYPE_MAP, {
+        pi: new Value(bs.TYPE_NUM, Math.PI),
+        e: new Value(bs.TYPE_NUM, Math.E),
+        ln10: new Value(bs.TYPE_NUM, Math.LN10),
+        ln2: new Value(bs.TYPE_NUM, Math.LN2),
+        log10e: new Value(bs.TYPE_NUM, Math.LOG10E),
+        log2e: new Value(bs.TYPE_NUM, Math.LOG2E),
+        sqrt1_2: new Value(bs.TYPE_NUM, Math.SQRT1_2),
+        sqrt2: new Value(bs.TYPE_NUM, Math.SQRT2),
+        Infinity: new Value(bs.TYPE_NUM, Infinity),
     }, `# map of mathematical constants.
 
 # the number that is bigger than any other number (which is kind of a contradiction...)
@@ -2681,7 +2668,7 @@ mathconst.log2e   # - base 2 logarithm of e
 mathconst.log10e  # - base 10 logarithm of e    
     `),
 
-    "ARGV" : new Value(TYPE_LIST, [], `
+    "ARGV" : new Value(bs.TYPE_LIST, [], `
 # array of command line parameters passed to the program.
 # you can pass command line parameter to the shell like this:
 
@@ -2700,10 +2687,10 @@ pyx programFile.p 1 2 3 4
     
 `),
 
-    "ENV": new Value(TYPE_MAP,
+    "ENV": new Value(bs.TYPE_MAP,
         Object.entries(process.env).reduce(
             (prev,current)=>{
-                prev[current[0]]= new Value(TYPE_STR, current[1]);
+                prev[current[0]]= new Value(bs.TYPE_STR, current[1]);
                 return prev
             } , {}) ,
         "# environment variables, entry key is the name of the environment variable, the entry value is it's value"
@@ -2767,7 +2754,7 @@ class Frame {
             let it=keys[i];
             if (prefix == "" || it.startsWith(prefix)) {
                 let varVal = this.vars[keys[i]];
-                if (varVal.type == TYPE_CLOSURE || varVal.type == TYPE_BUILTIN_FUNCTION) {
+                if (varVal.type == bs.TYPE_CLOSURE || varVal.type == bs.TYPE_BUILTIN_FUNCTION) {
                     if (it.startsWith("_")) {
                         continue;
                     }
@@ -2788,7 +2775,7 @@ class Frame {
             let it=keys[i];
 
             let varVal = this.vars[keys[i]];
-            if ((varVal.type == TYPE_CLOSURE || varVal.type == TYPE_BUILTIN_FUNCTION)) {
+            if ((varVal.type == bs.TYPE_CLOSURE || varVal.type == bs.TYPE_BUILTIN_FUNCTION)) {
                 if ("help" in varVal) {
                     resultList.push(it);
                 }
@@ -2855,7 +2842,7 @@ class AstStmtList extends AstBase {
 
             val = stmt.eval(frame);
             //console.log("eval obj: " + stmt.constructor.name + " res: " + JSON.stringify(val));
-            if (val.type >= TYPE_FORCE_RETURN) {
+            if (val.type >= bs.TYPE_FORCE_RETURN) {
                 break;
             }
         }
@@ -2878,7 +2865,7 @@ class AstStmtList extends AstBase {
                 val = stmt.eval(frame);
             }
 
-            if (val.type >= TYPE_FORCE_RETURN) {
+            if (val.type >= bs.TYPE_FORCE_RETURN) {
                 return val;
             }
         }
@@ -2968,7 +2955,7 @@ class AstTryCatchBlock extends AstBase {
         if (this.finallyBlock != null) {
             try {
                 let res2 = this.finallyBlock.eval(frame);
-                if (res2.type != TYPE_NONE) {
+                if (res2.type != bs.TYPE_NONE) {
                     res = res2;
                 }
             } catch(er) {
@@ -3043,7 +3030,7 @@ class AstTryCatchBlock extends AstBase {
                     res2 = this.finallyBlock.eval(frame);
                 }
 
-                if (res == null || res2.type != TYPE_NONE) {
+                if (res == null || res2.type != bs.TYPE_NONE) {
                     res = res2;
                 }
             } catch(er) {
@@ -3117,7 +3104,7 @@ class RegexConstValue extends AstBase {
 
     eval(frame) {
         console.log("haha");
-        return new Value(TYPE_STR, this.regex.toString());
+        return new Value(bs.TYPE_STR, this.regex.toString());
     }
 
     show() {
@@ -3144,10 +3131,10 @@ class AstConstValue extends AstBase {
 function makeConstValue(type, value) {
     let val = value[0];
 
-    if (type == TYPE_REGEX) {
+    if (type == bs.TYPE_REGEX) {
         return new AstConstValue(new RegexValue(value[0]), value[1]);
     }
-    if (type == TYPE_BOOL) {
+    if (type == bs.TYPE_BOOL) {
         value[0] = val == "true";
     }
     if (val == "none") {
@@ -3163,7 +3150,7 @@ function checkMixedType(op, lhs, rhs) {
 }
 
 function checkMixedTypeAllowNone(op, lhs, rhs) {
-    if (lhs.type != TYPE_NONE && rhs.type != TYPE_NONE) {
+    if (lhs.type != bs.TYPE_NONE && rhs.type != bs.TYPE_NONE) {
         if (lhs.type != rhs.type) {
             throw new RuntimeException(op + " not allowed between " + typeNameVal(rhs) + " and " + typeNameVal(lhs))
         }
@@ -3172,46 +3159,46 @@ function checkMixedTypeAllowNone(op, lhs, rhs) {
 
 MAP_OP_TO_FUNC={
     "and" : function(lhs,rhs, frame) {
-        return new Value(TYPE_BOOL, value2Bool(lhs.eval(frame)) && value2Bool(rhs.eval(frame)));
+        return new Value(bs.TYPE_BOOL, value2Bool(lhs.eval(frame)) && value2Bool(rhs.eval(frame)));
     },
     "or" : function(lhs,rhs, frame) {
-        return new Value(TYPE_BOOL, value2Bool(lhs.eval(frame)) || value2Bool(rhs.eval(frame)));
+        return new Value(bs.TYPE_BOOL, value2Bool(lhs.eval(frame)) || value2Bool(rhs.eval(frame)));
     },
     "<" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedType("<", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val < rhs.val); // javascript takes care of it, does it?
+        return new Value(bs.TYPE_BOOL, lhs.val < rhs.val); // javascript takes care of it, does it?
     },
     ">" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedType(">", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val > rhs.val);
+        return new Value(bs.TYPE_BOOL, lhs.val > rhs.val);
     },
     "<=" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedType("<=", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val <= rhs.val);
+        return new Value(bs.TYPE_BOOL, lhs.val <= rhs.val);
     },
     ">=" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedType(">=", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val >= rhs.val);
+        return new Value(bs.TYPE_BOOL, lhs.val >= rhs.val);
     },
     "==" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedTypeAllowNone("==", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val == rhs.val);
+        return new Value(bs.TYPE_BOOL, lhs.val == rhs.val);
     },
     "!=" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
         rhs = rhs.eval(frame);
         checkMixedTypeAllowNone("!=", lhs, rhs);
-        return new Value(TYPE_BOOL, lhs.val != rhs.val);
+        return new Value(bs.TYPE_BOOL, lhs.val != rhs.val);
     },
     "+" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
@@ -3219,16 +3206,16 @@ MAP_OP_TO_FUNC={
         if (lhs.type != rhs.type) {
             throw new RuntimeException("Can't add " + typeNameVal(lhs) + " to " + typeNameVal(rhs));
         }
-        if (lhs.type == TYPE_STR) {
+        if (lhs.type == bs.TYPE_STR) {
             /* allow add for strings - this concats the string values */
             return new Value(lhs.type, lhs.val + rhs.val);
         }
-        if (lhs.type == TYPE_NUM) {
+        if (lhs.type == bs.TYPE_NUM) {
             return new Value(lhs.type, checkResNan(lhs.val + rhs.val));
         }
-        if (lhs.type == TYPE_LIST) {
+        if (lhs.type == bs.TYPE_LIST) {
             // concat lists
-            return new Value(TYPE_LIST, lhs.val.concat(rhs.val));
+            return new Value(bs.TYPE_LIST, lhs.val.concat(rhs.val));
         }
         throw new RuntimeException("Can't add " + typeNameVal(lhs) + " to " + typeNameVal(rhs));
     },
@@ -3238,7 +3225,7 @@ MAP_OP_TO_FUNC={
         if (lhs.type != rhs.type) {
             throw new RuntimeException("Can't subtract " + typeNameVal(rhs) + " from " + typeNameVal(lhs) );
         }
-        if (lhs.type != TYPE_NUM) {
+        if (lhs.type != bs.TYPE_NUM) {
             throw new RuntimeException("need number types for substraction" );
         }
         return new Value(lhs.type, checkResNan(lhs.val - rhs.val));
@@ -3250,11 +3237,11 @@ MAP_OP_TO_FUNC={
         if (lhs.type != rhs.type) {
             throw new RuntimeException("Can't multiply " + typeNameVal(lhs) + " with " + typeNameVal(rhs));
         }
-        if (lhs.type != TYPE_NUM) {
+        if (lhs.type != bs.TYPE_NUM) {
             throw new RuntimeException("need number types for multiplication" );
         }
 
-        return new Value(TYPE_NUM, checkResNan(value2Num(lhs) * value2Num(rhs)));
+        return new Value(bs.TYPE_NUM, checkResNan(value2Num(lhs) * value2Num(rhs)));
     },
     "/" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
@@ -3263,7 +3250,7 @@ MAP_OP_TO_FUNC={
         if (lhs.type != rhs.type) {
             throw new RuntimeException("Can't divide " + typeNameVal(lhs) + " by " + typeNameVal(rhs) );
         }
-        if (lhs.type != TYPE_NUM) {
+        if (lhs.type != bs.TYPE_NUM) {
             throw new RuntimeException("need number types for division" );
         }
 
@@ -3272,7 +3259,7 @@ MAP_OP_TO_FUNC={
             // javascript allows to divide by zero, amazing.
             throw new RuntimeException("Can't divide by zero");
         }
-        return new Value(TYPE_NUM,checkResNan(value2Num(lhs) / rhsVal));
+        return new Value(bs.TYPE_NUM,checkResNan(value2Num(lhs) / rhsVal));
     },
     "%" : function(lhs,rhs, frame) {
         lhs = lhs.eval(frame);
@@ -3282,7 +3269,7 @@ MAP_OP_TO_FUNC={
             throw new RuntimeException("Can't divide modulo " + typeNameVal(lhs) + " by " + typeNameVal(rhs) );
         }
 
-        if (lhs.type != TYPE_NUM) {
+        if (lhs.type != bs.TYPE_NUM) {
             throw new RuntimeException("need number types for modulo division" );
         }
 
@@ -3291,7 +3278,7 @@ MAP_OP_TO_FUNC={
             // javascript allows to divide by zero, amazing.
             throw new RuntimeException("Can't divide modulo by zero");
         }
-        return new Value(TYPE_NUM,value2Num(lhs) % rhsVal);
+        return new Value(bs.TYPE_NUM,value2Num(lhs) % rhsVal);
     },
 
 }
@@ -3378,11 +3365,11 @@ function makeExpression(exprList) {
 
 MAP_UNARY_OP_TO_FUNC={
     "not": function(value) {
-        return new Value(TYPE_BOOL, !value2Bool(value));
+        return new Value(bs.TYPE_BOOL, !value2Bool(value));
 
     },
     "-": function(value) {
-        return new Value(TYPE_NUM, -1 * value2Num(value));
+        return new Value(bs.TYPE_NUM, -1 * value2Num(value));
     }
 }
 
@@ -3432,7 +3419,7 @@ class AstDictCtorExpression extends AstBase {
 
             ret[ name ] = value;
         }
-        return new Value(TYPE_MAP, ret);
+        return new Value(bs.TYPE_MAP, ret);
     }
 
     show() {
@@ -3456,7 +3443,7 @@ class AstListCtorExpression extends AstBase {
             let val = this.exprList[i].eval(frame);
             vals.push(val)
         }
-        return new Value(TYPE_LIST, vals);
+        return new Value(bs.TYPE_LIST, vals);
     }
 
     show() {
@@ -3503,7 +3490,7 @@ function lookupIndex(frame, value, refExpr) {
         let expr = refExpr[i];
 
         let curValue = value.type;
-        if (curValue != TYPE_LIST && curValue != TYPE_MAP && curValue != TYPE_STR) {
+        if (curValue != bs.TYPE_LIST && curValue != bs.TYPE_MAP && curValue != bs.TYPE_STR) {
             let er = new RuntimeException("Can't access expression of type " + typeNameVal(value) + " by index");
             if (i > 0) {
                 er.addToStack([expr.startOffset, expr.currentSourceInfo]);
@@ -3512,8 +3499,8 @@ function lookupIndex(frame, value, refExpr) {
         }
         let indexValue = expr.eval(frame);
 
-        if (curValue == TYPE_LIST || curValue == TYPE_STR) {
-            if (indexValue.type != TYPE_NUM) {
+        if (curValue == bs.TYPE_LIST || curValue == bs.TYPE_STR) {
+            if (indexValue.type != bs.TYPE_NUM) {
                 let err = new RuntimeException("Can't lookup " + typeNameVal(value) + " entry - the index value must be a number. Instead got a " + typeNameVal(indexValue));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
@@ -3529,7 +3516,7 @@ function lookupIndex(frame, value, refExpr) {
         let nextValue = value.val[ indexValue.val ];
         if (nextValue == null) {
             let ex =  null;
-            if (value.type != TYPE_MAP) {
+            if (value.type != bs.TYPE_MAP) {
                 ex = new RuntimeException("Can't lookup index " + indexValue.val  + " in" + typeNameVal(value) + "  - index value must be less than " + value.val.length + " and greater than zero.");
             } else {
                 ex = new RuntimeException("Can't lookup key " + indexValue.val + " in map. No value has been set for this key");
@@ -3539,8 +3526,8 @@ function lookupIndex(frame, value, refExpr) {
         }
         value = nextValue;
 
-        if (curValue == TYPE_STR) {
-            value = new Value(TYPE_STR, value);
+        if (curValue == bs.TYPE_STR) {
+            value = new Value(bs.TYPE_STR, value);
         }
     }
 
@@ -3596,7 +3583,7 @@ function _assignImp(frame, value, lhs) {
             traceRhs.push(traceVal[1]);
         }
     } else {
-        if (value.type != TYPE_LIST) {
+        if (value.type != bs.TYPE_LIST) {
             throw new RuntimeException("list value expected on right hand side of assignment");
         }
         let rhsVal = value.val;
@@ -3631,7 +3618,7 @@ function _assign(frame, singleLhs, value) {
             let lhsValue = frame.lookup(varName);
             //console.log("varName: " + varName + " value: " + JSON.stringify(lhsValue));
 
-            if (lhsValue == undefined || (lhsValue.type != TYPE_LIST && lhsValue.type != TYPE_MAP && lhsValue.type != TYPE_STR)) {
+            if (lhsValue == undefined || (lhsValue.type != bs.TYPE_LIST && lhsValue.type != bs.TYPE_MAP && lhsValue.type != bs.TYPE_STR)) {
                 let err = new RuntimeException("Can't lookup index expression - value is not a list or map");
                 err.addToStack([singleLhs.startOffset, singleLhs.currentSourceInfo]);
                 throw err;
@@ -3664,8 +3651,8 @@ function _indexAssign(frame, value, refExpr, newValue) {
         let expr = refExpr[i];
         let indexValue = expr.eval(frame);
 
-        if (value.type == TYPE_LIST || value.type == TYPE_STR) {
-            if (indexValue.type != TYPE_NUM) {
+        if (value.type == bs.TYPE_LIST || value.type == bs.TYPE_STR) {
+            if (indexValue.type != bs.TYPE_NUM) {
                 let err = new RuntimeException("Can't assign this " + typeNameVal(value) + " index . Index value of must be an number, instead got " + rtValueToJsVal(indexValue));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
@@ -3686,16 +3673,16 @@ function _indexAssign(frame, value, refExpr, newValue) {
 
         if (i != (refExpr.length-1)) {
             value = value.val[indexValue.val];
-            if (value == undefined || (value.type != TYPE_LIST && value.type != TYPE_MAP)) {
+            if (value == undefined || (value.type != bs.TYPE_LIST && value.type != bs.TYPE_MAP)) {
                 let err = new RuntimeException("Can't assign this entry, lookup did not return a list or a map, got " + typeNameVal(value) +" instead. index value: " + rtValueToJsVal(value));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                 throw err;
             }
         } else {
-            if (value.type != TYPE_STR) {
+            if (value.type != bs.TYPE_STR) {
                 value.val[indexValue.val] = newValue;
             } else {
-                if (newValue.type != TYPE_STR) {
+                if (newValue.type != bs.TYPE_STR) {
                     let err = new RuntimeException("Can't assign string index to " + typeNameVal(newValue) + " - right hand side value must be a string")
                     err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                     throw err;
@@ -3863,14 +3850,14 @@ class AstWhileStmt extends AstBase {
 
             let rt = this.stmtList.eval(frame);
 
-            if (rt.type >= TYPE_FORCE_RETURN) {
-                if (rt.type == TYPE_FORCE_BREAK) {
+            if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_BREAK) {
                     break;
                 }
-                if (rt.type == TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_RETURN) {
                     return rt;
                 }
-                if (rt.type ==TYPE_FORCE_CONTINUE) {
+                if (rt.type ==bs.TYPE_FORCE_CONTINUE) {
                     continue;
                 }
             }
@@ -3899,11 +3886,11 @@ class AstWhileStmt extends AstBase {
                 rt = this.stmtList.eval(frame);
             }
 
-            if (rt.type >= TYPE_FORCE_RETURN) {
-                if (rt.type == TYPE_FORCE_BREAK) {
+            if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_BREAK) {
                     break;
                 }
-                if (rt.type == TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_RETURN) {
                     return rt;
                 }
             }
@@ -3942,14 +3929,14 @@ class AstForStmt extends AstBase {
                 _assignImp(frame, val, this.lhs);
                 let rt = this.stmtList.eval(frame);
 
-                if (rt.type >= TYPE_FORCE_RETURN) {
-                    if (rt.type == TYPE_FORCE_BREAK) {
+                if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                    if (rt.type == bs.TYPE_FORCE_BREAK) {
                         break;
                     }
-                    if (rt.type == TYPE_FORCE_RETURN) {
+                    if (rt.type == bs.TYPE_FORCE_RETURN) {
                         return rt;
                     }
-                    if (rt.type == TYPE_FORCE_CONTINUE) {
+                    if (rt.type == bs.TYPE_FORCE_CONTINUE) {
                         continue;
                     }
                 }
@@ -3958,7 +3945,7 @@ class AstForStmt extends AstBase {
         }
 
         let rt = this.expr.eval(frame);
-        if (rt.type != TYPE_LIST && rt.type != TYPE_MAP) {
+        if (rt.type != bs.TYPE_LIST && rt.type != bs.TYPE_MAP) {
             throw new RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
         }
         for(let val of genValues(rt)) {
@@ -3966,11 +3953,11 @@ class AstForStmt extends AstBase {
 
             let rt = this.stmtList.eval(frame);
 
-            if (rt.type >= TYPE_FORCE_RETURN) {
-                if (rt.type == TYPE_FORCE_BREAK) {
+            if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_BREAK) {
                     break;
                 }
-                if (rt.type == TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_RETURN) {
                     return rt;
                 }
             }
@@ -3984,14 +3971,14 @@ class AstForStmt extends AstBase {
                 _assignImp(frame, val, this.lhs);
                 let rt = yield *this.stmtList.genEval(frame);
 
-                if (rt != null && rt.type >= TYPE_FORCE_RETURN) {
-                    if (rt.type == TYPE_FORCE_BREAK) {
+                if (rt != null && rt.type >= bs.TYPE_FORCE_RETURN) {
+                    if (rt.type == bs.TYPE_FORCE_BREAK) {
                         break;
                     }
-                    if (rt.type == TYPE_FORCE_RETURN) {
+                    if (rt.type == bs.TYPE_FORCE_RETURN) {
                         return rt;
                     }
-                    if (rt.type == TYPE_FORCE_CONTINUE) {
+                    if (rt.type == bs.TYPE_FORCE_CONTINUE) {
                         continue;
                     }
                 }
@@ -4000,18 +3987,18 @@ class AstForStmt extends AstBase {
         }
 
         let rt = this.expr.eval(frame);
-        if (rt.type != TYPE_LIST && rt.type != TYPE_MAP) {
+        if (rt.type != bs.TYPE_LIST && rt.type != bs.TYPE_MAP) {
             throw new RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
         }
         for(let val of genValues(rt)) {
             _assignImp(frame, val, this.lhs);
             let rt = yield* this.stmtList.genEval(frame);
 
-            if (rt.type >= TYPE_FORCE_RETURN) {
-                if (rt.type == TYPE_FORCE_BREAK) {
+            if (rt.type >= bs.TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_BREAK) {
                     break;
                 }
-                if (rt.type == TYPE_FORCE_RETURN) {
+                if (rt.type == bs.TYPE_FORCE_RETURN) {
                     return rt;
                 }
             }
@@ -4043,7 +4030,7 @@ class AstReturnStmt extends AstBase {
         if (traceMode) {
             process.stderr.write(tracePrompt + "return " + rtValueToJson(retValue) + "\n");
         }
-        return new Value(TYPE_FORCE_RETURN, retValue);
+        return new Value(bs.TYPE_FORCE_RETURN, retValue);
     }
 
     show() {
@@ -4125,7 +4112,7 @@ class AstBreakStmt extends AstBase {
         if (traceMode) {
             process.stderr.write(tracePrompt + "break\n");
         }
-        return new Value(TYPE_FORCE_BREAK, null);
+        return new Value(bs.TYPE_FORCE_BREAK, null);
     }
 
     show() {
@@ -4146,7 +4133,7 @@ class AstContinueStmt extends AstBase {
         if (traceMode) {
             process.stderr.write(tracePrompt + "continue\n");
         }
-        return new Value(TYPE_FORCE_CONTINUE, null);
+        return new Value(bs.TYPE_FORCE_CONTINUE, null);
     }
 
     show() {
@@ -4199,7 +4186,7 @@ class AstFunctionDef extends AstBase {
             } catch(er) {
                 // can throw runtime exception - when value is not defined
             }
-            if (prevValue != null && prevValue.type == TYPE_BUILTIN_FUNCTION) {
+            if (prevValue != null && prevValue.type == bs.TYPE_BUILTIN_FUNCTION) {
                 throw new RuntimeException("Can't redefine built-in function " + this.name);
             }
             frame.assign(this.name, closureValue);
@@ -4268,7 +4255,7 @@ class AstFunctionCall extends AstBase {
                 for (let val of genEvalClosure(funcVal, args, frame)) {
                     ret.push(val);
                 }
-                return new Value(TYPE_LIST, ret);
+                return new Value(bs.TYPE_LIST, ret);
             }
         } catch (er) {
             if (er instanceof RuntimeException && !er.isUnwind()) {
@@ -4337,7 +4324,7 @@ class AstFunctionCall extends AstBase {
             throw new RuntimeException("Can't call undefined function " + this.name, this.startOffset);
         }
 
-        if (funcVal.type != TYPE_CLOSURE && funcVal.type != TYPE_BUILTIN_FUNCTION) {
+        if (funcVal.type != bs.TYPE_CLOSURE && funcVal.type != bs.TYPE_BUILTIN_FUNCTION) {
             throw new RuntimeException("variable is not a function/closure, it is a " + typeNameVal(funcVal), this.startOffset);
         }
         this.funcVal_ = funcVal;
@@ -4394,7 +4381,7 @@ function makeFrame(cmdLine) {
 }
 
 function listToString(lst) {
-    let stringList = lst.map(function (arg) { return new Value(TYPE_STR, arg); });
+    let stringList = lst.map(function (arg) { return new Value(bs.TYPE_STR, arg); });
     return stringList;
 
 }
@@ -4427,14 +4414,6 @@ function addSourceToTopLevelStmts(data,ast) {
 
 if (typeof(module) == 'object') {
     module.exports = {
-        TYPE_BOOL,
-        TYPE_NUM,
-        TYPE_STR,
-        TYPE_REGEX,
-        TYPE_LIST,
-        TYPE_MAP,
-        TYPE_NONE,
-        TYPE_CLOSURE,
         Value,
         RuntimeException,
         Frame,

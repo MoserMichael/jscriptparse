@@ -165,7 +165,7 @@ function runEvalLoop(cmdLine) {
                 evalPrintMsg += msg;
             }
 
-            //rt.setLogHook(logHook);
+            //rt.bs.setLogHook(logHook);
 
             try {
                 isRunning = true;

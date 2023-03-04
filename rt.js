@@ -9,11 +9,8 @@ const bs=require(path.join(__dirname,"rtbase.js"));
 
 const httpAgent = new http.Agent({ keepAlive: true });
 
-let doLogHook = function(msg) { process.stdout.write(msg); }
 
 const showJavascriptStack = false;
-
-let maxStackFrames = 20;
 
 // callback for running evaluator
 let evalCallback = null;
@@ -25,10 +22,6 @@ function setEvalCallback(cb) {
 // the file that is being parsed right now. Can't pass that around.
 // Should be thread local, or something like this.
 let currentSourceInfo = null;
-
-function setLogHook(hook) {
-    doLogHook = hook;
-}
 
 function setCurrentSourceInfo(info) {
     let prevValue = currentSourceInfo;
@@ -49,10 +42,6 @@ let errorOnExecFail = false;
 
 function setErrorOnExecFail(on) {
     errorOnExecFail = on;
-}
-
-function setMaxStackFrames(nframes) {
-    maxStackFrames = nframes
 }
 
 
@@ -412,7 +401,7 @@ class RuntimeException  extends Error {
     }
 
     addToStack(frameInfo) {
-        if (this.stackTrace.length < maxStackFrames ) {
+        if (this.stackTrace.length < bs.maxStackFrames ) {
             this.stackTrace.push(frameInfo);
         } else {
             this.hasMoreStackFrames = true;
@@ -455,7 +444,7 @@ class RuntimeException  extends Error {
             ret += "\nCaused by:\n" + this.originalCause.showStackTrace();
         }
         if (reportError) {
-            doLogHook(ret);
+            bs.doLogHook(ret);
         }
         return ret;
     }
@@ -1494,13 +1483,13 @@ text="a b a c a d"
 # prints argument values to console. 
 # Can accept multiple values - each of them is converted to a string`, -1, function(arg) {
         let msg = printImpl(arg); //value2Str(arg, 0);
-        doLogHook(msg)
+        bs.doLogHook(msg)
     }),
     "println" : new BuiltinFunctionValue(`
 # prints argument values to console, followed by newline.
 # Can accept multiple values - each of them is converted to a string`, -1, function(arg) {
         let msg = printImpl(arg); //value2Str(arg, 0);
-        doLogHook(msg + "\n")
+        bs.doLogHook(msg + "\n")
     }),
     "readFile" : new BuiltinFunctionValue(`
 # read text file and return it as a string, the file name is the first argument of this function
@@ -2379,8 +2368,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
         } else if (optname == "errorExit") {
             errorOnExecFail = value2Bool(arg, 1);
         } else if (optname == "framesInError") {    
-            maxStackFrames =  value2Num(arg, 1);
-            console.log("maxStackFrames " + maxStackFrames)
+            bs.maxStackFrames =  value2Num(arg, 1);
         } else {
             throw new RuntimeException("Unknwon option name");
         }
@@ -4440,13 +4428,11 @@ if (typeof(module) == 'object') {
         makeFunctionCall,
         makeFrame,
         eval,
-        setLogHook,
         setEvalCallback,
         setCurrentSourceInfo,
         //setForceStopEval,
         setTraceMode,
         setErrorOnExecFail,
-        setMaxStackFrames,
         rtValueToJsVal,
         isBreakOrContinue,
         isReturnOrYield,

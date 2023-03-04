@@ -29,7 +29,6 @@ function setCurrentSourceInfo(info) {
     return prevValue;
 }
 
-
 // if set - throw exception if executing a process fails / returns error status
 let errorOnExecFail = false;
 
@@ -2365,30 +2364,6 @@ function makeThrowStmt(expression, offset) {
     return new AstThrowStmt(expression, offset);
 }
 
-/*
-class RegexConstValue extends AstBase {
-    constructor(value, offset) {
-        super(offset);
-
-        this.isGlobal = value.endsWith('g');
-        try {
-            this.regex = new RegExp(value);
-        } catch(ex) {
-            throw new ParserError(ex, offset);
-        }
-    }
-
-    eval(frame) {
-        console.log("haha");
-        return new bs.Value(bs.TYPE_STR, this.regex.toString());
-    }
-
-    show() {
-        return this.regex.toString();
-    }
-}
-*/
-
 class AstConstValue extends AstBase {
     constructor(value, offset) {
         super(offset);
@@ -2573,16 +2548,12 @@ class AstBinaryExpression extends AstBase {
     
     eval(frame) {
         try {
-            //let lhsVal = this.lhs.eval(frame);
-            //let rhsVal = this.rhs.eval(frame);
-            //return this.fun(lhsVal, rhsVal);
             return this.fun(this.lhs, this.rhs, frame);
         } catch(er) {
             if (er instanceof bs.RuntimeException && er.firstChance) {
                 er.firstChance = false;
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
-            //console.trace(er);
             throw er;
         }
     }
@@ -3360,17 +3331,50 @@ class AstUseStatement extends AstBase {
         if (this.statements == null) {
 
             let fileToInclude = this.expr.eval(frame);
-            let includedFile = bs.value2Str(fileToInclude);
-            if (includedFile == "" || includedFile==null) {
-                throw new bs.RuntimeException("expression in use statement gives an empty value. (should be a string with the name of a file)", this.startOffset);
+            let includedFile = bs.value2Str2(fileToInclude);
+
+            if (includedFile == "" || includedFile == null) {
+                throw new bs.RuntimeException("expression in use statement gives an empty string value. (should be a string with the name of a file)", this.startOffset);
             }
-            try {
-                this.statements = this.parserFunction(includedFile, true);
-            } catch(er) {
+
+            let extension =  this.fileExtension(includedFile)
+            if (extension  == "p") {
+                try {
+                    this.statements = this.parserFunction(includedFile, true);
+                } catch (er) {
+                    er.addToStack([this.startOffset, this.currentSourceInfo]);
+                    throw er;
+                }
+            }
+            else if (extension == "js") {
+                this.useJsExtension(includedFile);
+            } else {
+                let er = new bs.RuntimeException("file extension of included file should be either .p or .js, is: " + extension + " using: " + includedFile);
+                er.addToStack([this.startOffset, this.currentSourceInfo]);
                 throw er;
             }
         }
         return this.statements.eval(frame);
+    }
+
+    useJsExtension(incFile) {
+        let ext = require(incFile);
+        try {
+            ext.addExtension(frame);
+        } catch(ex) {
+            let er = new bs.RuntimeError("Can't use extension module. " + incFile + " error:", er);
+            er.addToStack([this.startOffset, this.currentSourceInfo]);
+            throw er;
+        }
+
+    }
+
+    fileExtension(filename) {
+        let components = filename.split('.');
+        if (components.length > 1) {
+            return components[components.length-1];
+        }
+        return '';
     }
 }
 
@@ -3715,7 +3719,6 @@ if (typeof(module) == 'object') {
         eval,
         setEvalCallback,
         setCurrentSourceInfo,
-        //setForceStopEval,
         setErrorOnExecFail,
         isBreakOrContinue,
         isReturnOrYield,

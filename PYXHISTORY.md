@@ -1,3 +1,8 @@
+ * PYX 0.2.9 / PRS 0.0.4  
+    * add import with namespace (use as)
+    * split runtime library into base and runtime
+    * add support for extension modules, these are written in javascript
+
  * PYX 0.2.8 / PRS 0.0.4  
     * add tests
     * round - add function to properly round to integer. (int is using parseInt - which is always rounding down)

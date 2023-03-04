@@ -3361,7 +3361,7 @@ class AstUseStatement extends AstBase {
                 }
             }
             else if (extension == "js") {
-                this.useJsExtension(includedFile, frame);
+                return this.useJsExtension(includedFile, frame);
             } else {
                 let er = new bs.RuntimeException("file extension of included file should be either .p or .js, is: " + extension + " using: " + includedFile);
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
@@ -3374,8 +3374,10 @@ class AstUseStatement extends AstBase {
         let ext = require(incFile);
         try {
             ext.addExtension(frame);
+            return bs.VALUE_NONE;
         } catch(ex) {
-            let er = new bs.RuntimeError("Can't use extension module. " + incFile + " error:", er);
+            //console.trace(ex);
+            let er = new bs.RuntimeException("Can't use/include extension module. " + incFile + " error:",  ex);
             er.addToStack([this.startOffset, this.currentSourceInfo]);
             throw er;
         }

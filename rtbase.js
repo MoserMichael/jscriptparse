@@ -142,6 +142,49 @@ function typeNameRaw(val) {
     return mapTypeToName[val];
 }
 
+function checkType(arg, index, expectedType) {
+    let val;
+
+    if (index != null) {
+        val = arg[index];
+    } else {
+        val = arg
+    }
+
+    if (val.type != expectedType) {
+        let paramName = "";
+        if (index != null) {
+            paramName = getParamName(index);
+        }
+        throw new RuntimeException("expected " + bs.typeNameRaw(expectedType)  + " - " + paramName + " - Instead got value of " + bs.typeNameVal(val) );
+    }
+}
+
+function checkTypeList(arg, index, expectedTypeList) {
+    let val;
+
+    if (index != null) {
+        val = arg[index];
+    } else {
+        val = arg
+    }
+    for(let i=0; i<expectedTypeList.length; ++i) {
+        let expectedType = expectedTypeList[i];
+
+        if (val.type == expectedType) {
+            return;
+        }
+    }
+    let paramName = "";
+    if (index != null) {
+        paramName = getParamName(index);
+    }
+    let typeNames = expectedTypeList.map(bs.typeNameRaw).join(", ");
+    throw new RuntimeException("expected " + typeNames  + " - " + paramName + " - Instead got value of " + bs.typeNameVal(val) );
+}
+
+
+
 if (typeof(module) == 'object') {
     module.exports = {
         doLogHook,
@@ -171,5 +214,7 @@ if (typeof(module) == 'object') {
         VALUE_NONE,
         typeNameVal,
         typeNameRaw,
+        checkType,
+        checkTypeList,
     }
 } 

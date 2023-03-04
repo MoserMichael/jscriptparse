@@ -38,6 +38,7 @@ function setErrorOnExecFail(on) {
 }
 
 
+
 let NumberNames={ 1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth"};
 
 function getParamName(index) {
@@ -74,48 +75,6 @@ function value2Bool(arg, index) {
     }
     throw new RuntimeException("can't convert " + bs.typeNameVal(val) + " to boolean. " + paramName);
 }
-
-function checkType(arg, index, expectedType) {
-    let val;
-
-    if (index != null) {
-        val = arg[index];
-    } else {
-        val = arg
-    }
-
-    if (val.type != expectedType) {
-        let paramName = "";
-        if (index != null) {
-            paramName = getParamName(index);
-        }
-        throw new RuntimeException("expected " + bs.typeNameRaw(expectedType)  + " - " + paramName + " - Instead got value of " + bs.typeNameVal(val) );
-    }
-}
-
-function checkTypeList(arg, index, expectedTypeList) {
-    let val;
-
-    if (index != null) {
-        val = arg[index];
-    } else {
-        val = arg
-    }
-    for(let i=0; i<expectedTypeList.length; ++i) {
-        let expectedType = expectedTypeList[i];
-
-        if (val.type == expectedType) {
-            return;
-        }
-    }
-    let paramName = "";
-    if (index != null) {
-        paramName = getParamName(index);
-    }
-    let typeNames = expectedTypeList.map(bs.typeNameRaw).join(", ");
-    throw new RuntimeException("expected " + typeNames  + " - " + paramName + " - Instead got value of " + bs.typeNameVal(val) );
-}
-
 
 function value2Num(arg, index) {
     let val;
@@ -844,7 +803,7 @@ RTLIB={
 `, 3, function(arg) {
         let hay = value2Str(arg, 0);
 
-        checkType(arg, 1, bs.TYPE_REGEX)
+        bs.checkType(arg, 1, bs.TYPE_REGEX)
 
         let ret = hay.match(arg[1].regex);
 
@@ -865,7 +824,7 @@ RTLIB={
         let hay = value2Str(arg, 0);
         let ret = []
 
-        checkType(arg, 1, bs.TYPE_REGEX)
+        bs.checkType(arg, 1, bs.TYPE_REGEX)
 
         let lenConsumed = 0;
 
@@ -1082,7 +1041,7 @@ text="a b a c a d"
 `, 4, function(arg) {
         let hay = value2Str(arg, 0);
 
-        checkType(arg, 1, bs.TYPE_REGEX)
+        bs.checkType(arg, 1, bs.TYPE_REGEX)
 
         let needle = arg[1].regex;
         let newNeedle = value2Str(arg, 2);
@@ -1143,7 +1102,7 @@ text="a b a c a d"
 292
 
 `, 2, function(arg) {
-        checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_REGEX, bs.TYPE_NUM]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_REGEX, bs.TYPE_NUM]);
 
         let sval = value2Str(arg, 0);
         let radix = 10;
@@ -1173,7 +1132,7 @@ text="a b a c a d"
 > num('.37e2')
 37
 `, 1, function(arg) {
-        checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_NUM]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_NUM]);
 
         let sval = value2Str(arg, 0);
         let res = parseFloat(sval);
@@ -1199,7 +1158,7 @@ text="a b a c a d"
 > round('3.7')
 4
 `, 1, function(arg) {
-        checkTypeList(arg, 0, [bs.TYPE_NUM,bs.TYPE_STR]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_NUM,bs.TYPE_STR]);
 
         let res = Math.round(value2Num(arg,0));
         return new bs.Value(bs.TYPE_NUM, checkResNan(res));
@@ -1561,14 +1520,14 @@ false
 
 > len([1,2,3])
 3`, 1, function(arg) {
-        checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST]);
         return new bs.Value(bs.TYPE_NUM, arg[0].val.length);
     }),
     "join": new bs.BuiltinFunctionValue(`# given a list argument, joins the values of the list into a single string
 
 > join(["a: ",1," b: ", true])
 "a: 1 b: true"`, 2, function(arg) {
-        checkType(arg, 0, bs.TYPE_LIST);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
 
         let delim ="";
         if (arg[1] != null) {
@@ -1592,8 +1551,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 > ["key: Ernie age: 3","key: Bert age: 4","key: Cookie-Monster age: 5","key: GraphCount age: 100"]
 `, 2, function(arg, frame) {
 
-        checkTypeList(arg, 0, [bs.TYPE_LIST, bs.TYPE_MAP])
-        checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION])
+        bs.checkTypeList(arg, 0, [bs.TYPE_LIST, bs.TYPE_MAP])
+        bs.checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION])
 
         let ret = [];
         let funVal = arg[1];
@@ -1626,8 +1585,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 > mapIndex([3,4,5,6],def(x,y) [2*x, y])
 [[6,0],[8,1],[10,2],[12,3]]`, 2, function(arg, frame) {
 
-        checkType(arg, 0, bs.TYPE_LIST);
-        checkTypeList(arg, 0, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION]);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
+        bs.checkTypeList(arg, 0, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION]);
 
         let ret = [];
         let argList = arg[0];
@@ -1661,8 +1620,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 > (((2+1)+2)+3)
 8
 `, 3, function(arg, frame) {
-        checkType(arg, 0, bs.TYPE_LIST);
-        checkType(arg, 1, bs.TYPE_CLOSURE);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
+        bs.checkType(arg, 1, bs.TYPE_CLOSURE);
 
         let argList = arg[0];
         let funVal = arg[1];
@@ -1687,8 +1646,8 @@ same as:
 
 > (((1024/32) / 8) / 4)
 1`, 3, function(arg, frame) {
-        checkType(arg, 0, bs.TYPE_LIST);
-        checkType(arg, 1, bs.TYPE_CLOSURE);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
+        bs.checkType(arg, 1, bs.TYPE_CLOSURE);
 
         let argList = arg[0];
         let funVal = arg[1];
@@ -1712,7 +1671,7 @@ same as:
 > a
 [1,2]`, 1,function(arg, frame) {
 
-        checkType(arg, 0, bs.TYPE_LIST);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
 
         if (arg[0].val.length == 0) {
             throw new RuntimeException("Can't pop from an empty list");
@@ -1728,7 +1687,7 @@ same as:
 [1,2,3]
 > a
 [1,2,3]`, 2, function(arg, frame) {
-        checkType(arg, 0, bs.TYPE_LIST)
+        bs.checkType(arg, 0, bs.TYPE_LIST)
         arg[0].val.push(arg[1]);
         return arg[0];
     }),
@@ -1742,7 +1701,7 @@ same as:
 > a
 [2,3]    
 `, 1,function(arg, frame) {
-        checkType(arg, 0, bs.TYPE_LIST)
+        bs.checkType(arg, 0, bs.TYPE_LIST)
         if (arg[0].val.length == 0) {
             throw new RuntimeException("Can't pop from an empty list");
         }
@@ -1762,7 +1721,7 @@ same as:
 > a
 [1,2,3]    
 `, 2, function(arg, frame) {
-        checkType(arg, 0, bs.TYPE_LIST)
+        bs.checkType(arg, 0, bs.TYPE_LIST)
         arg[0].val.unshift(arg[1]);
         return arg[0];
     }),
@@ -1770,8 +1729,8 @@ same as:
 
  > joinl([1,2],[3,4])
 [1,2,3,4]`, 2,function(arg, frame) {
-        checkType(arg, 0, bs.TYPE_LIST)
-        checkType(arg, 1, bs.TYPE_LIST)
+        bs.checkType(arg, 0, bs.TYPE_LIST)
+        bs.checkType(arg, 1, bs.TYPE_LIST)
 
         let lst = arg[0].val.concat(arg[1].val);
         return new bs.Value(bs.TYPE_LIST, lst);
@@ -1799,10 +1758,10 @@ same as:
 
         if (arg[1] != null) {
             funVal = arg[1];
-            checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION])
+            bs.checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION])
         }
 
-        checkType(arg, 0, bs.TYPE_LIST);
+        bs.checkType(arg, 0, bs.TYPE_LIST);
 
         let rt = null;
         if (funVal == null) {
@@ -1846,7 +1805,7 @@ same as:
 > map( pairs, def (arg) [ arg[0]+arg[0], arg[1]*arg[1] ] )
 [["aa",1],["bb",4],["cc",9]]    
 `, 1, function*(arg) {
-        checkTypeList(arg, 0, [bs.TYPE_MAP, bs.TYPE_LIST]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_MAP, bs.TYPE_LIST]);
         yield* genValues(arg[0]);
     },null, true),
     "keys": new bs.BuiltinFunctionValue(`# for maps: returns the keys of the map
@@ -1855,7 +1814,7 @@ same as:
 {"first":1,"second":2,"third":3}
 > keys(a)
 ["first","second","third"]`, 1, function(arg) {
-        checkType(arg, 0, bs.TYPE_MAP);
+        bs.checkType(arg, 0, bs.TYPE_MAP);
         let keys = Object.keys(arg[0].val);
         let rt = [];
         for(let i=0; i<keys.length;++i) {
@@ -1871,7 +1830,7 @@ same as:
 {"name":"Kermit","surname":"Frog"}
 > parseJsonString('[1,2,3]')
 [1,2,3]`, 1,function(arg, frame) {
-        checkType(arg, 0, bs.TYPE_STR);
+        bs.checkType(arg, 0, bs.TYPE_STR);
         let val = JSON.parse(arg[0].val);
         let rt = jsValueToRtVal(val);
         return rt;
@@ -1901,7 +1860,7 @@ c:
 > parseYamlString("a: 1\\nb: 2\\nc:\\n  - 1\\n  - 2\\n  - 3\\n")
 {"a":1,"b":2,"c":[1,2,3]}    
     `, 1,function(arg, frame) {
-        checkType(arg, 0, bs.TYPE_STR);
+        bs.checkType(arg, 0, bs.TYPE_STR);
         let val = yaml.parse(arg[0].val);
         let rt = jsValueToRtVal(val);
         return rt;
@@ -1995,7 +1954,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
     `, 2,function(arg, frame) {
         let cmd = value2Str(arg, 0);
-        checkType(arg, 1, bs.TYPE_CLOSURE);
+        bs.checkType(arg, 1, bs.TYPE_CLOSURE);
         let callback = arg[1];
 
         let env = _getEnv(frame);
@@ -2139,7 +2098,7 @@ true
 true
 > exists(5, a)
 false`, 2,function(arg, frame) {
-        checkTypeList(arg, 1, [bs.TYPE_MAP, bs.TYPE_LIST]);
+        bs.checkTypeList(arg, 1, [bs.TYPE_MAP, bs.TYPE_LIST]);
 
         if (arg[1].type == bs.TYPE_MAP) {
            // check if map has first argument as key
@@ -2404,7 +2363,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
         let surl = value2Str(arg, 0);
 
         if (arg[1] != null && arg[1].type != bs.TYPE_NONE) {
-            checkType(arg, 1, bs.TYPE_MAP);
+            bs.checkType(arg, 1, bs.TYPE_MAP);
             options = rtValueToJsVal(arg[1]);
 
             if ('method' in options) {
@@ -2419,7 +2378,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
         }
 
         if (arg[2] != null) {
-            checkType(arg, 2, bs.TYPE_CLOSURE);
+            bs.checkType(arg, 2, bs.TYPE_CLOSURE);
         }
         callback = arg[2];
 

@@ -13,7 +13,7 @@ The scripting language and interpreter for the pyx language.
 - See [pyx tutorial (pyxtut)](PYXTUT.md)
 - See [pyx functions by category (pyxfunc)](PYXFUNC.md)
 - see the [design document (pyxdesign)](PYXDESIGN.md)
-- Example tests scripts are [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) - see files with extension .p (.out - expected output of the script)
+- Example tests scripts are [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) and [here](https://github.com/MoserMichael/jscriptparse/tree/main/leetcode) - see files with extension .p (.out - expected output of the script)
 
 ## Running it
 

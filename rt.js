@@ -2109,7 +2109,7 @@ class AstStmtList extends AstBase {
         let val = bs.VALUE_NONE;
 
         if (bs.getTraceMode() && !this.skipTrace && this.statements.length > 1) {
-            process.stderr.write(bs.getTracePrompt + "{\n");
+            process.stderr.write(bs.getTracePrompt() + "{\n");
         }
 
         for(let i=0; i < this.statements.length; ++i) {
@@ -2123,7 +2123,7 @@ class AstStmtList extends AstBase {
         }
 
         if (bs.getTraceMode() && !this.skipTrace && this.statements.length > 1) {
-            process.stderr.write(bs.getTracePrompt + "}\n");
+            process.stderr.write(bs.getTracePrompt() + "}\n");
         }
 
         return val;
@@ -2553,6 +2553,8 @@ class AstBinaryExpression extends AstBase {
             if (er instanceof bs.RuntimeException && er.firstChance) {
                 er.firstChance = false;
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
+            } else {
+                //console.trace(er);
             }
             throw er;
         }
@@ -2637,8 +2639,10 @@ class AstUnaryExpression extends AstBase {
                 er.firstChance = false;
                 er.currentSourceInfo = this.currentSourceInfo;
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
-            }
-            //console.trace(er);
+            } //else {
+            //    console.trace(er);
+            //}
+            console.trace(er);
             throw er;
         }
     }
@@ -2799,6 +2803,8 @@ class AstIdentifierRef extends AstBase {
         } catch(er) {
             if (er instanceof bs.RuntimeException && !er.isUnwind()) {
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
+            } else {
+                consle.trace(er);
             }
             throw er;
         }
@@ -2851,7 +2857,7 @@ function _assignImp(frame, value, lhs) {
         }
     }
     if (bs.getTraceMode()) {
-        process.stderr.write(bs.getTracePrompt + traceLhs.join(", ") + " = " + traceRhs.join(",") + "\n");
+        process.stderr.write(bs.getTracePrompt() + traceLhs.join(", ") + " = " + traceRhs.join(",") + "\n");
     }
     return bs.VALUE_NONE;
 }
@@ -2993,10 +2999,10 @@ class AstIfStmt extends AstBase {
             let boolVal = bs.value2Bool(val);
             if (bs.getTraceMode()) {
                 if (i == 0) {
-                    process.stderr.write(bs.getTracePrompt + "if " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
+                    process.stderr.write(bs.getTracePrompt() + "if " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
 
                 } else {
-                    process.stderr.write(bs.getTracePrompt + "elif " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
+                    process.stderr.write(bs.getTracePrompt() + "elif " + boolVal + (!boolVal ? " # <pass>" : "") + "\n");
                 }
             }
 
@@ -3006,7 +3012,7 @@ class AstIfStmt extends AstBase {
         }
         if (this.elseStmtList != null) {
             if (bs.getTraceMode()) {
-                process.stderr.write(bs.getTracePrompt + "else\n");
+                process.stderr.write(bs.getTracePrompt() + "else\n");
             }
 
             return this.elseStmtList.eval(frame);
@@ -3092,7 +3098,7 @@ class AstWhileStmt extends AstBase {
             }
 
             if (bs.getTraceMode()) {
-                process.stderr.write(bs.getTracePrompt + "while " + cond + "\n" )
+                process.stderr.write(bs.getTracePrompt() + "while " + cond + "\n" )
             }
 
             let rt = this.stmtList.eval(frame);
@@ -3169,7 +3175,7 @@ class AstForStmt extends AstBase {
 
     eval(frame) {
         if (bs.getTraceMode()) {
-            process.stderr.write(bs.getTracePrompt + "for ");
+            process.stderr.write(bs.getTracePrompt() + "for ");
         }
         if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
             for (let val of this.expr.genEval(frame)) {
@@ -3275,7 +3281,7 @@ class AstReturnStmt extends AstBase {
     eval(frame) {
         let retValue = this.expr.eval(frame);
         if (bs.getTraceMode()) {
-            process.stderr.write(bs.getTracePrompt + "return " + bs.rtValueToJson(retValue) + "\n");
+            process.stderr.write(bs.getTracePrompt() + "return " + bs.rtValueToJson(retValue) + "\n");
         }
         return new bs.Value(bs.TYPE_FORCE_RETURN, retValue);
     }
@@ -3371,8 +3377,11 @@ class AstUseStatement extends AstBase {
     }
 
     useJsExtension(incFile, frame) {
-        let ext = require(incFile);
         try {
+            if (incFile.startsWith(".")) {
+                incFile = path.resolve(incFile);
+            }
+            let ext = require(incFile);
             ext.addExtension(frame);
             return bs.VALUE_NONE;
         } catch(ex) {
@@ -3405,7 +3414,7 @@ class AstBreakStmt extends AstBase {
 
     eval(frame) {
         if (bs.getTraceMode()) {
-            process.stderr.write(bs.getTracePrompt + "break\n");
+            process.stderr.write(bs.getTracePrompt() + "break\n");
         }
         return new bs.Value(bs.TYPE_FORCE_BREAK, null);
     }
@@ -3426,7 +3435,7 @@ class AstContinueStmt extends AstBase {
 
     eval(frame) {
         if (bs.getTraceMode()) {
-            process.stderr.write(bs.getTracePrompt + "continue\n");
+            process.stderr.write(bs.getTracePrompt() + "continue\n");
         }
         return new bs.Value(bs.TYPE_FORCE_CONTINUE, null);
     }

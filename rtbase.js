@@ -525,6 +525,12 @@ class RuntimeException  extends Error {
             let stackTraceEntry = this.stackTrace[i];
             let offset = stackTraceEntry[0];
             let sourceInfo = stackTraceEntry[1];
+
+            if (sourceInfo == null) {
+                ret += "???\n";
+                continue;
+            }
+
             let fileInfo = sourceInfo[0];
             let fname = "";
             if (fileInfo != null) {
@@ -663,7 +669,7 @@ function evalClosure(name, funcVal, args, frame) {
     let traceParams = _prepareBuiltinFuncArgs(funcVal, frame, args);
 
     if (getTraceMode()) {
-        process.stderr.write(getTracePrompt + name + "(" + traceParams + ") {\n");
+        process.stderr.write(getTracePrompt() + name + "(" + traceParams + ") {\n");
     }
 
     // function call
@@ -678,7 +684,7 @@ function evalClosure(name, funcVal, args, frame) {
     }
 
     if (getTraceMode() && retVal.type != TYPE_NONE) {
-        process.stderr.write(getTracePrompt + rtValueToJson(retVal) + "\n}");
+        process.stderr.write(getTracePrompt() + rtValueToJson(retVal) + "\n}");
     }
 
     return retVal;
@@ -723,7 +729,7 @@ function _prepareClosureFrame(funcVal, frame, args) {
     let traceParam = "";
 
     if (args.length > functionDef.params.length) {
-        throw new RuntimeException("function takes " + functionDef.params.length + " params, but " + args.length + " were given", [funcVal.startOffset, funcVal.currentSourceInfo]);
+        throw new RuntimeException("function takes " + functionDef.params.length + " params, but " + args.length + " were given", [funcVal.functionDef.startOffset, funcVal.functionDef.currentSourceInfo]);
     }
 
     // define all provided parameters in the new function frmae

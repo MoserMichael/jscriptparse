@@ -1,4 +1,4 @@
- * PYX 0.3.4 / PRS 0.0.4  
+ * PYX 0.3.3 / PRS 0.0.4  
     * fix error reporting - if wrong number of parameters were passed to function
     * wrong prefix while tracing 
     * adding tests

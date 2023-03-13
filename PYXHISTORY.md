@@ -1,3 +1,8 @@
+ * PYX 0.3.4 / PRS 0.0.4  
+    * fix error reporting - if wrong number of parameters were passed to function
+    * wrong prefix while tracing 
+    * adding tests
+
  * PYX 0.3.2 / PRS 0.0.4  
     * add import with namespace (use as)
     * split runtime library into base and runtime

@@ -90,7 +90,7 @@ Global vs local variables.
                 On the other hand that would break library code - the library function don't know what kind of globals are defined in a given program...
     
         Python approach:
-            - makes more sense to make the variables local - that's  what was probably intended, when writing a functio
+            - makes more sense to make the variables local - that's  what was probably intended, when writing a function
         Javascript approach    
             - closures are cool, and you really want to access captured variables without too much additional declarations... (that's my guess)
 

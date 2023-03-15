@@ -3343,7 +3343,7 @@ class AstUseStatement extends AstBase {
                 let namespace = new bs.Value(bs.TYPE_MAP, {});
                 frame.defineVar(this.namespaceId, namespace);
 
-                let newFrame = new bs.Frame(frame);
+                let newFrame = new bs.Frame(frame, true);
                 newFrame.vars = namespace.val;
 
                 frame = newFrame;
@@ -3671,8 +3671,9 @@ function isReturnOrYield(arg) {
     return arg instanceof AstReturnStmt || arg instanceof AstYieldStmt;
 }
 
+// makes a global frame
 function makeFrame(cmdLine) {
-    let frame = new bs.Frame();
+    let frame = new bs.Frame(null, true);
     frame.vars = bs.RTLIB;
 
     if (cmdLine != null) {

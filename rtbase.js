@@ -399,9 +399,10 @@ function cloneAll(val) {
 // closures have a parent frame - which is the frame where they where evaluated.
 // simple rules. aren't they?
 class Frame {
-    constructor(parentFrame = null) {
+    constructor(parentFrame = null, globalFrame = false) {
         this.vars = {}; // maps variable name to Value instance
         this.parentFrame = parentFrame;
+        this.globalFrame = globalFrame;
     }
 
     lookup(name) {

@@ -37,7 +37,7 @@ function setErrorOnExecFail(on) {
 }
 
 function _getEnv(frame) {
-    let val = frame.lookup("ENV");
+    let [val, _ ] = frame.lookup("ENV");
 
     if (val == null || val.type != bs.TYPE_MAP) {
         return {};
@@ -2795,7 +2795,7 @@ class AstIdentifierRef extends AstBase {
     // evaluate, if as part of expression (for assignment there is AstAssignment)
     eval(frame) {
         try {
-            let value = frame.lookup(this.identifierName);
+            let [value, _] = frame.lookup(this.identifierName);
             if (this.refExpr != null) {
                 value = lookupIndex(frame, value, this.refExpr)
             }
@@ -2824,13 +2824,13 @@ function makeIdentifierRef(identifierName, refExpr) {
     return new AstIdentifierRef(identifierName[0], refExpr, identifierName[1]);
 }
 
-function _assignImp(frame, value, lhs) {
+function _assignImp(frame, value, lhs, isRegularAssignment) {
     let traceLhs=[];
     let traceRhs=[];
 
     if (lhs.length == 1) {
         let singleLhs = lhs[0];
-        let traceVal = _assign(frame, singleLhs, value);
+        let traceVal = _assign(frame, singleLhs, value, isRegularAssignment);
         if (bs.getTraceMode()) {
             traceLhs.push(traceVal[0]);
             traceRhs.push(traceVal[1]);
@@ -2848,7 +2848,7 @@ function _assignImp(frame, value, lhs) {
             }
         }
         for(let i=0; i<rhsVal.length; ++i) {
-            let traceVal = _assign(frame, lhs[i], rhsVal[i]);
+            let traceVal = _assign(frame, lhs[i], rhsVal[i], isRegularAssignment);
             if (bs.getTraceMode()) {
                 traceLhs.push(traceVal[0]);
                 traceRhs.push(traceVal[1]);
@@ -2862,14 +2862,18 @@ function _assignImp(frame, value, lhs) {
     return bs.VALUE_NONE;
 }
 
-function _assign(frame, singleLhs, value) {
+function _assign(frame, singleLhs, value, isRegularAssignment) {
     let varName = singleLhs.identifierName;
     let indexExpr = singleLhs.refExpr;
 
     if (varName != "_") {
         if (indexExpr != null) {
-            let lhsValue = frame.lookup(varName);
+            let [lhsValue, isGlobalFrame] = frame.lookup(varName);
             //console.log("varName: " + varName + " value: " + JSON.stringify(lhsValue));
+
+            if (isRegularAssignment && !frame.isGlobalFrame && isGlobalFrame) {
+                throw new bs.RuntimeException("Can't assign to global variable " + varName + " from within a function, use := instead for assignment");
+            }
 
             if (lhsValue == undefined || (lhsValue.type != bs.TYPE_LIST && lhsValue.type != bs.TYPE_MAP && lhsValue.type != bs.TYPE_STR)) {
                 let err = new bs.RuntimeException("Can't lookup index expression - value is not a list or map");
@@ -2886,7 +2890,7 @@ function _assign(frame, singleLhs, value) {
                 return [ varName + indexExpr, bs.rtValueToJsVal(value) ];
             }
         } else {
-            frame.assign(varName, value);
+            frame.assign(varName, value, isRegularAssignment);
             if (bs.getTraceMode()) {
                 return [ varName, bs.rtValueToJsVal(value) ];
             }
@@ -2950,15 +2954,16 @@ function _indexAssign(frame, value, refExpr, newValue) {
 
 
 class AstAssign extends AstBase {
-    constructor(lhs, rhs, offset) {
+    constructor(lhs, rhs, offset, isRegularAssignment) {
         super(offset);
         this.lhs = lhs;
         this.rhs = rhs;
+        this.isRegularAssignment = isRegularAssignment;
     }
 
     eval(frame) {
         let value = this.rhs.eval(frame);
-        _assignImp(frame, value, this.lhs);
+        _assignImp(frame, value, this.lhs, this.isRegularAssignment);
         return value;
     }
 
@@ -2967,8 +2972,8 @@ class AstAssign extends AstBase {
     }
 }
 
-function makeAstAssignment(lhs, rhs, offset) {
-    return new AstAssign(lhs, rhs, offset);
+function makeAstAssignment(lhs, rhs, offset, isRegularAssignment) {
+    return new AstAssign(lhs, rhs, offset, isRegularAssignment);
 }
 
 class AstIfStmt extends AstBase {
@@ -3179,7 +3184,7 @@ class AstForStmt extends AstBase {
         }
         if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
             for (let val of this.expr.genEval(frame)) {
-                _assignImp(frame, val, this.lhs);
+                _assignImp(frame, val, this.lhs, true);
                 let rt = this.stmtList.eval(frame);
 
                 if (rt.type >= bs.TYPE_FORCE_RETURN) {
@@ -3202,7 +3207,7 @@ class AstForStmt extends AstBase {
             throw new bs.RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
         }
         for(let val of genValues(rt)) {
-            _assignImp(frame, val, this.lhs);
+            _assignImp(frame, val, this.lhs, true);
 
             let rt = this.stmtList.eval(frame);
 
@@ -3221,7 +3226,7 @@ class AstForStmt extends AstBase {
     *genEval(frame) {
         if (this.expr instanceof AstFunctionCall && this.expr.hasYield(frame)) {
             for (let val of this.expr.genEval(frame)) {
-                _assignImp(frame, val, this.lhs);
+                _assignImp(frame, val, this.lhs, true);
                 let rt = yield *this.stmtList.genEval(frame);
 
                 if (rt != null && rt.type >= bs.TYPE_FORCE_RETURN) {
@@ -3244,7 +3249,7 @@ class AstForStmt extends AstBase {
             throw new bs.RuntimeException("Can't iterate over expression (expected list or map)", this.currentSourceInfo);
         }
         for(let val of genValues(rt)) {
-            _assignImp(frame, val, this.lhs);
+            _assignImp(frame, val, this.lhs, true);
             let rt = yield* this.stmtList.genEval(frame);
 
             if (rt.type >= bs.TYPE_FORCE_RETURN) {
@@ -3486,7 +3491,7 @@ class AstFunctionDef extends AstBase {
         if (this.name != null) {
             let prevValue = null
             try {
-                prevValue = frame.lookup(this.name);
+                prevValue = frame.lookup(this.name)[0];
             } catch(er) {
                 // can throw runtime exception - when value is not defined
             }
@@ -3568,6 +3573,7 @@ class AstFunctionCall extends AstBase {
                 if (showJavascriptStack) {
                     console.log("stack length: " + er.stack);
                 }
+                console.trace(er);
                 er = new bs.RuntimeException("internal error: " + er);
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
             }
@@ -3600,7 +3606,7 @@ class AstFunctionCall extends AstBase {
                 //what if identifier name comes from lookup of values?
             }
         } else {
-            funcVal = frame.lookup(this.name);
+            funcVal = frame.lookup(this.name)[0];
             funcVal.name = this.name;
         }
         return funcVal;
@@ -3621,7 +3627,7 @@ class AstFunctionCall extends AstBase {
             funcVal.name = this.name.identifierName;
             //what if identifier name comes from lookup of values?
         } else {
-            funcVal = frame.lookup(this.name);
+            funcVal = frame.lookup(this.name)[0];
             funcVal.name = this.name;
         }
         if (funcVal == undefined) {
@@ -3677,7 +3683,7 @@ function makeFrame(cmdLine) {
     frame.vars = bs.RTLIB;
 
     if (cmdLine != null) {
-        let cmd = frame.lookup("ARGV");
+        let [cmd,_] = frame.lookup("ARGV");
         cmd.val = listToString(cmdLine);
     }
 

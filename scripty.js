@@ -652,14 +652,17 @@ function makeParserImp() {
     let assignment = prs.makeTransformer(
         prs.makeSequenceParser([
             assignLhs,
-            prs.makeTokenParser("="),
+            prs.makeAlternativeParser([
+                prs.makeTokenParser("="),
+                prs.makeTokenParser(":=")
+            ]),
             expression
         ], "assignment"),
         function (arg) {
-            return rt.makeAstAssignment(arg[0], arg[2], arg[1][1]);
+            return rt.makeAstAssignment(arg[0], arg[2], arg[1][1], arg[1][0] == '=');
         }
     );
-
+    
 
     let statementOrStatementListFwd = new prs.makeForwarder();
 

@@ -13,7 +13,7 @@ requestData: {req.requestData()}
 "
 
         resp.send(200, "Pooh says hello. {cnt}" + text)
-        cnt = cnt + 1
+        cnt := cnt + 1
     })
 }
 

@@ -399,10 +399,10 @@ function cloneAll(val) {
 // closures have a parent frame - which is the frame where they where evaluated.
 // simple rules. aren't they?
 class Frame {
-    constructor(parentFrame = null, globalFrame = false) {
+    constructor(parentFrame = null, isGlobalFrame = false) {
         this.vars = {}; // maps variable name to Value instance
         this.parentFrame = parentFrame;
-        this.globalFrame = globalFrame;
+        this.isGlobalFrame = isGlobalFrame;
     }
 
     lookup(name) {
@@ -414,7 +414,7 @@ class Frame {
 
     _lookup(name) {
         if (name in this.vars) {
-            return this.vars[name];
+            return [ this.vars[name], this.isGlobalFrame];
         }
         if (this.parentFrame != null) {
             return this.parentFrame._lookup(name);
@@ -422,19 +422,22 @@ class Frame {
         throw new RuntimeException("undefined variable: " + name  );
     }
 
-    assign(name, value) {
-        if (!this._assign(name, value)) {
+    assign(name, value, isRegularAssignment = true) {
+        if (!this._assign(name, value, !isRegularAssignment || this.isGlobalFrame)) {
             this.vars[name] = clonePrimitiveVal(value);
         }
     }
 
-    _assign(name, value) {
+    _assign(name, value, fromGlobalFrame) {
         if (name in this.vars) {
+            if (!fromGlobalFrame && this.isGlobalFrame) {
+                return false;
+            }
             this.vars[name] = clonePrimitiveVal(value);
             return true;
         }
         if (this.parentFrame != null) {
-            return this.parentFrame._assign(name, value);
+            return this.parentFrame._assign(name, value, fromGlobalFrame);
         }
         return false;
     }

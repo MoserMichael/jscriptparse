@@ -1,0 +1,5 @@
+globVar: 1
+square:  9
+globVar: 1 - not changed
+square:  9
+globVar: 9 - did changed

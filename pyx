@@ -250,7 +250,7 @@ function runEvalLoop(cmdLine) {
                 let sval = line.substring(index, nextIndex).trim();
 
                 if (isFirst) {
-                    val = glob.lookup(sval);
+                    val = glob.lookup(sval)[0];
                 } else {
                     val = val.val[ sval ];
                 }

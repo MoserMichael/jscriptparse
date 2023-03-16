@@ -102,6 +102,9 @@ Global vs local variables.
                         
                         (means that the global frame is special....)
 
+                - now assignment with = within a function does the most common thing: it defines a new variable.
+                  However there is a second type of assignment, with := - if you put in that one, then you can change a global variable with the same name, provided there is no other variable in a nested scope. (don't know if that's too complicated, though)
+
 
 Map access
 

@@ -1,4 +1,4 @@
- * PYX 0.3.3 / PRS 0.0.4  
+ * PYX 0.3.4 / PRS 0.0.4  
     assignment with = - don't change global variable when used within a function
     new assignment with := - does change global variable when used within a function
 

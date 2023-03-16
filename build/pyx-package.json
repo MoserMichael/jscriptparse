@@ -3,7 +3,7 @@
   },
   "name": "pyxlang",
   "description": "educational scripting language / shell with read-eval-print loop",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "devDependencies": {},
   "scripts": {
     "test": 

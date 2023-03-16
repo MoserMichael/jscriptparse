@@ -1,0 +1,5 @@
+Error: Can't assign to global variable glob from within a function, use := instead for assignment
+#(errorTest/12-global-access.p:4) def changeGlobalWithRegularAssignment() {
+                                |.^
+#(errorTest/12-global-access.p:8) changeGlobalWithRegularAssignment()
+                                |.^

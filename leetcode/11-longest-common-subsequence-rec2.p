@@ -58,8 +58,6 @@ testCases = [
                 [ "azzbzcd", "zzabzcdzz", [6, "zzbzcd"] ],
                 [ "bacadaaf", "abacadaf", [7, "bacadaf"] ]
             ]
-[6,"dczbzz","dczbzz"]
-[7,"fadacab","fadacab"]
 
 for t each(testCases) {
    res = lcs(t[0], t[1])

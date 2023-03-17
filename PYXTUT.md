@@ -541,6 +541,14 @@ Each element of the list is another list. Now you can access that as a board for
 
 if you want to check what is on the board: ```lst[0][0]``` - first we get the first row ```lst[0]``` then we get the first element of the first row ```lst[0][0]```
 
+
+You can also initialize a list and assign a value to each of the entries - the ```dimInit``` function does that:
+
+```
+> dimInit({},3)
+[{},{},{}]
+```
+
 ### <a id='s-1-2-7' />Maps
 
 There is a type of data called a map. It allows to give names to things.

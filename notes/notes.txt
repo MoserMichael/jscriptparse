@@ -46,13 +46,17 @@ Global vs local variables.
         ...     global glob
         ...     glob=v
         ...
+        >>> def change_local(v):
+        ...     glob=v
+        ...     return glob
+        ...
         >>> def read_glob():
         ...     return glob
         ...
         >>> change_glob(1)
         >>> read_glob()
         1
-        >>> change_local()
+        >>> change_local(42)
         42
         >>> read_glob()
         1

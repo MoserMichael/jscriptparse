@@ -116,7 +116,28 @@ Map access
         > a[[1,2]]=1
         1
         > a[[1,2]]
-        1
+        
+        Actually they call the values toString method to turn it into a key. That Doesn't work for objects -they turn into the same key.
+        - so also will not work for arrays with object entries. (funny)
+
+        > key1={'a':1}
+        { a: 1 }
+        > key1.toString()
+        '[object Object]'
+        > key2={'b':1}
+        { b: 1 }
+        > key2.toString()
+        '[object Object]'
+        > b={}
+        {}
+        > b[key1]=10
+        10
+        > b[key2]=20
+        20
+        > b[key1]
+        20
+        > Object.keys(b)
+        [ '[object Object]' ]        
 
     python doesn't want to have that:
 

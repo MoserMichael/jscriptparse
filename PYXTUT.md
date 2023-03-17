@@ -553,7 +553,21 @@ You can also initialize a list and assign a value to each of the entries - the `
 
 There is a type of data called a map. It allows to give names to things.
 
-Like the days of the week - this map has the key, the number of the day of a week, and the name of the day.
+Like the days of the week 
+
+You can map between the name of the day and its number:
+
+```
+> dayOfWeekReverse = { "Sunday" : 1, "Monday" : 2, "Tuesday" : 3, "Wednesday" : 4, "Thursday" : 5, "Friday" : 6, "Saturday" : 7 }
+{"Sunday":1,"Monday":2,"Tuesday":3,"Wednesday":4,"Thursday":5,"Friday":6,"Saturday":7}
+>
+
+> dayOfWeekRevers["Tuesday"]
+3
+```
+
+
+You can also use a number as a key value in a map.
 
 We put the map into a variable called dayOfWeek. 
 
@@ -569,16 +583,16 @@ And then show the name of the day of the week - ```dayOfWeek[6]``` shows the nam
 Friday
 ```
 
-Now you can also map between the name of the day and its number.
+Now a map with a number key is very different from a list, for example you can have gaps in the key values:
 
 ```
-> dayOfWeekReverse = { "Sunday" : 1, "Monday" : 2, "Tuesday" : 3, "Wednesday" : 4, "Thursday" : 5, "Friday" : 6, "Saturday" : 7 }
-{"Sunday":1,"Monday":2,"Tuesday":3,"Wednesday":4,"Thursday":5,"Friday":6,"Saturday":7}
->
+> firstPrimes={ 2: 'two', 3: 'three', 5 : "five", 7 : "seven" }
+{"2":"two","3":"three","5":"five","7":"seven"}
 
-> dayOfWeekRevers["Tuesday"]
-3
+> firstPrimes[3]
+"three"
 ```
+
 
 Of you can use the map to organize your data, like having a list of records for each employees in the muppet show:
 

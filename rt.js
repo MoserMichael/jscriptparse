@@ -2872,7 +2872,9 @@ function _assign(frame, singleLhs, value, isRegularAssignment) {
             //console.log("varName: " + varName + " value: " + JSON.stringify(lhsValue));
 
             if (isRegularAssignment && !frame.isGlobalFrame && isGlobalFrame) {
-                throw new bs.RuntimeException("Can't assign to global variable " + varName + " from within a function, use := instead for assignment");
+                let err = new bs.RuntimeException("Can't assign to global variable " + varName + " from within a function, use := instead for assignment");
+                err.addToStack([singleLhs.startOffset, singleLhs.currentSourceInfo]);
+                throw err;
             }
 
             if (lhsValue == undefined || (lhsValue.type != bs.TYPE_LIST && lhsValue.type != bs.TYPE_MAP && lhsValue.type != bs.TYPE_STR)) {
@@ -3367,7 +3369,9 @@ class AstUseStatement extends AstBase {
                     let statements = this.parserFunction(includedFile, true);
                     return statements.eval(frame);
                 } catch (er) {
-                    er.addToStack([this.startOffset, this.currentSourceInfo]);
+                    if (er instanceof bs.RuntimeException && !er.isUnwind()) {
+                        er.addToStack([this.startOffset, this.currentSourceInfo]);
+                    }
                     throw er;
                 }
             }

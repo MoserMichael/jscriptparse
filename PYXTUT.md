@@ -692,6 +692,19 @@ There are the following operations, these can be used in expressions
 "aaa-bbb"
 > 12 * 2
 24
+
+# you can't add values of mixed type - that's not allowed.
+
+> "2" + 2
+Error: Can't add String to Number
+#(1) "2" + 2
+   |.....^
+
+> "2" + [1,2,3]
+Error: Can't add String to List
+#(1) "2" + [1,2,3]
+   |.....^
+
 </code>
 </pre>
 
@@ -937,7 +950,7 @@ Or you can have a function that receives the number of bottles to write the song
 
 ```
 
-You can also text values with the ```+``` sign
+You can also concatenate text values with the ```+``` sign
 
 ```
 > title="very big"

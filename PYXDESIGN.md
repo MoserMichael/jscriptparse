@@ -7,11 +7,11 @@ The programming language is named after Winnie-the-Pooh, in the Russian translat
 ## Objective 
 
 - an interpreted language that is easy to learn / educational programming language
-- save some complexity, by throwing out some of the features of a regular scripting language (only one number type, no classes here, no separated namespaces/imports - you can still include source into the same namespace)
+- save some complexity, by throwing out some of the features of a regular scripting language (only one number type, no classes here, fewer variants of 'import' - fewer than in python. No equivalent concept of a python package - but you can have modules by importing a single file)
 - must provide a [Read–eval–print loop/Shell](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)  as a development environment.
 - should provide for concise expression (map/reduce/short functions/possibly one line scripts)
 - it should be easy to handle structured data, such as json.
-- integration with shell (the repl has tab completion when writing a special backtick operator)
+- integration with shell (the REPL/shell has tab completion for commands - upon writing a special backtick operator)
 - the most important thing: readable and detailed error messages. Look at what I mean as error messages for accessing lists and strings
 
 ```

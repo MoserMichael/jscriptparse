@@ -55,12 +55,10 @@ def makeTree(nodeValue, left = none, right = none) {
                 throw "Node {tree.node} most be smaller than {to}"
             }
             if tree.left != none {
-                println("go left")
-                #tree.left.validateTree(from, tree.node)
+                tree.left.validateTree(from, tree.node)
             }
             if tree.right != none {
-                println("go right")
-                #tree.right.validateTree(tree.node, to)
+                tree.right.validateTree(tree.node, to)
             }
 
         }

@@ -165,12 +165,18 @@
 
 ```python
 
-# return the bigger of the two two argument values (argument are interpreted as a numbers)
+# return the biggest of the argument values, can take any number of arguments
 
 > max(3,4)
 4
+
 > max(4,3)
 4
+
+> max(1,4,2,10)
+1
+
+
 
 ```
 <a id='s-12'/>
@@ -178,12 +184,17 @@
 
 ```python
 
-# return the smaller of the two two argument values (argument are interpreted as a numbers)
+# return the smallest of the argument values, can take any number of arguments
 
 > min(4,3)
 3
+
 > min(3,4)
 3
+
+> min(20,3,100,1)
+1
+
 
 ```
 <a id='s-13'/>

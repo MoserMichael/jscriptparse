@@ -1,5 +1,6 @@
  * next release
-    fix error message for assigning global variable list/dict
+    * fix error message for assigning global variable list/dict
+    * min, max - now variable length functions, can accept any number of arguments. 
 
  * PYX 0.3.4 / PRS 0.0.4  
     assignment with = - don't change global variable when used within a function

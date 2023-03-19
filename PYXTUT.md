@@ -34,7 +34,6 @@
 
 
 
-
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
 ## <a id='s-1-1' />First steps
@@ -715,17 +714,17 @@ There are the following operations, these can be used in expressions
 > 12 * 2
 24
 
-# you can't add values of mixed type - that's not allowed.
+you can't add values of mixed type - that's not allowed.
 
 > "2" + 2
 Error: Can't add String to Number
-#(1) "2" + 2
-   |.....^
+(1) "2" + 2
+  |.....^
 
 > "2" + [1,2,3]
 Error: Can't add String to List
-#(1) "2" + [1,2,3]
-   |.....^
+(1) "2" + [1,2,3]
+  |.....^
 
 </code>
 </pre>

@@ -744,34 +744,48 @@ text="a b a c a d"
     }),
 
     "max" : new bs.BuiltinFunctionValue(`
-# return the bigger of the two two argument values (argument are interpreted as a numbers)
+# return the biggest of the argument values, can take any number of arguments
 
 > max(3,4)
 4
+
 > max(4,3)
-4`, 2, function(arg) {
-        let num = bs.value2Num(arg,0);
-        let num2 = bs.value2Num(arg, 1);
-        let res = num;
-        if (num2 > num) {
-            res = num2;
+4
+
+> max(1,4,2,10)
+1
+
+`, -1, function(arg) {
+
+        let maxVal = Number.NEGATIVE_INFINITY;
+        for(let i=0; i<arg.length; ++i) {
+            let val = bs.value2Num(arg,i);
+            if (val > maxVal) {
+                maxVal = val;
+            }
         }
-        return new bs.Value(bs.TYPE_NUM, res);
+        return new bs.Value(bs.TYPE_NUM, maxVal);
     }),
     "min" : new bs.BuiltinFunctionValue(`
-# return the smaller of the two two argument values (argument are interpreted as a numbers)
+# return the smallest of the argument values, can take any number of arguments
 
 > min(4,3)
 3
+
 > min(3,4)
-3`, 2, function(arg) {
-        let num = bs.value2Num(arg, 0);
-        let num2 = bs.value2Num(arg, 1);
-        let res = num;
-        if (num2 < num) {
-            res = num2;
+3
+
+> min(20,3,100,1)
+1
+`, -1, function(arg) {
+        let minVal = Number.POSITIVE_INFINITY;
+        for(let i=0; i<arg.length; ++i) {
+            let val = bs.value2Num(arg,i);
+            if (val < minVal) {
+                minVal = val;
+            }
         }
-        return new bs.Value(bs.TYPE_NUM, res);
+        return new bs.Value(bs.TYPE_NUM, minVal);
     }),
     "abs" : new bs.BuiltinFunctionValue(`
 # return the absolute of the argument value  (if it's negative then turn it into a positive number)

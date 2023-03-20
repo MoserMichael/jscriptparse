@@ -36,6 +36,26 @@ How to handle binary data?
     > b.length
     10
 
+How do you parse binary data in scripting languages?
+
+
+    - perl unpack:  - a kind of printf like API for binary data. (nice for C-like structures - i guess that's why they invented it)
+            https://perldoc.perl.org/perlpacktut
+
+    - python has a similar module (print-f like interface)
+        https://docs.python.org/3/library/struct.html
+
+    - javascript doesn't have this kind of business, out of the box
+
+    
+    - php has it's own kind of unpack (print-f like interface)
+        https://www.php.net/manual/en/function.unpack.php
+
+    Is this unpack business a good idea? (i don't know)
+        - i think it's a kind of awkward business of unpacking a binary structure into an array of fields.
+        - the alternative would be a series of getters - where you have to specify such low level details as byte order and alignment. 
+        - don't know which of them is preferable.
+
  
 Global vs local variables.
     

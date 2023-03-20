@@ -2,6 +2,15 @@ const path=require("node:path");
 const fs=require("node:fs");
 const cp=require("node:child_process");
 const http = require('node:http');
+let https = null;
+let httpsAgent = null;
+try {
+    https = require('node:https');
+    httpsAgent = new https.Agent({ keepAlive: true });
+} catch(e) {
+    
+}
+
 const url = require('node:url');
 const yaml=require("yaml");
 const prs=require(path.join(__dirname,"prs.js"));
@@ -1922,7 +1931,6 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
         }
     
         //requestOptions['headers'] = {  'Connection': 'keep-alive' };
-        requestOptions['agent'] = httpAgent;
 
         let callUserFunction = function(data, error) {
             // this one is evaluated from another task. runtime exceptions need to be handled here
@@ -1940,8 +1948,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
         }
 
         //console.log("request: " + JSON.stringify(requestOptions));
-
-        let reqObj = http.request(requestOptions,function (resp) {
+        let httpHandler = function (resp) {
             resp.setEncoding('utf8');
 
             let data = "";
@@ -1951,7 +1958,20 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
             resp.on('end', () => {
                 callUserFunction(data, bs.VALUE_NONE);
             });
-        });
+        };
+
+        let reqObj = null;
+
+        if (urlObj.protocol == 'https:') {
+            if (https==null) {
+                throw new bs.RuntimeException("https not supported by this nodejs instance");
+            }
+            reqObj = https.request(requestOptions,httpHandler);
+            requestOptions['agent'] = httpsAgent;
+        } else {
+            reqObj = http.request(requestOptions,httpHandler);
+            requestOptions['agent'] = httpAgent;
+        }
 
         reqObj.on('error', (e) => {
             callUserFunction(bs.VALUE_NONE, new bs.Value(bs.TYPE_STR, e.message));

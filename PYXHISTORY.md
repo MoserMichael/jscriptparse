@@ -1,3 +1,6 @@
+ * next release 
+    * http client: handle https url's
+
  * PYX 0.3.5 / PRS 0.0.4  
     * fix error message for assigning global variable list/dict
     * min, max - now variable length functions, can accept any number of arguments. 

@@ -402,8 +402,23 @@ bs.RTLIB={
 "am me"
 > mid("I am me", 2, -1)
 "am me"
+
+# it also works with binary buffers
+
+> a=buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+
+> a[0]=1
+1
+> a[1]=2
+2
+> a[2]=3
+3
+
+> mid(a,0,3)
+{"type":"Buffer","data":[1,2,3]}
+
 `, 3, function(arg) {
-        let sval = bs.value2Str(arg, 0);
         let from = parseInt(bs.value2Num(arg[1]), 10);
         let to = null;
 
@@ -414,14 +429,27 @@ bs.RTLIB={
                 to = parseInt(bs.value2Num(arg[2]), 10);
             }
         }
+    
+        if (arg[0].type == bs.TYPE_BINARY) {
+           let sval = null;      
+           if (to == -1) {
+                sval = arg[0].val.slice(from);
+            } else {
+                sval = arg[0].val.slice(from, to);
+            }
 
-        if (to == -1) {
-            sval = sval.substring(from)
+            return new bs.Value(bs.TYPE_BINARY, sval);
+
         } else {
-            sval = sval.substring(from, to);
-        }
+            let sval = bs.value2Str(arg, 0);
+            if (to == -1) {
+                sval = sval.substring(from)
+            } else {
+                sval = sval.substring(from, to);
+            }
 
-        return new bs.Value(bs.TYPE_STR, sval);
+            return new bs.Value(bs.TYPE_STR, sval);
+        }
     }, [null, null, new bs.Value(bs.TYPE_NUM, -1) ]),
     "lc": new bs.BuiltinFunctionValue(`# convert to lower case string
 > lc("BIG little")

@@ -17,11 +17,11 @@
 ## functions for working with processes
 <a href='#s-68'>chdir</a>&nbsp;,&nbsp;<a href='#s-69'>exec</a>&nbsp;,&nbsp;<a href='#s-70'>exit</a>&nbsp;,&nbsp;<a href='#s-71'>getcwd</a>&nbsp;,&nbsp;<a href='#s-72'>kill</a>&nbsp;,&nbsp;<a href='#s-73'>sleep</a>&nbsp;,&nbsp;<a href='#s-74'>system</a>
 ## functions for working with binary data
-<a href='#s-75'>buffer</a>
+<a href='#s-75'>buffer</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>
 ## Other functions
-<a href='#s-76'>assert</a>&nbsp;,&nbsp;<a href='#s-77'>clone</a>&nbsp;,&nbsp;<a href='#s-78'>eval</a>&nbsp;,&nbsp;<a href='#s-79'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-80'>help</a>&nbsp;,&nbsp;<a href='#s-81'>localtime</a>&nbsp;,&nbsp;<a href='#s-82'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-83'>time</a>&nbsp;,&nbsp;<a href='#s-84'>type</a>
+<a href='#s-77'>assert</a>&nbsp;,&nbsp;<a href='#s-78'>clone</a>&nbsp;,&nbsp;<a href='#s-79'>eval</a>&nbsp;,&nbsp;<a href='#s-80'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-81'>help</a>&nbsp;,&nbsp;<a href='#s-82'>localtime</a>&nbsp;,&nbsp;<a href='#s-83'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-84'>time</a>&nbsp;,&nbsp;<a href='#s-85'>type</a>
 ## Global variables
-<a href='#s-85'>ARGV</a>&nbsp;,&nbsp;<a href='#s-86'>ENV</a>&nbsp;,&nbsp;<a href='#s-87'>mathconst</a>
+<a href='#s-86'>ARGV</a>&nbsp;,&nbsp;<a href='#s-87'>ENV</a>&nbsp;,&nbsp;<a href='#s-88'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -364,6 +364,22 @@
 "am me"
 > mid("I am me", 2, -1)
 "am me"
+
+# it also works with binary buffers
+
+> a=buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+
+> a[0]=1
+1
+> a[1]=2
+2
+> a[2]=3
+3
+
+> mid(a,0,3)
+{"type":"Buffer","data":[1,2,3]}
+
 
 
 ```
@@ -1268,7 +1284,40 @@ var
 
 
 ```
-<a id='s-76'/>
+<a id='s-23'/>
+<hr>function: <b>mid</b>
+
+```python
+
+# returns a substring in the text, first argument is the text, 
+# second argument is the start offset, third argument is ending offset (optional)
+
+> mid("I am me", 2, 4)
+"am"
+> mid("I am me", 2)
+"am me"
+> mid("I am me", 2, -1)
+"am me"
+
+# it also works with binary buffers
+
+> a=buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+
+> a[0]=1
+1
+> a[1]=2
+2
+> a[2]=3
+3
+
+> mid(a,0,3)
+{"type":"Buffer","data":[1,2,3]}
+
+
+
+```
+<a id='s-77'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1290,7 +1339,7 @@ Error: a should be true
 
 
 ```
-<a id='s-77'/>
+<a id='s-78'/>
 <hr>function: <b>clone</b>
 
 ```python
@@ -1317,7 +1366,7 @@ false
 
 
 ```
-<a id='s-78'/>
+<a id='s-79'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1343,7 +1392,7 @@ false
 
 
 ```
-<a id='s-79'/>
+<a id='s-80'/>
 <hr>function: <b>getPYXOptions</b>
 
 ```python
@@ -1356,7 +1405,7 @@ false
 
 
 ```
-<a id='s-80'/>
+<a id='s-81'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1371,7 +1420,7 @@ help()
 
 
 ```
-<a id='s-81'/>
+<a id='s-82'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1382,7 +1431,7 @@ help()
 
 
 ```
-<a id='s-82'/>
+<a id='s-83'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1436,14 +1485,14 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-83'/>
+<a id='s-84'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-84'/>
+<a id='s-85'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1461,7 +1510,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-85'/>
+<a id='s-86'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1485,14 +1534,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-86'/>
+<a id='s-87'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-87'/>
+<a id='s-88'/>
 <hr>function: <b>mathconst</b>
 
 ```python

@@ -1,5 +1,7 @@
  * next release 
     * http client: handle https url's
+    * add binary data type 
+    * add buffer function to runtime library - for allocating a new binary buffer
 
  * PYX 0.3.5 / PRS 0.0.4  
     * fix error message for assigning global variable list/dict

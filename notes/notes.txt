@@ -2,6 +2,40 @@
 python can  tell you the id of an object  - builtin id(any_value); 
 I wish that javascript had that feature...
 
+
+How to handle binary data?
+    - node has Buffers
+
+    Binary data in nodejs
+    (The javascript standard later added it's own stuff:  ArrayBuffer, Uint8array, Float64array etc.. but they don't use that in node)
+
+    > let b= new Buffer.alloc(10); // allocates zero allocated buffer
+    undefined
+
+    > typeof(a)
+    'object'
+    > a.constructor.name
+    'Buffer'
+
+    > b
+    <Buffer 00 00 00 00 00 00 00 00 00 00>
+
+    > b[2]
+    0
+
+    > b[2]=1
+    1
+
+    > b[2]
+    1
+
+    > b
+    <Buffer 00 00 01 00 00 00 00 00 00 00>
+
+        
+    > b.length
+    10
+
  
 Global vs local variables.
     

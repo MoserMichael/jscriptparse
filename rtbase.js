@@ -30,16 +30,17 @@ function getTracePrompt() {
 const TYPE_BOOL=0
 const TYPE_NUM=1
 const TYPE_STR=2
-const TYPE_REGEX=3
-const TYPE_LIST=4
-const TYPE_MAP=5
-const TYPE_NONE=6
-const TYPE_CLOSURE=7
-const TYPE_BUILTIN_FUNCTION=8
+const TYPE_BINARY=3
+const TYPE_REGEX=4
+const TYPE_LIST=5
+const TYPE_MAP=6
+const TYPE_NONE=7
+const TYPE_CLOSURE=8
+const TYPE_BUILTIN_FUNCTION=9
 
-const TYPE_FORCE_RETURN=9
-const TYPE_FORCE_BREAK=10
-const TYPE_FORCE_CONTINUE=11
+const TYPE_FORCE_RETURN=10
+const TYPE_FORCE_BREAK=11
+const TYPE_FORCE_CONTINUE=12
 
 class ClosureValue {
     // needs the function definition and the frame of the current function (for lookup of captured vars)
@@ -120,15 +121,16 @@ mapTypeToName = {
     0 : "Boolean",
     1  : "Number",
     2  : "String",
-    3 : "Regular expression",
-    4 : "List",
-    5 : "Map",
-    6 : "None",
-    7 : "Closure",
-    8 : "BuiltinFunction",
-    9 : "Return",
-    10 : "Break",
-    11 : "Continue",
+    3  : "Binary data",
+    4 : "Regular expression",
+    5 : "List",
+    6 : "Map",
+    7 : "None",
+    8 : "Closure",
+    9 : "BuiltinFunction",
+    10 : "Return",
+    11 : "Break",
+    12 : "Continue",
 }
 
 let NumberNames={ 1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth"};
@@ -319,6 +321,10 @@ function jsValueToRtVal(value) {
         return new Value(TYPE_LIST, rt);
     }
 
+    if (value.constructor.name == "Buffer") {
+        return new Value(TYPE_BINARY, rt);
+    }
+
     if (value.constructor == Object) { // check if dictionary.
         let rt = {};
         let keys = Object.keys(value);
@@ -366,7 +372,7 @@ function rtValueToJsVal(value) {
         return ret;
     }
 
-    if (value.type == TYPE_STR || value.type == TYPE_BOOL || value.type == TYPE_NUM || value.type == TYPE_NONE || value.type == TYPE_REGEX) {
+    if (value.type == TYPE_STR || value.type == TYPE_BINARY || value.type == TYPE_BOOL || value.type == TYPE_NUM || value.type == TYPE_NONE || value.type == TYPE_REGEX) {
         return value.val;
     }
 
@@ -389,7 +395,12 @@ function clonePrimitiveVal(val) {
 }
 
 function cloneAll(val) {
-    if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
+    if (val.type == TYPE_BINARY) {
+        let copyBuffer = Buffer.init(val.val.length);
+        val.val.copy(copyBuffer);
+        return new Value(val.type, copyBuffer);
+    }
+     if (val.type == TYPE_BOOL || val.type == TYPE_STR || val.type == TYPE_NUM) {
         return new Value(val.type, val.val);
     }
     return new Value(val.type, JSON.parse( JSON.stringify(val.val) ) );
@@ -786,6 +797,7 @@ if (typeof(module) == 'object') {
         getTraceMode,
         getTracePrompt,
         TYPE_BOOL,
+        TYPE_BINARY,
         TYPE_NUM,
         TYPE_STR,
         TYPE_REGEX,

@@ -258,6 +258,27 @@ let spawnedProcesses = {};
 // the runtime library is defined here
 bs.RTLIB={
 
+    // functions on binary data
+    "buffer": new bs.BuiltinFunctionValue(` 
+# allocate a buffer for binary data, size of buffeer is given in the argument
+
+> a=buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+
+> a[0]=10
+10
+
+> a
+{"type":"Buffer","data":[10,0,0,0,0,0,0,0,0,0]}
+> a[0]
+10
+
+`, 1, function(arg) {
+        let bufSize = bs.value2Num(arg, 0);
+        return new bs.Value(bs.TYPE_BINARY, Buffer.alloc(bufSize));
+    }),
+
+
     // function on scalars or strings
     "find": new bs.BuiltinFunctionValue(` 
 # search for a string (second argument) in a big string (first argument)
@@ -2775,7 +2796,7 @@ function lookupIndex(frame, value, refExpr) {
         let expr = refExpr[i];
 
         let curValue = value.type;
-        if (curValue != bs.TYPE_LIST && curValue != bs.TYPE_MAP && curValue != bs.TYPE_STR) {
+        if (curValue != bs.TYPE_LIST && curValue != bs.TYPE_MAP && curValue != bs.TYPE_STR && curValue != bs.TYPE_BINARY) {
             let er = new bs.RuntimeException("Can't access expression of type " + bs.typeNameVal(value) + " by index");
             if (i > 0) {
                 er.addToStack([expr.startOffset, expr.currentSourceInfo]);
@@ -2784,7 +2805,7 @@ function lookupIndex(frame, value, refExpr) {
         }
         let indexValue = expr.eval(frame);
 
-        if (curValue == bs.TYPE_LIST || curValue == bs.TYPE_STR) {
+        if (curValue == bs.TYPE_LIST || curValue == bs.TYPE_STR || curValue == bs.TYPE_BINARY) {
             if (indexValue.type != bs.TYPE_NUM) {
                 let err = new bs.RuntimeException("Can't lookup " + bs.typeNameVal(value) + " entry - the index value must be a number. Instead got a " + bs.typeNameVal(indexValue));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
@@ -2814,6 +2835,10 @@ function lookupIndex(frame, value, refExpr) {
         if (curValue == bs.TYPE_STR) {
             value = new bs.Value(bs.TYPE_STR, value);
         }
+        if (curValue == bs.TYPE_BINARY) {
+            value = new bs.Value(bs.TYPE_NUM, value);
+        }
+
     }
 
     return value;
@@ -2911,8 +2936,8 @@ function _assign(frame, singleLhs, value, isRegularAssignment) {
                 throw err;
             }
 
-            if (lhsValue == undefined || (lhsValue.type != bs.TYPE_LIST && lhsValue.type != bs.TYPE_MAP && lhsValue.type != bs.TYPE_STR)) {
-                let err = new bs.RuntimeException("Can't lookup index expression - value is not a list or map");
+            if (lhsValue == undefined || (lhsValue.type != bs.TYPE_LIST && lhsValue.type != bs.TYPE_MAP && lhsValue.type != bs.TYPE_STR && lhsValue.type != bs.TYPE_BINARY)) {
+                let err = new bs.RuntimeException("Can't lookup index expression from a " + bs.typeNameVal(lhsValue) + " .The type of the value must be a list, map, string or buffer");
                 err.addToStack([singleLhs.startOffset, singleLhs.currentSourceInfo]);
                 throw err;
             }
@@ -2944,7 +2969,7 @@ function _indexAssign(frame, value, refExpr, newValue) {
         let expr = refExpr[i];
         let indexValue = expr.eval(frame);
 
-        if (value.type == bs.TYPE_LIST || value.type == bs.TYPE_STR) {
+        if (value.type == bs.TYPE_LIST || value.type == bs.TYPE_STR || value.type == bs.TYPE_BINARY) {
             if (indexValue.type != bs.TYPE_NUM) {
                 let err = new bs.RuntimeException("Can't assign this " + bs.typeNameVal(value) + " index . Index value of must be an number, instead got " + bs.rtValueToJsVal(indexValue));
                 err.addToStack([expr.startOffset, expr.currentSourceInfo]);
@@ -2972,17 +2997,30 @@ function _indexAssign(frame, value, refExpr, newValue) {
                 throw err;
             }
         } else {
-            if (value.type != bs.TYPE_STR) {
+            if (value.type == bs.TYPE_LIST || value.type == bs.TYPE_MAP || value.type == bs.TYPE_BINARY) {
+              if (value.type != bs.TYPE_BINARY) {  
                 value.val[indexValue.val] = newValue;
+              } else {
+                 let val = 0; 
+                 if (newValue.type == bs.TYPE_NUM) {
+                    val = Math.trunc(newValue.val);
+                 } else {
+                    let err = new bs.RuntimeException("Can't assign a " + bs.typeNameVal(newValue) + " to a byte of a binary value entry, right hand side must be a number value.");
+                    err.addToStack([expr.startOffset, expr.currentSourceInfo]);
+                    throw err;
+                 }
+                 value.val[indexValue.val] = val;
+              }
             } else {
+
                 if (newValue.type != bs.TYPE_STR) {
                     let err = new bs.RuntimeException("Can't assign string index to " + bs.typeNameVal(newValue) + " - right hand side value must be a string")
                     err.addToStack([expr.startOffset, expr.currentSourceInfo]);
                     throw err;
                 }
                 // strings are immutable in javascript - have to make a new one
-                value.val = value.val.substring(0,indexValue.val) + newValue.val + value.val.substring(indexValue.val+1)
-            }
+                value.val = value.val.substring(0,indexValue.val) + newValue.val + value.val.substring(indexValue.val+1);
+            }   
         }
     }
     return traceVals;

@@ -17,11 +17,11 @@
 ## functions for working with processes
 <a href='#s-68'>chdir</a>&nbsp;,&nbsp;<a href='#s-69'>exec</a>&nbsp;,&nbsp;<a href='#s-70'>exit</a>&nbsp;,&nbsp;<a href='#s-71'>getcwd</a>&nbsp;,&nbsp;<a href='#s-72'>kill</a>&nbsp;,&nbsp;<a href='#s-73'>sleep</a>&nbsp;,&nbsp;<a href='#s-74'>system</a>
 ## functions for working with binary data
-<a href='#s-75'>buffer</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>
+<a href='#s-75'>buffer</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>
 ## Other functions
-<a href='#s-77'>assert</a>&nbsp;,&nbsp;<a href='#s-78'>clone</a>&nbsp;,&nbsp;<a href='#s-79'>eval</a>&nbsp;,&nbsp;<a href='#s-80'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-81'>help</a>&nbsp;,&nbsp;<a href='#s-82'>localtime</a>&nbsp;,&nbsp;<a href='#s-83'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-84'>time</a>&nbsp;,&nbsp;<a href='#s-85'>type</a>
+<a href='#s-78'>assert</a>&nbsp;,&nbsp;<a href='#s-79'>clone</a>&nbsp;,&nbsp;<a href='#s-80'>eval</a>&nbsp;,&nbsp;<a href='#s-81'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-82'>help</a>&nbsp;,&nbsp;<a href='#s-83'>localtime</a>&nbsp;,&nbsp;<a href='#s-84'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-85'>time</a>&nbsp;,&nbsp;<a href='#s-86'>type</a>
 ## Global variables
-<a href='#s-86'>ARGV</a>&nbsp;,&nbsp;<a href='#s-87'>ENV</a>&nbsp;,&nbsp;<a href='#s-88'>mathconst</a>
+<a href='#s-87'>ARGV</a>&nbsp;,&nbsp;<a href='#s-88'>ENV</a>&nbsp;,&nbsp;<a href='#s-89'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -347,6 +347,16 @@
 # for a list argument - returns the number of elements in the list
 
 > len([1,2,3])
+
+
+# supports binary buffers
+
+> a=buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+
+> len(a)
+10
+
 3
 
 ```
@@ -848,6 +858,16 @@ false
 # for a list argument - returns the number of elements in the list
 
 > len([1,2,3])
+
+
+# supports binary buffers
+
+> a=buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+
+> len(a)
+10
+
 3
 
 ```
@@ -1284,6 +1304,31 @@ var
 
 
 ```
+<a id='s-22'/>
+<hr>function: <b>len</b>
+
+```python
+# for a string argument - returns the number of characters in the string
+
+> len("abc")
+3
+
+# for a list argument - returns the number of elements in the list
+
+> len([1,2,3])
+
+
+# supports binary buffers
+
+> a=buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+
+> len(a)
+10
+
+3
+
+```
 <a id='s-23'/>
 <hr>function: <b>mid</b>
 
@@ -1317,7 +1362,7 @@ var
 
 
 ```
-<a id='s-77'/>
+<a id='s-78'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1339,7 +1384,7 @@ Error: a should be true
 
 
 ```
-<a id='s-78'/>
+<a id='s-79'/>
 <hr>function: <b>clone</b>
 
 ```python
@@ -1366,7 +1411,7 @@ false
 
 
 ```
-<a id='s-79'/>
+<a id='s-80'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1392,7 +1437,7 @@ false
 
 
 ```
-<a id='s-80'/>
+<a id='s-81'/>
 <hr>function: <b>getPYXOptions</b>
 
 ```python
@@ -1405,7 +1450,7 @@ false
 
 
 ```
-<a id='s-81'/>
+<a id='s-82'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1420,7 +1465,7 @@ help()
 
 
 ```
-<a id='s-82'/>
+<a id='s-83'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1431,7 +1476,7 @@ help()
 
 
 ```
-<a id='s-83'/>
+<a id='s-84'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1485,14 +1530,14 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-84'/>
+<a id='s-85'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-85'/>
+<a id='s-86'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1510,7 +1555,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-86'/>
+<a id='s-87'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1534,14 +1579,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-87'/>
+<a id='s-88'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-88'/>
+<a id='s-89'/>
 <hr>function: <b>mathconst</b>
 
 ```python

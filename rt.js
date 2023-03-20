@@ -1103,8 +1103,18 @@ false
 # for a list argument - returns the number of elements in the list
 
 > len([1,2,3])
+
+
+# supports binary buffers
+
+> a=buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+
+> len(a)
+10
+
 3`, 1, function(arg) {
-        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST, bs.TYPE_BINARY]);
         return new bs.Value(bs.TYPE_NUM, arg[0].val.length);
     }),
     "join": new bs.BuiltinFunctionValue(`# given a list argument, joins the values of the list into a single string

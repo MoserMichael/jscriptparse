@@ -56,7 +56,16 @@ How do you parse binary data in scripting languages?
         - the alternative would be a series of getters - where you have to specify such low level details as byte order and alignment. 
         - don't know which of them is preferable.
 
+
+    That's kind of situation where you don't look for novel ways : it's either this printf like business or some long elaborate kind of getters (which are ugly to look at). 
+    No idea what would be preferable.... Thinking...
  
+    There are lot's of mini-languages for expressing binary data, that express relationships between structures (instead of expressing a single structure)
+    These are used with tools for parsing/inspecting binary data,
+    Don't know if these are a kind of overkill for a scripting language. 
+    Not sure...
+
+
 Global vs local variables.
     
     Python

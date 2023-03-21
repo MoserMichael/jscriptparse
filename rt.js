@@ -252,6 +252,102 @@ function makeHttpServerListener(callback, frame) {
     };
 }
 
+function httpSendImp(arg, frame) {
+    let options  = null
+    let httpMethod = 'GET';
+    let httpHeaders = null;
+    let httpRequestData = null;
+    let callback = null;
+    let surl = bs.value2Str(arg, 0);
+
+    if (arg[1] != null && arg[1].type != bs.TYPE_NONE) {
+        bs.checkType(arg, 1, bs.TYPE_MAP);
+        options = bs.rtValueToJsVal(arg[1]);
+
+        if ('method' in options) {
+            httpMethod = options['method'];
+        }
+        if ('headers' in options) {
+            httpHeaders = options['headers'];
+        }
+        if ('data' in options) {
+            httpRequestData = options['data'];
+        }
+    }
+
+    if (arg[2] != null) {
+        bs.checkType(arg, 2, bs.TYPE_CLOSURE);
+    }
+    callback = arg[2];
+
+    let urlObj = new url.URL(surl);
+
+    let requestOptions = {
+        protocol: urlObj.protocol,
+        hostname: urlObj.hostname,
+        port: parseInt(urlObj.port),
+        path: urlObj.pathname,
+        method: httpMethod,
+    };
+    if (httpHeaders != null) {
+        requestOptions['headers'] = httpHeaders;
+    }
+
+    //requestOptions['headers'] = {  'Connection': 'keep-alive' };
+
+    let callUserFunction = function(data, error) {
+        // this one is evaluated from another task. runtime exceptions need to be handled here
+        let varg = [ new bs.Value(bs.TYPE_STR,data), error ];
+
+        try {
+            bs.evalClosure("", callback, varg, frame);
+        } catch(er) {
+            if (er instanceof bs.RuntimeException) {
+                er.showStackTrace(true);
+            } else {
+                throw er;
+            }
+        }
+    }
+
+    //console.log("request: " + JSON.stringify(requestOptions));
+    let httpHandler = function (resp) {
+        resp.setEncoding('utf8');
+
+        let data = "";
+        resp.on('data', (chunk) => {
+            data += chunk.toString();
+        });
+        resp.on('end', () => {
+            callUserFunction(data, bs.VALUE_NONE);
+        });
+    };
+
+    let reqObj = null;
+
+    if (urlObj.protocol == 'https:') {
+        if (https==null) {
+            throw new bs.RuntimeException("https not supported by this nodejs instance");
+        }
+        requestOptions['agent'] = httpsAgent;
+        reqObj = https.request(requestOptions,httpHandler);
+    } else {
+        requestOptions['agent'] = httpAgent;
+        reqObj = http.request(requestOptions,httpHandler);
+    }
+
+    reqObj.on('error', (e) => {
+        callUserFunction(bs.VALUE_NONE, new bs.Value(bs.TYPE_STR, e.message));
+    });
+
+
+    if (httpRequestData != null) {
+        reqObj.write(httpRequestData);
+    }
+    reqObj.end();
+    return bs.VALUE_NONE;
+}
+
 // maps between process id and node childprocess object.
 let spawnedProcesses = {};
 
@@ -1964,99 +2060,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 `, 3, function(arg, frame) {
-        let options  = null
-        let httpMethod = 'GET';
-        let httpHeaders = null;
-        let httpRequestData = null;
-        let callback = null;
-        let surl = bs.value2Str(arg, 0);
-
-        if (arg[1] != null && arg[1].type != bs.TYPE_NONE) {
-            bs.checkType(arg, 1, bs.TYPE_MAP);
-            options = bs.rtValueToJsVal(arg[1]);
-
-            if ('method' in options) {
-                httpMethod = options['method'];
-            }
-            if ('headers' in options) {
-                httpHeaders = options['headers'];
-            }
-            if ('data' in options) {
-                httpRequestData = options['data'];
-            }
-        }
-
-        if (arg[2] != null) {
-            bs.checkType(arg, 2, bs.TYPE_CLOSURE);
-        }
-        callback = arg[2];
-
-        let urlObj = new url.URL(surl);
-
-        let requestOptions = {
-            protocol: urlObj.protocol,
-            hostname: urlObj.hostname,
-            port: parseInt(urlObj.port),
-            path: urlObj.pathname,
-            method: httpMethod,
-        };
-        if (httpHeaders != null) {
-            requestOptions['headers'] = httpHeaders;
-        }
-    
-        //requestOptions['headers'] = {  'Connection': 'keep-alive' };
-
-        let callUserFunction = function(data, error) {
-            // this one is evaluated from another task. runtime exceptions need to be handled here
-            let varg = [ new bs.Value(bs.TYPE_STR,data), error ];
-
-            try {
-                bs.evalClosure("", callback, varg, frame);
-            } catch(er) {
-                if (er instanceof bs.RuntimeException) {
-                    er.showStackTrace(true);
-                } else {
-                    throw er;
-                }
-            }
-        }
-
-        //console.log("request: " + JSON.stringify(requestOptions));
-        let httpHandler = function (resp) {
-            resp.setEncoding('utf8');
-
-            let data = "";
-            resp.on('data', (chunk) => {
-                data += chunk.toString();
-            });
-            resp.on('end', () => {
-                callUserFunction(data, bs.VALUE_NONE);
-            });
-        };
-
-        let reqObj = null;
-
-        if (urlObj.protocol == 'https:') {
-            if (https==null) {
-                throw new bs.RuntimeException("https not supported by this nodejs instance");
-            }
-            reqObj = https.request(requestOptions,httpHandler);
-            requestOptions['agent'] = httpsAgent;
-        } else {
-            reqObj = http.request(requestOptions,httpHandler);
-            requestOptions['agent'] = httpAgent;
-        }
-
-        reqObj.on('error', (e) => {
-            callUserFunction(bs.VALUE_NONE, new bs.Value(bs.TYPE_STR, e.message));
-        });
-
-
-        if (httpRequestData != null) {
-            reqObj.write(httpRequestData);
-        }
-        reqObj.end();
-        return bs.VALUE_NONE;
+        return httpSendImp(arg, frame); 
     }, [null, null, null]),
 
     "httpServer": new bs.BuiltinFunctionValue(` 

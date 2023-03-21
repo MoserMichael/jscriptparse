@@ -103,9 +103,9 @@ class RegexValue {
         let lastPos = value.lastIndexOf('/');
         let flags = null;
         if (!value.endsWith('//')) {
-            flags = value.suring(lastPos+1);
+            flags = value.substring(lastPos+1);
         }
-        let rawRegex = value.suring(firstPos+1, lastPos);
+        let rawRegex = value.substring(firstPos+1, lastPos);
         this.regex = new RegExp(rawRegex, flags);
         this.val = this.regex.toString();
     }

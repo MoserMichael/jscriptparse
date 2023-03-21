@@ -479,13 +479,18 @@ bs.RTLIB={
 
         bs.checkType(arg, 1, bs.TYPE_REGEX)
 
+        let offset = 0;
+        if (arg[2] != null) {
+            offset = parseInt(bs.value2Num(arg,2));
+            hay = hay.substring(offset);
+        }
         let ret = hay.match(arg[1].regex);
 
         if (ret == null) {
             return [ -1, "" ];
         }
-        return new bs.Value(bs.TYPE_LIST, [ new bs.Value(bs.TYPE_NUM, ret['index']), new bs.Value(bs.TYPE_STR, ret[0]) ]);
-    }, [null, null, null]),
+        return new bs.Value(bs.TYPE_LIST, [ new bs.Value(bs.TYPE_NUM, ret['index'] + offset), new bs.Value(bs.TYPE_STR, ret[0]) ]);
+    }, [,, null]),
 
     "matchAll": new bs.BuiltinFunctionValue(`
 > text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
@@ -502,6 +507,13 @@ bs.RTLIB={
 
         let lenConsumed = 0;
 
+        let offset = 0;
+        if (arg[2] != null) {
+            offset = parseInt(bs.value2Num(arg,2));
+            hay = hay.substring(offset);
+        }
+
+
         while(true) {
             let mval = hay.match(arg[1].regex);
             if (mval == null) {
@@ -509,7 +521,7 @@ bs.RTLIB={
             }
             let index = mval['index'];
 
-            let r = [ new bs.Value(bs.TYPE_NUM, lenConsumed + index), new bs.Value(bs.TYPE_STR, mval[0]) ];
+            let r = [ new bs.Value(bs.TYPE_NUM, lenConsumed + index + offset), new bs.Value(bs.TYPE_STR, mval[0]) ];
             ret.push( new bs.Value(bs.TYPE_LIST, r ) );
 
             let toAdd = mval[0].length;
@@ -521,7 +533,7 @@ bs.RTLIB={
 
         }
         return new bs.Value(bs.TYPE_LIST, ret );
-    }, [null, null, null]),
+    }, [,, null]),
 
 
     "mid": new bs.BuiltinFunctionValue(`
@@ -552,14 +564,10 @@ bs.RTLIB={
 
 `, 3, function(arg) {
         let from = parseInt(bs.value2Num(arg[1]), 10);
-        let to = null;
+        let to = -1;
 
         if (arg[2] != null) {
-            if (arg[2].type == bs.TYPE_NUM) {
-                to = arg[2].val;
-            } else {
-                to = parseInt(bs.value2Num(arg[2]), 10);
-            }
+           to = parseInt(bs.value2Num(arg[2]), 10);
         }
     
         if (arg[0].type == bs.TYPE_BINARY) {
@@ -582,7 +590,7 @@ bs.RTLIB={
 
             return new bs.Value(bs.TYPE_STR, sval);
         }
-    }, [null, null, new bs.Value(bs.TYPE_NUM, -1) ]),
+    }, [,,null ]),
     "lc": new bs.BuiltinFunctionValue(`# convert to lower case string
 > lc("BIG little")
 "big little"`, 1, function(arg) {
@@ -656,7 +664,7 @@ bs.RTLIB={
         for(let n of hay.split(delim)) {
             yield new bs.Value(bs.TYPE_STR, n);
         }
-    }, [null, null], true),
+    }, [, null], true),
     "str": new bs.BuiltinFunctionValue(`> str(123)
 "123"
 > str("abc")
@@ -718,7 +726,7 @@ text="a b a c a d"
             start = findPos + needle.length;
         }
         return new bs.Value(bs.TYPE_STR, retVal);
-    }, [null, null, null, null]),
+    }, [,,, null]),
 
 
     "replacere": new bs.BuiltinFunctionValue(`
@@ -770,7 +778,7 @@ text="a b a c a d"
             hay = hay.substring(posAfterMatch);
         }
         return new bs.Value(bs.TYPE_STR, retVal);
-    }, [null, null, null, null]),
+    }, [,,, null]),
 
 // Numeric functions
     "int": new bs.BuiltinFunctionValue(`# convert argument string or number to integer value
@@ -823,7 +831,7 @@ text="a b a c a d"
             throw new bs.RuntimeException("Can't convert " + arg[0].val + " to integer with base " + parseInt(arg[1].val));
         }
         return new bs.Value(bs.TYPE_NUM, checkResNan(res));
-    }, [null, null]),
+    }, [,null]),
 
     "num": new bs.BuiltinFunctionValue(`
 #  convert argument string to floating point number, if number - returns the same number value 
@@ -1292,7 +1300,7 @@ false
             delim = bs.value2Str(arg, 1);
         }
         return new bs.Value(bs.TYPE_STR, arg[0].val.map(bs.value2StrDisp).join(delim));
-    }, [null, null]),
+    }, [, null]),
     "map": new bs.BuiltinFunctionValue(`# the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
 
 > map([1,2,3], def (x) 1 + x)
@@ -1547,7 +1555,7 @@ same as:
             });
         }
         return new bs.Value(bs.TYPE_LIST, rt);
-    }, [null, null]),
+    }, [, null]),
 
     // functions for maps/hashes
     "each" : new bs.BuiltinFunctionValue( `# iterate over entries of a list or maps. 
@@ -1839,7 +1847,7 @@ Error: a should be true
             }
             throw new bs.RuntimeException(msg)
         }
-    }, [null, null]),
+    }, [, null]),
 
     // other functions
     "exists": new bs.BuiltinFunctionValue(`> a={"first":1}
@@ -2054,7 +2062,7 @@ number: 3`, 3,function *(arg, frame) {
                 from += step;
             }
         }
-    }, [null, null, null], true),
+    }, [,, null], true),
 
     // functions for working with time
     "time": new bs.BuiltinFunctionValue("# returns epoch time in seconds", 0,function(arg, frame) {
@@ -2115,7 +2123,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 `, 3, function(arg, frame) {
         return httpSendImp(arg, frame, true); 
-    }, [null, null, null]),
+    }, [, null, null]),
 
     "httpSendBinary": new bs.BuiltinFunctionValue(`
 
@@ -2149,7 +2157,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 `, 3, function(arg, frame) {
         return httpSendImp(arg, frame, false); 
-    }, [null, null, null]),
+    }, [, null, null]),
 
 
     "httpServer": new bs.BuiltinFunctionValue(` 
@@ -2192,7 +2200,7 @@ requestData: {req.requestData()}
 
         return bs.VALUE_NONE;
 
-    }, [null]),
+    }),
 
     "mathconst" : new bs.Value(bs.TYPE_MAP, {
         pi: new bs.Value(bs.TYPE_NUM, Math.PI),
@@ -2754,9 +2762,9 @@ class AstBinaryExpression extends AstBase {
             if (er instanceof bs.RuntimeException && er.firstChance) {
                 er.firstChance = false;
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
-            } else {
-                //console.trace(er);
-            }
+            } //else {
+            //    console.trace(er);
+            //}
             throw er;
         }
     }

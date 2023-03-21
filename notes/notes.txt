@@ -240,8 +240,24 @@ Lists/Arrays
         undefined
         > a[100]
         1
+
+
+        // this feature is called 'sparse arrays' (python doesn't have that, don't know of any other scripting language with this array weirdness...)
+
+        > a=[,,2]
+        [ <2 empty items>, 2 ]
+        > 0 in a
+        false
+        > 1 in a
+        false
+        > 2 in a
+        true
+        > a[2]
+        2
+        > a[0]
+        undefined
     
-        // Now it gets weird: you can have indexes that are not round integers - and they are kept as special keys !!! (that's weird)
+        // Now it gets weird: you can have indexes that are not round integers - and they are kept as special keys !!! (that's really weird)
 
         > a=[1,2,3]
         [ 1, 2, 3 ]

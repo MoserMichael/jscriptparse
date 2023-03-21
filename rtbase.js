@@ -474,7 +474,7 @@ class Frame {
                     it += "(";
                 }
                 resultList.push(it);
-                //resultList.push(it.suring(prefix.length));
+                //resultList.push(it.string(prefix.length));
             }
         }
         if (this.parentFrame != null) {
@@ -722,14 +722,16 @@ function _prepareBuiltinFuncArgs(funcVal, frame, args) {
         // try to add omitted params with default values;
         if (args.length < funcVal.defaultParamValues.length) {
             for (let i = args.length; i < funcVal.defaultParamValues.length; ++i) {
-                let val = funcVal.defaultParamValues[i];
-                args.push(val);
+                if (i in funcVal.defaultParamValues) {
+                    let val = funcVal.defaultParamValues[i];
+                    args.push(val);
 
-                if (getTraceMode() && val != null) {
-                    if (traceParams != "") {
-                        traceParams += ", ";
+                    if (getTraceMode() && val != null) {
+                        if (traceParams != "") {
+                            traceParams += ", ";
+                        }
+                        traceParams += rtValueToJson(val);
                     }
-                    traceParams += rtValueToJson(val);
                 }
             }
         }

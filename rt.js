@@ -461,14 +461,14 @@ bs.RTLIB={
         let needle = bs.value2Str(arg, 1);
         let res = hay.indexOf(needle, index)
         return new bs.Value(bs.TYPE_NUM, res);
-    }, [null, null, null]),
+    }, [,, null]),
 
 
     "match": new bs.BuiltinFunctionValue(`
 # search for a match of regular expression argument (second) argument) in big text (first argument)
 # returns a list - first element is zero based index of match, second is the matching string
 
-> text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
+>text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
 "a 1232 blablalba 34234 ;aksdf;laksdf 3423"
 
 > match(text,/[0-9]+/)
@@ -1070,7 +1070,24 @@ text="a b a c a d"
             throw new bs.RuntimeException("Can't read file: " + fname + " error: " + err);
         };
     }),
+
+    "readBinaryFile" : new bs.BuiltinFunctionValue(`
+# read file and return the content as a binary data variable
     
+> a=readBinaryFile("bin.bin")
+{"type":"Buffer","data":[1,0,0,0,0,0,0,0,0,0]}
+
+> type(a)
+"Binary data"    
+    `, 1, function(arg) {
+        let fname = bs.value2Str(arg, 0);
+        try {
+            let res = fs.readFileSync(fname, null);
+            return new bs.Value(bs.TYPE_BINARY,res);
+        } catch(err) {
+            throw new bs.RuntimeException("Can't read file: " + fname + " error: " + err);
+        };
+    }),
     "writeFile" : new bs.BuiltinFunctionValue(`
 # write string parameter into text file. 
 # The file name is the first argument, 

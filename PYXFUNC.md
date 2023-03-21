@@ -17,11 +17,11 @@
 ## functions for working with processes
 <a href='#s-68'>chdir</a>&nbsp;,&nbsp;<a href='#s-69'>exec</a>&nbsp;,&nbsp;<a href='#s-70'>exit</a>&nbsp;,&nbsp;<a href='#s-71'>getcwd</a>&nbsp;,&nbsp;<a href='#s-72'>kill</a>&nbsp;,&nbsp;<a href='#s-73'>sleep</a>&nbsp;,&nbsp;<a href='#s-74'>system</a>
 ## functions for working with binary data
-<a href='#s-75'>buffer</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
+<a href='#s-75'>buffer</a>&nbsp;,&nbsp;<a href='#s-76'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
 ## Other functions
-<a href='#s-79'>assert</a>&nbsp;,&nbsp;<a href='#s-80'>clone</a>&nbsp;,&nbsp;<a href='#s-81'>eval</a>&nbsp;,&nbsp;<a href='#s-82'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-83'>help</a>&nbsp;,&nbsp;<a href='#s-84'>localtime</a>&nbsp;,&nbsp;<a href='#s-85'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-86'>time</a>&nbsp;,&nbsp;<a href='#s-87'>type</a>
+<a href='#s-80'>assert</a>&nbsp;,&nbsp;<a href='#s-81'>clone</a>&nbsp;,&nbsp;<a href='#s-82'>eval</a>&nbsp;,&nbsp;<a href='#s-83'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-84'>help</a>&nbsp;,&nbsp;<a href='#s-85'>localtime</a>&nbsp;,&nbsp;<a href='#s-86'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-87'>time</a>&nbsp;,&nbsp;<a href='#s-88'>type</a>
 ## Global variables
-<a href='#s-88'>ARGV</a>&nbsp;,&nbsp;<a href='#s-89'>ENV</a>&nbsp;,&nbsp;<a href='#s-90'>mathconst</a>
+<a href='#s-89'>ARGV</a>&nbsp;,&nbsp;<a href='#s-90'>ENV</a>&nbsp;,&nbsp;<a href='#s-91'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -633,7 +633,8 @@ text="a b a c a d"
 ```python
 
 
-# send htp request
+# send htp request, handles response as text data
+
 # - first argument - the request url
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
@@ -1312,6 +1313,44 @@ var
 
 
 ```
+<a id='s-76'/>
+<hr>function: <b>httpSendBinary</b>
+
+```python
+
+
+# send htp request, handles response as binary data
+
+# - first argument - the request url
+# - second argument - additional request parameters (none means http get request)
+# - third argument - called upon reponse (called on both success and error)
+#    resp - not none on success, error - not none on error (error message)
+httpSend('http://127.0.0.1:9010/abcd', none, def(resp,error) {
+    println("response: {resp} error: {error}
+") 
+})
+
+# send http POST request with data and headers
+
+postData = '{ "name": "Pooh", "family": "Bear" }'
+
+options = {
+  'method': 'POST',
+  'headers': {
+     'Content-Type': 'text/json',
+     'Content-Length' : len(postData)
+  },
+  'data' : postData
+}
+
+httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
+    println("response: {resp} error: {error}") 
+})
+
+
+
+
+```
 <a id='s-22'/>
 <hr>function: <b>len</b>
 
@@ -1396,7 +1435,7 @@ var
     
 
 ```
-<a id='s-79'/>
+<a id='s-80'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1418,7 +1457,7 @@ Error: a should be true
 
 
 ```
-<a id='s-80'/>
+<a id='s-81'/>
 <hr>function: <b>clone</b>
 
 ```python
@@ -1445,7 +1484,7 @@ false
 
 
 ```
-<a id='s-81'/>
+<a id='s-82'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1471,7 +1510,7 @@ false
 
 
 ```
-<a id='s-82'/>
+<a id='s-83'/>
 <hr>function: <b>getPYXOptions</b>
 
 ```python
@@ -1484,7 +1523,7 @@ false
 
 
 ```
-<a id='s-83'/>
+<a id='s-84'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1499,7 +1538,7 @@ help()
 
 
 ```
-<a id='s-84'/>
+<a id='s-85'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1510,7 +1549,7 @@ help()
 
 
 ```
-<a id='s-85'/>
+<a id='s-86'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1564,14 +1603,14 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-86'/>
+<a id='s-87'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-87'/>
+<a id='s-88'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1589,7 +1628,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-88'/>
+<a id='s-89'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1613,14 +1652,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-89'/>
+<a id='s-90'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-90'/>
+<a id='s-91'/>
 <hr>function: <b>mathconst</b>
 
 ```python

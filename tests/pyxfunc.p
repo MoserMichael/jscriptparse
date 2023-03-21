@@ -29,7 +29,7 @@ funcCats = [
    "func": [ "system", "exit", "sleep", "exec", "kill", "chdir", "getcwd" ]
  },
  { "name": "functions for working with binary data",
-     "func": [ "buffer", "mid", "len" ]
+     "func": [ "buffer", "mid", "len", "writeFile" ]
  },
  { "name": "Other functions",
    "func": [ "assert", "help", "type", "time", "localtime", "getPYXOptions", "setPYXOptions", "eval", "clone" ]

@@ -949,10 +949,25 @@ text="a b a c a d"
 # append file
 
 > writeFile("fileName.txt","add this after end of file", "append")
-   
+
+# can also be used to write binary data
+
+> a =buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+> a[0]=1
+1
+> writeFile("bin.bin",a)
+
     `, 3, function(arg) {
         let fname = bs.value2Str(arg, 0);
-        let data = bs.value2Str(arg, 1);
+        let data = null;
+
+        if (arg[1].type != bs.TYPE_BINARY) {
+            data = bs.value2Str(arg, 1);
+        } else {
+            data = arg[1].val;
+        }
+
         let append = false;
         if (arg[2] != null ) {
             let mode = bs.value2Str(arg, 2);

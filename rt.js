@@ -252,7 +252,7 @@ function makeHttpServerListener(callback, frame) {
     };
 }
 
-function httpSendImp(arg, frame) {
+function httpSendImp(arg, frame, responseAsText) {
     let options  = null
     let httpMethod = 'GET';
     let httpHeaders = null;
@@ -295,33 +295,69 @@ function httpSendImp(arg, frame) {
 
     //requestOptions['headers'] = {  'Connection': 'keep-alive' };
 
-    let callUserFunction = function(data, error) {
-        // this one is evaluated from another task. runtime exceptions need to be handled here
-        let varg = [ new bs.Value(bs.TYPE_STR,data), error ];
+    let callUserFunction = null;
 
-        try {
-            bs.evalClosure("", callback, varg, frame);
-        } catch(er) {
-            if (er instanceof bs.RuntimeException) {
-                er.showStackTrace(true);
-            } else {
-                throw er;
+    if (responseAsText) {
+        callUserFunction = function(data, error) {
+            // this one is evaluated from another task. runtime exceptions need to be handled here
+            let varg = [ new bs.Value(bs.TYPE_STR,data), error ];
+
+            try {
+                bs.evalClosure("", callback, varg, frame);
+            } catch(er) {
+                if (er instanceof bs.RuntimeException) {
+                    er.showStackTrace(true);
+                } else {
+                    throw er;
+                }
             }
         }
+    } else {
+        callUserFunction = function(data, error) {
+            // this one is evaluated from another task. runtime exceptions need to be handled here
+            let varg = [ new bs.Value(bs.TYPE_BINARY,data), error ];
+
+            try {
+                bs.evalClosure("", callback, varg, frame);
+            } catch(er) {
+                if (er instanceof bs.RuntimeException) {
+                    er.showStackTrace(true);
+                } else {
+                    throw er;
+                }
+            }
+        }
+
     }
 
     //console.log("request: " + JSON.stringify(requestOptions));
-    let httpHandler = function (resp) {
-        resp.setEncoding('utf8');
+    let httpHandler = null;
 
-        let data = "";
-        resp.on('data', (chunk) => {
-            data += chunk.toString();
-        });
-        resp.on('end', () => {
-            callUserFunction(data, bs.VALUE_NONE);
-        });
-    };
+    if (responseAsText) {
+        httpHandler = function (resp) {
+            resp.setEncoding('utf8');
+
+            let data = "";
+            resp.on('data', (chunk) => {
+                data += chunk.toString();
+            });
+            resp.on('end', () => {
+                callUserFunction(data, bs.VALUE_NONE);
+            });
+        };
+    } else {
+        httpHandler = function (resp) {
+            let data = [];
+            resp.on('data', (chunk) => {
+                data.push(chunk);
+            });
+            resp.on('end', () => {
+                let buffer  = Buffer.concat(data);
+                callUserFunction(buffer, bs.VALUE_NONE);
+            });
+        };
+
+    }
 
     let reqObj = null;
 
@@ -2032,7 +2068,8 @@ number: 3`, 3,function *(arg, frame) {
 
     "httpSend": new bs.BuiltinFunctionValue(`
 
-# send htp request
+# send htp request, handles response as text data
+
 # - first argument - the request url
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
@@ -2060,8 +2097,43 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 `, 3, function(arg, frame) {
-        return httpSendImp(arg, frame); 
+        return httpSendImp(arg, frame, true); 
     }, [null, null, null]),
+
+    "httpSendBinary": new bs.BuiltinFunctionValue(`
+
+# send htp request, handles response as binary data
+
+# - first argument - the request url
+# - second argument - additional request parameters (none means http get request)
+# - third argument - called upon reponse (called on both success and error)
+#    resp - not none on success, error - not none on error (error message)
+httpSend('http://127.0.0.1:9010/abcd', none, def(resp,error) {
+    println("response: {resp} error: {error}\n") 
+})
+
+# send http POST request with data and headers
+
+postData = '{ "name": "Pooh", "family": "Bear" }'
+
+options = {
+  'method': 'POST',
+  'headers': {
+     'Content-Type': 'text/json',
+     'Content-Length' : len(postData)
+  },
+  'data' : postData
+}
+
+httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
+    println("response: {resp} error: {error}") 
+})
+
+
+`, 3, function(arg, frame) {
+        return httpSendImp(arg, frame, false); 
+    }, [null, null, null]),
+
 
     "httpServer": new bs.BuiltinFunctionValue(` 
 

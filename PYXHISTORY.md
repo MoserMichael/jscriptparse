@@ -1,10 +1,11 @@
- * next release 
-    * http client: handle https url's
+ * PYX 0.3.6 / PRS 0.0.4  
+    * http client: handle https url
     * add binary data type 
     * add buffer function to runtime library - for allocating a new binary buffer
     * mid - support extraction of subsection from binary buffer
     * len - return length of binary buffer
     * writeFile - accept binary data as input
+    * add httpSendBinary - for receiving binary data as http response
 
  * PYX 0.3.5 / PRS 0.0.4  
     * fix error message for assigning global variable list/dict

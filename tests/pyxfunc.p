@@ -31,8 +31,11 @@ funcCats = [
  { "name": "functions for working with binary data",
      "func": [ "buffer", "mid", "len", "writeFile", "httpSendBinary", "readBinaryFile" ]
  },
+ { "name": "Time functions",
+   "func": [ "time", "localtime" ]
+ },
  { "name": "Other functions",
-   "func": [ "assert", "help", "type", "time", "localtime", "getPYXOptions", "setPYXOptions", "eval", "clone" ]
+   "func": [ "assert", "help", "type", "getPYXOptions", "setPYXOptions", "eval", "clone" ]
  },
  { "name": "Global variables",
     "func": [ "mathconst", "ARGV", "ENV" ]

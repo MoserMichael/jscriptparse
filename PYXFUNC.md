@@ -18,8 +18,10 @@
 <a href='#s-70'>chdir</a>&nbsp;,&nbsp;<a href='#s-71'>exec</a>&nbsp;,&nbsp;<a href='#s-72'>exit</a>&nbsp;,&nbsp;<a href='#s-73'>getcwd</a>&nbsp;,&nbsp;<a href='#s-74'>kill</a>&nbsp;,&nbsp;<a href='#s-75'>runcmd</a>&nbsp;,&nbsp;<a href='#s-76'>sleep</a>&nbsp;,&nbsp;<a href='#s-77'>system</a>
 ## functions for working with binary data
 <a href='#s-78'>buffer</a>&nbsp;,&nbsp;<a href='#s-79'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-82'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
+## Time functions
+<a href='#s-84'>localtime</a>&nbsp;,&nbsp;<a href='#s-85'>time</a>
 ## Other functions
-<a href='#s-84'>assert</a>&nbsp;,&nbsp;<a href='#s-85'>clone</a>&nbsp;,&nbsp;<a href='#s-86'>eval</a>&nbsp;,&nbsp;<a href='#s-87'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-88'>help</a>&nbsp;,&nbsp;<a href='#s-89'>localtime</a>&nbsp;,&nbsp;<a href='#s-90'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-91'>time</a>&nbsp;,&nbsp;<a href='#s-92'>type</a>
+<a href='#s-86'>assert</a>&nbsp;,&nbsp;<a href='#s-87'>clone</a>&nbsp;,&nbsp;<a href='#s-88'>eval</a>&nbsp;,&nbsp;<a href='#s-89'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-90'>help</a>&nbsp;,&nbsp;<a href='#s-91'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-92'>type</a>
 ## Global variables
 <a href='#s-93'>ARGV</a>&nbsp;,&nbsp;<a href='#s-94'>ENV</a>&nbsp;,&nbsp;<a href='#s-95'>mathconst</a>
 
@@ -1589,6 +1591,24 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 ```
 <a id='s-84'/>
+<hr>function: <b>localtime</b>
+
+```python
+# decodes epoch time into map
+    
+> localtime(time())
+{"seconds":22,"minutes":33,"hours":7,"days":1,"year":2023,"month":0}    
+
+
+```
+<a id='s-85'/>
+<hr>function: <b>time</b>
+
+```python
+# returns epoch time in seconds
+
+```
+<a id='s-86'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1610,7 +1630,7 @@ Error: a should be true
 
 
 ```
-<a id='s-85'/>
+<a id='s-87'/>
 <hr>function: <b>clone</b>
 
 ```python
@@ -1637,7 +1657,7 @@ false
 
 
 ```
-<a id='s-86'/>
+<a id='s-88'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1663,7 +1683,7 @@ false
 
 
 ```
-<a id='s-87'/>
+<a id='s-89'/>
 <hr>function: <b>getPYXOptions</b>
 
 ```python
@@ -1676,7 +1696,7 @@ false
 
 
 ```
-<a id='s-88'/>
+<a id='s-90'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1691,18 +1711,7 @@ help()
 
 
 ```
-<a id='s-89'/>
-<hr>function: <b>localtime</b>
-
-```python
-# decodes epoch time into map
-    
-> localtime(time())
-{"seconds":22,"minutes":33,"hours":7,"days":1,"year":2023,"month":0}    
-
-
-```
-<a id='s-90'/>
+<a id='s-91'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1754,13 +1763,6 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 #(1) def stackOverflow(x)  x * stackOverflow(x-1)
    |.^      
 
-
-```
-<a id='s-91'/>
-<hr>function: <b>time</b>
-
-```python
-# returns epoch time in seconds
 
 ```
 <a id='s-92'/>

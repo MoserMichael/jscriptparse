@@ -1,3 +1,9 @@
+ * PYX 0.3.7 / PRS 0.0.4  
+    * fix regexps.
+    * fix default parameters (in some cases)
+    * add runCmd function
+    * fix stack trace test (?)
+
  * PYX 0.3.6 / PRS 0.0.4  
     * http client: handle https url
     * add binary data type 
@@ -6,9 +12,7 @@
     * len - return length of binary buffer
     * writeFile - accept binary data as input
     * add httpSendBinary - for receiving binary data as http response
-    * fix regexps.
-    * fix default parameters (in some cases)
-
+ 
  * PYX 0.3.5 / PRS 0.0.4  
     * fix error message for assigning global variable list/dict
     * min, max - now variable length functions, can accept any number of arguments. 

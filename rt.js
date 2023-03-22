@@ -1321,8 +1321,14 @@ false
 
 > len([1,2,3])
 
+# fora map argument - returns the number of keys in the map
 
-# supports binary buffers
+{"a":1,"b":2}
+
+> len(a)
+2
+
+# returns the number of bytes in a binary buffers
 
 > a=buffer(10)
 {"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
@@ -1331,7 +1337,11 @@ false
 10
 
 3`, 1, function(arg) {
-        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST, bs.TYPE_BINARY]);
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST, bs.TYPE_MAP, bs.TYPE_BINARY]);
+        if (arg[0].type == bs.TYPE_MAP) {
+            return new bs.Value(bs.TYPE_NUM, Object.keys(arg[0].val).length);
+
+        }
         return new bs.Value(bs.TYPE_NUM, arg[0].val.length);
     }),
     "join": new bs.BuiltinFunctionValue(`# given a list argument, joins the values of the list into a single string
@@ -2840,12 +2850,16 @@ class AstBinaryExpression extends AstBase {
         try {
             return this.fun(this.lhs, this.rhs, frame);
         } catch(er) {
-            if (er instanceof bs.RuntimeException && er.firstChance) {
-                er.firstChance = false;
+            if (er instanceof bs.RuntimeException) {
+                if (er.firstChance) {
+                    er.firstChance = false;
+                    er.addToStack([this.startOffset, this.currentSourceInfo]);
+                }
+            } else {
+                //console.trace(er);
+                er = new bs.RuntimeException("Error: internal error: " + er);
                 er.addToStack([this.startOffset, this.currentSourceInfo]);
-            } //else {
-            //    console.trace(er);
-            //}
+            }
             throw er;
         }
     }

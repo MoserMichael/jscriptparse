@@ -1,12 +1,12 @@
-Error: internal error: RangeError: Maximum call stack size exceeded
-#(errorTest/10-er-stack-overflow.p:7)     return n * fact(n-1)
-                                    |................^
+Error: Error: internal error: RangeError: Maximum call stack size exceeded
 #(errorTest/10-er-stack-overflow.p:7)     return n * fact(n-1)
                                     |..............^
 #(errorTest/10-er-stack-overflow.p:3) def fact(n) {
                                     |.^
 #(errorTest/10-er-stack-overflow.p:7)     return n * fact(n-1)
                                     |................^
+#(errorTest/10-er-stack-overflow.p:7)     return n * fact(n-1)
+                                    |..............^
 #(errorTest/10-er-stack-overflow.p:3) def fact(n) {
                                     |.^
 #(errorTest/10-er-stack-overflow.p:7)     return n * fact(n-1)

@@ -1,3 +1,6 @@
+ * next version
+   * mid - make it return a list slice as well.
+
  * PYX 0.3.7 / PRS 0.0.4  
     * fix regexps.
     * fix default parameters (in some cases)

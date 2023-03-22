@@ -592,6 +592,17 @@ bs.RTLIB={
 > mid("I am me", 2, -1)
 "am me"
 
+# it also returns a slice of an input array
+
+> lst=[1,3,2,5,3,2]
+[1,3,2,5,3,2]
+
+> mid(lst,2,4)
+[2,5]
+
+> mid(lst,3)
+[5,3,2]
+
 # it also works with binary buffers
 
 > a=buffer(10)
@@ -616,14 +627,26 @@ bs.RTLIB={
         }
     
         if (arg[0].type == bs.TYPE_BINARY) {
-           let sval = null;      
-           if (to == -1) {
+            let sval = null;
+            if (to == -1) {
                 sval = arg[0].val.slice(from);
             } else {
                 sval = arg[0].val.slice(from, to);
             }
 
             return new bs.Value(bs.TYPE_BINARY, sval);
+
+        } else if (arg[0].type == bs.TYPE_LIST) {
+
+            // create a slioce of the array
+            let sval = null;
+            if (to == -1) {
+                to = arg[0].val.length;
+                sval = arg[0].val.slice(from);
+            } else {
+                sval = arg[0].val.slice(from, to);
+            }
+            return new bs.Value(bs.TYPE_LIST, sval);
 
         } else {
             let sval = bs.value2Str(arg, 0);

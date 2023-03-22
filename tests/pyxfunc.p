@@ -29,7 +29,7 @@ funcCats = [
    "func": [ "system", "runcmd", "exit", "sleep", "exec", "kill", "chdir", "getcwd" ]
  },
  { "name": "functions for working with binary data",
-     "func": [ "buffer", "mid", "len", "writeFile", "httpSendBinary", "readBinaryFile" ]
+     "func": [ "buffer", "mid", "len", "writeFile", "httpSendBinary", "readBinaryFile", "isfile", "stat" ]
  },
  { "name": "Time functions",
    "func": [ "time", "localtime" ]

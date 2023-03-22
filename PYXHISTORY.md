@@ -1,5 +1,6 @@
  * next version
    * mid - make it return a list slice as well.
+   * add isfile and stat functions
 
  * PYX 0.3.7 / PRS 0.0.4  
     * fix regexps.
@@ -7,6 +8,7 @@
     * add runCmd function
     * fix stack trace test (?)
     * len - also accept map argument, return number of keys in map.
+    
 
  * PYX 0.3.6 / PRS 0.0.4  
     * http client: handle https url

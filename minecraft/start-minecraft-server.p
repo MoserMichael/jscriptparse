@@ -35,8 +35,16 @@ def hasEulaWithYes() {
 
 def makeNewWorldFlat() {
     props = readFile("server.properties")
+
+    # set level type
     props = replace(props, 'level-type=minecraft\\:normal', 'level-type=minecraft\\:flat' )
+
+    # set game mode
     props = replace(props, 'gamemode=survival', 'gamemode=creative') 
+
+    # with value of true: you need a micrsoft account for authentication (even bots, everyone)
+    props = replace(props, 'online-mode=true', 'online-mode=false')
+
     writeFile("server.properties", props)
 }
 
@@ -76,9 +84,15 @@ def runJavaServer() {
    startServer()  
 }
 
-httpSendBinary(JAR_URL, options, def(resp,error) {
-    #println("response: {type(resp)} {resp} error: {error}\n")
-    writeFile("server.jar", resp)
+if not isfile("server.jar") {
+    println("downloading server.jar...")
+
+    httpSendBinary(JAR_URL, options, def(resp,error) {
+        #println("response: {type(resp)} {resp} error: {error}\n")
+        writeFile("server.jar", resp)
+        runJavaServer()
+    })
+} else {
     runJavaServer()
-})
+}
 

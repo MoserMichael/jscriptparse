@@ -17,13 +17,13 @@
 ## functions for working with processes
 <a href='#s-70'>chdir</a>&nbsp;,&nbsp;<a href='#s-71'>exec</a>&nbsp;,&nbsp;<a href='#s-72'>exit</a>&nbsp;,&nbsp;<a href='#s-73'>getcwd</a>&nbsp;,&nbsp;<a href='#s-74'>kill</a>&nbsp;,&nbsp;<a href='#s-75'>runcmd</a>&nbsp;,&nbsp;<a href='#s-76'>sleep</a>&nbsp;,&nbsp;<a href='#s-77'>system</a>
 ## functions for working with binary data
-<a href='#s-78'>buffer</a>&nbsp;,&nbsp;<a href='#s-79'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-82'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
+<a href='#s-78'>buffer</a>&nbsp;,&nbsp;<a href='#s-79'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-80'>isfile</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-83'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-84'>stat</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
 ## Time functions
-<a href='#s-84'>localtime</a>&nbsp;,&nbsp;<a href='#s-85'>time</a>
+<a href='#s-86'>localtime</a>&nbsp;,&nbsp;<a href='#s-87'>time</a>
 ## Other functions
-<a href='#s-86'>assert</a>&nbsp;,&nbsp;<a href='#s-87'>clone</a>&nbsp;,&nbsp;<a href='#s-88'>eval</a>&nbsp;,&nbsp;<a href='#s-89'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-90'>help</a>&nbsp;,&nbsp;<a href='#s-91'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-92'>type</a>
+<a href='#s-88'>assert</a>&nbsp;,&nbsp;<a href='#s-89'>clone</a>&nbsp;,&nbsp;<a href='#s-90'>eval</a>&nbsp;,&nbsp;<a href='#s-91'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-92'>help</a>&nbsp;,&nbsp;<a href='#s-93'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-94'>type</a>
 ## Global variables
-<a href='#s-93'>ARGV</a>&nbsp;,&nbsp;<a href='#s-94'>ENV</a>&nbsp;,&nbsp;<a href='#s-95'>mathconst</a>
+<a href='#s-95'>ARGV</a>&nbsp;,&nbsp;<a href='#s-96'>ENV</a>&nbsp;,&nbsp;<a href='#s-97'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -1474,6 +1474,16 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
+<a id='s-80'/>
+<hr>function: <b>isfile</b>
+
+```python
+
+# check if argument is a file and if it exists returns true/false   
+        
+
+
+```
 <a id='s-22'/>
 <hr>function: <b>len</b>
 
@@ -1549,7 +1559,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
-<a id='s-82'/>
+<a id='s-83'/>
 <hr>function: <b>readBinaryFile</b>
 
 ```python
@@ -1562,6 +1572,16 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 > type(a)
 "Binary data"    
     
+
+```
+<a id='s-84'/>
+<hr>function: <b>stat</b>
+
+```python
+
+# argument is a file path, returns map with attributes of the file. (    
+        
+
 
 ```
 <a id='s-43'/>
@@ -1590,7 +1610,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
     
 
 ```
-<a id='s-84'/>
+<a id='s-86'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1601,14 +1621,14 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
-<a id='s-85'/>
+<a id='s-87'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-86'/>
+<a id='s-88'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1630,7 +1650,7 @@ Error: a should be true
 
 
 ```
-<a id='s-87'/>
+<a id='s-89'/>
 <hr>function: <b>clone</b>
 
 ```python
@@ -1657,7 +1677,7 @@ false
 
 
 ```
-<a id='s-88'/>
+<a id='s-90'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1683,7 +1703,7 @@ false
 
 
 ```
-<a id='s-89'/>
+<a id='s-91'/>
 <hr>function: <b>getPYXOptions</b>
 
 ```python
@@ -1696,7 +1716,7 @@ false
 
 
 ```
-<a id='s-90'/>
+<a id='s-92'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1711,7 +1731,7 @@ help()
 
 
 ```
-<a id='s-91'/>
+<a id='s-93'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1765,7 +1785,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-92'/>
+<a id='s-94'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1783,7 +1803,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-93'/>
+<a id='s-95'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1807,14 +1827,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-94'/>
+<a id='s-96'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-95'/>
+<a id='s-97'/>
 <hr>function: <b>mathconst</b>
 
 ```python

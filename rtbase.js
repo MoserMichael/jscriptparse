@@ -349,7 +349,6 @@ function jsValueToRtVal(value) {
     if (typeof(value) == null) {
         return VALUE_NONE;
     }
-
     throw new RuntimeException("Unknown type " + typeof(value));
 }
 

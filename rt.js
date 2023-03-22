@@ -429,6 +429,14 @@ function httpSendImp(arg, frame, responseAsText) {
     return bs.VALUE_NONE;
 }
 
+
+function objToDict(obj) {
+    return Object.keys(obj).reduce((result, key) => {
+        result[key] = obj[key];
+        return result;
+    }, {});
+}
+
 // maps between process id and node childprocess object.
 let spawnedProcesses = {};
 
@@ -1236,6 +1244,41 @@ unlink("file1.txt")
             numUnlinked += 1;
         }
         return new bs.Value(bs.TYPE_NUM, numUnlinked);
+    }),
+
+    "stat" : new bs.BuiltinFunctionValue(`
+# argument is a file path, returns map with attributes of the file. (    
+        
+`, 1, function(arg) {
+        let filePath = bs.value2Str(arg, 0);
+        try {
+            let stat = fs.statSync(filePath);
+
+            stat.atime = stat.atime.toISOString()
+            stat.mtime = stat.mtime.toISOString()
+            stat.ctime = stat.ctime.toISOString()
+            stat.birthtime = stat.birthtime.toISOString()
+
+            return bs.jsValueToRtVal(objToDict(stat));
+        } catch(ex) {
+            console.trace(ex);
+            throw new bs.RuntimeException("stat error: " + ex);
+        }
+    }),
+
+
+    "isfile" : new bs.BuiltinFunctionValue(`
+# check if argument is a file and if it exists returns true/false   
+        
+`, 1, function(arg) {
+        let filePath = bs.value2Str(arg, 0);
+        try {
+            let exists = fs.existsSync(filePath);
+            return new bs.Value(bs.TYPE_BOOL, exists);
+        } catch(ex) {
+            console.trace(ex);
+            throw new bs.RuntimeException("stat error: " + ex);
+        }
     }),
 
     "rename" : new bs.BuiltinFunctionValue(`

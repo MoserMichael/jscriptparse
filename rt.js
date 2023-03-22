@@ -1,23 +1,22 @@
 const path=require("node:path");
 const fs=require("node:fs");
 const cp=require("node:child_process");
+
 const http = require('node:http');
+const httpAgent = new http.Agent({ keepAlive: true });
+const url = require('node:url');
+
 let https = null;
 let httpsAgent = null;
 try {
     https = require('node:https');
     httpsAgent = new https.Agent({ keepAlive: true });
 } catch(e) {
-    
 }
 
-const url = require('node:url');
 const yaml=require("yaml");
 const prs=require(path.join(__dirname,"prs.js"));
 const bs=require(path.join(__dirname,"rtbase.js"));
-
-const httpAgent = new http.Agent({ keepAlive: true });
-
 
 const showJavascriptStack = false;
 
@@ -57,6 +56,52 @@ function _getEnv(frame) {
         envDct[key] = bs.value2Str(value);
     }
     return envDct;
+}
+
+function runCmdImpl(cmd, callback, frame) {
+
+    let envDct = _getEnv(frame);
+    let env={shell: true, env: envDct}
+
+    let childProc = cp.spawn(cmd, [], env);
+
+    let doCallback = function(stdout, stderr, err) {
+        try {
+            event = {};
+            if (stdout != null) {
+                event['stdout'] = stdout;
+            }
+            if (stderr != null) {
+                event['stderr'] = stderr;
+            }
+            if (err != null) {
+                event['status'] = err;
+            }
+            let vargs = [bs.jsValueToRtVal(event)];
+
+            bs.evalClosure("", callback, vargs, frame);
+        } catch(er) {
+            if (er instanceof bs.RuntimeException) {
+                er.showStackTrace(true);
+            } else {
+                console.trace(er);
+            }
+        }
+    }
+
+    childProc.stdout.on('data', (data) => {
+        doCallback(data.toString(),null,null);
+    });
+
+    childProc.stderr.on('data', (data) => {
+        doCallback(null,data.toString(),null);
+    });
+
+    childProc.on('close', (code) => {
+        doCallback(null,null,code);
+    });
+
+    return bs.VALUE_NONE;
 }
 
 function _system(cmd, frame) {
@@ -1675,6 +1720,7 @@ var
 
         let cmd ="";
 
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST]);
         if (arg[0].type == bs.TYPE_STR) {
             cmd = arg[0].val;
         } else {
@@ -1683,6 +1729,41 @@ var
             }
         }
         return _system(cmd, frame);
+    }),
+
+
+    "runcmd": new bs.BuiltinFunctionValue(`
+# runs a shell command, asynchronously
+# first argument is the shell command, second argument is a function to handle the results
+
+# example
+runcmd("java -jar server.jar --nogui", def(event) {
+    if exists('stdout', event)
+        println(event.stdout)
+    if exists('stderr', event)
+        println(event.stderr)
+    if exists('status', event) {
+        println("Error: minecraft stopped. exit status: {event.status}")
+        exit(1)
+    }    
+})
+    
+`, 2, function(arg, frame) {
+
+        let cmd ="";
+
+        bs.checkTypeList(arg, 0, [bs.TYPE_STR, bs.TYPE_LIST]);
+        bs.checkTypeList(arg, 1, [bs.TYPE_CLOSURE]);
+
+        if (arg[0].type == bs.TYPE_STR) {
+            cmd = bs.value2Str(arg,0)
+        } else {
+            if (arg[0].type == bs.TYPE_LIST) {
+                cmd = arg[0].val.map(value2Str).join(" ");
+            }
+        }
+
+        return runCmdImpl(cmd, arg[1], frame);
     }),
 
     "getcwd": new bs.BuiltinFunctionValue(`

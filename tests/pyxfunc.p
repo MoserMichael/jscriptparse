@@ -26,7 +26,7 @@ funcCats = [
    "func": [ "parseJsonString", "toJsonString", "parseYamlString", "toYamlString" ]
  },
  { "name": "functions for working with processes",
-   "func": [ "system", "exit", "sleep", "exec", "kill", "chdir", "getcwd" ]
+   "func": [ "system", "runcmd", "exit", "sleep", "exec", "kill", "chdir", "getcwd" ]
  },
  { "name": "functions for working with binary data",
      "func": [ "buffer", "mid", "len", "writeFile", "httpSendBinary", "readBinaryFile" ]

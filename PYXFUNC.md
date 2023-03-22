@@ -15,13 +15,13 @@
 ## Function for working with json/yaml
 <a href='#s-64'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-65'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-66'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-67'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-68'>chdir</a>&nbsp;,&nbsp;<a href='#s-69'>exec</a>&nbsp;,&nbsp;<a href='#s-70'>exit</a>&nbsp;,&nbsp;<a href='#s-71'>getcwd</a>&nbsp;,&nbsp;<a href='#s-72'>kill</a>&nbsp;,&nbsp;<a href='#s-73'>sleep</a>&nbsp;,&nbsp;<a href='#s-74'>system</a>
+<a href='#s-68'>chdir</a>&nbsp;,&nbsp;<a href='#s-69'>exec</a>&nbsp;,&nbsp;<a href='#s-70'>exit</a>&nbsp;,&nbsp;<a href='#s-71'>getcwd</a>&nbsp;,&nbsp;<a href='#s-72'>kill</a>&nbsp;,&nbsp;<a href='#s-73'>runcmd</a>&nbsp;,&nbsp;<a href='#s-74'>sleep</a>&nbsp;,&nbsp;<a href='#s-75'>system</a>
 ## functions for working with binary data
-<a href='#s-75'>buffer</a>&nbsp;,&nbsp;<a href='#s-76'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
+<a href='#s-76'>buffer</a>&nbsp;,&nbsp;<a href='#s-77'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-80'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
 ## Other functions
-<a href='#s-80'>assert</a>&nbsp;,&nbsp;<a href='#s-81'>clone</a>&nbsp;,&nbsp;<a href='#s-82'>eval</a>&nbsp;,&nbsp;<a href='#s-83'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-84'>help</a>&nbsp;,&nbsp;<a href='#s-85'>localtime</a>&nbsp;,&nbsp;<a href='#s-86'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-87'>time</a>&nbsp;,&nbsp;<a href='#s-88'>type</a>
+<a href='#s-82'>assert</a>&nbsp;,&nbsp;<a href='#s-83'>clone</a>&nbsp;,&nbsp;<a href='#s-84'>eval</a>&nbsp;,&nbsp;<a href='#s-85'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-86'>help</a>&nbsp;,&nbsp;<a href='#s-87'>localtime</a>&nbsp;,&nbsp;<a href='#s-88'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-89'>time</a>&nbsp;,&nbsp;<a href='#s-90'>type</a>
 ## Global variables
-<a href='#s-89'>ARGV</a>&nbsp;,&nbsp;<a href='#s-90'>ENV</a>&nbsp;,&nbsp;<a href='#s-91'>mathconst</a>
+<a href='#s-91'>ARGV</a>&nbsp;,&nbsp;<a href='#s-92'>ENV</a>&nbsp;,&nbsp;<a href='#s-93'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -549,7 +549,7 @@ text="a b a c a d"
 # search for a match of regular expression argument (second) argument) in big text (first argument)
 # returns a list - first element is zero based index of match, second is the matching string
 
-> text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
+>text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
 "a 1232 blablalba 34234 ;aksdf;laksdf 3423"
 
 > match(text,/[0-9]+/)
@@ -1252,6 +1252,29 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 ```
 <a id='s-73'/>
+<hr>function: <b>runcmd</b>
+
+```python
+
+# runs a shell command, asynchronously
+# first argument is the shell command, second argument is a function to handle the results
+
+# example
+runcmd("java -jar server.jar --nogui", def(event) {
+    if exists('stdout', event)
+        println(event.stdout)
+    if exists('stderr', event)
+        println(event.stderr)
+    if exists('status', event) {
+        println("Error: minecraft stopped. exit status: {event.status}")
+        exit(1)
+    }    
+})
+    
+
+
+```
+<a id='s-74'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -1261,7 +1284,7 @@ sleep(3)
 
 
 ```
-<a id='s-74'/>
+<a id='s-75'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -1292,7 +1315,7 @@ var
 0
 
 ```
-<a id='s-75'/>
+<a id='s-76'/>
 <hr>function: <b>buffer</b>
 
 ```python
@@ -1313,7 +1336,7 @@ var
 
 
 ```
-<a id='s-76'/>
+<a id='s-77'/>
 <hr>function: <b>httpSendBinary</b>
 
 ```python
@@ -1409,6 +1432,21 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
+<a id='s-80'/>
+<hr>function: <b>readBinaryFile</b>
+
+```python
+
+# read file and return the content as a binary data variable
+    
+> a=readBinaryFile("bin.bin")
+{"type":"Buffer","data":[1,0,0,0,0,0,0,0,0,0]}
+
+> type(a)
+"Binary data"    
+    
+
+```
 <a id='s-43'/>
 <hr>function: <b>writeFile</b>
 
@@ -1435,7 +1473,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
     
 
 ```
-<a id='s-80'/>
+<a id='s-82'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1457,7 +1495,7 @@ Error: a should be true
 
 
 ```
-<a id='s-81'/>
+<a id='s-83'/>
 <hr>function: <b>clone</b>
 
 ```python
@@ -1484,7 +1522,7 @@ false
 
 
 ```
-<a id='s-82'/>
+<a id='s-84'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1510,7 +1548,7 @@ false
 
 
 ```
-<a id='s-83'/>
+<a id='s-85'/>
 <hr>function: <b>getPYXOptions</b>
 
 ```python
@@ -1523,7 +1561,7 @@ false
 
 
 ```
-<a id='s-84'/>
+<a id='s-86'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1538,7 +1576,7 @@ help()
 
 
 ```
-<a id='s-85'/>
+<a id='s-87'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1549,7 +1587,7 @@ help()
 
 
 ```
-<a id='s-86'/>
+<a id='s-88'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1603,14 +1641,14 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-87'/>
+<a id='s-89'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-88'/>
+<a id='s-90'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1628,7 +1666,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-89'/>
+<a id='s-91'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1652,14 +1690,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-90'/>
+<a id='s-92'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-91'/>
+<a id='s-93'/>
 <hr>function: <b>mathconst</b>
 
 ```python

@@ -322,7 +322,7 @@ function jsValueToRtVal(value) {
     }
 
     if (value.constructor.name == "Buffer") {
-        return new Value(TYPE_BINARY, rt);
+        return new Value(TYPE_BINARY, value);
     }
 
     if (value.constructor == Object) { // check if dictionary.

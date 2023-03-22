@@ -11,17 +11,17 @@
 ## Functions for arrays
 <a href='#s-44'>dim</a>&nbsp;,&nbsp;<a href='#s-45'>dimInit</a>&nbsp;,&nbsp;<a href='#s-46'>exists</a>&nbsp;,&nbsp;<a href='#s-47'>join</a>&nbsp;,&nbsp;<a href='#s-48'>joinl</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-50'>map</a>&nbsp;,&nbsp;<a href='#s-51'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-52'>pop</a>&nbsp;,&nbsp;<a href='#s-53'>push</a>&nbsp;,&nbsp;<a href='#s-54'>range</a>&nbsp;,&nbsp;<a href='#s-55'>reduce</a>&nbsp;,&nbsp;<a href='#s-56'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-57'>shift</a>&nbsp;,&nbsp;<a href='#s-58'>sort</a>&nbsp;,&nbsp;<a href='#s-59'>unshift</a>
 ## Functions for maps
-<a href='#s-60'>each</a>&nbsp;,&nbsp;<a href='#s-46'>exists</a>&nbsp;,&nbsp;<a href='#s-62'>keys</a>&nbsp;,&nbsp;<a href='#s-50'>map</a>
+<a href='#s-60'>each</a>&nbsp;,&nbsp;<a href='#s-46'>exists</a>&nbsp;,&nbsp;<a href='#s-62'>keys</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-50'>map</a>
 ## Function for working with json/yaml
-<a href='#s-64'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-65'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-66'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-67'>toYamlString</a>
+<a href='#s-65'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-66'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-67'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-68'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-68'>chdir</a>&nbsp;,&nbsp;<a href='#s-69'>exec</a>&nbsp;,&nbsp;<a href='#s-70'>exit</a>&nbsp;,&nbsp;<a href='#s-71'>getcwd</a>&nbsp;,&nbsp;<a href='#s-72'>kill</a>&nbsp;,&nbsp;<a href='#s-73'>runcmd</a>&nbsp;,&nbsp;<a href='#s-74'>sleep</a>&nbsp;,&nbsp;<a href='#s-75'>system</a>
+<a href='#s-69'>chdir</a>&nbsp;,&nbsp;<a href='#s-70'>exec</a>&nbsp;,&nbsp;<a href='#s-71'>exit</a>&nbsp;,&nbsp;<a href='#s-72'>getcwd</a>&nbsp;,&nbsp;<a href='#s-73'>kill</a>&nbsp;,&nbsp;<a href='#s-74'>runcmd</a>&nbsp;,&nbsp;<a href='#s-75'>sleep</a>&nbsp;,&nbsp;<a href='#s-76'>system</a>
 ## functions for working with binary data
-<a href='#s-76'>buffer</a>&nbsp;,&nbsp;<a href='#s-77'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-80'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
+<a href='#s-77'>buffer</a>&nbsp;,&nbsp;<a href='#s-78'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-81'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
 ## Other functions
-<a href='#s-82'>assert</a>&nbsp;,&nbsp;<a href='#s-83'>clone</a>&nbsp;,&nbsp;<a href='#s-84'>eval</a>&nbsp;,&nbsp;<a href='#s-85'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-86'>help</a>&nbsp;,&nbsp;<a href='#s-87'>localtime</a>&nbsp;,&nbsp;<a href='#s-88'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-89'>time</a>&nbsp;,&nbsp;<a href='#s-90'>type</a>
+<a href='#s-83'>assert</a>&nbsp;,&nbsp;<a href='#s-84'>clone</a>&nbsp;,&nbsp;<a href='#s-85'>eval</a>&nbsp;,&nbsp;<a href='#s-86'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-87'>help</a>&nbsp;,&nbsp;<a href='#s-88'>localtime</a>&nbsp;,&nbsp;<a href='#s-89'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-90'>time</a>&nbsp;,&nbsp;<a href='#s-91'>type</a>
 ## Global variables
-<a href='#s-91'>ARGV</a>&nbsp;,&nbsp;<a href='#s-92'>ENV</a>&nbsp;,&nbsp;<a href='#s-93'>mathconst</a>
+<a href='#s-92'>ARGV</a>&nbsp;,&nbsp;<a href='#s-93'>ENV</a>&nbsp;,&nbsp;<a href='#s-94'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -1123,6 +1123,37 @@ false
 ["first","second","third"]
 
 ```
+<a id='s-22'/>
+<hr>function: <b>len</b>
+
+```python
+# for a string argument - returns the number of characters in the string
+
+> len("abc")
+3
+
+# for a list argument - returns the number of elements in the list
+
+> len([1,2,3])
+
+# fora map argument - returns the number of keys in the map
+
+{"a":1,"b":2}
+
+> len(a)
+2
+
+# returns the number of bytes in a binary buffers
+
+> a=buffer(10)
+{"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
+
+> len(a)
+10
+
+3
+
+```
 <a id='s-50'/>
 <hr>function: <b>map</b>
 
@@ -1144,7 +1175,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-64'/>
+<a id='s-65'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -1156,7 +1187,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-65'/>
+<a id='s-66'/>
 <hr>function: <b>parseYamlString</b>
 
 ```python
@@ -1177,7 +1208,7 @@ c:
     
 
 ```
-<a id='s-66'/>
+<a id='s-67'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -1189,7 +1220,7 @@ c:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-67'/>
+<a id='s-68'/>
 <hr>function: <b>toYamlString</b>
 
 ```python
@@ -1206,7 +1237,7 @@ c:
   - 3
 
 ```
-<a id='s-68'/>
+<a id='s-69'/>
 <hr>function: <b>chdir</b>
 
 ```python
@@ -1217,7 +1248,7 @@ c:
 
 
 ```
-<a id='s-69'/>
+<a id='s-70'/>
 <hr>function: <b>exec</b>
 
 ```python
@@ -1235,7 +1266,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
     
 
 ```
-<a id='s-70'/>
+<a id='s-71'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -1244,7 +1275,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-71'/>
+<a id='s-72'/>
 <hr>function: <b>getcwd</b>
 
 ```python
@@ -1254,7 +1285,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 
 ```
-<a id='s-72'/>
+<a id='s-73'/>
 <hr>function: <b>kill</b>
 
 ```python
@@ -1263,7 +1294,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 
 ```
-<a id='s-73'/>
+<a id='s-74'/>
 <hr>function: <b>runcmd</b>
 
 ```python
@@ -1286,7 +1317,7 @@ runcmd("java -jar server.jar --nogui", def(event) {
 
 
 ```
-<a id='s-74'/>
+<a id='s-75'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -1296,7 +1327,7 @@ sleep(3)
 
 
 ```
-<a id='s-75'/>
+<a id='s-76'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -1327,7 +1358,7 @@ var
 0
 
 ```
-<a id='s-76'/>
+<a id='s-77'/>
 <hr>function: <b>buffer</b>
 
 ```python
@@ -1348,7 +1379,7 @@ var
 
 
 ```
-<a id='s-77'/>
+<a id='s-78'/>
 <hr>function: <b>httpSendBinary</b>
 
 ```python
@@ -1450,7 +1481,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
-<a id='s-80'/>
+<a id='s-81'/>
 <hr>function: <b>readBinaryFile</b>
 
 ```python
@@ -1491,7 +1522,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
     
 
 ```
-<a id='s-82'/>
+<a id='s-83'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1513,7 +1544,7 @@ Error: a should be true
 
 
 ```
-<a id='s-83'/>
+<a id='s-84'/>
 <hr>function: <b>clone</b>
 
 ```python
@@ -1540,7 +1571,7 @@ false
 
 
 ```
-<a id='s-84'/>
+<a id='s-85'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1566,7 +1597,7 @@ false
 
 
 ```
-<a id='s-85'/>
+<a id='s-86'/>
 <hr>function: <b>getPYXOptions</b>
 
 ```python
@@ -1579,7 +1610,7 @@ false
 
 
 ```
-<a id='s-86'/>
+<a id='s-87'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1594,7 +1625,7 @@ help()
 
 
 ```
-<a id='s-87'/>
+<a id='s-88'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1605,7 +1636,7 @@ help()
 
 
 ```
-<a id='s-88'/>
+<a id='s-89'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1659,14 +1690,14 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-89'/>
+<a id='s-90'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-90'/>
+<a id='s-91'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1684,7 +1715,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-91'/>
+<a id='s-92'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1708,14 +1739,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-92'/>
+<a id='s-93'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-93'/>
+<a id='s-94'/>
 <hr>function: <b>mathconst</b>
 
 ```python

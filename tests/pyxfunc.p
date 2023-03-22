@@ -20,7 +20,7 @@ funcCats = [
     "func": [ "dim", "dimInit", "len", "join", "map", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex", "shift", "unshift" ]
  },
  { "name": "Functions for maps",
-    "func": [ "each", "keys", "exists", "map" ]
+    "func": [ "each", "keys", "exists", "len", "map" ]
  },
  { "name": "Function for working with json/yaml",
    "func": [ "parseJsonString", "toJsonString", "parseYamlString", "toYamlString" ]

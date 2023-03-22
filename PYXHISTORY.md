@@ -3,6 +3,7 @@
     * fix default parameters (in some cases)
     * add runCmd function
     * fix stack trace test (?)
+    * len - also accept map argument, return number of keys in map.
 
  * PYX 0.3.6 / PRS 0.0.4  
     * http client: handle https url

@@ -348,8 +348,14 @@
 
 > len([1,2,3])
 
+# fora map argument - returns the number of keys in the map
 
-# supports binary buffers
+{"a":1,"b":2}
+
+> len(a)
+2
+
+# returns the number of bytes in a binary buffers
 
 > a=buffer(10)
 {"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
@@ -868,8 +874,14 @@ false
 
 > len([1,2,3])
 
+# fora map argument - returns the number of keys in the map
 
-# supports binary buffers
+{"a":1,"b":2}
+
+> len(a)
+2
+
+# returns the number of bytes in a binary buffers
 
 > a=buffer(10)
 {"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}
@@ -1387,8 +1399,14 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 > len([1,2,3])
 
+# fora map argument - returns the number of keys in the map
 
-# supports binary buffers
+{"a":1,"b":2}
+
+> len(a)
+2
+
+# returns the number of bytes in a binary buffers
 
 > a=buffer(10)
 {"type":"Buffer","data":[0,0,0,0,0,0,0,0,0,0]}

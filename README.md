@@ -91,3 +91,5 @@ Now I keep noticing quite a lot of details, while writing my little interpreter.
 The moral: you can learn a lot with this type of project! (i think the important part is to keep notes, otherwise you tend to forget the details...)
 
 ... also it's a fascinating kind of project, when you start to use your own stuff for other purposes. As as if you are forming your own reality, somehow!
+
+It's kind of a philosophical problem, wheather language has an inluence on thought (even less so with programming langauges, as these aren't quite for real). Still, having your program that intreprets commands to do general computations is a big wow moment...

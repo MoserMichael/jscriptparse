@@ -7,23 +7,23 @@
 ## Functions for regular expressions
 <a href='#s-20'>find</a>&nbsp;,&nbsp;<a href='#s-32'>match</a>&nbsp;,&nbsp;<a href='#s-33'>matchAll</a>&nbsp;,&nbsp;<a href='#s-34'>replacere</a>&nbsp;,&nbsp;<a href='#s-27'>split</a>
 ## Input and output functions
-<a href='#s-36'>httpSend</a>&nbsp;,&nbsp;<a href='#s-37'>httpServer</a>&nbsp;,&nbsp;<a href='#s-38'>print</a>&nbsp;,&nbsp;<a href='#s-39'>println</a>&nbsp;,&nbsp;<a href='#s-40'>readFile</a>&nbsp;,&nbsp;<a href='#s-41'>rename</a>&nbsp;,&nbsp;<a href='#s-42'>unlink</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
+<a href='#s-36'>httpSend</a>&nbsp;,&nbsp;<a href='#s-37'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-38'>httpServer</a>&nbsp;,&nbsp;<a href='#s-39'>print</a>&nbsp;,&nbsp;<a href='#s-40'>println</a>&nbsp;,&nbsp;<a href='#s-41'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-42'>readFile</a>&nbsp;,&nbsp;<a href='#s-43'>rename</a>&nbsp;,&nbsp;<a href='#s-44'>unlink</a>&nbsp;,&nbsp;<a href='#s-45'>writeFile</a>
 ## Functions for lists
-<a href='#s-44'>dim</a>&nbsp;,&nbsp;<a href='#s-45'>dimInit</a>&nbsp;,&nbsp;<a href='#s-46'>exists</a>&nbsp;,&nbsp;<a href='#s-47'>join</a>&nbsp;,&nbsp;<a href='#s-48'>joinl</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-50'>map</a>&nbsp;,&nbsp;<a href='#s-51'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-53'>pop</a>&nbsp;,&nbsp;<a href='#s-54'>push</a>&nbsp;,&nbsp;<a href='#s-55'>range</a>&nbsp;,&nbsp;<a href='#s-56'>reduce</a>&nbsp;,&nbsp;<a href='#s-57'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-58'>shift</a>&nbsp;,&nbsp;<a href='#s-59'>sort</a>&nbsp;,&nbsp;<a href='#s-60'>unshift</a>
+<a href='#s-46'>dim</a>&nbsp;,&nbsp;<a href='#s-47'>dimInit</a>&nbsp;,&nbsp;<a href='#s-48'>exists</a>&nbsp;,&nbsp;<a href='#s-49'>join</a>&nbsp;,&nbsp;<a href='#s-50'>joinl</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-52'>map</a>&nbsp;,&nbsp;<a href='#s-53'>mapIndex</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-55'>pop</a>&nbsp;,&nbsp;<a href='#s-56'>push</a>&nbsp;,&nbsp;<a href='#s-57'>range</a>&nbsp;,&nbsp;<a href='#s-58'>reduce</a>&nbsp;,&nbsp;<a href='#s-59'>reduceFromEnd</a>&nbsp;,&nbsp;<a href='#s-60'>shift</a>&nbsp;,&nbsp;<a href='#s-61'>sort</a>&nbsp;,&nbsp;<a href='#s-62'>unshift</a>
 ## Functions for maps
-<a href='#s-61'>each</a>&nbsp;,&nbsp;<a href='#s-46'>exists</a>&nbsp;,&nbsp;<a href='#s-63'>keys</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-50'>map</a>
+<a href='#s-63'>each</a>&nbsp;,&nbsp;<a href='#s-48'>exists</a>&nbsp;,&nbsp;<a href='#s-65'>keys</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-52'>map</a>
 ## Function for working with json/yaml
-<a href='#s-66'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-67'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-68'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-69'>toYamlString</a>
+<a href='#s-68'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-69'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-70'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-71'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-70'>chdir</a>&nbsp;,&nbsp;<a href='#s-71'>exec</a>&nbsp;,&nbsp;<a href='#s-72'>exit</a>&nbsp;,&nbsp;<a href='#s-73'>getcwd</a>&nbsp;,&nbsp;<a href='#s-74'>kill</a>&nbsp;,&nbsp;<a href='#s-75'>runcmd</a>&nbsp;,&nbsp;<a href='#s-76'>sleep</a>&nbsp;,&nbsp;<a href='#s-77'>system</a>
+<a href='#s-72'>chdir</a>&nbsp;,&nbsp;<a href='#s-73'>exec</a>&nbsp;,&nbsp;<a href='#s-74'>exit</a>&nbsp;,&nbsp;<a href='#s-75'>getcwd</a>&nbsp;,&nbsp;<a href='#s-76'>kill</a>&nbsp;,&nbsp;<a href='#s-77'>runcmd</a>&nbsp;,&nbsp;<a href='#s-78'>sleep</a>&nbsp;,&nbsp;<a href='#s-79'>system</a>
 ## functions for working with binary data
-<a href='#s-78'>buffer</a>&nbsp;,&nbsp;<a href='#s-79'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-80'>isfile</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-83'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-84'>stat</a>&nbsp;,&nbsp;<a href='#s-43'>writeFile</a>
+<a href='#s-80'>buffer</a>&nbsp;,&nbsp;<a href='#s-37'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-82'>isfile</a>&nbsp;,&nbsp;<a href='#s-22'>len</a>&nbsp;,&nbsp;<a href='#s-23'>mid</a>&nbsp;,&nbsp;<a href='#s-41'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-86'>stat</a>&nbsp;,&nbsp;<a href='#s-45'>writeFile</a>
 ## Time functions
-<a href='#s-86'>localtime</a>&nbsp;,&nbsp;<a href='#s-87'>time</a>
+<a href='#s-88'>localtime</a>&nbsp;,&nbsp;<a href='#s-89'>time</a>
 ## Other functions
-<a href='#s-88'>assert</a>&nbsp;,&nbsp;<a href='#s-89'>clone</a>&nbsp;,&nbsp;<a href='#s-90'>eval</a>&nbsp;,&nbsp;<a href='#s-91'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-92'>help</a>&nbsp;,&nbsp;<a href='#s-93'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-94'>type</a>
+<a href='#s-90'>assert</a>&nbsp;,&nbsp;<a href='#s-91'>clone</a>&nbsp;,&nbsp;<a href='#s-92'>eval</a>&nbsp;,&nbsp;<a href='#s-93'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-94'>help</a>&nbsp;,&nbsp;<a href='#s-95'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-96'>type</a>
 ## Global variables
-<a href='#s-95'>ARGV</a>&nbsp;,&nbsp;<a href='#s-96'>ENV</a>&nbsp;,&nbsp;<a href='#s-97'>mathconst</a>
+<a href='#s-97'>ARGV</a>&nbsp;,&nbsp;<a href='#s-98'>ENV</a>&nbsp;,&nbsp;<a href='#s-99'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -686,6 +686,44 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, respons
 
 ```
 <a id='s-37'/>
+<hr>function: <b>httpSendBinary</b>
+
+```python
+
+
+# send htp request, handles response as binary data
+
+# - first argument - the request url
+# - second argument - additional request parameters (none means http get request)
+# - third argument - called upon reponse (called on both success and error)
+#    resp - not none on success, error - not none on error (error message)
+httpSend('http://127.0.0.1:9010/abcd', none, def(statusCode, headers, responseData, error) {
+    println("status: {statusCode} headers: {headers} response: {responseData} error: {error}
+") 
+})
+
+# send http POST request with data and headers
+
+postData = '{ "name": "Pooh", "family": "Bear" }'
+
+options = {
+  'method': 'POST',
+  'headers': {
+     'Content-Type': 'text/json',
+     'Content-Length' : len(postData)
+  },
+  'data' : postData
+}
+
+httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
+    println("response: {resp} error: {error}") 
+})
+
+
+
+
+```
+<a id='s-38'/>
 <hr>function: <b>httpServer</b>
 
 ```python
@@ -721,7 +759,7 @@ requestData: {req.requestData()}
 
 
 ```
-<a id='s-38'/>
+<a id='s-39'/>
 <hr>function: <b>print</b>
 
 ```python
@@ -730,7 +768,7 @@ requestData: {req.requestData()}
 # Can accept multiple values - each of them is converted to a string
 
 ```
-<a id='s-39'/>
+<a id='s-40'/>
 <hr>function: <b>println</b>
 
 ```python
@@ -739,7 +777,22 @@ requestData: {req.requestData()}
 # Can accept multiple values - each of them is converted to a string
 
 ```
-<a id='s-40'/>
+<a id='s-41'/>
+<hr>function: <b>readBinaryFile</b>
+
+```python
+
+# read file and return the content as a binary data variable
+    
+> a=readBinaryFile("bin.bin")
+{"type":"Buffer","data":[1,0,0,0,0,0,0,0,0,0]}
+
+> type(a)
+"Binary data"    
+    
+
+```
+<a id='s-42'/>
 <hr>function: <b>readFile</b>
 
 ```python
@@ -750,7 +803,7 @@ requestData: {req.requestData()}
     
 
 ```
-<a id='s-41'/>
+<a id='s-43'/>
 <hr>function: <b>rename</b>
 
 ```python
@@ -761,7 +814,7 @@ rename("oldFileName","newFileName")
 
 
 ```
-<a id='s-42'/>
+<a id='s-44'/>
 <hr>function: <b>unlink</b>
 
 ```python
@@ -774,7 +827,7 @@ unlink("file1.txt")
     
 
 ```
-<a id='s-43'/>
+<a id='s-45'/>
 <hr>function: <b>writeFile</b>
 
 ```python
@@ -800,7 +853,7 @@ unlink("file1.txt")
     
 
 ```
-<a id='s-44'/>
+<a id='s-46'/>
 <hr>function: <b>dim</b>
 
 ```python
@@ -819,7 +872,7 @@ unlink("file1.txt")
 
 
 ```
-<a id='s-45'/>
+<a id='s-47'/>
 <hr>function: <b>dimInit</b>
 
 ```python
@@ -835,7 +888,7 @@ unlink("file1.txt")
 
 
 ```
-<a id='s-46'/>
+<a id='s-48'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -855,7 +908,7 @@ true
 false
 
 ```
-<a id='s-47'/>
+<a id='s-49'/>
 <hr>function: <b>join</b>
 
 ```python
@@ -865,7 +918,7 @@ false
 "a: 1 b: true"
 
 ```
-<a id='s-48'/>
+<a id='s-50'/>
 <hr>function: <b>joinl</b>
 
 ```python
@@ -906,7 +959,7 @@ false
 3
 
 ```
-<a id='s-50'/>
+<a id='s-52'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -927,7 +980,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-51'/>
+<a id='s-53'/>
 <hr>function: <b>mapIndex</b>
 
 ```python
@@ -982,7 +1035,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-53'/>
+<a id='s-55'/>
 <hr>function: <b>pop</b>
 
 ```python
@@ -998,7 +1051,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2]
 
 ```
-<a id='s-54'/>
+<a id='s-56'/>
 <hr>function: <b>push</b>
 
 ```python
@@ -1013,7 +1066,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-55'/>
+<a id='s-57'/>
 <hr>function: <b>range</b>
 
 ```python
@@ -1025,7 +1078,7 @@ number: 2
 number: 3
 
 ```
-<a id='s-56'/>
+<a id='s-58'/>
 <hr>function: <b>reduce</b>
 
 ```python
@@ -1052,7 +1105,7 @@ number: 3
 
 
 ```
-<a id='s-57'/>
+<a id='s-59'/>
 <hr>function: <b>reduceFromEnd</b>
 
 ```python
@@ -1070,7 +1123,7 @@ same as:
 1
 
 ```
-<a id='s-58'/>
+<a id='s-60'/>
 <hr>function: <b>shift</b>
 
 ```python
@@ -1086,7 +1139,7 @@ same as:
 
 
 ```
-<a id='s-59'/>
+<a id='s-61'/>
 <hr>function: <b>sort</b>
 
 ```python
@@ -1110,7 +1163,7 @@ same as:
 [["b",1],["a",100],["c",1000]]
 
 ```
-<a id='s-60'/>
+<a id='s-62'/>
 <hr>function: <b>unshift</b>
 
 ```python
@@ -1130,7 +1183,7 @@ same as:
 
 
 ```
-<a id='s-61'/>
+<a id='s-63'/>
 <hr>function: <b>each</b>
 
 ```python
@@ -1149,7 +1202,7 @@ same as:
 
 
 ```
-<a id='s-46'/>
+<a id='s-48'/>
 <hr>function: <b>exists</b>
 
 ```python
@@ -1169,7 +1222,7 @@ true
 false
 
 ```
-<a id='s-63'/>
+<a id='s-65'/>
 <hr>function: <b>keys</b>
 
 ```python
@@ -1212,7 +1265,7 @@ false
 3
 
 ```
-<a id='s-50'/>
+<a id='s-52'/>
 <hr>function: <b>map</b>
 
 ```python
@@ -1233,7 +1286,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-66'/>
+<a id='s-68'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -1245,7 +1298,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 [1,2,3]
 
 ```
-<a id='s-67'/>
+<a id='s-69'/>
 <hr>function: <b>parseYamlString</b>
 
 ```python
@@ -1266,7 +1319,7 @@ c:
     
 
 ```
-<a id='s-68'/>
+<a id='s-70'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -1278,7 +1331,7 @@ c:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-69'/>
+<a id='s-71'/>
 <hr>function: <b>toYamlString</b>
 
 ```python
@@ -1295,7 +1348,7 @@ c:
   - 3
 
 ```
-<a id='s-70'/>
+<a id='s-72'/>
 <hr>function: <b>chdir</b>
 
 ```python
@@ -1306,7 +1359,7 @@ c:
 
 
 ```
-<a id='s-71'/>
+<a id='s-73'/>
 <hr>function: <b>exec</b>
 
 ```python
@@ -1324,7 +1377,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
     
 
 ```
-<a id='s-72'/>
+<a id='s-74'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -1333,7 +1386,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-73'/>
+<a id='s-75'/>
 <hr>function: <b>getcwd</b>
 
 ```python
@@ -1343,7 +1396,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 
 ```
-<a id='s-74'/>
+<a id='s-76'/>
 <hr>function: <b>kill</b>
 
 ```python
@@ -1352,7 +1405,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 
 ```
-<a id='s-75'/>
+<a id='s-77'/>
 <hr>function: <b>runcmd</b>
 
 ```python
@@ -1375,7 +1428,7 @@ runcmd("java -jar server.jar --nogui", def(event) {
 
 
 ```
-<a id='s-76'/>
+<a id='s-78'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -1385,7 +1438,7 @@ sleep(3)
 
 
 ```
-<a id='s-77'/>
+<a id='s-79'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -1416,7 +1469,7 @@ var
 0
 
 ```
-<a id='s-78'/>
+<a id='s-80'/>
 <hr>function: <b>buffer</b>
 
 ```python
@@ -1437,7 +1490,7 @@ var
 
 
 ```
-<a id='s-79'/>
+<a id='s-37'/>
 <hr>function: <b>httpSendBinary</b>
 
 ```python
@@ -1475,7 +1528,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
-<a id='s-80'/>
+<a id='s-82'/>
 <hr>function: <b>isfile</b>
 
 ```python
@@ -1560,7 +1613,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
-<a id='s-83'/>
+<a id='s-41'/>
 <hr>function: <b>readBinaryFile</b>
 
 ```python
@@ -1575,7 +1628,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
     
 
 ```
-<a id='s-84'/>
+<a id='s-86'/>
 <hr>function: <b>stat</b>
 
 ```python
@@ -1585,7 +1638,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
-<a id='s-43'/>
+<a id='s-45'/>
 <hr>function: <b>writeFile</b>
 
 ```python
@@ -1611,7 +1664,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
     
 
 ```
-<a id='s-86'/>
+<a id='s-88'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1622,14 +1675,14 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
-<a id='s-87'/>
+<a id='s-89'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-88'/>
+<a id='s-90'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1651,7 +1704,7 @@ Error: a should be true
 
 
 ```
-<a id='s-89'/>
+<a id='s-91'/>
 <hr>function: <b>clone</b>
 
 ```python
@@ -1678,7 +1731,7 @@ false
 
 
 ```
-<a id='s-90'/>
+<a id='s-92'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1704,7 +1757,7 @@ false
 
 
 ```
-<a id='s-91'/>
+<a id='s-93'/>
 <hr>function: <b>getPYXOptions</b>
 
 ```python
@@ -1717,7 +1770,7 @@ false
 
 
 ```
-<a id='s-92'/>
+<a id='s-94'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1732,7 +1785,7 @@ help()
 
 
 ```
-<a id='s-93'/>
+<a id='s-95'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1786,7 +1839,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-94'/>
+<a id='s-96'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1804,7 +1857,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-95'/>
+<a id='s-97'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1828,14 +1881,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-96'/>
+<a id='s-98'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-97'/>
+<a id='s-99'/>
 <hr>function: <b>mathconst</b>
 
 ```python

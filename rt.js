@@ -343,9 +343,9 @@ function httpSendImp(arg, frame, responseAsText) {
     let callUserFunction = null;
 
     if (responseAsText) {
-        callUserFunction = function(data, error) {
+        callUserFunction = function(data, response, error) {
             // this one is evaluated from another task. runtime exceptions need to be handled here
-            let varg = [ new bs.Value(bs.TYPE_STR,data), error ];
+            let varg = [ new bs.Value(bs.TYPE_NUM, response.statusCode), bs.jsValueToRtVal(response.Headers), new bs.Value(bs.TYPE_STR,data), error ];
 
             try {
                 bs.evalClosure("", callback, varg, frame);
@@ -358,9 +358,9 @@ function httpSendImp(arg, frame, responseAsText) {
             }
         }
     } else {
-        callUserFunction = function(data, error) {
+        callUserFunction = function(data, response, error) {
             // this one is evaluated from another task. runtime exceptions need to be handled here
-            let varg = [ new bs.Value(bs.TYPE_BINARY,data), error ];
+            let varg = [ new bs.Value(bs.TYPE_NUM, response.statusCode), bs.jsValueToRtVal(response.Headers), new bs.Value(bs.TYPE_BINARY,data), error ];
 
             try {
                 bs.evalClosure("", callback, varg, frame);
@@ -387,7 +387,7 @@ function httpSendImp(arg, frame, responseAsText) {
                 data += chunk.toString();
             });
             resp.on('end', () => {
-                callUserFunction(data, bs.VALUE_NONE);
+                callUserFunction(data, resp, bs.VALUE_NONE);
             });
         };
     } else {
@@ -398,7 +398,7 @@ function httpSendImp(arg, frame, responseAsText) {
             });
             resp.on('end', () => {
                 let buffer  = Buffer.concat(data);
-                callUserFunction(buffer, bs.VALUE_NONE);
+                callUserFunction(buffer, resp, bs.VALUE_NONE);
             });
         };
 
@@ -418,7 +418,7 @@ function httpSendImp(arg, frame, responseAsText) {
     }
 
     reqObj.on('error', (e) => {
-        callUserFunction(bs.VALUE_NONE, new bs.Value(bs.TYPE_STR, e.message));
+        callUserFunction(bs.VALUE_NONE, none, new bs.Value(bs.TYPE_STR, e.message));
     });
 
 
@@ -2273,8 +2273,8 @@ options = {
   'data' : postData
 }
 
-httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
-    println("response: {resp} error: {error}") 
+httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, responseData, error) {
+    println("status: {statusCode} headers: {headers} response: {responseData} error: {error}\n") 
 })
 
 
@@ -2290,8 +2290,8 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
 #    resp - not none on success, error - not none on error (error message)
-httpSend('http://127.0.0.1:9010/abcd', none, def(resp,error) {
-    println("response: {resp} error: {error}\n") 
+httpSend('http://127.0.0.1:9010/abcd', none, def(statusCode, headers, responseData, error) {
+    println("status: {statusCode} headers: {headers} response: {responseData} error: {error}\n") 
 })
 
 # send http POST request with data and headers

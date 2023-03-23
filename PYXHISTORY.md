@@ -1,3 +1,6 @@
+ * next version
+   * httpSend - pass status code and headers
+
  * PYX 0.3.8 / PRS 0.0.4  
    * mid - make it return a list slice as well.
    * add isfile and stat functions

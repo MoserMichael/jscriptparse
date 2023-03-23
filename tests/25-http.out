@@ -1,4 +1,4 @@
-response: Pooh says hello. 1
+status: 200 headers: none response: Pooh says hello. 1
 =====    
 request url: /abcd  
 method: POST    
@@ -7,7 +7,7 @@ user-agent: none
 requestData: { "name": "Pooh", "family": "Bear" }
  error: none
 
-response: Pooh says hello. 2
+status: 200 headers: none response: Pooh says hello. 2
 =====    
 request url: /cdef  
 method: GET    

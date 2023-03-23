@@ -45,11 +45,13 @@ options = {
   'data' : postData
 }
 
-httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
-    println("response: {resp} error: {error}\n") 
+httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, responseData, error) {
 
-    httpSend('http://127.0.0.1:9010/cdef', none, def(resp,error) {
-        println("response: {resp} error: {error}\n") 
+    
+    println("status: {statusCode} headers: {headers} response: {responseData} error: {error}\n") 
+
+    httpSend('http://127.0.0.1:9010/cdef', none, def(statusCode, headers, responseData, error) {
+        println("status: {statusCode} headers: {headers} response: {responseData} error: {error}\n") 
         exit(0)
     })
 })

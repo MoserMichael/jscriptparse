@@ -87,8 +87,12 @@ def runJavaServer() {
 if not isfile("server.jar") {
     println("downloading server.jar...")
 
-    httpSendBinary(JAR_URL, options, def(resp,error) {
-        #println("response: {type(resp)} {resp} error: {error}\n")
+    httpSendBinary(JAR_URL, options, def(statusCode, headers, resp, error) {
+        if statusCode != 200 {
+            println("failed to download the server jar. http status: {statusCode}")a
+            exit(1)
+        }
+        #println("statusCode: {statusCode} response: {type(resp)} error: {error}\n")
         writeFile("server.jar", resp)
         runJavaServer()
     })

@@ -4,6 +4,12 @@ funcCats = [
   "name": "Numeric functions",
   "func": [ "int", "round", "num", "max", "min", "abs", "sqrt", "sin", "cos", "tan", "atan", "pow", "random", "bit_and", "bit_or", "bit_xor", "bit_neg", "bit_shiftl", "bit_shiftr"  ]
  },
+ { "name": "Functions for lists",
+    "func": [ "dim", "dimInit", "len", "join", "map", "mid", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex", "shift", "unshift" ]
+ },
+ { "name": "Functions for maps",
+    "func": [ "each", "keys", "exists", "len", "map" ]
+ },
  {
  "name": "Functions for scalars or strings",
  "func": [ "find", "mid", "lc", "uc", "reverse", "str", "repeat", "len", "replace", "split", "trim" ]
@@ -12,24 +18,22 @@ funcCats = [
   "name": "Functions for regular expressions",
   "func": [ "find", "split", "match", "matchAll", "replacere" ]
  },
+ { "name": "functions for working with binary data",
+     "func": [ "buffer", "mid", "len", "writeFile", "httpSendBinary", "readBinaryFile" ]
+ },
  {
    "name": "Input and output functions",
-   "func": [ "print", "println", "readFile", "writeFile", "readBinaryFile", "rename", "unlink", "httpSend", "httpSendBinary", "httpServer" ]
+   "func": [ "print", "println", "readFile", "writeFile", "readBinaryFile",  "httpSend", "httpSendBinary", "httpServer" ]
  },
- { "name": "Functions for lists",
-    "func": [ "dim", "dimInit", "len", "join", "map", "mid", "reduce", "reduceFromEnd", "pop", "push", "joinl", "sort", "exists", "range", "mapIndex", "shift", "unshift" ]
- },
- { "name": "Functions for maps",
-    "func": [ "each", "keys", "exists", "len", "map" ]
+ {
+   "name": "Files for working with files",
+   "func": [ "rename", "unlink", "isfile", "stat" ]
  },
  { "name": "Function for working with json/yaml",
    "func": [ "parseJsonString", "toJsonString", "parseYamlString", "toYamlString" ]
  },
  { "name": "functions for working with processes",
    "func": [ "system", "runcmd", "exit", "sleep", "exec", "kill", "chdir", "getcwd" ]
- },
- { "name": "functions for working with binary data",
-     "func": [ "buffer", "mid", "len", "writeFile", "httpSendBinary", "readBinaryFile", "isfile", "stat" ]
  },
  { "name": "Time functions",
    "func": [ "time", "localtime" ]

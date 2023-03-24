@@ -85,7 +85,7 @@ def doIt() {
          println("<a id='{link_name}'/>")
 
          print("<hr>")
-         print("<a href='#top' align='right'>[top]</a>\n")
+         print("<div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>\n")
 
          fn = system("./pyx -e 'help({name})'")
          println("function: <b>{name}</b>")

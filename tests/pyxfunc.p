@@ -47,6 +47,7 @@ funcCats = [
 ]
 
 def doIt() {
+    println("<a id='top' />")
     println("# pyxfunc - PYX functions reference by category")
     println("")
 
@@ -88,6 +89,8 @@ def doIt() {
          println("function: <b>{name}</b>")
 
          println("")
+         print("<a href='#top' align='right'>[top]</a>")
+
          println("```python")
          println(fn[0])
          println("```")

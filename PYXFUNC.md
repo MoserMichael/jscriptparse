@@ -1470,6 +1470,13 @@ requestData: {req.requestData()}
 
 ```python
 
+# shows files and type of files in a given directory    
+# first argument is a directory, second (optional) argument - walk the directory recursively    
+
+for fileName, fileType readdir('.', true) 
+    println("fileName: {fileName} fileType: {fileType}")    
+    
+    
 
 ```
 <a id='s-75'/>

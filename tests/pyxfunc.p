@@ -12,7 +12,7 @@ funcCats = [
  },
  {
  "name": "Functions for scalars or strings",
- "func": [ "find", "mid", "lc", "uc", "reverse", "str", "repeat", "len", "replace", "split", "trim" ]
+ "func": [ "find", "mid", "lc", "uc", "reverse", "str", "repeat", "len", "replace", "split", "trim", "endsWith" ]
  },
  {
   "name": "Functions for regular expressions",
@@ -26,8 +26,8 @@ funcCats = [
    "func": [ "print", "println", "readFile", "writeFile", "readBinaryFile",  "httpSend", "httpSendBinary", "httpServer" ]
  },
  {
-   "name": "Files for working with files",
-   "func": [ "rename", "unlink", "isfile", "stat" ]
+   "name": "Files for working with files or directories",
+   "func": [ "rename", "unlink", "isfile", "stat", "readdir" ]
  },
  { "name": "Function for working with json/yaml",
    "func": [ "parseJsonString", "toJsonString", "parseYamlString", "toYamlString" ]

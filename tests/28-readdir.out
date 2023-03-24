@@ -1,0 +1,76 @@
+javascript files in current directory
+
+
+fileName: prs.js fileType: file
+fileName: prstst.js fileType: file
+fileName: rt.js fileType: file
+fileName: rtbase.js fileType: file
+fileName: scripty.js fileType: file
+
+
+pux files - enumerated recursively from current directory
+
+
+fileName: build/publish-pyx.p fileType: file
+fileName: errorTest/01-map-error.p fileType: file
+fileName: errorTest/02-error-in-func.p fileType: file
+fileName: errorTest/03-error-end-func.p fileType: file
+fileName: errorTest/04-error-func.p fileType: file
+fileName: errorTest/05-error-sym.p fileType: file
+fileName: errorTest/06-err-map-in-func.p fileType: file
+fileName: errorTest/07-err-map-in-func2.p fileType: file
+fileName: errorTest/08-err-closure-in-map.p fileType: file
+fileName: errorTest/09-er-closer-if.p fileType: file
+fileName: errorTest/10-er-stack-overflow.p fileType: file
+fileName: errorTest/11-array-access.p fileType: file
+fileName: errorTest/12-global-access.p fileType: file
+fileName: leetcode/01-roman-numerals.p fileType: file
+fileName: leetcode/02-valid-parenthesis.p fileType: file
+fileName: leetcode/03-fib.p fileType: file
+fileName: leetcode/04-validate-bintree-search.p fileType: file
+fileName: leetcode/05-eval-polynomial-horn.p fileType: file
+fileName: leetcode/06-permutations.p fileType: file
+fileName: leetcode/07-plot-ascii-graph.p fileType: file
+fileName: leetcode/08-erastophenes.p fileType: file
+fileName: leetcode/09-knapsack-0-1.p fileType: file
+fileName: leetcode/10-longest-common-subsequence-rec.p fileType: file
+fileName: leetcode/11-longest-common-subsequence-rec2.p fileType: file
+fileName: leetcode/12-edit-distance.p fileType: file
+fileName: minecraft/start-minecraft-server.p fileType: file
+fileName: tests/01-assign.p fileType: file
+fileName: tests/02-assign-global.p fileType: file
+fileName: tests/02-func.p fileType: file
+fileName: tests/03-func-default.p fileType: file
+fileName: tests/03-func-if.p fileType: file
+fileName: tests/04-func-rec.p fileType: file
+fileName: tests/05-func-n.p fileType: file
+fileName: tests/06-fstring.p fileType: file
+fileName: tests/07-fstring.p fileType: file
+fileName: tests/08-list.p fileType: file
+fileName: tests/09-map.p fileType: file
+fileName: tests/10-closure.p fileType: file
+fileName: tests/11-map-reduce.p fileType: file
+fileName: tests/12-error-with-stack.p fileType: file
+fileName: tests/13-json.p fileType: file
+fileName: tests/14-multi-assign-shell.p fileType: file
+fileName: tests/15-include-use-as.p fileType: file
+fileName: tests/15-include-use-ext.p fileType: file
+fileName: tests/15-include-use.p fileType: file
+fileName: tests/16-include-error.p fileType: file
+fileName: tests/17-for.p fileType: file
+fileName: tests/18-gen.p fileType: file
+fileName: tests/19-sort.p fileType: file
+fileName: tests/20-throw.p fileType: file
+fileName: tests/21-throw-catch.p fileType: file
+fileName: tests/22-throw-catch.p fileType: file
+fileName: tests/23-throw-from-catch-with-finally.p fileType: file
+fileName: tests/24-object-access.p fileType: file
+fileName: tests/25-http.p fileType: file
+fileName: tests/26-no-redefine-builtin-func.p fileType: file
+fileName: tests/27-binary-search-rec.p fileType: file
+fileName: tests/27-binary-search.p fileType: file
+fileName: tests/28-readdir.p fileType: file
+fileName: tests/buildtoc.p fileType: file
+fileName: tests/pyxfunc.p fileType: file
+fileName: tests/testuse.p fileType: file
+fileName: tests/throwfromuse.p fileType: file

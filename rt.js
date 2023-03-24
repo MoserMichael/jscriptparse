@@ -1,5 +1,5 @@
 const path=require("node:path");
-const fs=require("node:fs");
+        const fs=require("node:fs");
 const cp=require("node:child_process");
 
 const http = require('node:http');
@@ -437,6 +437,40 @@ function objToDict(obj) {
     }, {});
 }
 
+function *readDirImp(dirName, recursive) {
+    let entries = fs.readdirSync(dirName,{withFileTypes:true});
+    for(let i=0; i<entries.length;++i) {
+        let entry = entries[i];
+
+        let resolvedName = path.resolve(dirName, entry.name);
+
+        let stype = '';
+        if (entry.isFile()) {
+            stype = "file";
+        } else if (entry.isDirectory()) {
+            stype = "directory";
+        } else if (entry.isSymbolicLink()) {
+            stype = "symlink";
+        } else if (entry.isFIFO()) {
+            stype = "pipe";
+        } else if (entry.isFIFO()) {
+            stype = "pipe";
+        } else if (entry.isBlockDevice()) {
+            stype = "blockdevice";
+        } else if (entry.isCharacterDevice()) {
+            stype = "chardevice";
+        } else if (entry.isSocket()) { //???
+            stype = "pipe";
+        }
+        let ret = [ new bs.Value(bs.TYPE_STR, resolvedName), new bs.Value(bs.TYPE_STR,stype) ];
+        yield new bs.Value(bs.TYPE_LIST, ret);
+
+        if (recursive && entry.isDirectory() ) {
+            yield *readDirImp(resolvedName, recursive);
+        }
+    }
+}
+
 // maps between process id and node childprocess object.
 let spawnedProcesses = {};
 
@@ -539,10 +573,13 @@ bs.RTLIB={
         }
         let ret = hay.match(arg[1].regex);
 
+        let rval;
         if (ret == null) {
-            return [ -1, "" ];
+            rval = [ new bs.Value(bs.TYPE_NUM,-1), new bs.Value(bs.TYPE_STR,"") ];
+        } else {
+            rval = [ new bs.Value(bs.TYPE_NUM, ret['index'] + offset), new bs.Value(bs.TYPE_STR, ret[0])];
         }
-        return new bs.Value(bs.TYPE_LIST, [ new bs.Value(bs.TYPE_NUM, ret['index'] + offset), new bs.Value(bs.TYPE_STR, ret[0]) ]);
+        return new bs.Value(bs.TYPE_LIST, rval);
     }, [,, null]),
 
     "matchAll": new bs.BuiltinFunctionValue(`
@@ -1246,6 +1283,25 @@ unlink("file1.txt")
         return new bs.Value(bs.TYPE_NUM, numUnlinked);
     }),
 
+    "readdir" : new bs.BuiltinFunctionValue(`
+# shows files and type of files in a given directory    
+# first argument is a directory, second (optional) argument - walk the directory recursively    
+
+for fileName, fileType readdir('.', true) 
+    println("fileName: {fileName} fileType: {fileType}")    
+    
+    `, 2, function *(arg, frame) {
+            let dirName = bs.value2Str(arg, 0);
+            let recursive = false;
+
+            if (arg[1] != null) {
+                recursive = bs.value2Bool(arg,1);
+            }
+
+            yield *readDirImp(dirName, recursive);
+    }, [, false], true),
+
+
     "stat" : new bs.BuiltinFunctionValue(`
 # argument is a file path, returns map with attributes of the file. (    
         
@@ -1280,6 +1336,7 @@ unlink("file1.txt")
             throw new bs.RuntimeException("stat error: " + ex);
         }
     }),
+
 
     "rename" : new bs.BuiltinFunctionValue(`
 # rename files, old file name is the first argument, the new file name is the second argument
@@ -1376,6 +1433,22 @@ false
 `, 1, function(arg) {
         return bs.cloneAll(arg[0]);
     }),
+
+    "endsWith" : new bs.BuiltinFunctionValue(`
+# check if first argument has suffix (the second argument)
+
+> endsWith('main.p', '.p')
+true
+
+> endsWith('main.p', '.x')
+false
+
+`, 2, function(arg) {
+        let hay = bs.value2Str(arg, 0);
+        let suffix = bs.value2Str(arg, 1);
+        return new bs.Value(bs.TYPE_BOOL, hay.endsWith(suffix));
+    }),
+
 
 
     "len" : new bs.BuiltinFunctionValue(`# for a string argument - returns the number of characters in the string
@@ -3012,7 +3085,6 @@ class AstUnaryExpression extends AstBase {
             } //else {
             //    console.trace(er);
             //}
-            console.trace(er);
             throw er;
         }
     }

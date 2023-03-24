@@ -1,3 +1,7 @@
+ * PYX 0.4.0 / PRS 0.0.4  
+   * add endsWith function to rt
+   * add readdir function to rt
+   * fix match function - upon returning non match it caused errors.
 
  * PYX 0.3.9 / PRS 0.0.4  
    * httpSend - pass status code and headers

@@ -7,25 +7,25 @@
 ## Functions for maps
 <a href='#s-37'>each</a>&nbsp;,&nbsp;<a href='#s-22'>exists</a>&nbsp;,&nbsp;<a href='#s-39'>keys</a>&nbsp;,&nbsp;<a href='#s-25'>len</a>&nbsp;,&nbsp;<a href='#s-26'>map</a>
 ## Functions for scalars or strings
-<a href='#s-42'>find</a>&nbsp;,&nbsp;<a href='#s-43'>lc</a>&nbsp;,&nbsp;<a href='#s-25'>len</a>&nbsp;,&nbsp;<a href='#s-28'>mid</a>&nbsp;,&nbsp;<a href='#s-46'>repeat</a>&nbsp;,&nbsp;<a href='#s-47'>replace</a>&nbsp;,&nbsp;<a href='#s-48'>reverse</a>&nbsp;,&nbsp;<a href='#s-49'>split</a>&nbsp;,&nbsp;<a href='#s-50'>str</a>&nbsp;,&nbsp;<a href='#s-51'>trim</a>&nbsp;,&nbsp;<a href='#s-52'>uc</a>
+<a href='#s-42'>endsWith</a>&nbsp;,&nbsp;<a href='#s-43'>find</a>&nbsp;,&nbsp;<a href='#s-44'>lc</a>&nbsp;,&nbsp;<a href='#s-25'>len</a>&nbsp;,&nbsp;<a href='#s-28'>mid</a>&nbsp;,&nbsp;<a href='#s-47'>repeat</a>&nbsp;,&nbsp;<a href='#s-48'>replace</a>&nbsp;,&nbsp;<a href='#s-49'>reverse</a>&nbsp;,&nbsp;<a href='#s-50'>split</a>&nbsp;,&nbsp;<a href='#s-51'>str</a>&nbsp;,&nbsp;<a href='#s-52'>trim</a>&nbsp;,&nbsp;<a href='#s-53'>uc</a>
 ## Functions for regular expressions
-<a href='#s-42'>find</a>&nbsp;,&nbsp;<a href='#s-54'>match</a>&nbsp;,&nbsp;<a href='#s-55'>matchAll</a>&nbsp;,&nbsp;<a href='#s-56'>replacere</a>&nbsp;,&nbsp;<a href='#s-49'>split</a>
+<a href='#s-43'>find</a>&nbsp;,&nbsp;<a href='#s-55'>match</a>&nbsp;,&nbsp;<a href='#s-56'>matchAll</a>&nbsp;,&nbsp;<a href='#s-57'>replacere</a>&nbsp;,&nbsp;<a href='#s-50'>split</a>
 ## functions for working with binary data
-<a href='#s-58'>buffer</a>&nbsp;,&nbsp;<a href='#s-59'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-25'>len</a>&nbsp;,&nbsp;<a href='#s-28'>mid</a>&nbsp;,&nbsp;<a href='#s-62'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-63'>writeFile</a>
+<a href='#s-59'>buffer</a>&nbsp;,&nbsp;<a href='#s-60'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-25'>len</a>&nbsp;,&nbsp;<a href='#s-28'>mid</a>&nbsp;,&nbsp;<a href='#s-63'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-64'>writeFile</a>
 ## Input and output functions
-<a href='#s-64'>httpSend</a>&nbsp;,&nbsp;<a href='#s-59'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-66'>httpServer</a>&nbsp;,&nbsp;<a href='#s-67'>print</a>&nbsp;,&nbsp;<a href='#s-68'>println</a>&nbsp;,&nbsp;<a href='#s-62'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-70'>readFile</a>&nbsp;,&nbsp;<a href='#s-63'>writeFile</a>
-## Files for working with files
-<a href='#s-72'>isfile</a>&nbsp;,&nbsp;<a href='#s-73'>rename</a>&nbsp;,&nbsp;<a href='#s-74'>stat</a>&nbsp;,&nbsp;<a href='#s-75'>unlink</a>
+<a href='#s-65'>httpSend</a>&nbsp;,&nbsp;<a href='#s-60'>httpSendBinary</a>&nbsp;,&nbsp;<a href='#s-67'>httpServer</a>&nbsp;,&nbsp;<a href='#s-68'>print</a>&nbsp;,&nbsp;<a href='#s-69'>println</a>&nbsp;,&nbsp;<a href='#s-63'>readBinaryFile</a>&nbsp;,&nbsp;<a href='#s-71'>readFile</a>&nbsp;,&nbsp;<a href='#s-64'>writeFile</a>
+## Files for working with files or directories
+<a href='#s-73'>isfile</a>&nbsp;,&nbsp;<a href='#s-74'>readdir</a>&nbsp;,&nbsp;<a href='#s-75'>rename</a>&nbsp;,&nbsp;<a href='#s-76'>stat</a>&nbsp;,&nbsp;<a href='#s-77'>unlink</a>
 ## Function for working with json/yaml
-<a href='#s-76'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-77'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-78'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-79'>toYamlString</a>
+<a href='#s-78'>parseJsonString</a>&nbsp;,&nbsp;<a href='#s-79'>parseYamlString</a>&nbsp;,&nbsp;<a href='#s-80'>toJsonString</a>&nbsp;,&nbsp;<a href='#s-81'>toYamlString</a>
 ## functions for working with processes
-<a href='#s-80'>chdir</a>&nbsp;,&nbsp;<a href='#s-81'>exec</a>&nbsp;,&nbsp;<a href='#s-82'>exit</a>&nbsp;,&nbsp;<a href='#s-83'>getcwd</a>&nbsp;,&nbsp;<a href='#s-84'>kill</a>&nbsp;,&nbsp;<a href='#s-85'>runcmd</a>&nbsp;,&nbsp;<a href='#s-86'>sleep</a>&nbsp;,&nbsp;<a href='#s-87'>system</a>
+<a href='#s-82'>chdir</a>&nbsp;,&nbsp;<a href='#s-83'>exec</a>&nbsp;,&nbsp;<a href='#s-84'>exit</a>&nbsp;,&nbsp;<a href='#s-85'>getcwd</a>&nbsp;,&nbsp;<a href='#s-86'>kill</a>&nbsp;,&nbsp;<a href='#s-87'>runcmd</a>&nbsp;,&nbsp;<a href='#s-88'>sleep</a>&nbsp;,&nbsp;<a href='#s-89'>system</a>
 ## Time functions
-<a href='#s-88'>localtime</a>&nbsp;,&nbsp;<a href='#s-89'>time</a>
+<a href='#s-90'>localtime</a>&nbsp;,&nbsp;<a href='#s-91'>time</a>
 ## Other functions
-<a href='#s-90'>assert</a>&nbsp;,&nbsp;<a href='#s-91'>clone</a>&nbsp;,&nbsp;<a href='#s-92'>eval</a>&nbsp;,&nbsp;<a href='#s-93'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-94'>help</a>&nbsp;,&nbsp;<a href='#s-95'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-96'>type</a>
+<a href='#s-92'>assert</a>&nbsp;,&nbsp;<a href='#s-93'>clone</a>&nbsp;,&nbsp;<a href='#s-94'>eval</a>&nbsp;,&nbsp;<a href='#s-95'>getPYXOptions</a>&nbsp;,&nbsp;<a href='#s-96'>help</a>&nbsp;,&nbsp;<a href='#s-97'>setPYXOptions</a>&nbsp;,&nbsp;<a href='#s-98'>type</a>
 ## Global variables
-<a href='#s-97'>ARGV</a>&nbsp;,&nbsp;<a href='#s-98'>ENV</a>&nbsp;,&nbsp;<a href='#s-99'>mathconst</a>
+<a href='#s-99'>ARGV</a>&nbsp;,&nbsp;<a href='#s-100'>ENV</a>&nbsp;,&nbsp;<a href='#s-101'>mathconst</a>
 
 <a id='s-1'/>
 <hr>function: <b>abs</b>
@@ -730,6 +730,22 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 ```
 <a id='s-42'/>
+<hr>function: <b>endsWith</b>
+
+```python
+
+# check if first argument has suffix (the second argument)
+
+> endsWith('main.p', '.p')
+true
+
+> endsWith('main.p', '.x')
+false
+
+
+
+```
+<a id='s-43'/>
 <hr>function: <b>find</b>
 
 ```python
@@ -763,7 +779,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-43'/>
+<a id='s-44'/>
 <hr>function: <b>lc</b>
 
 ```python
@@ -847,7 +863,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 
 ```
-<a id='s-46'/>
+<a id='s-47'/>
 <hr>function: <b>repeat</b>
 
 ```python
@@ -857,7 +873,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 "ababab"
 
 ```
-<a id='s-47'/>
+<a id='s-48'/>
 <hr>function: <b>replace</b>
 
 ```python
@@ -885,7 +901,7 @@ text="a b a c a d"
 
 
 ```
-<a id='s-48'/>
+<a id='s-49'/>
 <hr>function: <b>reverse</b>
 
 ```python
@@ -897,7 +913,7 @@ text="a b a c a d"
 "dcba"
 
 ```
-<a id='s-49'/>
+<a id='s-50'/>
 <hr>function: <b>split</b>
 
 ```python
@@ -926,7 +942,7 @@ text="a b a c a d"
 
 
 ```
-<a id='s-50'/>
+<a id='s-51'/>
 <hr>function: <b>str</b>
 
 ```python
@@ -936,7 +952,7 @@ text="a b a c a d"
 "abc"
 
 ```
-<a id='s-51'/>
+<a id='s-52'/>
 <hr>function: <b>trim</b>
 
 ```python
@@ -952,7 +968,7 @@ text="a b a c a d"
 "a lot of honey honey"
 
 ```
-<a id='s-52'/>
+<a id='s-53'/>
 <hr>function: <b>uc</b>
 
 ```python
@@ -961,7 +977,7 @@ text="a b a c a d"
 "BIG LITTLE"
 
 ```
-<a id='s-42'/>
+<a id='s-43'/>
 <hr>function: <b>find</b>
 
 ```python
@@ -995,7 +1011,7 @@ text="a b a c a d"
 
 
 ```
-<a id='s-54'/>
+<a id='s-55'/>
 <hr>function: <b>match</b>
 
 ```python
@@ -1012,7 +1028,7 @@ text="a b a c a d"
 
 
 ```
-<a id='s-55'/>
+<a id='s-56'/>
 <hr>function: <b>matchAll</b>
 
 ```python
@@ -1026,7 +1042,7 @@ text="a b a c a d"
 
 
 ```
-<a id='s-56'/>
+<a id='s-57'/>
 <hr>function: <b>replacere</b>
 
 ```python
@@ -1052,7 +1068,7 @@ text="a b a c a d"
 
 
 ```
-<a id='s-49'/>
+<a id='s-50'/>
 <hr>function: <b>split</b>
 
 ```python
@@ -1081,7 +1097,7 @@ text="a b a c a d"
 
 
 ```
-<a id='s-58'/>
+<a id='s-59'/>
 <hr>function: <b>buffer</b>
 
 ```python
@@ -1102,7 +1118,7 @@ text="a b a c a d"
 
 
 ```
-<a id='s-59'/>
+<a id='s-60'/>
 <hr>function: <b>httpSendBinary</b>
 
 ```python
@@ -1215,7 +1231,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
-<a id='s-62'/>
+<a id='s-63'/>
 <hr>function: <b>readBinaryFile</b>
 
 ```python
@@ -1230,7 +1246,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
     
 
 ```
-<a id='s-63'/>
+<a id='s-64'/>
 <hr>function: <b>writeFile</b>
 
 ```python
@@ -1256,7 +1272,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
     
 
 ```
-<a id='s-64'/>
+<a id='s-65'/>
 <hr>function: <b>httpSend</b>
 
 ```python
@@ -1295,7 +1311,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, respons
 
 
 ```
-<a id='s-59'/>
+<a id='s-60'/>
 <hr>function: <b>httpSendBinary</b>
 
 ```python
@@ -1333,7 +1349,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 
 ```
-<a id='s-66'/>
+<a id='s-67'/>
 <hr>function: <b>httpServer</b>
 
 ```python
@@ -1369,7 +1385,7 @@ requestData: {req.requestData()}
 
 
 ```
-<a id='s-67'/>
+<a id='s-68'/>
 <hr>function: <b>print</b>
 
 ```python
@@ -1378,7 +1394,7 @@ requestData: {req.requestData()}
 # Can accept multiple values - each of them is converted to a string
 
 ```
-<a id='s-68'/>
+<a id='s-69'/>
 <hr>function: <b>println</b>
 
 ```python
@@ -1387,7 +1403,7 @@ requestData: {req.requestData()}
 # Can accept multiple values - each of them is converted to a string
 
 ```
-<a id='s-62'/>
+<a id='s-63'/>
 <hr>function: <b>readBinaryFile</b>
 
 ```python
@@ -1402,7 +1418,7 @@ requestData: {req.requestData()}
     
 
 ```
-<a id='s-70'/>
+<a id='s-71'/>
 <hr>function: <b>readFile</b>
 
 ```python
@@ -1413,7 +1429,7 @@ requestData: {req.requestData()}
     
 
 ```
-<a id='s-63'/>
+<a id='s-64'/>
 <hr>function: <b>writeFile</b>
 
 ```python
@@ -1439,7 +1455,7 @@ requestData: {req.requestData()}
     
 
 ```
-<a id='s-72'/>
+<a id='s-73'/>
 <hr>function: <b>isfile</b>
 
 ```python
@@ -1449,7 +1465,14 @@ requestData: {req.requestData()}
 
 
 ```
-<a id='s-73'/>
+<a id='s-74'/>
+<hr>function: <b>readdir</b>
+
+```python
+
+
+```
+<a id='s-75'/>
 <hr>function: <b>rename</b>
 
 ```python
@@ -1460,7 +1483,7 @@ rename("oldFileName","newFileName")
 
 
 ```
-<a id='s-74'/>
+<a id='s-76'/>
 <hr>function: <b>stat</b>
 
 ```python
@@ -1470,7 +1493,7 @@ rename("oldFileName","newFileName")
 
 
 ```
-<a id='s-75'/>
+<a id='s-77'/>
 <hr>function: <b>unlink</b>
 
 ```python
@@ -1483,7 +1506,7 @@ unlink("file1.txt")
     
 
 ```
-<a id='s-76'/>
+<a id='s-78'/>
 <hr>function: <b>parseJsonString</b>
 
 ```python
@@ -1495,7 +1518,7 @@ unlink("file1.txt")
 [1,2,3]
 
 ```
-<a id='s-77'/>
+<a id='s-79'/>
 <hr>function: <b>parseYamlString</b>
 
 ```python
@@ -1516,7 +1539,7 @@ c:
     
 
 ```
-<a id='s-78'/>
+<a id='s-80'/>
 <hr>function: <b>toJsonString</b>
 
 ```python
@@ -1528,7 +1551,7 @@ c:
 "{\"name\":\"Pooh\",\"family\":\"Bear\",\"likes\":[\"Honey\",\"Songs\",\"Friends\"]}"
 
 ```
-<a id='s-79'/>
+<a id='s-81'/>
 <hr>function: <b>toYamlString</b>
 
 ```python
@@ -1545,7 +1568,7 @@ c:
   - 3
 
 ```
-<a id='s-80'/>
+<a id='s-82'/>
 <hr>function: <b>chdir</b>
 
 ```python
@@ -1556,7 +1579,7 @@ c:
 
 
 ```
-<a id='s-81'/>
+<a id='s-83'/>
 <hr>function: <b>exec</b>
 
 ```python
@@ -1574,7 +1597,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
     
 
 ```
-<a id='s-82'/>
+<a id='s-84'/>
 <hr>function: <b>exit</b>
 
 ```python
@@ -1583,7 +1606,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 # exit(1) - exit program with status 1 (failure)
 
 ```
-<a id='s-83'/>
+<a id='s-85'/>
 <hr>function: <b>getcwd</b>
 
 ```python
@@ -1593,7 +1616,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 
 ```
-<a id='s-84'/>
+<a id='s-86'/>
 <hr>function: <b>kill</b>
 
 ```python
@@ -1602,7 +1625,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 
 ```
-<a id='s-85'/>
+<a id='s-87'/>
 <hr>function: <b>runcmd</b>
 
 ```python
@@ -1625,7 +1648,7 @@ runcmd("java -jar server.jar --nogui", def(event) {
 
 
 ```
-<a id='s-86'/>
+<a id='s-88'/>
 <hr>function: <b>sleep</b>
 
 ```python
@@ -1635,7 +1658,7 @@ sleep(3)
 
 
 ```
-<a id='s-87'/>
+<a id='s-89'/>
 <hr>function: <b>system</b>
 
 ```python
@@ -1666,7 +1689,7 @@ var
 0
 
 ```
-<a id='s-88'/>
+<a id='s-90'/>
 <hr>function: <b>localtime</b>
 
 ```python
@@ -1677,14 +1700,14 @@ var
 
 
 ```
-<a id='s-89'/>
+<a id='s-91'/>
 <hr>function: <b>time</b>
 
 ```python
 # returns epoch time in seconds
 
 ```
-<a id='s-90'/>
+<a id='s-92'/>
 <hr>function: <b>assert</b>
 
 ```python
@@ -1706,7 +1729,7 @@ Error: a should be true
 
 
 ```
-<a id='s-91'/>
+<a id='s-93'/>
 <hr>function: <b>clone</b>
 
 ```python
@@ -1733,7 +1756,7 @@ false
 
 
 ```
-<a id='s-92'/>
+<a id='s-94'/>
 <hr>function: <b>eval</b>
 
 ```python
@@ -1759,7 +1782,7 @@ false
 
 
 ```
-<a id='s-93'/>
+<a id='s-95'/>
 <hr>function: <b>getPYXOptions</b>
 
 ```python
@@ -1772,7 +1795,7 @@ false
 
 
 ```
-<a id='s-94'/>
+<a id='s-96'/>
 <hr>function: <b>help</b>
 
 ```python
@@ -1787,7 +1810,7 @@ help()
 
 
 ```
-<a id='s-95'/>
+<a id='s-97'/>
 <hr>function: <b>setPYXOptions</b>
 
 ```python
@@ -1841,7 +1864,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 
 ```
-<a id='s-96'/>
+<a id='s-98'/>
 <hr>function: <b>type</b>
 
 ```python
@@ -1859,7 +1882,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 "Closure"
 
 ```
-<a id='s-97'/>
+<a id='s-99'/>
 <hr>function: <b>ARGV</b>
 
 ```python
@@ -1883,14 +1906,14 @@ pyx programFile.p 1 2 3 4
 
 
 ```
-<a id='s-98'/>
+<a id='s-100'/>
 <hr>function: <b>ENV</b>
 
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
-<a id='s-99'/>
+<a id='s-101'/>
 <hr>function: <b>mathconst</b>
 
 ```python

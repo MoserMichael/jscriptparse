@@ -49,7 +49,7 @@ funcCats = [
 def doIt() {
     println("# pyxfunc - PYX functions reference by category")
     println("")
-    println("<a id='top' />")
+    println("<a id='top' />\n")
  
     link_num=1
     link_map={}
@@ -85,12 +85,12 @@ def doIt() {
          println("<a id='{link_name}'/>")
 
          print("<hr>")
+         print("<a href='#top' align='right'>[top]</a>\n")
+
          fn = system("./pyx -e 'help({name})'")
          println("function: <b>{name}</b>")
 
          println("")
-         print("<a href='#top' align='right'>[top]</a>\n")
-
          println("```python")
          println(fn[0])
          println("```")

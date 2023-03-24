@@ -1,6 +1,7 @@
 # pyxfunc - PYX functions reference by category
 
 <a id='top' />
+
 ## Numeric functions
 <a href='#s-1'>abs</a>&nbsp;,&nbsp;<a href='#s-2'>atan</a>&nbsp;,&nbsp;<a href='#s-3'>bit_and</a>&nbsp;,&nbsp;<a href='#s-4'>bit_neg</a>&nbsp;,&nbsp;<a href='#s-5'>bit_or</a>&nbsp;,&nbsp;<a href='#s-6'>bit_shiftl</a>&nbsp;,&nbsp;<a href='#s-7'>bit_shiftr</a>&nbsp;,&nbsp;<a href='#s-8'>bit_xor</a>&nbsp;,&nbsp;<a href='#s-9'>cos</a>&nbsp;,&nbsp;<a href='#s-10'>int</a>&nbsp;,&nbsp;<a href='#s-11'>max</a>&nbsp;,&nbsp;<a href='#s-12'>min</a>&nbsp;,&nbsp;<a href='#s-13'>num</a>&nbsp;,&nbsp;<a href='#s-14'>pow</a>&nbsp;,&nbsp;<a href='#s-15'>random</a>&nbsp;,&nbsp;<a href='#s-16'>round</a>&nbsp;,&nbsp;<a href='#s-17'>sin</a>&nbsp;,&nbsp;<a href='#s-18'>sqrt</a>&nbsp;,&nbsp;<a href='#s-19'>tan</a>
 ## Functions for lists
@@ -29,9 +30,9 @@
 <a href='#s-99'>ARGV</a>&nbsp;,&nbsp;<a href='#s-100'>ENV</a>&nbsp;,&nbsp;<a href='#s-101'>mathconst</a>
 
 <a id='s-1'/>
-<hr>function: <b>abs</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>abs</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # return the absolute of the argument value  (if it's negative then turn it into a positive number)
@@ -43,17 +44,17 @@
 
 ```
 <a id='s-2'/>
-<hr>function: <b>atan</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>atan</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # returns the inverse tangent (in radians) of a number
 
 ```
 <a id='s-3'/>
-<hr>function: <b>bit_and</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>bit_and</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # bitwise and, both argument must be numbers with integer values (not floating point values)
@@ -67,9 +68,9 @@
 
 ```
 <a id='s-4'/>
-<hr>function: <b>bit_neg</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>bit_neg</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # bitwise negation, the argument must be numbers with integer value (not floating point value)                        
@@ -77,9 +78,9 @@
 
 ```
 <a id='s-5'/>
-<hr>function: <b>bit_or</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>bit_or</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # bitwise or, both argument must be numbers with integer values (not floating point values)
@@ -90,9 +91,9 @@
 
 ```
 <a id='s-6'/>
-<hr>function: <b>bit_shiftl</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>bit_shiftl</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # bitwise shift left, both argument must be numbers with integer values (not floating point values)
@@ -103,9 +104,9 @@
 
 ```
 <a id='s-7'/>
-<hr>function: <b>bit_shiftr</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>bit_shiftr</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # bitwise shift right, both argument must be numbers with integer values (not floating point values)
@@ -116,9 +117,9 @@
 
 ```
 <a id='s-8'/>
-<hr>function: <b>bit_xor</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>bit_xor</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # bitwise xor, both argument must be numbers with integer values (not floating point values)
@@ -129,9 +130,9 @@
 
 ```
 <a id='s-9'/>
-<hr>function: <b>cos</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>cos</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # returns the cosine of a number in radians
 
@@ -140,9 +141,9 @@
 
 ```
 <a id='s-10'/>
-<hr>function: <b>int</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>int</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # convert argument string or number to integer value
 
@@ -178,9 +179,9 @@
 
 ```
 <a id='s-11'/>
-<hr>function: <b>max</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>max</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # return the biggest of the argument values, can take any number of arguments
@@ -198,9 +199,9 @@
 
 ```
 <a id='s-12'/>
-<hr>function: <b>min</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>min</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # return the smallest of the argument values, can take any number of arguments
@@ -217,9 +218,9 @@
 
 ```
 <a id='s-13'/>
-<hr>function: <b>num</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>num</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 #  convert argument string to floating point number, if number - returns the same number value 
@@ -233,9 +234,9 @@
 
 ```
 <a id='s-14'/>
-<hr>function: <b>pow</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>pow</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # returns the first arugment nubmer raised to the power of the second argument number
 
@@ -248,9 +249,9 @@
 
 ```
 <a id='s-15'/>
-<hr>function: <b>random</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>random</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # returns pseudo random number with value between 0 and 1 (that means it is almost random)
 > random()
@@ -259,9 +260,9 @@
 
 ```
 <a id='s-16'/>
-<hr>function: <b>round</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>round</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 #  convert an argument value to an integer value - without rounding down 
@@ -281,9 +282,9 @@
 
 ```
 <a id='s-17'/>
-<hr>function: <b>sin</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>sin</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # returns the sine of a number in radians
 
@@ -292,9 +293,9 @@
 
 ```
 <a id='s-18'/>
-<hr>function: <b>sqrt</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>sqrt</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # return the square root of the argument 
@@ -309,17 +310,17 @@
 
 ```
 <a id='s-19'/>
-<hr>function: <b>tan</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>tan</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # returns the tangent of a number in radians
 
 ```
 <a id='s-20'/>
-<hr>function: <b>dim</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>dim</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # defines n-dimensional array, all elements are set to zero. 
@@ -337,9 +338,9 @@
 
 ```
 <a id='s-21'/>
-<hr>function: <b>dimInit</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>dimInit</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # defines n-dimensional array, all elements are set to a deep copy of the first argument. 
@@ -354,9 +355,9 @@
 
 ```
 <a id='s-22'/>
-<hr>function: <b>exists</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>exists</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 > a={"first":1}
 {"first":1}
@@ -375,9 +376,9 @@ false
 
 ```
 <a id='s-23'/>
-<hr>function: <b>join</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>join</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # given a list argument, joins the values of the list into a single string
 
@@ -386,9 +387,9 @@ false
 
 ```
 <a id='s-24'/>
-<hr>function: <b>joinl</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>joinl</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # takes two lists and joins them into a single list, which is returned by this function
 
@@ -397,9 +398,9 @@ false
 
 ```
 <a id='s-25'/>
-<hr>function: <b>len</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>len</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # for a string argument - returns the number of characters in the string
 
@@ -429,9 +430,9 @@ false
 
 ```
 <a id='s-26'/>
-<hr>function: <b>map</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>map</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
 
@@ -451,9 +452,9 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 ```
 <a id='s-27'/>
-<hr>function: <b>mapIndex</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>mapIndex</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # similar to map, the argument function is called with the list value and the index of that value within the argument list
@@ -463,9 +464,9 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 ```
 <a id='s-28'/>
-<hr>function: <b>mid</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>mid</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # returns a substring in the text, first argument is the text, 
@@ -508,9 +509,9 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 ```
 <a id='s-29'/>
-<hr>function: <b>pop</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>pop</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # takes an argument list, returns the last element of the list
@@ -525,9 +526,9 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 ```
 <a id='s-30'/>
-<hr>function: <b>push</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>push</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # takes the second argument and appends it to the list, which is the first argument to this function
@@ -541,9 +542,9 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 ```
 <a id='s-31'/>
-<hr>function: <b>range</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>range</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 > range(1,4)
 [1,2,3]
@@ -554,9 +555,9 @@ number: 3
 
 ```
 <a id='s-32'/>
-<hr>function: <b>reduce</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>reduce</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # form a single return values by applying the arugment value repatedly
@@ -582,9 +583,9 @@ number: 3
 
 ```
 <a id='s-33'/>
-<hr>function: <b>reduceFromEnd</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>reduceFromEnd</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # same as reduce, but working from the end of the list backward.
@@ -601,9 +602,9 @@ same as:
 
 ```
 <a id='s-34'/>
-<hr>function: <b>shift</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>shift</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # removes the first element from the list
 > a=[1,2,3]
@@ -618,9 +619,9 @@ same as:
 
 ```
 <a id='s-35'/>
-<hr>function: <b>sort</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>sort</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # sorts the argument list in increasing order
 
@@ -643,9 +644,9 @@ same as:
 
 ```
 <a id='s-36'/>
-<hr>function: <b>unshift</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>unshift</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # The first argument is a list, the second argument will be prepended to the argument list
@@ -664,9 +665,9 @@ same as:
 
 ```
 <a id='s-37'/>
-<hr>function: <b>each</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>each</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # iterate over entries of a list or maps. 
 
@@ -684,9 +685,9 @@ same as:
 
 ```
 <a id='s-22'/>
-<hr>function: <b>exists</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>exists</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 > a={"first":1}
 {"first":1}
@@ -705,9 +706,9 @@ false
 
 ```
 <a id='s-39'/>
-<hr>function: <b>keys</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>keys</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # for maps: returns the keys of the map
     
@@ -718,9 +719,9 @@ false
 
 ```
 <a id='s-25'/>
-<hr>function: <b>len</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>len</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # for a string argument - returns the number of characters in the string
 
@@ -750,9 +751,9 @@ false
 
 ```
 <a id='s-26'/>
-<hr>function: <b>map</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>map</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # the first argument is a list, the second argument is a function that is called once for each element of the input list. The return values of this function will each be appended to the returned list.
 
@@ -772,9 +773,9 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 ```
 <a id='s-42'/>
-<hr>function: <b>endsWith</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>endsWith</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # check if first argument has suffix (the second argument)
@@ -789,9 +790,9 @@ false
 
 ```
 <a id='s-43'/>
-<hr>function: <b>find</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>find</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
  
 # search for a string (second argument) in a big string (first argument)
@@ -824,9 +825,9 @@ false
 
 ```
 <a id='s-44'/>
-<hr>function: <b>lc</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>lc</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # convert to lower case string
 > lc("BIG little")
@@ -834,9 +835,9 @@ false
 
 ```
 <a id='s-25'/>
-<hr>function: <b>len</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>len</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # for a string argument - returns the number of characters in the string
 
@@ -866,9 +867,9 @@ false
 
 ```
 <a id='s-28'/>
-<hr>function: <b>mid</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>mid</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # returns a substring in the text, first argument is the text, 
@@ -911,9 +912,9 @@ false
 
 ```
 <a id='s-47'/>
-<hr>function: <b>repeat</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>repeat</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 > repeat("a",3)
 "aaa"
@@ -922,9 +923,9 @@ false
 
 ```
 <a id='s-48'/>
-<hr>function: <b>replace</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>replace</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # replace replace occurances of second argument string with third argument string in text.
@@ -951,9 +952,9 @@ text="a b a c a d"
 
 ```
 <a id='s-49'/>
-<hr>function: <b>reverse</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>reverse</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # return the reverse of the argument (either string or list argument)
 
@@ -964,9 +965,9 @@ text="a b a c a d"
 
 ```
 <a id='s-50'/>
-<hr>function: <b>split</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>split</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # split the first argument string into tokens, the second argument specifies how to split it.
@@ -994,9 +995,9 @@ text="a b a c a d"
 
 ```
 <a id='s-51'/>
-<hr>function: <b>str</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>str</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 > str(123)
 "123"
@@ -1005,9 +1006,9 @@ text="a b a c a d"
 
 ```
 <a id='s-52'/>
-<hr>function: <b>trim</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>trim</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # remove leading and trailing whitespace characters
 
@@ -1022,9 +1023,9 @@ text="a b a c a d"
 
 ```
 <a id='s-53'/>
-<hr>function: <b>uc</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>uc</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # convert to upper case string
 > uc("BIG little")
@@ -1032,9 +1033,9 @@ text="a b a c a d"
 
 ```
 <a id='s-43'/>
-<hr>function: <b>find</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>find</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
  
 # search for a string (second argument) in a big string (first argument)
@@ -1067,9 +1068,9 @@ text="a b a c a d"
 
 ```
 <a id='s-55'/>
-<hr>function: <b>match</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>match</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # search for a match of regular expression argument (second) argument) in big text (first argument)
@@ -1085,9 +1086,9 @@ text="a b a c a d"
 
 ```
 <a id='s-56'/>
-<hr>function: <b>matchAll</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>matchAll</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 > text="a 1232 blablalba 34234 ;aksdf;laksdf 3423"
@@ -1100,9 +1101,9 @@ text="a b a c a d"
 
 ```
 <a id='s-57'/>
-<hr>function: <b>replacere</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>replacere</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # replace the regular expression (second argument) with replacement expression (third argument) 
@@ -1127,9 +1128,9 @@ text="a b a c a d"
 
 ```
 <a id='s-50'/>
-<hr>function: <b>split</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>split</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # split the first argument string into tokens, the second argument specifies how to split it.
@@ -1157,9 +1158,9 @@ text="a b a c a d"
 
 ```
 <a id='s-59'/>
-<hr>function: <b>buffer</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>buffer</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
  
 # allocate a buffer for binary data, size of buffeer is given in the argument
@@ -1179,9 +1180,9 @@ text="a b a c a d"
 
 ```
 <a id='s-60'/>
-<hr>function: <b>httpSendBinary</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>httpSendBinary</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 
@@ -1218,9 +1219,9 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 ```
 <a id='s-25'/>
-<hr>function: <b>len</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>len</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # for a string argument - returns the number of characters in the string
 
@@ -1250,9 +1251,9 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 ```
 <a id='s-28'/>
-<hr>function: <b>mid</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>mid</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # returns a substring in the text, first argument is the text, 
@@ -1295,9 +1296,9 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 ```
 <a id='s-63'/>
-<hr>function: <b>readBinaryFile</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>readBinaryFile</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # read file and return the content as a binary data variable
@@ -1311,9 +1312,9 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 ```
 <a id='s-64'/>
-<hr>function: <b>writeFile</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>writeFile</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # write string parameter into text file. 
@@ -1338,9 +1339,9 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 ```
 <a id='s-65'/>
-<hr>function: <b>httpSend</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>httpSend</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 
@@ -1378,9 +1379,9 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, respons
 
 ```
 <a id='s-60'/>
-<hr>function: <b>httpSendBinary</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>httpSendBinary</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 
@@ -1417,9 +1418,9 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 ```
 <a id='s-67'/>
-<hr>function: <b>httpServer</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>httpServer</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
  
 
@@ -1454,9 +1455,9 @@ requestData: {req.requestData()}
 
 ```
 <a id='s-68'/>
-<hr>function: <b>print</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>print</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # prints argument values to console. 
@@ -1464,9 +1465,9 @@ requestData: {req.requestData()}
 
 ```
 <a id='s-69'/>
-<hr>function: <b>println</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>println</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # prints argument values to console, followed by newline.
@@ -1474,9 +1475,9 @@ requestData: {req.requestData()}
 
 ```
 <a id='s-63'/>
-<hr>function: <b>readBinaryFile</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>readBinaryFile</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # read file and return the content as a binary data variable
@@ -1490,9 +1491,9 @@ requestData: {req.requestData()}
 
 ```
 <a id='s-71'/>
-<hr>function: <b>readFile</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>readFile</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # read text file and return it as a string, the file name is the first argument of this function
@@ -1502,9 +1503,9 @@ requestData: {req.requestData()}
 
 ```
 <a id='s-64'/>
-<hr>function: <b>writeFile</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>writeFile</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # write string parameter into text file. 
@@ -1529,9 +1530,9 @@ requestData: {req.requestData()}
 
 ```
 <a id='s-73'/>
-<hr>function: <b>isfile</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>isfile</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # check if argument is a file and if it exists returns true/false   
@@ -1540,9 +1541,9 @@ requestData: {req.requestData()}
 
 ```
 <a id='s-74'/>
-<hr>function: <b>readdir</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>readdir</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # shows files and type of files in a given directory    
@@ -1555,9 +1556,9 @@ for fileName, fileType readdir('.', true)
 
 ```
 <a id='s-75'/>
-<hr>function: <b>rename</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>rename</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # rename files, old file name is the first argument, the new file name is the second argument
@@ -1567,9 +1568,9 @@ rename("oldFileName","newFileName")
 
 ```
 <a id='s-76'/>
-<hr>function: <b>stat</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>stat</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # argument is a file path, returns map with attributes of the file. (    
@@ -1578,9 +1579,9 @@ rename("oldFileName","newFileName")
 
 ```
 <a id='s-77'/>
-<hr>function: <b>unlink</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>unlink</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # delete a number of files, returns number of deleted files
@@ -1592,9 +1593,9 @@ unlink("file1.txt")
 
 ```
 <a id='s-78'/>
-<hr>function: <b>parseJsonString</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>parseJsonString</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # given a json formatted string as argument: returns am equivalent data structure of nested lists and maps
 
@@ -1605,9 +1606,9 @@ unlink("file1.txt")
 
 ```
 <a id='s-79'/>
-<hr>function: <b>parseYamlString</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>parseYamlString</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # given a yaml formatted string, : returns am equivalent data structure of nested lists and maps
          
@@ -1627,9 +1628,9 @@ c:
 
 ```
 <a id='s-80'/>
-<hr>function: <b>toJsonString</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>toJsonString</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # given a data argument: returns a json formatted string
 
@@ -1640,9 +1641,9 @@ c:
 
 ```
 <a id='s-81'/>
-<hr>function: <b>toYamlString</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>toYamlString</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # given a data argument: returns a yaml formatted string
     
@@ -1658,9 +1659,9 @@ c:
 
 ```
 <a id='s-82'/>
-<hr>function: <b>chdir</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>chdir</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # change the current directory. 
@@ -1670,9 +1671,9 @@ c:
 
 ```
 <a id='s-83'/>
-<hr>function: <b>exec</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>exec</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # run a process and receive the input output in a callback. Returns the process id as return value 
@@ -1689,9 +1690,9 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 ```
 <a id='s-84'/>
-<hr>function: <b>exit</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>exit</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # exit() - exit program with status 0 (success)
@@ -1699,9 +1700,9 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 ```
 <a id='s-85'/>
-<hr>function: <b>getcwd</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>getcwd</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # returns the current directory of processes created with system, exec or via backick operator `
@@ -1710,9 +1711,9 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 ```
 <a id='s-86'/>
-<hr>function: <b>kill</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>kill</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # gets process id returned by exec. kills the process.    
@@ -1720,9 +1721,9 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 ```
 <a id='s-87'/>
-<hr>function: <b>runcmd</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>runcmd</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # runs a shell command, asynchronously
@@ -1744,9 +1745,9 @@ runcmd("java -jar server.jar --nogui", def(event) {
 
 ```
 <a id='s-88'/>
-<hr>function: <b>sleep</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>sleep</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
     
 # sleep for three seconds    
@@ -1755,9 +1756,9 @@ sleep(3)
 
 ```
 <a id='s-89'/>
-<hr>function: <b>system</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>system</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # runs the string command in a shell, returns an array where the first element is the standard output of the command, the second element of the list is the exit code of the process
     
@@ -1787,9 +1788,9 @@ var
 
 ```
 <a id='s-90'/>
-<hr>function: <b>localtime</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>localtime</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # decodes epoch time into map
     
@@ -1799,17 +1800,17 @@ var
 
 ```
 <a id='s-91'/>
-<hr>function: <b>time</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>time</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # returns epoch time in seconds
 
 ```
 <a id='s-92'/>
-<hr>function: <b>assert</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>assert</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # first argument is a boolean expression, if it's value is false then throw an exception
@@ -1830,9 +1831,9 @@ Error: a should be true
 
 ```
 <a id='s-93'/>
-<hr>function: <b>clone</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>clone</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # create a deep copy of any value
@@ -1858,9 +1859,9 @@ false
 
 ```
 <a id='s-94'/>
-<hr>function: <b>eval</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>eval</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # evaluate the string as a pyx program - in the current scope
@@ -1885,9 +1886,9 @@ false
 
 ```
 <a id='s-95'/>
-<hr>function: <b>getPYXOptions</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>getPYXOptions</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # get opttions of the PYX runtime
@@ -1899,9 +1900,9 @@ false
 
 ```
 <a id='s-96'/>
-<hr>function: <b>help</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>help</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # Show help text for built-in functions: Example usage:
@@ -1915,9 +1916,9 @@ help()
 
 ```
 <a id='s-97'/>
-<hr>function: <b>setPYXOptions</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>setPYXOptions</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # set opttions of the PYX runtime
@@ -1970,9 +1971,9 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 ```
 <a id='s-98'/>
-<hr>function: <b>type</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>type</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # returns a string that describes the argument value
     
@@ -1989,9 +1990,9 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 ```
 <a id='s-99'/>
-<hr>function: <b>ARGV</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>ARGV</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 
 # array of command line parameters passed to the program.
@@ -2014,17 +2015,17 @@ pyx programFile.p 1 2 3 4
 
 ```
 <a id='s-100'/>
-<hr>function: <b>ENV</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>ENV</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # environment variables, entry key is the name of the environment variable, the entry value is it's value
 
 ```
 <a id='s-101'/>
-<hr>function: <b>mathconst</b>
+<hr><a href='#top' align='right'>[top]</a>
+function: <b>mathconst</b>
 
-<a href='#top' align='right'>[top]</a>
 ```python
 # map of mathematical constants.
 

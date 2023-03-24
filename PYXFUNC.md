@@ -30,7 +30,7 @@
 <a href='#s-99'>ARGV</a>&nbsp;,&nbsp;<a href='#s-100'>ENV</a>&nbsp;,&nbsp;<a href='#s-101'>mathconst</a>
 
 <a id='s-1'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>abs</b>
 
 ```python
@@ -44,7 +44,7 @@ function: <b>abs</b>
 
 ```
 <a id='s-2'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>atan</b>
 
 ```python
@@ -52,7 +52,7 @@ function: <b>atan</b>
 
 ```
 <a id='s-3'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>bit_and</b>
 
 ```python
@@ -68,7 +68,7 @@ function: <b>bit_and</b>
 
 ```
 <a id='s-4'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>bit_neg</b>
 
 ```python
@@ -78,7 +78,7 @@ function: <b>bit_neg</b>
 
 ```
 <a id='s-5'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>bit_or</b>
 
 ```python
@@ -91,7 +91,7 @@ function: <b>bit_or</b>
 
 ```
 <a id='s-6'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>bit_shiftl</b>
 
 ```python
@@ -104,7 +104,7 @@ function: <b>bit_shiftl</b>
 
 ```
 <a id='s-7'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>bit_shiftr</b>
 
 ```python
@@ -117,7 +117,7 @@ function: <b>bit_shiftr</b>
 
 ```
 <a id='s-8'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>bit_xor</b>
 
 ```python
@@ -130,7 +130,7 @@ function: <b>bit_xor</b>
 
 ```
 <a id='s-9'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>cos</b>
 
 ```python
@@ -141,7 +141,7 @@ function: <b>cos</b>
 
 ```
 <a id='s-10'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>int</b>
 
 ```python
@@ -179,7 +179,7 @@ function: <b>int</b>
 
 ```
 <a id='s-11'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>max</b>
 
 ```python
@@ -199,7 +199,7 @@ function: <b>max</b>
 
 ```
 <a id='s-12'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>min</b>
 
 ```python
@@ -218,7 +218,7 @@ function: <b>min</b>
 
 ```
 <a id='s-13'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>num</b>
 
 ```python
@@ -234,7 +234,7 @@ function: <b>num</b>
 
 ```
 <a id='s-14'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>pow</b>
 
 ```python
@@ -249,7 +249,7 @@ function: <b>pow</b>
 
 ```
 <a id='s-15'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>random</b>
 
 ```python
@@ -260,7 +260,7 @@ function: <b>random</b>
 
 ```
 <a id='s-16'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>round</b>
 
 ```python
@@ -282,7 +282,7 @@ function: <b>round</b>
 
 ```
 <a id='s-17'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>sin</b>
 
 ```python
@@ -293,7 +293,7 @@ function: <b>sin</b>
 
 ```
 <a id='s-18'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>sqrt</b>
 
 ```python
@@ -310,7 +310,7 @@ function: <b>sqrt</b>
 
 ```
 <a id='s-19'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>tan</b>
 
 ```python
@@ -318,7 +318,7 @@ function: <b>tan</b>
 
 ```
 <a id='s-20'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>dim</b>
 
 ```python
@@ -338,7 +338,7 @@ function: <b>dim</b>
 
 ```
 <a id='s-21'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>dimInit</b>
 
 ```python
@@ -355,7 +355,7 @@ function: <b>dimInit</b>
 
 ```
 <a id='s-22'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>exists</b>
 
 ```python
@@ -376,7 +376,7 @@ false
 
 ```
 <a id='s-23'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>join</b>
 
 ```python
@@ -387,7 +387,7 @@ function: <b>join</b>
 
 ```
 <a id='s-24'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>joinl</b>
 
 ```python
@@ -398,7 +398,7 @@ function: <b>joinl</b>
 
 ```
 <a id='s-25'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>len</b>
 
 ```python
@@ -430,7 +430,7 @@ function: <b>len</b>
 
 ```
 <a id='s-26'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>map</b>
 
 ```python
@@ -452,7 +452,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 ```
 <a id='s-27'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>mapIndex</b>
 
 ```python
@@ -464,7 +464,7 @@ function: <b>mapIndex</b>
 
 ```
 <a id='s-28'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>mid</b>
 
 ```python
@@ -509,7 +509,7 @@ function: <b>mid</b>
 
 ```
 <a id='s-29'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>pop</b>
 
 ```python
@@ -526,7 +526,7 @@ function: <b>pop</b>
 
 ```
 <a id='s-30'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>push</b>
 
 ```python
@@ -542,7 +542,7 @@ function: <b>push</b>
 
 ```
 <a id='s-31'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>range</b>
 
 ```python
@@ -555,7 +555,7 @@ number: 3
 
 ```
 <a id='s-32'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>reduce</b>
 
 ```python
@@ -583,7 +583,7 @@ function: <b>reduce</b>
 
 ```
 <a id='s-33'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>reduceFromEnd</b>
 
 ```python
@@ -602,7 +602,7 @@ same as:
 
 ```
 <a id='s-34'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>shift</b>
 
 ```python
@@ -619,7 +619,7 @@ function: <b>shift</b>
 
 ```
 <a id='s-35'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>sort</b>
 
 ```python
@@ -644,7 +644,7 @@ function: <b>sort</b>
 
 ```
 <a id='s-36'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>unshift</b>
 
 ```python
@@ -665,7 +665,7 @@ function: <b>unshift</b>
 
 ```
 <a id='s-37'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>each</b>
 
 ```python
@@ -685,7 +685,7 @@ function: <b>each</b>
 
 ```
 <a id='s-22'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>exists</b>
 
 ```python
@@ -706,7 +706,7 @@ false
 
 ```
 <a id='s-39'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>keys</b>
 
 ```python
@@ -719,7 +719,7 @@ function: <b>keys</b>
 
 ```
 <a id='s-25'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>len</b>
 
 ```python
@@ -751,7 +751,7 @@ function: <b>len</b>
 
 ```
 <a id='s-26'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>map</b>
 
 ```python
@@ -773,7 +773,7 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 
 ```
 <a id='s-42'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>endsWith</b>
 
 ```python
@@ -790,7 +790,7 @@ false
 
 ```
 <a id='s-43'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>find</b>
 
 ```python
@@ -825,7 +825,7 @@ function: <b>find</b>
 
 ```
 <a id='s-44'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>lc</b>
 
 ```python
@@ -835,7 +835,7 @@ function: <b>lc</b>
 
 ```
 <a id='s-25'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>len</b>
 
 ```python
@@ -867,7 +867,7 @@ function: <b>len</b>
 
 ```
 <a id='s-28'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>mid</b>
 
 ```python
@@ -912,7 +912,7 @@ function: <b>mid</b>
 
 ```
 <a id='s-47'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>repeat</b>
 
 ```python
@@ -923,7 +923,7 @@ function: <b>repeat</b>
 
 ```
 <a id='s-48'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>replace</b>
 
 ```python
@@ -952,7 +952,7 @@ text="a b a c a d"
 
 ```
 <a id='s-49'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>reverse</b>
 
 ```python
@@ -965,7 +965,7 @@ function: <b>reverse</b>
 
 ```
 <a id='s-50'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>split</b>
 
 ```python
@@ -995,7 +995,7 @@ function: <b>split</b>
 
 ```
 <a id='s-51'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>str</b>
 
 ```python
@@ -1006,7 +1006,7 @@ function: <b>str</b>
 
 ```
 <a id='s-52'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>trim</b>
 
 ```python
@@ -1023,7 +1023,7 @@ function: <b>trim</b>
 
 ```
 <a id='s-53'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>uc</b>
 
 ```python
@@ -1033,7 +1033,7 @@ function: <b>uc</b>
 
 ```
 <a id='s-43'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>find</b>
 
 ```python
@@ -1068,7 +1068,7 @@ function: <b>find</b>
 
 ```
 <a id='s-55'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>match</b>
 
 ```python
@@ -1086,7 +1086,7 @@ function: <b>match</b>
 
 ```
 <a id='s-56'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>matchAll</b>
 
 ```python
@@ -1101,7 +1101,7 @@ function: <b>matchAll</b>
 
 ```
 <a id='s-57'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>replacere</b>
 
 ```python
@@ -1128,7 +1128,7 @@ function: <b>replacere</b>
 
 ```
 <a id='s-50'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>split</b>
 
 ```python
@@ -1158,7 +1158,7 @@ function: <b>split</b>
 
 ```
 <a id='s-59'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>buffer</b>
 
 ```python
@@ -1180,7 +1180,7 @@ function: <b>buffer</b>
 
 ```
 <a id='s-60'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>httpSendBinary</b>
 
 ```python
@@ -1219,7 +1219,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 ```
 <a id='s-25'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>len</b>
 
 ```python
@@ -1251,7 +1251,7 @@ function: <b>len</b>
 
 ```
 <a id='s-28'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>mid</b>
 
 ```python
@@ -1296,7 +1296,7 @@ function: <b>mid</b>
 
 ```
 <a id='s-63'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>readBinaryFile</b>
 
 ```python
@@ -1312,7 +1312,7 @@ function: <b>readBinaryFile</b>
 
 ```
 <a id='s-64'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>writeFile</b>
 
 ```python
@@ -1339,7 +1339,7 @@ function: <b>writeFile</b>
 
 ```
 <a id='s-65'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>httpSend</b>
 
 ```python
@@ -1379,7 +1379,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, respons
 
 ```
 <a id='s-60'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>httpSendBinary</b>
 
 ```python
@@ -1418,7 +1418,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
 
 ```
 <a id='s-67'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>httpServer</b>
 
 ```python
@@ -1455,7 +1455,7 @@ requestData: {req.requestData()}
 
 ```
 <a id='s-68'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>print</b>
 
 ```python
@@ -1465,7 +1465,7 @@ function: <b>print</b>
 
 ```
 <a id='s-69'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>println</b>
 
 ```python
@@ -1475,7 +1475,7 @@ function: <b>println</b>
 
 ```
 <a id='s-63'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>readBinaryFile</b>
 
 ```python
@@ -1491,7 +1491,7 @@ function: <b>readBinaryFile</b>
 
 ```
 <a id='s-71'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>readFile</b>
 
 ```python
@@ -1503,7 +1503,7 @@ function: <b>readFile</b>
 
 ```
 <a id='s-64'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>writeFile</b>
 
 ```python
@@ -1530,7 +1530,7 @@ function: <b>writeFile</b>
 
 ```
 <a id='s-73'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>isfile</b>
 
 ```python
@@ -1541,7 +1541,7 @@ function: <b>isfile</b>
 
 ```
 <a id='s-74'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>readdir</b>
 
 ```python
@@ -1556,7 +1556,7 @@ for fileName, fileType readdir('.', true)
 
 ```
 <a id='s-75'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>rename</b>
 
 ```python
@@ -1568,7 +1568,7 @@ rename("oldFileName","newFileName")
 
 ```
 <a id='s-76'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>stat</b>
 
 ```python
@@ -1579,7 +1579,7 @@ function: <b>stat</b>
 
 ```
 <a id='s-77'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>unlink</b>
 
 ```python
@@ -1593,7 +1593,7 @@ unlink("file1.txt")
 
 ```
 <a id='s-78'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>parseJsonString</b>
 
 ```python
@@ -1606,7 +1606,7 @@ function: <b>parseJsonString</b>
 
 ```
 <a id='s-79'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>parseYamlString</b>
 
 ```python
@@ -1628,7 +1628,7 @@ c:
 
 ```
 <a id='s-80'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>toJsonString</b>
 
 ```python
@@ -1641,7 +1641,7 @@ function: <b>toJsonString</b>
 
 ```
 <a id='s-81'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>toYamlString</b>
 
 ```python
@@ -1659,7 +1659,7 @@ c:
 
 ```
 <a id='s-82'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>chdir</b>
 
 ```python
@@ -1671,7 +1671,7 @@ function: <b>chdir</b>
 
 ```
 <a id='s-83'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>exec</b>
 
 ```python
@@ -1690,7 +1690,7 @@ pid = exec("ls /", def(ex,out,err) { println("error: {ex} standard output: {out}
 
 ```
 <a id='s-84'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>exit</b>
 
 ```python
@@ -1700,7 +1700,7 @@ function: <b>exit</b>
 
 ```
 <a id='s-85'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>getcwd</b>
 
 ```python
@@ -1711,7 +1711,7 @@ function: <b>getcwd</b>
 
 ```
 <a id='s-86'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>kill</b>
 
 ```python
@@ -1721,7 +1721,7 @@ function: <b>kill</b>
 
 ```
 <a id='s-87'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>runcmd</b>
 
 ```python
@@ -1745,7 +1745,7 @@ runcmd("java -jar server.jar --nogui", def(event) {
 
 ```
 <a id='s-88'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>sleep</b>
 
 ```python
@@ -1756,7 +1756,7 @@ sleep(3)
 
 ```
 <a id='s-89'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>system</b>
 
 ```python
@@ -1788,7 +1788,7 @@ var
 
 ```
 <a id='s-90'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>localtime</b>
 
 ```python
@@ -1800,7 +1800,7 @@ function: <b>localtime</b>
 
 ```
 <a id='s-91'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>time</b>
 
 ```python
@@ -1808,7 +1808,7 @@ function: <b>time</b>
 
 ```
 <a id='s-92'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>assert</b>
 
 ```python
@@ -1831,7 +1831,7 @@ Error: a should be true
 
 ```
 <a id='s-93'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>clone</b>
 
 ```python
@@ -1859,7 +1859,7 @@ false
 
 ```
 <a id='s-94'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>eval</b>
 
 ```python
@@ -1886,7 +1886,7 @@ function: <b>eval</b>
 
 ```
 <a id='s-95'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>getPYXOptions</b>
 
 ```python
@@ -1900,7 +1900,7 @@ function: <b>getPYXOptions</b>
 
 ```
 <a id='s-96'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>help</b>
 
 ```python
@@ -1916,7 +1916,7 @@ help()
 
 ```
 <a id='s-97'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>setPYXOptions</b>
 
 ```python
@@ -1971,7 +1971,7 @@ Error: internal error: RangeError: Maximum call stack size exceeded
 
 ```
 <a id='s-98'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>type</b>
 
 ```python
@@ -1990,7 +1990,7 @@ function: <b>type</b>
 
 ```
 <a id='s-99'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>ARGV</b>
 
 ```python
@@ -2015,7 +2015,7 @@ pyx programFile.p 1 2 3 4
 
 ```
 <a id='s-100'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>ENV</b>
 
 ```python
@@ -2023,7 +2023,7 @@ function: <b>ENV</b>
 
 ```
 <a id='s-101'/>
-<hr><div style='text-align: right;'>a href='#top' align='right'>[top]</a></div><br/>
+<hr><div style='text-align: right;'><a href='#top'>[top]</a></div><br/>
 function: <b>mathconst</b>
 
 ```python

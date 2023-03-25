@@ -15,6 +15,62 @@ The scripting language and interpreter for the pyx language.
 - see the [design document (pyxdesign)](PYXDESIGN.md)
 - Example tests scripts are [here](https://github.com/MoserMichael/jscriptparse/tree/main/tests) and [here](https://github.com/MoserMichael/jscriptparse/tree/main/leetcode) - see files with extension .p (.out - expected output of the script)
 
+## Examples
+
+Here is an example script that gets the exchange rates for today, 
+
+```
+urlExchangeRate='https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json'
+
+httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
+    if (statusCode == 200) {
+        data = parseJsonString(responseData)
+        println("Current date: {data['date']} Euro to USD {data['eur']['usd']} Euro to GPB {data['eur']['gbp']}")
+    } else 
+        println("Error: got http status: {statusCode} error: {err}")
+    
+})
+```
+
+Here is an example that does binary search in an array
+
+```
+tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
+
+def binarySearch(tosearch, findme) {
+  low=0
+  high=len(tosearch)-1
+
+  while low <= high {
+    middle = int( (high + low)/2 )
+
+    if tosearch[ middle ] == findme
+        return true
+    elif tosearch[ middle ] > findme
+        high = middle-1
+    else
+        low = middle+1
+
+  }
+  return false
+}
+
+def linearSearch(tosearch, num) {
+    for n tosearch {
+        if n == num
+            return true
+    }
+    return false
+}
+
+for num range(2,18) {
+    res = binarySearch(tosearch, num)
+    res2 = linearSearch(tosearch, num)
+    assert(res == res2, "same result for binary and linear search binarySearch: {res} linearSearch: {res2}")
+}
+
+```
+
 ## Running it
 
 First we need the to install node.js - you can download an installer [here](https://nodejs.org/en/download/)

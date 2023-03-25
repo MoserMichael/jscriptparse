@@ -1,9 +1,6 @@
 tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
 
-
-println("searching:", tosearch)
-
-def search(tosearch, findme) {
+def binarySearch(tosearch, findme) {
   low=0
   high=len(tosearch)-1
 
@@ -14,16 +11,24 @@ def search(tosearch, findme) {
         return true
     elif tosearch[ middle ] > findme 
         high = middle-1
-     else 
+    else 
         low = middle+1
     
   }
   return false
 }
 
-println("10 ", search(tosearch,10))
-println("11 ", search(tosearch,11))
-println("12 ", search(tosearch,12))
-println("13 ", search(tosearch,13))
-println("14 ", search(tosearch,14))
+def linearSearch(tosearch, num) {
+    for n tosearch {
+        if n == num
+            return true
+    }
+    return false
+}
+
+for num range(2,18) {
+    res = binarySearch(tosearch, num)
+    res2 = linearSearch(tosearch, num)
+    assert(res == res2, "same result for binary and linear search binarySearch: {res} linearSearch: {res2}")
+}
 

@@ -1,5 +1,5 @@
 const path=require("node:path");
-        const fs=require("node:fs");
+const fs=require("node:fs");
 const cp=require("node:child_process");
 
 const http = require('node:http');
@@ -2329,7 +2329,8 @@ number: 3`, 3,function *(arg, frame) {
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
 #    resp - not none on success, error - not none on error (error message)
-httpSend('http://127.0.0.1:9010/abcd', none, def(resp,error) {
+
+httpSend('http://127.0.0.1:9010/abcd', none, def(statusCode,header,resp,error) {
     println("response: {resp} error: {error}\n") 
 })
 
@@ -2363,7 +2364,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, respons
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
 #    resp - not none on success, error - not none on error (error message)
-httpSend('http://127.0.0.1:9010/abcd', none, def(statusCode, headers, responseData, error) {
+httpSendBinary('http://127.0.0.1:9010/abcd', none, def(statusCode, headers, responseData, error) {
     println("status: {statusCode} headers: {headers} response: {responseData} error: {error}\n") 
 })
 
@@ -2380,7 +2381,7 @@ options = {
   'data' : postData
 }
 
-httpSend('http://127.0.0.1:9010/abcd', options, def(resp,error) {
+httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, resp, error) {
     println("response: {resp} error: {error}") 
 })
 

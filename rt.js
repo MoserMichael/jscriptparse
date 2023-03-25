@@ -1581,7 +1581,8 @@ map(a,def(k,v) { "key: {k} age: {v}" })
 8
 `, 3, function(arg, frame) {
         bs.checkType(arg, 0, bs.TYPE_LIST);
-        bs.checkType(arg, 1, bs.TYPE_CLOSURE);
+        bs.checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION])
+
 
         let argList = arg[0];
         let funVal = arg[1];
@@ -1607,7 +1608,7 @@ same as:
 > (((1024/32) / 8) / 4)
 1`, 3, function(arg, frame) {
         bs.checkType(arg, 0, bs.TYPE_LIST);
-        bs.checkType(arg, 1, bs.TYPE_CLOSURE);
+        bs.checkTypeList(arg, 1, [bs.TYPE_CLOSURE, bs.TYPE_BUILTIN_FUNCTION]);
 
         let argList = arg[0];
         let funVal = arg[1];

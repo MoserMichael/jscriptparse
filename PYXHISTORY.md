@@ -1,3 +1,6 @@
+ * Next release
+   * reduce, reduceFromEnd - accept both user defined and runtime library functions as actions.
+
  * PYX 0.4.0 / PRS 0.0.4  
    * add endsWith function to rt
    * add readdir function to rt

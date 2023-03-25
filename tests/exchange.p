@@ -5,7 +5,7 @@ responseJson=httpSend(urlExchangeRate, none, def(statusCode, headers, responseDa
         data = parseJsonString(responseData)
         println("Current date: {data['date']}
   Euro to USD {data['eur']['usd']} 
-  Euro to GPB {data['eur']['gbp']}
+  Euro to GBP {data['eur']['gbp']}
   Euro to NIS {data['eur']['ils']} 
 ")
     } else 

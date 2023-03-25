@@ -27,7 +27,7 @@ responseJson=httpSend(urlExchangeRate, none, def(statusCode, headers, responseDa
         data = parseJsonString(responseData)
         println("Current date: {data['date']}
   Euro to USD {data['eur']['usd']}
-  Euro to GPB {data['eur']['gbp']}
+  Euro to GBP {data['eur']['gbp']}
   Euro to NIS {data['eur']['ils']}
 ")
     } else
@@ -40,7 +40,7 @@ That got me
 ```
 Current date: 2023-03-24
   Euro to USD 1.082544
-  Euro to GPB 0.882025
+  Euro to GBP 0.882025
   Euro to NIS 3.842182
 ```
 

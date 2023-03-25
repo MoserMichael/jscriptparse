@@ -24,6 +24,8 @@ fileName: errorTest/09-er-closer-if.p fileType: file
 fileName: errorTest/10-er-stack-overflow.p fileType: file
 fileName: errorTest/11-array-access.p fileType: file
 fileName: errorTest/12-global-access.p fileType: file
+fileName: exchange.p fileType: file
+fileName: exchange2.p fileType: file
 fileName: leetcode/01-roman-numerals.p fileType: file
 fileName: leetcode/02-valid-parenthesis.p fileType: file
 fileName: leetcode/03-fib.p fileType: file
@@ -71,6 +73,8 @@ fileName: tests/27-binary-search-rec.p fileType: file
 fileName: tests/27-binary-search.p fileType: file
 fileName: tests/28-readdir.p fileType: file
 fileName: tests/buildtoc.p fileType: file
+fileName: tests/exchange.p fileType: file
+fileName: tests/exchange2.p fileType: file
 fileName: tests/pyxfunc.p fileType: file
 fileName: tests/testuse.p fileType: file
 fileName: tests/throwfromuse.p fileType: file

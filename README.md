@@ -17,19 +17,79 @@ The scripting language and interpreter for the pyx language.
 
 ## Examples
 
-Here is an example script that gets the exchange rates for today, 
+Here is an example script that gets the exchange rates for today - for a few select currencies: 
 
 ```
 urlExchangeRate='https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json'
 
-httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
+responseJson=httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
     if (statusCode == 200) {
         data = parseJsonString(responseData)
-        println("Current date: {data['date']} Euro to USD {data['eur']['usd']} Euro to GPB {data['eur']['gbp']}")
-    } else 
+        println("Current date: {data['date']}
+  Euro to USD {data['eur']['usd']}
+  Euro to GPB {data['eur']['gbp']}
+  Euro to NIS {data['eur']['ils']}
+")
+    } else
         println("Error: got http status: {statusCode} error: {err}")
-    
 })
+```
+
+That got me 
+
+```
+Current date: 2023-03-24
+  Euro to USD 1.082544
+  Euro to GPB 0.882025
+  Euro to NIS 3.842182
+```
+
+Here is an example that computes the minimum, maximum, mean and standard deviation of the exchange rates for all currencies:
+
+```
+urlExchangeRate='https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json'
+
+responseJson=httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
+    if (statusCode == 200) {
+        data = parseJsonString(responseData)
+
+
+        maxRate = reduce( map(data['eur'],def(key,value) value), max, -mathconst.Infinity)
+        minRate = reduce( map(data['eur'],def(key,value) value), min, mathconst.Infinity)
+
+
+        sum = 0
+        map(data['eur'],def(key,value) { sum = sum + value })
+        mean = sum / len(data['eur'])
+
+
+        sum = 0
+        map(data['eur'],def(key,value) { sum = sum + pow( abs(value - mean), 2) })
+
+        stddev = sqrt( sum / len(data['eur']) )
+
+        println("Statistics on the euro exchange rates for: {data['date']}
+
+  maximum exchange rate: {maxRate}
+  minimum exchange rate: {minRate}
+  mean exchange rate:    {mean}
+  standard deviation:    {stddev}
+")
+
+    } else
+        println("Error: got http status: {statusCode} error: {err}")
+})
+```
+
+That got me
+
+```
+Statistics on the euro exchange rates for: 2023-03-25
+
+  maximum exchange rate: 2603666.310995
+  minimum exchange rate: 0.000039
+  mean exchange rate:    11115.981531639705
+  standard deviation:    157676.53204828722
 ```
 
 Here is an example that does binary search in an array

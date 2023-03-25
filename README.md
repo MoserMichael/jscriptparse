@@ -22,7 +22,7 @@ Here is an example script that gets the exchange rates for today - for a few sel
 ```
 urlExchangeRate='https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json'
 
-responseJson=httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
+httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
     if (statusCode == 200) {
         data = parseJsonString(responseData)
         println("Current date: {data['date']}
@@ -49,7 +49,7 @@ Here is an example that computes the minimum, maximum, mean and standard deviati
 ```
 urlExchangeRate='https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json'
 
-responseJson=httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
+httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
     if (statusCode == 200) {
         data = parseJsonString(responseData)
 

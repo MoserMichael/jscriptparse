@@ -1,6 +1,6 @@
 urlExchangeRate='https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur.json' 
 
-responseJson=httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
+httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
     if (statusCode == 200) {
         data = parseJsonString(responseData)
         println("Current date: {data['date']}

@@ -34,6 +34,8 @@
 
 
 
+
+
 # <a id='s-1' />PYXTUT - tutorial for the PYX scripting language
 
 ## <a id='s-1-1' />First steps
@@ -582,6 +584,20 @@ And then show the name of the day of the week - ```dayOfWeek[6]``` shows the nam
 Friday
 ```
 
+You can pass over all of the entries of a map with the ```for``` statement:
+
+```
+> for key, value dayOfWeek
+... println("mape entry: {key} - {value}")
+mape entry: 1 - Sunday
+mape entry: 2 - Monday
+mape entry: 3 - Tuesday
+mape entry: 4 - Wednesday
+mape entry: 5 - Thursday
+mape entry: 6 - Friday
+mape entry: 7 - Saturday
+```
+
 Now a map with a number key is very different from a list, for example you can have gaps in the key values:
 
 ```
@@ -592,8 +608,7 @@ Now a map with a number key is very different from a list, for example you can h
 "three"
 ```
 
-
-Of you can use the map to organize your data, like having a list of records for each employees in the muppet show:
+You can also use a map to organize your data, like having a list of records for character of the muppet show:
 
 ```
 > employees = [ { "Name": "Kermit", "Surname": "Frog", "Profession": "Producer" }, { "Name": "Fozzy", "Surname": "Bear", "Profession": "Comedian" } ]

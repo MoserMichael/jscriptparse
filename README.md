@@ -92,44 +92,54 @@ Statistics on the euro exchange rates for: 2023-03-25
   standard deviation:    157676.53204828722
 ```
 
-Here is an example that does binary search in an array
+Here is a test that is computing the editing distance between two strings:
 
 ```
-tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
+# https://en.wikipedia.org/wiki/Levenshtein_distance
 
-def binarySearch(tosearch, findme) {
-  low=0
-  high=len(tosearch)-1
+def edit_distance_imp(string_a, pos_a, string_b, pos_b, memo) {
 
-  while low <= high {
-    middle = int( (high + low)/2 )
+    key = str(pos_a) + "-" + str(pos_b)
+    if exists(key, memo)
+        return memo[key]
 
-    if tosearch[ middle ] == findme
-        return true
-    elif tosearch[ middle ] > findme
-        high = middle-1
-    else
-        low = middle+1
+    if pos_a==0 or pos_b == 0
+        return max(pos_a,pos_b)
 
-  }
-  return false
+    ed_a = 1 + edit_distance_imp(string_a, pos_a-1, string_b, pos_b, memo)
+    ed_b = 1 + edit_distance_imp(string_a, pos_a, string_b, pos_b-1, memo) 
+
+    if string_a[pos_a] == string_b[pos_b]
+        ed_c = edit_distance_imp(string_a, pos_a-1, string_b, pos_b-1, memo) 
+    else 
+        ed_c = 1 + edit_distance_imp(string_a, pos_a-1, string_b, pos_b-1, memo) 
+
+    res = min(ed_a, ed_b, ed_c)
+
+    memo[key] = res
+
+    return res
 }
 
-def linearSearch(tosearch, num) {
-    for n tosearch {
-        if n == num
-            return true
-    }
-    return false
+def edit_distance(string_a, string_b ) {
+    memo = {}
+    return edit_distance_imp(string_a, len(string_a)-1, string_b, len(string_b)-1, memo)
 }
 
-for num range(2,18) {
-    res = binarySearch(tosearch, num)
-    res2 = linearSearch(tosearch, num)
-    assert(res == res2, "same result for binary and linear search binarySearch: {res} linearSearch: {res2}")
-}
 
+tests = [
+    [ "dog", "doggy", 2 ],
+    [ "akidtty", "kidttyaaa", 4 ],
+    [ "abear", "bears", 2 ]
+]
+ 
+for t tests {
+    dst = edit_distance(t[0],t[1])
+    println("distance {t[0]} to {t[1]} is {dst}")
+    assert(dst == t[2], "expected edit distance")
+}    
 ```
+
 
 ## Running it
 

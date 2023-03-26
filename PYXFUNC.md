@@ -1431,13 +1431,23 @@ httpServer(9010, opts, def (req,resp) {
  
     # function is called on each request  
     # 9010 - listening port
-    # opts - array of options 
-    #        for valid values see https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener
+    # opts - array of options (see later)        
     # third argument - callback is called upon incoming request.
     #   Parameters of callback:
     #       req  - request properties of incoming http request
     #       resp - send response via send method - resp.send(httpResponseCode, data, mimeType)
 
+    # valid values in options
+    #   keepAlive: true - If set to true, it enables sending keep-alive on the client connection, Default: false
+    #   keepAliveInitialDelay <number> -  initial delay before the first keepalive probe (assuming keepAlive: true)
+    #   keepAliveTimeout The number of milliseconds of inactivity a server needs to wait for additional incoming
+    #     data, after it has finished writing the last response, before a socket will be destroyed 
+    #   maxHeaderSize <number> - maximum length of request headers in bytes. Default: 16384 
+    #   noDelay <boolean> - true (default value) - disables the use of Nagle's algorithm on incoming connection
+    #   requestTimeout: Sets the timeout value in milliseconds for receiving the entire request from the client (Default: 300000)
+    #   joinDuplicateHeaders <boolean> It joins the field line values of multiple headers in a request with , instead of 
+    #           discarding the duplicates.
+    
     println("url: {req.url()}")
     if req.url() == "/time" {
 

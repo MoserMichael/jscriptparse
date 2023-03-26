@@ -17,6 +17,10 @@ httpSend(urlExchangeRate, none, def(statusCode, headers, responseData, err) {
         sum = 0
         map(data['eur'],def(key,value) { sum = sum + pow( abs(value - mean), 2) })
 
+        # double check that you get the same result with reduce 
+        sum2 = reduce( map(data['eur'],def(key,value) value), def(prev, cur) prev + pow( abs(cur - mean), 2 ), 0)
+        assert(sum2==sum, "reduce must give the same result")
+
         stddev = sqrt( sum / len(data['eur']) )
 
         println("Statistics on the euro exchange rates for: {data['date']}

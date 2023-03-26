@@ -1,5 +1,6 @@
  * Next release
    * reduce, reduceFromEnd - accept both user defined and runtime library functions as actions.
+   * exit - add optional message before exit
 
  * PYX 0.4.0 / PRS 0.0.4  
    * add endsWith function to rt

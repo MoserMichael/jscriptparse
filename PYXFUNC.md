@@ -1186,9 +1186,9 @@ function: <b>httpSendBinary</b>
 ```python
 
 
-# send htp request, handles response as binary data
+# sends http/https request, reads response and handles response as binary data
 
-# - first argument - the request url
+# - first argument - the request url (either with http:// or https:// prefix)
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
 #    resp - not none on success, error - not none on error (error message)
@@ -1345,9 +1345,9 @@ function: <b>httpSend</b>
 ```python
 
 
-# send htp request, handles response as text data
+# sends http/https request, reads response and handles response as text data
 
-# - first argument - the request url
+# - first argument - the request url (either with http:// or https:// prefix)
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
 #    resp - not none on success, error - not none on error (error message)
@@ -1386,9 +1386,9 @@ function: <b>httpSendBinary</b>
 ```python
 
 
-# send htp request, handles response as binary data
+# sends http/https request, reads response and handles response as binary data
 
-# - first argument - the request url
+# - first argument - the request url (either with http:// or https:// prefix)
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
 #    resp - not none on success, error - not none on error (error message)
@@ -1425,12 +1425,18 @@ function: <b>httpServer</b>
 ```python
  
 
-# listen for incoming http requests on port 9010.     
-httpServer(9010, def (req,resp) {
+# listen for incoming http requests on port 9010. 
+opts={}    
+httpServer(9010, opts, def (req,resp) {
  
     # function is called on each request  
-    # req  - access request properties
-    # resp - send response via send method
+    # 9010 - listening port
+    # opts - array of options 
+    #        for valid values see https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener
+    # third argument - callback is called upon incoming request.
+    #   Parameters of callback:
+    #       req  - request properties of incoming http request
+    #       resp - send response via send method - resp.send(httpResponseCode, data, mimeType)
 
     println("url: {req.url()}")
     if req.url() == "/time" {
@@ -1697,7 +1703,11 @@ function: <b>exit</b>
 ```python
 
 # exit() - exit program with status 0 (success)
+
 # exit(1) - exit program with status 1 (failure)
+
+# exit(1,'program error') - exits program with status 1, shows the message 'program error' before exit.
+
 
 ```
 <a id='s-85'/>

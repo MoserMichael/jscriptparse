@@ -2,7 +2,7 @@
 cnt = 1
 
 def startTxtSrv() {
-    httpServer(9010, def(req,resp) {
+    httpServer(9010, none, def(req,resp) {
         text = "
 =====    
 request url: {req.url()}  

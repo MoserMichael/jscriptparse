@@ -269,7 +269,7 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
     return [ req_, res_ ];
 }
 
-function makeHttpServerListener(callback, frame) {
+function makeHttpServerListener(callback, frame, opts, isHttpClear) {
     return function (req, res) {
 
         const chunks = [];
@@ -2043,14 +2043,23 @@ sleep(3)
     // control flow
     "exit": new bs.BuiltinFunctionValue(`
 # exit() - exit program with status 0 (success)
-# exit(1) - exit program with status 1 (failure)`,
-        1,function(arg, frame) {
+
+# exit(1) - exit program with status 1 (failure)
+
+# exit(1,'program error') - exits program with status 1, shows the message 'program error' before exit.
+`,
+
+        2,function(arg, frame) {
         let num = 0;
         if (arg[0] != null) {
             num = bs.value2Num(arg, 0);
         }
+        if (arg[1] != null) {
+            let msg = bs.value2Str(arg, 1);
+            console.log(msg);
+        }
         process.exit(num);
-    }),
+    }, [null,null]),
 
     "assert": new bs.BuiltinFunctionValue( `
 # first argument is a boolean expression, if it's value is false then throw an exception
@@ -2324,9 +2333,9 @@ number: 3`, 3,function *(arg, frame) {
 
     "httpSend": new bs.BuiltinFunctionValue(`
 
-# send htp request, handles response as text data
+# sends http/https request, reads response and handles response as text data
 
-# - first argument - the request url
+# - first argument - the request url (either with http:// or https:// prefix)
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
 #    resp - not none on success, error - not none on error (error message)
@@ -2359,9 +2368,9 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, respons
 
     "httpSendBinary": new bs.BuiltinFunctionValue(`
 
-# send htp request, handles response as binary data
+# sends http/https request, reads response and handles response as binary data
 
-# - first argument - the request url
+# - first argument - the request url (either with http:// or https:// prefix)
 # - second argument - additional request parameters (none means http get request)
 # - third argument - called upon reponse (called on both success and error)
 #    resp - not none on success, error - not none on error (error message)
@@ -2394,12 +2403,18 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, resp, e
 
     "httpServer": new bs.BuiltinFunctionValue(` 
 
-# listen for incoming http requests on port 9010.     
-httpServer(9010, def (req,resp) {
+# listen for incoming http requests on port 9010. 
+opts={}    
+httpServer(9010, opts, def (req,resp) {
  
     # function is called on each request  
-    # req  - access request properties
-    # resp - send response via send method
+    # 9010 - listening port
+    # opts - array of options 
+    #        for valid values see https://nodejs.org/api/http.html#httpcreateserveroptions-requestlistener
+    # third argument - callback is called upon incoming request.
+    #   Parameters of callback:
+    #       req  - request properties of incoming http request
+    #       resp - send response via send method - resp.send(httpResponseCode, data, mimeType)
 
     println("url: {req.url()}")
     if req.url() == "/time" {
@@ -2421,14 +2436,18 @@ requestData: {req.requestData()}
         resp.send(501, "no one here")
 })
 
-`, 2,function(arg, frame) {
+`, 3,function(arg, frame) {
         let  listenPort = bs.value2Num(arg, 0);
 
-        if (arg[1].type != bs.TYPE_CLOSURE) {
-            throw new bs.RuntimeException("Callback function expected as second parameter")
+        bs.checkTypeList(arg, 1, [ bs.TYPE_MAP, bs.TYPE_NONE ]);
+
+        let httpOpts = {};
+        if (arg[1].type != bs.TYPE_NONE) {
+            httpOpts = bs.rtValueToJsVal(arg[1]);
         }
 
-        http.createServer(makeHttpServerListener(arg[1], frame)).listen(listenPort);
+        bs.checkType(arg,2, bs.TYPE_CLOSURE);
+        http.createServer(httpOpts, makeHttpServerListener(arg[2], frame)).listen(listenPort);
 
         return bs.VALUE_NONE;
 

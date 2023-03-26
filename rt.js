@@ -232,14 +232,10 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
 
         'send': new bs.BuiltinFunctionValue(``,3, function(arg) {
 
-            let code = arg[0];
+            bs.checkType(arg, 0, bs.TYPE_NUM);
             let textResponse = bs.value2Str(arg, 1);
+
             let contentType = "text/plain"
-
-            if (code.type != bs.TYPE_NUM) {
-                throw new bs.RuntimeException("first argument: expected number")
-            }
-
             if (arg[2] != null) {
                 contentType = bs.value2Str(arg, 2);
             }
@@ -255,14 +251,42 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
 
             //console.log("status: " + code.val + " resp-hdr: " + JSON.stringify(respHeader));
 
-            httpRes.writeHead(parseInt(code.val), respHeader);
+            httpRes.writeHead(parseInt(arg[0].val), respHeader);
             httpRes.write(textResponse);
             httpRes.end();
             //httpRes.end(textResponse);
 
             //console.log("eof send: " + textResponse);
             return bs.VALUE_NONE;
-        }, [null, null, null])
+        }, [,, null]),
+
+        'sendBinary': new bs.BuiltinFunctionValue(``,3, function(arg) {
+
+            bs.checkType(arg, 0, bs.TYPE_BINARY);
+            let binaryResponse = arg[0].val;
+
+            let contentType = "application/octet-stream"
+            if (arg[2] != null) {
+                contentType = bs.value2Str(arg, 2);
+            }
+
+            let respHeader = {};
+
+            if (httpRes.getHeader("Content-Length") == null) {
+                respHeader['Content-length'] = binaryResponse.length.toString();
+            }
+            if (httpRes.getHeader("Content-Type") == null) {
+                respHeader['Content-Type'] = contentType;
+            }
+
+            //console.log("status: " + code.val + " resp-hdr: " + JSON.stringify(respHeader));
+
+            httpRes.writeHead(parseInt(arg[0].val), respHeader);
+            httpRes.write(binaryResponse);
+            httpRes.end();
+
+            return bs.VALUE_NONE;
+        }, [,, null])
     });
 
 
@@ -2407,24 +2431,29 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, resp, e
 opts={}    
 httpServer(9010, opts, def (req,resp) {
  
-    # function is called on each request  
-    # 9010 - listening port
-    # opts - array of options (see later)        
-    # third argument - callback is called upon incoming request.
-    #   Parameters of callback:
-    #       req  - request properties of incoming http request
-    #       resp - send response via send method - resp.send(httpResponseCode, data, mimeType)
+# function is called on each request  
+# 9010 - listening port
+# opts - array of options (see later)        
+# third argument - callback is called upon incoming request.
+#   Parameters of callback:
+#       req  - request properties of incoming http request
+#       resp - object with methods for sending response
+#           resp.setHeader(headerName, headerVal)               # set http header of outgoing reponse (call before send)
+#           resp.send(httpResponseCode, text)                   # send text response with mime type text/plain  
+#           resp.send(httpResponseCode, text, mimeType)         # send binary response with given mime type
+#           resp.sendBinary(httpResponseCode, text)             # send binary response with mime type application/octet-stream  
+#           resp.sendBinary(httpResponseCode, text, mimeType)   # send binary response with given mime type
 
-    # valid values in options
-    #   keepAlive: true - If set to true, it enables sending keep-alive on the client connection, Default: false
-    #   keepAliveInitialDelay <number> -  initial delay before the first keepalive probe (assuming keepAlive: true)
-    #   keepAliveTimeout The number of milliseconds of inactivity a server needs to wait for additional incoming
-    #     data, after it has finished writing the last response, before a socket will be destroyed 
-    #   maxHeaderSize <number> - maximum length of request headers in bytes. Default: 16384 
-    #   noDelay <boolean> - true (default value) - disables the use of Nagle's algorithm on incoming connection
-    #   requestTimeout: Sets the timeout value in milliseconds for receiving the entire request from the client (Default: 300000)
-    #   joinDuplicateHeaders <boolean> It joins the field line values of multiple headers in a request with , instead of 
-    #           discarding the duplicates.
+# valid values in options
+#   keepAlive: true - If set to true, it enables sending keep-alive on the client connection, Default: false
+#   keepAliveInitialDelay <number> -  initial delay before the first keepalive probe (assuming keepAlive: true)
+#   keepAliveTimeout The number of milliseconds of inactivity a server needs to wait for additional incoming
+#     data, after it has finished writing the last response, before a socket will be destroyed 
+#   maxHeaderSize <number> - maximum length of request headers in bytes. Default: 16384 
+#   noDelay <boolean> - true (default value) - disables the use of Nagle's algorithm on incoming connection
+#   requestTimeout: Sets the timeout value in milliseconds for receiving the entire request from the client (Default: 300000)
+#   joinDuplicateHeaders <boolean> It joins the field line values of multiple headers in a request with , instead of 
+#           discarding the duplicates.
     
     println("url: {req.url()}")
     if req.url() == "/time" {

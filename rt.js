@@ -293,6 +293,25 @@ function makeHttpCallbackInvocationParams(httpReq, httpRes, requestData) {
     return [ req_, res_ ];
 }
 
+function prepareHttpsServerOpts(opts) {
+
+    if ('privkeyfile' in opts && 'certfile' in opts) {
+        let privKeyFile = opts.privkeyfile;
+        let privKeyFileData = fs.readFileSync(privKeyFile);
+
+        let certFile = opts.certfile;
+        let certFileData = fs.readFileSync(certFile)
+
+        delete opts.certfile;
+        delete opts.privkeyfile
+
+        opts.key = privKeyFileData;
+        opts.cert = certFileData;
+
+        return true;
+    }
+    return false;
+}
 function makeHttpServerListener(callback, frame, opts, isHttpClear) {
     return function (req, res) {
 
@@ -411,7 +430,7 @@ function httpSendImp(arg, frame, responseAsText) {
                 data += chunk.toString();
             });
             resp.on('end', () => {
-                callUserFunction(data, resp, bs.VALUE_NONE);
+                callUserFunction(data, resp, new bs.Value(bs.TYPE_STR,""));
             });
         };
     } else {
@@ -422,7 +441,7 @@ function httpSendImp(arg, frame, responseAsText) {
             });
             resp.on('end', () => {
                 let buffer  = Buffer.concat(data);
-                callUserFunction(buffer, resp, bs.VALUE_NONE);
+                callUserFunction(buffer, resp, new bs.Value(bs.TYPE_STR,""));
             });
         };
 
@@ -442,7 +461,7 @@ function httpSendImp(arg, frame, responseAsText) {
     }
 
     reqObj.on('error', (e) => {
-        callUserFunction(bs.VALUE_NONE, none, new bs.Value(bs.TYPE_STR, e.message));
+        callUserFunction(bs.VALUE_NONE, bs.VALUE_NONE, new bs.Value(bs.TYPE_STR, e.message));
     });
 
 
@@ -2427,7 +2446,7 @@ httpSend('http://127.0.0.1:9010/abcd', options, def(statusCode, headers, resp, e
 
     "httpServer": new bs.BuiltinFunctionValue(` 
 
-# listen for incoming http requests on port 9010. 
+# starts http or https server (depending on option argument) 
 opts={}    
 httpServer(9010, opts, def (req,resp) {
  
@@ -2444,7 +2463,14 @@ httpServer(9010, opts, def (req,resp) {
 #           resp.sendBinary(httpResponseCode, text)             # send binary response with mime type application/octet-stream  
 #           resp.sendBinary(httpResponseCode, text, mimeType)   # send binary response with given mime type
 
+
 # valid values in options
+
+# for https server set the following option:# for 
+#  privkeyfile: filename with private key in PEM encoding
+#  certfile:    filename with server certificate in PEM encoding
+
+# options common to http and https servers
 #   keepAlive: true - If set to true, it enables sending keep-alive on the client connection, Default: false
 #   keepAliveInitialDelay <number> -  initial delay before the first keepalive probe (assuming keepAlive: true)
 #   keepAliveTimeout The number of milliseconds of inactivity a server needs to wait for additional incoming
@@ -2486,7 +2512,24 @@ requestData: {req.requestData()}
         }
 
         bs.checkType(arg,2, bs.TYPE_CLOSURE);
-        http.createServer(httpOpts, makeHttpServerListener(arg[2], frame)).listen(listenPort);
+        if (prepareHttpsServerOpts(httpOpts)) {
+            if (https==null) {
+                throw new bs.RuntimeException("https not supported by this nodejs instance");
+            }
+            // check if NODE_TLS_REJECT_UNAUTHORIZED is set - the frame env variables are not synced with process.env
+            let [val, _ ] = frame.lookup("ENV");
+
+            if (val != null || val.type == bs.TYPE_MAP) {
+                let eval = val.val['NODE_TLS_REJECT_UNAUTHORIZED'];
+                if (eval != null) {
+                    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = eval.val;
+                }
+            }
+
+            https.createServer(httpOpts, makeHttpServerListener(arg[2], frame)).listen(listenPort);
+        } else {
+            http.createServer(httpOpts, makeHttpServerListener(arg[2], frame)).listen(listenPort);
+        }
 
         return bs.VALUE_NONE;
 

@@ -68,6 +68,7 @@ fileName: tests/22-throw-catch.p fileType: file
 fileName: tests/23-throw-from-catch-with-finally.p fileType: file
 fileName: tests/24-object-access.p fileType: file
 fileName: tests/25-http.p fileType: file
+fileName: tests/25-https.p fileType: file
 fileName: tests/26-no-redefine-builtin-func.p fileType: file
 fileName: tests/27-binary-search-rec.p fileType: file
 fileName: tests/27-binary-search.p fileType: file

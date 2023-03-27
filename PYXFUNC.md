@@ -1425,7 +1425,7 @@ function: <b>httpServer</b>
 ```python
  
 
-# listen for incoming http requests on port 9010. 
+# starts http or https server (depending on option argument) 
 opts={}    
 httpServer(9010, opts, def (req,resp) {
  
@@ -1442,7 +1442,14 @@ httpServer(9010, opts, def (req,resp) {
 #           resp.sendBinary(httpResponseCode, text)             # send binary response with mime type application/octet-stream  
 #           resp.sendBinary(httpResponseCode, text, mimeType)   # send binary response with given mime type
 
+
 # valid values in options
+
+# for https server set the following option:# for 
+#  privkeyfile: filename with private key in PEM encoding
+#  certfile:    filename with server certificate in PEM encoding
+
+# options common to http and https servers
 #   keepAlive: true - If set to true, it enables sending keep-alive on the client connection, Default: false
 #   keepAliveInitialDelay <number> -  initial delay before the first keepalive probe (assuming keepAlive: true)
 #   keepAliveTimeout The number of milliseconds of inactivity a server needs to wait for additional incoming

@@ -1,8 +1,9 @@
- * Next release
+ * PYX 0.4.1 / PRS 0.0.4  
    * reduce, reduceFromEnd - accept both user defined and runtime library functions as actions.
    * exit - add optional message before exit
    * httpServer - add options argument (to set timeouts, etc)
    *    allow sending of binary response, update docs
+   * support https servers, add unit test
 
  * PYX 0.4.0 / PRS 0.0.4  
    * add endsWith function to rt

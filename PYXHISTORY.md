@@ -1,3 +1,6 @@
+ * next release
+   * allow // as start of comment (not just #)
+
  * PYX 0.4.1 / PRS 0.0.4  
    * reduce, reduceFromEnd - accept both user defined and runtime library functions as actions.
    * exit - add optional message before exit

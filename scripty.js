@@ -104,7 +104,7 @@ function skipComments(state) {
         }
 
         let ch = state.data.charAt(state.pos);
-        if (ch == '#' || (ch == '/' && state.data.charAt(state.pos+1) == '/'))   {
+        if (ch == '#' || (ch == '/' && state.pos < (state.data.length-1) && state.data.charAt(state.pos+1) == '/'))   {
             while (state.pos < state.data.length) {
                 ch = state.data.charAt(state.pos);
                 if (ch == '\r' || ch == '\n')

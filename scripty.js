@@ -104,16 +104,17 @@ function skipComments(state) {
         }
 
         let ch = state.data.charAt(state.pos);
-        if (ch != '#' && (ch != '/' && state.data.charAt(state.pos+1) != '/'))   {
-            break
+        if (ch == '#' || (ch == '/' && state.data.charAt(state.pos+1) == '/'))   {
+            while (state.pos < state.data.length) {
+                ch = state.data.charAt(state.pos);
+                if (ch == '\r' || ch == '\n')
+                    break
+                state.pos += 1;
+            }
+        } else {
+           break
         }
 
-        while (state.pos < state.data.length) {
-            ch = state.data.charAt(state.pos);
-            if (ch == '\r' || ch == '\n')
-                break
-            state.pos += 1;
-        }
     }
 }
 

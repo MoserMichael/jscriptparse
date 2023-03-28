@@ -1,3 +1,6 @@
+// can have comments like this
+# and comments like this. (i think that's a good feature)
+
 tosearch=[2, 4, 5, 7, 9, 10, 12, 14, 15, 17]
 
 def binarySearch(tosearch, findme) {

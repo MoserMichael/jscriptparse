@@ -149,6 +149,8 @@ Now, from the command line: Install the pyx shell with the following command
 
 ```npm install pyxlang -g```
 
+On Windows one also needs to set the execution policy, by running ```Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser``` 
+
 Now run the shell 
 
 ```pyx```

@@ -225,6 +225,27 @@ Map access
 
 Lists/Arrays
 
+    In javascript an array access that is out of bound gives you 'undefined' - in python that throws an error (i think that is more correct)
+
+        node
+        Welcome to Node.js v18.16.1.
+        Type ".help" for more information.
+        > a=[1]
+        [ 1 ]
+        > a[2]
+        undefined
+        >
+
+        python
+        Python 3.7.13 (default, Sep 29 2022, 10:34:32)
+        [Clang 14.0.0 (clang-1400.0.29.102)] on darwin
+        Type "help", "copyright", "credits" or "license" for more information.
+        >>> a=[1]
+        >>> a[2]
+        Traceback (most recent call last):
+          File "<stdin>", line 1, in <module>
+        IndexError: list index out of range
+
     basic usage 
 
         node

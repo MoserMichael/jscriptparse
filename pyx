@@ -1,4 +1,4 @@
-#!/usr/bin/env NODE_PATH=. node 
+#!/usr/bin/env -S NODE_PATH=. node
 
 const os=require("os");
 const fs=require("fs");
